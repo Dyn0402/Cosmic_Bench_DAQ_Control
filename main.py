@@ -10,7 +10,7 @@ Created as Cosmic_Bench_DAQ_Control/main.py
 
 import os
 from time import sleep
-from HVPyWrapper import HVPyWrapper
+from caen_hv_py.CAENHVController import CAENHVController
 
 
 def main():
@@ -69,6 +69,7 @@ def main():
 
     for sub_run in sub_runs:
         set_hvs(sub_run['hvs'], hv_info)
+        # Start DAQ
 
     print('donzo')
 
@@ -80,14 +81,14 @@ def create_dir_if_not_exist(dir_path):
 
 def set_hvs(hv_info, hvs):
     ip_address, username, password = hv_info['hv_ip_address'], hv_info['hv_username'], hv_info['hv_password']
-    with HVPyWrapper(ip_address, username, password) as hv_wrapper:
+    with CAENHVController(ip_address, username, password) as caen_hv:
         for slot_channel, v0 in hvs.items():
             slot, channel = slot_channel.split('_')
             slot, channel = int(slot), int(channel)
-            hv_wrapper.set_ch_v0(slot, channel, v0)
-            power = hv_wrapper.get_ch_power(slot, channel)
+            caen_hv.set_ch_v0(slot, channel, v0)
+            power = caen_hv.get_ch_power(slot, channel)
             if not power:
-                hv_wrapper.set_ch_pw(slot, channel, 1)
+                caen_hv.set_ch_pw(slot, channel, 1)
 
         all_ramped = False
         while not all_ramped:
@@ -95,7 +96,7 @@ def set_hvs(hv_info, hvs):
             for slot_channel, v0 in hvs.items():
                 slot, channel = slot_channel.split('_')
                 slot, channel = int(slot), int(channel)
-                vmon = hv_wrapper.get_ch_vmon(slot, channel)
+                vmon = caen_hv.get_ch_vmon(slot, channel)
                 if abs(vmon - v0) > 1.5:  # Make sure within 1.5 V of set value
                     all_ramped = False
                     break
