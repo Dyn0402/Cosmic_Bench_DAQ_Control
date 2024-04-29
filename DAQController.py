@@ -40,7 +40,7 @@ class DAQController:
             if output == '' and process.poll() is not None:
                 break
             if output.strip() == '***':
-                process.stdin.write('G\n')
+                process.stdin.write('G')
                 process.stdin.flush()  # Ensure the command is sent immediately
             outputs.append(output)
         for out_i, output in enumerate(outputs):
