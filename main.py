@@ -10,10 +10,18 @@ Created as Cosmic_Bench_DAQ_Control/main.py
 
 import os
 from time import sleep
+
 from caen_hv_py.CAENHVController import CAENHVController
+from DAQController import DAQController
 
 
 def main():
+    # run_daq()
+    test_daq_controller()
+    print('donzo')
+
+
+def run_daq():
     run_name = 'test_run'
     input_fdf_dir = '/mnt/nas_clas12/DATA/CosmicBench/2024/W05/'
     input_dir = f'{input_fdf_dir}{run_name}/'
@@ -71,7 +79,13 @@ def main():
         set_hvs(sub_run['hvs'], hv_info)
         # Start DAQ
 
-    print('donzo')
+
+def test_daq_controller():
+    cfg_file_name = 'CosmicTb_TPOT.cfg'
+    out_name = 'test_py_communication'
+    run_dir = '/local/home/usernsw/dylan/test_run/'
+    daq_controller = DAQController(cfg_file_name, out_name, run_dir)
+    daq_controller.run()
 
 
 def create_dir_if_not_exist(dir_path):
