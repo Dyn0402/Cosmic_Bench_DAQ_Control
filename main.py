@@ -23,6 +23,7 @@ def main():
 
 def run_daq():
     run_name = 'test_run'
+    # input_fdf_dir = '/mnt/nas_clas12/DATA/CosmicBench/2024/W05/'
     input_fdf_dir = '/mnt/nas_clas12/DATA/CosmicBench/2024/W05/'
     input_dir = f'{input_fdf_dir}{run_name}/'
     create_dir_if_not_exist(input_dir)
@@ -34,6 +35,8 @@ def run_daq():
     signal_run_dir = f'{output_dir}signal/'
     tracking_sh_file = f'{output_dir}tracking/run_tracking_single.sh'
     signal_sh_file = f'{output_dir}signal/run_data_reader_single.sh'
+
+
 
     hv_info = {
         'hv_lib_path': 'hv_c_lib/libhv_c.so',

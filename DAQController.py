@@ -18,6 +18,8 @@ class DAQController:
         self.run_directory = run_directory  # Relative to run_directory if not None
         self.original_working_directory = os.getcwd()
 
+        self.max_run_time = 30  # minutes After this time assume stuck and kill
+
         if out_name is None:
             self.run_command = f'RunCtrl -c {cfg_file_path}'
         else:
@@ -33,36 +35,33 @@ class DAQController:
         if self.run_directory is not None:
             os.chdir(self.run_directory)
         process = Popen(self.run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
-        outputs = []
         start = time()
-        run_time = 0
-        sent_go, sent_continue = False, False
+        sent_go, sent_continue, run_successful = False, False, True
         while True:
             if sent_continue:
                 sleep(1)
             output = process.stdout.readline()
             if output == '' and process.poll() is not None:
-                outputs.append('DAQ process finished.')
+                print('DAQ process finished.')
                 break
             if not sent_go and output.strip() == '***':
-                ' Got the stars. Writing G.'
-                outputs.append(' Got the stars. Writing G.')
+                print(' Got the stars. Writing G.')
                 process.stdin.write('G')
                 process.stdin.flush()  # Ensure the command is sent immediately
                 sent_go = True
             elif not sent_continue and 'Press C to Continue' in output.strip():
                 print(' Got the continue. Writing C.')
-                outputs.append(' Got the continue. Writing C.')
                 process.stdin.write('C')
                 process.stdin.flush()
-            run_time = time() - start
-            outputs.append(f'{run_time}s: {output.strip()}')
             if output.strip() != '':
                 print(output.strip())
-        with open('output.txt', 'w') as file:
-            file.writelines(outputs)
-            # for output in outputs:
-            #     file.write(f'Out #{out_i}: {output}\n')
+            if time() - start > self.max_run_time * 60:
+                print('DAQ process timed out.')
+                process.kill()
+                run_successful = False
+                break
         os.chdir(self.original_working_directory)
+
+        return run_successful
 
 
