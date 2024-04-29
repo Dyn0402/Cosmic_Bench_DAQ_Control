@@ -39,6 +39,7 @@ class DAQController:
             if output == '' and process.poll() is not None:
                 break
             outputs.append(output)
+            sleep(1)
         for out_i, output in enumerate(outputs):
             print(f'Out #{out_i}: {output}')
         os.chdir(self.original_working_directory)
