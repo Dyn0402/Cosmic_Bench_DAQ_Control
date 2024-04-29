@@ -40,9 +40,10 @@ class DAQController:
             if output == '' and process.poll() is not None:
                 break
             if output.strip() == '***':
+                outputs.append(' Got the stars. Writing G.')
                 process.stdin.write('G')
                 process.stdin.flush()  # Ensure the command is sent immediately
-            outputs.append(output.strip())
+            outputs.append(output)
         with open('output.txt', 'w') as file:
             for out_i, output in enumerate(outputs):
                 file.write(f'Out #{out_i}: {output}')
