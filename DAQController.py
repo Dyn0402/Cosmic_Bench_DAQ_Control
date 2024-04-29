@@ -36,23 +36,33 @@ class DAQController:
         outputs = []
         start = time()
         run_time = 0
-        sent_go = False
-        while run_time < 80:
+        sent_go, sent_continue = False, False
+        while True:
+            if sent_continue:
+                sleep(1)
             output = process.stdout.readline()
             if output == '' and process.poll() is not None:
+                outputs.append('DAQ process finished.')
                 break
             if not sent_go and output.strip() == '***':
+                ' Got the stars. Writing G.'
                 outputs.append(' Got the stars. Writing G.')
                 process.stdin.write('G')
                 process.stdin.flush()  # Ensure the command is sent immediately
                 sent_go = True
-            outputs.append(output.strip())
+            elif not sent_continue and 'Press C to Continue' in output.strip():
+                print(' Got the continue. Writing C.')
+                outputs.append(' Got the continue. Writing C.')
+                process.stdin.write('C')
+                process.stdin.flush()
+            run_time = time() - start
+            outputs.append(f'{run_time}s: {output.strip()}')
             if output.strip() != '':
                 print(output.strip())
-            run_time = time() - start
         with open('output.txt', 'w') as file:
-            for out_i, output in enumerate(outputs):
-                file.write(f'Out #{out_i}: {output}\n')
+            file.writelines(outputs)
+            # for output in outputs:
+            #     file.write(f'Out #{out_i}: {output}\n')
         os.chdir(self.original_working_directory)
 
 
