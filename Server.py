@@ -31,6 +31,7 @@ class Server:
         print('Server closed')
 
     def start(self):
+        self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # Allow immediate reuse of address
         self.server.bind((self.server_host, self.port))
         self.server.listen(1)
         print(f"Listening on {self.server_host}:{self.port}")
