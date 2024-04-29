@@ -35,8 +35,8 @@ class DAQController:
         process = Popen(self.run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
         outputs = []
         start = time()
-        run_time = time() - start
-        while run_time < 30:
+        run_time = 0
+        while run_time < 45:
             output = process.stdout.readline()
             if output == '' and process.poll() is not None:
                 break
@@ -45,6 +45,7 @@ class DAQController:
                 process.stdin.write('G')
                 process.stdin.flush()  # Ensure the command is sent immediately
             outputs.append(output.strip())
+            run_time = time() - start
         with open('output.txt', 'w') as file:
             for out_i, output in enumerate(outputs):
                 file.write(f'Out #{out_i}: {output}\n')

@@ -12,7 +12,7 @@ from DAQController import DAQController
 
 
 def main():
-    cfg_file_name = 'CosmicTb_TPOT.cfg'
+    cfg_file_name = '../CosmicTb_TPOT.cfg'
     out_name = 'test_py_communication'
     run_dir = '/home/clas12/dylan/Run/remote_test_dir/'
     daq_controller = DAQController(cfg_file_name, out_name, run_dir)
