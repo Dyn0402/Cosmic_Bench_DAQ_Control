@@ -33,12 +33,14 @@ class DAQController:
         if self.run_directory is not None:
             os.chdir(self.run_directory)
         process = Popen(self.run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
-        while True:
+        outputs = []
+        for i in range(10):
             output = process.stdout.readline()
             if output == '' and process.poll() is not None:
                 break
-            if output:
-                print(output.strip())
+            outputs.append(output)
+        for out_i, output in enumerate(outputs):
+            print(f'Out #{out_i}: {output}')
         os.chdir(self.original_working_directory)
 
 
