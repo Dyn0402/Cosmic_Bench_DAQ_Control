@@ -35,6 +35,7 @@ def main():
                 daq_controller = DAQController(config.daq_config_path, sub_run_name, config.run_dir)
                 daq_controller.run()
                 print('DAQ Done')
+        client.send(f'Finished')
     print('donzo')
 
 
