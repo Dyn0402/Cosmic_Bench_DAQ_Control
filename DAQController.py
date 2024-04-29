@@ -36,15 +36,19 @@ class DAQController:
         outputs = []
         start = time()
         run_time = 0
-        while run_time < 45:
+        sent_go = False
+        while run_time < 80:
             output = process.stdout.readline()
             if output == '' and process.poll() is not None:
                 break
-            if output.strip() == '***':
+            if not sent_go and output.strip() == '***':
                 outputs.append(' Got the stars. Writing G.')
                 process.stdin.write('G')
                 process.stdin.flush()  # Ensure the command is sent immediately
+                sent_go = True
             outputs.append(output.strip())
+            if output.strip() != '':
+                print(output.strip())
             run_time = time() - start
         with open('output.txt', 'w') as file:
             for out_i, output in enumerate(outputs):
