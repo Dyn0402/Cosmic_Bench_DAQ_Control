@@ -47,12 +47,12 @@ class Server:
                 time.sleep(1)
 
     def receive(self):
-        data = self.server.recv(1024).decode()
+        data = self.client_socket.recv(1024).decode()
         print(f"Received: {data}")
         return data
 
     def send(self, data):
-        self.server.send(data.encode())
+        self.client_socket.send(data.encode())
         print(f"Sent: {data}")
 
     def wait_for_response(self, timeout=100, check_interval=1):
