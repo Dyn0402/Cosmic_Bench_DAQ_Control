@@ -15,7 +15,8 @@ from caen_hv_py.CAENHVController import CAENHVController
 def main():
     port = 1100
     with Server(port=port) as server:
-        res = server.wait_for_response()
+        # res = server.wait_for_response()
+        res = server.receive()
         print(res)
         server.send('Hello there')
     print('donzo')

@@ -18,7 +18,8 @@ def main():
     server_ip, port = '192.168.10.1', 1100
     with Client(server_ip, port=port) as client:
         client.send('Hello')
-        res = client.wait_for_response()
+        # res = client.wait_for_response()
+        res = client.receive()
         print(res)
     print('donzo')
 
