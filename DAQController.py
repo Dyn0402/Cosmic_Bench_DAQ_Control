@@ -42,9 +42,10 @@ class DAQController:
             if output.strip() == '***':
                 process.stdin.write('G')
                 process.stdin.flush()  # Ensure the command is sent immediately
-            outputs.append(output)
-        for out_i, output in enumerate(outputs):
-            print(f'Out #{out_i}: {output}')
+            outputs.append(output.strip())
+        with open('output.txt', 'w') as file:
+            for out_i, output in enumerate(outputs):
+                file.write(f'Out #{out_i}: {output}')
         os.chdir(self.original_working_directory)
 
 
