@@ -19,6 +19,7 @@ class Server:
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client_socket = None
         self.client_address = None
+        self.max_recv = 1024 * 1000  # Max bytes to receive
 
     def __enter__(self):
         self.start()
@@ -48,19 +49,10 @@ class Server:
                 time.sleep(1)
 
     def receive(self):
-        data = self.client_socket.recv(1024).decode()
+        data = self.client_socket.recv(self.max_recv).decode()
         print(f"Received: {data}")
         return data
 
     def send(self, data):
         self.client_socket.send(data.encode())
         print(f"Sent: {data}")
-
-    def wait_for_response(self, timeout=100, check_interval=1):
-        start = time.time()
-        while time.time() - start < timeout:
-            data = self.receive()
-            if data != '':
-                return data
-            time.sleep(check_interval)
-        return None
