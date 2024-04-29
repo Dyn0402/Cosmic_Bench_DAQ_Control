@@ -34,19 +34,20 @@ class DAQController:
             os.chdir(self.run_directory)
         process = Popen(self.run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
         outputs = []
-        for i in range(30):
+        start = time()
+        run_time = time() - start
+        while run_time < 30:
             output = process.stdout.readline()
-            sleep(1)
             if output == '' and process.poll() is not None:
                 break
             if output.strip() == '***':
                 outputs.append(' Got the stars. Writing G.')
                 process.stdin.write('G')
                 process.stdin.flush()  # Ensure the command is sent immediately
-            outputs.append(output)
+            outputs.append(output.strip())
         with open('output.txt', 'w') as file:
             for out_i, output in enumerate(outputs):
-                file.write(f'Out #{out_i}: {output}')
+                file.write(f'Out #{out_i}: {output}\n')
         os.chdir(self.original_working_directory)
 
 
