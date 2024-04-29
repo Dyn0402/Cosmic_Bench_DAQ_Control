@@ -34,12 +34,15 @@ class DAQController:
             os.chdir(self.run_directory)
         process = Popen(self.run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
         outputs = []
-        for i in range(10):
+        for i in range(60):
             output = process.stdout.readline()
+            sleep(1)
             if output == '' and process.poll() is not None:
                 break
+            if output.strip() == '***':
+                process.stdin.write('G\n')
+                process.stdin.flush()  # Ensure the command is sent immediately
             outputs.append(output)
-            sleep(1)
         for out_i, output in enumerate(outputs):
             print(f'Out #{out_i}: {output}')
         os.chdir(self.original_working_directory)
