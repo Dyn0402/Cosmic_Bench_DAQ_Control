@@ -65,12 +65,14 @@ def set_hvs(hv_info, hvs):
 
 def power_off_hvs(hv_info):
     ip_address, username, password = hv_info['hv_ip_address'], hv_info['hv_username'], hv_info['hv_password']
+    print('Powering off HV...')
     with CAENHVController(ip_address, username, password) as caen_hv:
         for slot in range(hv_info['n_cards']):
             for channel in range(hv_info['n_channels_per_card']):
                 power = caen_hv.get_ch_power(slot, channel)
                 if power:
                     caen_hv.set_ch_pw(slot, channel, 0)
+    print('HV Powered Off')
 
 
 if __name__ == '__main__':
