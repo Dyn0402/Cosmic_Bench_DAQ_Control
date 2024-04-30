@@ -11,7 +11,7 @@ Created as Cosmic_Bench_DAQ_Control/run_config.py
 
 class Config:
     def __init__(self):
-        self.run_name = 'test_run'
+        self.run_name = 'm3_hv_scan'
         self.daq_dir = '/home/clas12/dylan/Run/'
         self.run_dir = f'{self.daq_dir}{self.run_name}/'
         self.daq_config_path = '../CosmicTb_TPOT.cfg'
@@ -25,6 +25,94 @@ class Config:
         }
 
         self.sub_runs = [
+            {
+                'sub_run_name': 'mesh440',
+                'hvs': {
+                    0: {
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500
+                    },
+                    3: {
+                        8: 440,
+                        9: 440,
+                        10: 440,
+                        11: 440
+                    }
+                }
+            },
+            {
+                'sub_run_name': 'mesh445',
+                'hvs': {
+                    0: {
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500
+                    },
+                    3: {
+                        8: 445,
+                        9: 445,
+                        10: 445,
+                        11: 445
+                    }
+                }
+            },
+            {
+                'sub_run_name': 'mesh450',
+                'hvs': {
+                    0: {
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500
+                    },
+                    3: {
+                        8: 450,
+                        9: 450,
+                        10: 450,
+                        11: 450
+                    }
+                }
+            },
+            {
+                'sub_run_name': 'mesh455',
+                'hvs': {
+                    0: {
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500
+                    },
+                    3: {
+                        8: 455,
+                        9: 455,
+                        10: 455,
+                        11: 455
+                    }
+                }
+            },
+            {
+                'sub_run_name': 'mesh460',
+                'hvs': {
+                    0: {
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500
+                    },
+                    3: {
+                        8: 460,
+                        9: 460,
+                        10: 460,
+                        11: 460
+                    }
+                }
+            },
+        ]
+
+        self.sub_runs_test = [
             {
                 'sub_run_name': 'sub_run_0',
                 'run_time': 10,
