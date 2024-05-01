@@ -9,7 +9,7 @@ Created as Cosmic_Bench_DAQ_Control/trigger_switch_control.py
 """
 
 from Server import Server
-from RPi.GPIO import GPIO
+import RPi.GPIO as GPIO
 
 
 def main():

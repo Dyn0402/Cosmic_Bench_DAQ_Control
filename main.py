@@ -13,11 +13,13 @@ from time import sleep
 
 from caen_hv_py.CAENHVController import CAENHVController
 from DAQController import DAQController
+from Client import Client
 
 
 def main():
     # run_daq()
-    test_daq_controller()
+    # test_daq_controller()
+    test_trigger_switch()
     print('donzo')
 
 
@@ -118,6 +120,30 @@ def set_hvs(hv_info, hvs):
                     all_ramped = False
                     break
             sleep(10)  # Make sure not to wait too long, after 15s crate times out
+
+
+def test_trigger_switch():
+    trigger_switch_ip, trigger_switch_port = '192.168.1.21', 1100
+    with Client(trigger_switch_ip, trigger_switch_port) as trigger_switch_client:
+        trigger_switch_client.send('Connected to daq_control')
+        sleep(2)
+        trigger_switch_client.receive()
+        sleep(2)
+        trigger_switch_client.send('off')
+        sleep(2)
+        trigger_switch_client.receive()
+        sleep(2)
+        trigger_switch_client.send('on')
+        sleep(2)
+        trigger_switch_client.receive()
+        sleep(2)
+        trigger_switch_client.send('off')
+        sleep(2)
+        trigger_switch_client.receive()
+        sleep(2)
+        trigger_switch_client.send('Finished')
+        sleep(2)
+        trigger_switch_client.receive()
 
 
 if __name__ == '__main__':
