@@ -15,6 +15,7 @@ class Config:
         self.daq_dir = '/home/clas12/dylan/Run/'
         self.run_dir = f'{self.daq_dir}{self.run_name}/'
         self.daq_config_path = '../CosmicTb_TPOT.cfg'
+        self.banco_daq_run_path = '/home/banco/Test_Beam/framework/bin/test_multi_noiseocc_int'
 
         self.hv_info = {
             'hv_ip_address': '192.168.10.81',
@@ -27,6 +28,7 @@ class Config:
         self.sub_runs = [
             {
                 'sub_run_name': 'mesh440',
+                'run_time': 10,  # Minutes
                 'hvs': {
                     0: {
                         8: 500,
@@ -44,6 +46,7 @@ class Config:
             },
             {
                 'sub_run_name': 'mesh445',
+                'run_time': 10,  # Minutes
                 'hvs': {
                     0: {
                         8: 500,
@@ -61,6 +64,7 @@ class Config:
             },
             {
                 'sub_run_name': 'mesh450',
+                'run_time': 10,  # Minutes
                 'hvs': {
                     0: {
                         8: 500,
@@ -78,6 +82,7 @@ class Config:
             },
             {
                 'sub_run_name': 'mesh455',
+                'run_time': 10,  # Minutes
                 'hvs': {
                     0: {
                         8: 500,
@@ -95,6 +100,7 @@ class Config:
             },
             {
                 'sub_run_name': 'mesh460',
+                'run_time': 10,  # Minutes
                 'hvs': {
                     0: {
                         8: 500,

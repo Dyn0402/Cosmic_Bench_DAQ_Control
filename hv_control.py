@@ -20,9 +20,8 @@ def main():
     config = Config()
     port = 1100
     with Server(port=port) as server:
-        res = server.receive()
-        print(res)
-        server.send('Hello there')
+        server.receive()
+        server.send('HV control connected')
 
         res = server.receive()
         while 'Finished' not in res:
