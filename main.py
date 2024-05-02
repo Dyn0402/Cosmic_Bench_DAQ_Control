@@ -123,26 +123,27 @@ def set_hvs(hv_info, hvs):
 
 
 def test_trigger_switch():
-    trigger_switch_ip, trigger_switch_port = '192.168.1.21', 1100
+    trigger_switch_ip, trigger_switch_port = '169.254.91.5', 1100
+    pause = 10  # seconds
     with Client(trigger_switch_ip, trigger_switch_port) as trigger_switch_client:
         trigger_switch_client.send('Connected to daq_control')
-        sleep(2)
+        sleep(pause)
         trigger_switch_client.receive()
-        sleep(2)
+        sleep(pause)
         trigger_switch_client.send('off')
-        sleep(2)
+        sleep(pause)
         trigger_switch_client.receive()
-        sleep(2)
+        sleep(pause)
         trigger_switch_client.send('on')
-        sleep(2)
+        sleep(pause)
         trigger_switch_client.receive()
-        sleep(2)
+        sleep(pause)
         trigger_switch_client.send('off')
-        sleep(2)
+        sleep(pause)
         trigger_switch_client.receive()
-        sleep(2)
+        sleep(pause)
         trigger_switch_client.send('Finished')
-        sleep(2)
+        sleep(pause)
         trigger_switch_client.receive()
 
 
