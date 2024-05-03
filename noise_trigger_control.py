@@ -10,12 +10,13 @@ Created as Cosmic_Bench_DAQ_Control/noise_trigger_control
 
 
 from time import time, sleep
+from random import random
 from Client import Client
 
 
 def main():
-    n_triggers = 500
-    trig_high_pause, inter_trig_pause = 1, 1  # ms
+    n_triggers = 50000
+    trig_width, inter_trig_pause, inter_trig_rand_pause = 0.1, 0.5, 0.1  # ms
     trigger_switch_ip, trigger_switch_port = '169.254.91.5', 1100
     with Client(trigger_switch_ip, trigger_switch_port) as trigger_switch_client:
         trigger_switch_client.send('Connected to daq_control')
@@ -23,10 +24,11 @@ def main():
         for trig_i in range(n_triggers):
             trigger_switch_client.send('on')
             trigger_switch_client.receive()
-            sleep(trig_high_pause / 1000)
+            sleep(trig_width / 1000)
             trigger_switch_client.send('off')
             trigger_switch_client.receive()
-            sleep(inter_trig_pause / 1000)
+            pause = inter_trig_pause + inter_trig_rand_pause * random()
+            sleep(pause / 1000)
         trigger_switch_client.send('Finished')
         trigger_switch_client.receive()
 
