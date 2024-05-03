@@ -36,6 +36,7 @@ def main():
         create_dir_if_not_exist(config.run_dir)
         for sub_run in config.sub_runs:
             trigger_switch_client.send('off')  # Turn off trigger to make sure daqs are synced
+            trigger_switch_client.receive()
             sub_run_name = sub_run['sub_run_name']
             hv_client.send(f'Start {sub_run_name}')
             res = hv_client.receive()

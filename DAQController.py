@@ -60,6 +60,7 @@ class DAQController:
                 process.stdin.flush()
                 sleep(5)
                 trigger_switch_client.send('on')
+                trigger_switch_client.receive()
                 run_start = time()
             if output.strip() != '':
                 print(output.strip())
