@@ -15,8 +15,8 @@ from Client import Client
 
 
 def main():
-    n_triggers = 50000
-    trig_width, inter_trig_pause, inter_trig_rand_pause = 0.1, 0.5, 0.1  # ms
+    n_triggers = 5000
+    trig_width, inter_trig_pause, inter_trig_rand_pause = 0.01, 1, 0.5  # ms
     trigger_switch_ip, trigger_switch_port = '169.254.91.5', 1100
     with Client(trigger_switch_ip, trigger_switch_port) as trigger_switch_client:
         trigger_switch_client.send('Connected to daq_control')
