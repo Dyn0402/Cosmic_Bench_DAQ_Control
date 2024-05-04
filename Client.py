@@ -10,6 +10,7 @@ Created as Cosmic_Bench_DAQ_Control/Client.py
 
 import socket
 import time
+import json
 
 
 class Client:
@@ -42,6 +43,20 @@ class Client:
         print(f"Received: {data}")
         return data
 
+    def receive_json(self):
+        data = b''
+        while True:
+            packet = self.client.recv(self.max_recv)
+            data += packet
+            if len(packet) < self.max_recv:
+                break
+        data = json.loads(data.decode())
+        return data
+
     def send(self, data):
         self.client.send(data.encode())
+        print(f"Sent: {data}")
+
+    def send_json(self, data):
+        self.client.sendall(data.encode())
         print(f"Sent: {data}")
