@@ -29,14 +29,16 @@ class Client:
         print('Client closed')
 
     def start(self):
-        while True:
-            try:
-                self.client.connect((self.host, self.port))
-                print(f"Connected to {self.host}:{self.port}")
-                break
-            except ConnectionRefusedError:
-                print(f"Failed to connect to {self.host}:{self.port}. Retrying...")
-                time.sleep(1)
+        # while True:
+        try:
+            self.client.connect((self.host, self.port))
+            print(f"Connected to {self.host}:{self.port}")
+            # break
+        except ConnectionRefusedError or OSError:
+            # print(f"Failed to connect to {self.host}:{self.port}. Retrying...")
+            # time.sleep(1)
+            print(f"Failed to connect to {self.host}:{self.port}.")
+            self.client = None
 
     def receive(self):
         data = self.client.recv(self.max_recv).decode()
