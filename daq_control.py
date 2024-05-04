@@ -29,10 +29,10 @@ def main():
         hv_client.receive()
         hv_client.send_json(config.hv_info)
 
-        trigger_switch_client.send('Connected to daq_control')
-        trigger_switch_client.receive()
-
         if banco:
+            trigger_switch_client.send('Connected to daq_control')
+            trigger_switch_client.receive()
+
             banco_daq_client.send('Connected to daq_control')
             banco_daq_client.receive()
             banco_daq_client.send_json(config.banco_info)
@@ -42,8 +42,9 @@ def main():
             sub_run_name = sub_run['sub_run_name']
             sub_dir = f'{config.run_dir}{sub_run_name}/'
             create_dir_if_not_exist(sub_dir)
-            trigger_switch_client.send('off')  # Turn off trigger to make sure daqs are synced
-            trigger_switch_client.receive()
+            if banco:
+                trigger_switch_client.send('off')  # Turn off trigger to make sure daqs are synced
+                trigger_switch_client.receive()
             # sub_run_name = sub_run['sub_run_name']
             # hv_client.send(f'Start {sub_run_name}')
             hv_client.send('Start')
@@ -55,7 +56,10 @@ def main():
                     banco_daq_client.receive()
 
                 daq_controller = DAQController(config.daq_config_path, sub_run['run_time'], sub_run_name, sub_dir)
-                daq_controller.run(trigger_switch_client)
+                if banco:
+                    daq_controller.run(trigger_switch_client)
+                else:
+                    daq_controller.run()
 
                 if banco:
                     banco_daq_client.send('Stop')

@@ -32,7 +32,7 @@ class DAQController:
     def __exit__(self, exc_type, exc_val, exc_tb):
         os.chdir(self.original_working_directory)
 
-    def run(self, trigger_switch_client):
+    def run(self, trigger_switch_client=None):
         if self.run_directory is not None:
             os.chdir(self.run_directory)
         process = Popen(self.run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
@@ -58,9 +58,10 @@ class DAQController:
                 print(' Got the continue. Writing C.')
                 process.stdin.write('C')  # Signal to start data taking
                 process.stdin.flush()
-                sleep(5)
-                trigger_switch_client.send('on')
-                trigger_switch_client.receive()
+                if trigger_switch_client is not None:
+                    sleep(5)
+                    trigger_switch_client.send('on')
+                    trigger_switch_client.receive()
                 run_start = time()
             if output.strip() != '':
                 print(output.strip())
