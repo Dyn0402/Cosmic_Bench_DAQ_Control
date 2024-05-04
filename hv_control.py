@@ -17,25 +17,30 @@ from run_config import Config
 
 
 def main():
-    config = Config()
+    # config = Config()
     port = 1100
     with Server(port=port) as server:
         server.receive()
         server.send('HV control connected')
+        hv_info = server.receive_json()
 
         res = server.receive()
         while 'Finished' not in res:
             if 'Start' in res:
-                sub_run_name = res.split()[1]
-                for sub_run in config.sub_runs:
-                    if sub_run['sub_run_name'] == sub_run_name:
-                        set_hvs(config.hv_info, sub_run['hvs'])
-                        server.send(f'HV Set {sub_run_name}')
-                        break
+                sub_run = server.receive_json()
+                set_hvs(hv_info, sub_run['hvs'])
+                server.send(f'HV Set {sub_run["sub_run_name"]}')
+                # sub_run_name = res.split()[1]
+                # for sub_run in config.sub_runs:
+                #     if sub_run['sub_run_name'] == sub_run_name:
+                #         set_hvs(config.hv_info, sub_run['hvs'])
+                #         server.send(f'HV Set {sub_run_name}')
+                #         break
             else:
                 server.send('Unknown Command')
             res = server.receive()
-    power_off_hvs(config.hv_info)
+    # power_off_hvs(config.hv_info)
+    power_off_hvs(hv_info)
     print('donzo')
 
 
