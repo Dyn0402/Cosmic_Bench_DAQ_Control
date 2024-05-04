@@ -48,6 +48,7 @@ def main():
             # sub_run_name = sub_run['sub_run_name']
             # hv_client.send(f'Start {sub_run_name}')
             hv_client.send('Start')
+            hv_client.receive()
             hv_client.send_json(sub_run)
             res = hv_client.receive()
             if 'HV Set' in res:

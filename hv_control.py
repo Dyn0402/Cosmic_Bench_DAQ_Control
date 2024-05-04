@@ -27,6 +27,7 @@ def main():
         res = server.receive()
         while 'Finished' not in res:
             if 'Start' in res:
+                server.send('HV ready to start')
                 sub_run = server.receive_json()
                 set_hvs(hv_info, sub_run['hvs'])
                 server.send(f'HV Set {sub_run["sub_run_name"]}')
