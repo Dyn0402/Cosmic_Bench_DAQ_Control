@@ -62,6 +62,7 @@ class Server:
             if len(packet) < self.max_recv:
                 break
         data = json.loads(data.decode())
+        print(f"Received: {data}")
         return data
 
     def send(self, data):
