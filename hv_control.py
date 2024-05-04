@@ -50,17 +50,17 @@ def set_hvs(hv_info, hvs):
     with CAENHVController(ip_address, username, password) as caen_hv:
         for slot, channel_v0s in hvs.items():
             for channel, v0 in channel_v0s.items():
-                caen_hv.set_ch_v0(slot, channel, v0)
-                power = caen_hv.get_ch_power(slot, channel)
+                caen_hv.set_ch_v0(int(slot), int(channel), v0)
+                power = caen_hv.get_ch_power(int(slot), int(channel))
                 if not power:
-                    caen_hv.set_ch_pw(slot, channel, 1)
+                    caen_hv.set_ch_pw(int(slot), int(channel), 1)
 
         all_ramped = False
         while not all_ramped:
             all_ramped = True
             for slot, channel_v0s in hvs.items():
                 for channel, v0 in channel_v0s.items():
-                    vmon = caen_hv.get_ch_vmon(slot, channel)
+                    vmon = caen_hv.get_ch_vmon(int(slot), int(channel))
                     if abs(vmon - v0) > 1.5:  # Make sure within 1.5 V of set value
                         all_ramped = False
                         break
@@ -74,9 +74,9 @@ def power_off_hvs(hv_info):
     with CAENHVController(ip_address, username, password) as caen_hv:
         for slot in range(hv_info['n_cards']):
             for channel in range(hv_info['n_channels_per_card']):
-                power = caen_hv.get_ch_power(slot, channel)
+                power = caen_hv.get_ch_power(int(slot), int(channel))
                 if power:
-                    caen_hv.set_ch_pw(slot, channel, 0)
+                    caen_hv.set_ch_pw(int(slot), int(channel), 0)
     print('HV Powered Off')
 
 
