@@ -14,22 +14,23 @@ import RPi.GPIO as GPIO
 
 def main():
     port, gpio_pin = 1100, 17
-    with Server(port=port) as server:
-        server.receive()
-        server.send('Trigger switch control connected')
+    while True:
+        with Server(port=port) as server:
+            server.receive()
+            server.send('Trigger switch control connected')
 
-        res = server.receive()
-        while 'Finished' not in res:
-            if 'on' in res:
-                trigger_switch('on', pin=gpio_pin)
-                server.send(f'Trigger switch turned on')
-            elif 'off' in res:
-                trigger_switch('off', pin=gpio_pin)
-                server.send(f'Trigger switch turned off')
-            else:
-                server.send('Unknown Command')
             res = server.receive()
-    GPIO.cleanup()
+            while 'Finished' not in res:
+                if 'on' in res:
+                    trigger_switch('on', pin=gpio_pin)
+                    server.send(f'Trigger switch turned on')
+                elif 'off' in res:
+                    trigger_switch('off', pin=gpio_pin)
+                    server.send(f'Trigger switch turned off')
+                else:
+                    server.send('Unknown Command')
+                res = server.receive()
+        GPIO.cleanup()
     print('donzo')
 
 
