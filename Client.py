@@ -34,10 +34,10 @@ class Client:
             self.client.connect((self.host, self.port))
             print(f"Connected to {self.host}:{self.port}")
             # break
-        except ConnectionRefusedError or OSError:
+        except (ConnectionRefusedError, OSError) as e:
             # print(f"Failed to connect to {self.host}:{self.port}. Retrying...")
             # time.sleep(1)
-            print(f"Failed to connect to {self.host}:{self.port}.")
+            print(f"Failed to connect to {self.host}:{self.port}. {e}")
 
     def receive(self):
         data = self.client.recv(self.max_recv).decode()
