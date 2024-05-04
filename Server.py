@@ -69,5 +69,5 @@ class Server:
         print(f"Sent: {data}")
 
     def send_json(self, data):
-        self.client_socket.sendall(data.encode())
+        self.client_socket.sendall(json.dumps(data).encode())
         print(f"Sent: {data}")

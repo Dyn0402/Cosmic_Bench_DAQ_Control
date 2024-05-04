@@ -59,5 +59,5 @@ class Client:
         print(f"Sent: {data}")
 
     def send_json(self, data):
-        self.client.sendall(data.encode())
+        self.client.sendall(json.dumps(data).encode())
         print(f"Sent: {data}")
