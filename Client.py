@@ -38,7 +38,6 @@ class Client:
             # print(f"Failed to connect to {self.host}:{self.port}. Retrying...")
             # time.sleep(1)
             print(f"Failed to connect to {self.host}:{self.port}.")
-            self.client = None
 
     def receive(self):
         data = self.client.recv(self.max_recv).decode()
