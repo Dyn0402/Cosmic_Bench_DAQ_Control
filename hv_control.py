@@ -13,7 +13,7 @@ import time
 from Server import Server
 from caen_hv_py.CAENHVController import CAENHVController
 
-from run_config import Config
+# from run_config import Config
 
 
 def main():

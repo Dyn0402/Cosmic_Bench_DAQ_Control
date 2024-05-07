@@ -19,9 +19,9 @@ from run_config import Config
 
 def main():
     config = Config()
-    banco = 'banco' in [det['name'] for det in config.detectors]
+    banco = 'banco' in config.included_detectors
     hv_ip, hv_port = '192.168.10.1', 1100
-    trigger_switch_ip, trigger_switch_port = '169.254.91.5', 1100
+    trigger_switch_ip, trigger_switch_port = '192.168.10.101', 1100
     banco_daq_ip, banco_daq_port = '132.166.30.82', 1100
     with (Client(hv_ip, hv_port) as hv_client, Client(trigger_switch_ip, trigger_switch_port) as trigger_switch_client,
           Client(banco_daq_ip, banco_daq_port) as banco_daq_client):
