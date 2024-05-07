@@ -1,0 +1,10 @@
+{
+    "name": "banco",
+    "strip_map_type": "banco",
+    "resist_map_type": "banco",
+    "det_size": {
+        "x": 130,
+        "y": 130,
+        "z": 4
+    }
+}
