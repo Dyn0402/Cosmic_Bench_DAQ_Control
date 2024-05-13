@@ -21,7 +21,7 @@ class DAQController:
         self.original_working_directory = os.getcwd()
 
         self.run_time = run_time  # minutes
-        self.max_run_time = self.run_time * 1.5  # minutes After this time assume stuck and kill
+        self.max_run_time = self.run_time * 2  # minutes After this time assume stuck and kill
 
         if out_name is None:
             self.run_command = f'RunCtrl -c {cfg_file_path}'
