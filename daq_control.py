@@ -10,6 +10,7 @@ Created as Cosmic_Bench_DAQ_Control/daq_control.py
 
 import os
 import time
+from contextlib import nullcontext
 
 from Client import Client
 from DAQController import DAQController
@@ -27,8 +28,8 @@ def main():
     dedip196_ip, dedip196_port = config.processor_info['ip'], config.processor_info['port']
 
     hv_client = Client(hv_ip, hv_port)
-    trigger_switch_client = Client(trigger_switch_ip, trigger_switch_port) if banco else None
-    banco_daq_client = Client(banco_daq_ip, banco_daq_port) if banco else None
+    trigger_switch_client = Client(trigger_switch_ip, trigger_switch_port) if banco else nullcontext()
+    banco_daq_client = Client(banco_daq_ip, banco_daq_port) if banco else nullcontext()
     processor_client = Client(dedip196_ip, dedip196_port)
 
     # with (Client(hv_ip, hv_port) as hv_client,
