@@ -23,7 +23,7 @@ class Config:
         self.m3_tracking_inner_dir = 'm3_tracking'
 
         self.dream_daq_info = {
-            'daq_config_template_path': '../../config/CosmicTb_TPOT.cfg',
+            'daq_config_template_path': '~/dylan/Run/config/CosmicTb_TPOT.cfg',
         }
 
         self.banco_info = {
