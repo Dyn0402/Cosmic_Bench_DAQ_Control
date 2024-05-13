@@ -16,6 +16,7 @@ from Client import Client
 from DAQController import DAQController
 
 from run_config import Config
+from common_functions import *
 
 
 def main():
@@ -99,11 +100,6 @@ def main():
                 print('DAQ Done')
         hv.send(f'Finished')
     print('donzo')
-
-
-def create_dir_if_not_exist(dir_path):
-    if not os.path.isdir(dir_path):
-        os.makedirs(dir_path)
 
 
 if __name__ == '__main__':

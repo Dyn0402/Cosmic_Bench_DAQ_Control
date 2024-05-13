@@ -15,6 +15,7 @@ import signal
 from datetime import datetime
 
 from Server import Server
+from common_functions import *
 
 # from run_config import Config
 
@@ -71,11 +72,6 @@ def move_data_files(src_dir, dest_dir, start_time, end_time):
             if start_time <= file_time <= end_time:
                 # Copy file, maybe move and clean up later if confident
                 shutil.copy(f'{src_dir}{file}', f'{dest_dir}{file}')
-
-
-def create_dir_if_not_exist(dir_path):
-    if not os.path.isdir(dir_path):
-        os.makedirs(dir_path)
 
 
 if __name__ == '__main__':
