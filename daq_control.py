@@ -31,6 +31,7 @@ def main():
     trigger_switch_client = Client(trigger_switch_ip, trigger_switch_port) if banco else nullcontext()
     banco_daq_client = Client(banco_daq_ip, banco_daq_port) if banco else nullcontext()
     processor_client = Client(dedip196_ip, dedip196_port)
+    processor_client = nullcontext()
 
     print('Clients created')
     time.sleep(5)
