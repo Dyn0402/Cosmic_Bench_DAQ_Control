@@ -36,7 +36,7 @@ def main():
                 server.send('FDFs Decoded')
             elif 'Run M3 Tracking' in res:
                 sub_run = res.strip().split()[-1]
-                sub_run_dir = f"{run_info['run_dir']}{sub_run}/"
+                sub_run_dir = f"{run_info['run_dir']}/{sub_run}/"
                 fdf_dir = f"{sub_run_dir}{run_info['raw_daq_inner_dir']}"
                 out_dir = f"{sub_run_dir}{run_info['m3_tracking_inner_dir']}"
                 create_dir_if_not_exist(out_dir)

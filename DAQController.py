@@ -43,6 +43,11 @@ class DAQController:
         while True:
             if sent_continue:
                 if run_start is not None and time() - run_start >= self.run_time * 60:
+                    print('Turning off trigger switch.')
+                    if trigger_switch_client is not None:
+                        trigger_switch_client.send('off')
+                        trigger_switch_client.receive()
+                    sleep(5)
                     print('Run finished.')
                     process.stdin.write('g')  # Signal to stop run
                     process.stdin.flush()
@@ -60,8 +65,8 @@ class DAQController:
                 print(' Got the continue. Writing C.')
                 process.stdin.write('C')  # Signal to start data taking
                 process.stdin.flush()
+                sleep(5)
                 if trigger_switch_client is not None:
-                    sleep(5)
                     trigger_switch_client.send('on')
                     trigger_switch_client.receive()
                 run_start = time()
@@ -70,7 +75,9 @@ class DAQController:
             if time() - start > self.max_run_time * 60:
                 print('DAQ process timed out.')
                 process.kill()
+                sleep(5)
                 run_successful = False
+                print('DAQ process timed out.')
                 break
 
         os.chdir(self.original_working_directory)
