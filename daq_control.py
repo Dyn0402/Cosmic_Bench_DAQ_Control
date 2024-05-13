@@ -20,12 +20,11 @@ from run_config import Config
 def main():
     config = Config()
     banco = 'banco' in config.included_detectors
-    
-    hv_ip, hv_port = config.hv_info['hv_ip'], config.hv_info['hv_port']
-    trigger_switch_ip = config.trigger_switch_info['trigger_switch_ip']
-    trigger_switch_port = config.trigger_switch_info['trigger_switch_port']
-    banco_daq_ip, banco_daq_port = config.banco_info['banco_ip'], config.banco_info['banco_port']
-    dedip196_ip, dedip196_port = config.processor_info['dedip196_ip'], config.processor_info['dedip196_port']
+
+    hv_ip, hv_port = config.hv_info['ip'], config.hv_info['port']
+    trigger_switch_ip, trigger_switch_port = config.trigger_switch_info['ip'], config.trigger_switch_info['port']
+    banco_daq_ip, banco_daq_port = config.banco_info['ip'], config.banco_info['port']
+    dedip196_ip, dedip196_port = config.processor_info['ip'], config.processor_info['port']
 
     with (Client(hv_ip, hv_port) as hv_client, Client(trigger_switch_ip, trigger_switch_port) as trigger_switch_client,
           Client(banco_daq_ip, banco_daq_port) as banco_daq_client,
