@@ -32,12 +32,17 @@ def main():
     banco_daq_client = Client(banco_daq_ip, banco_daq_port) if banco else nullcontext()
     processor_client = Client(dedip196_ip, dedip196_port)
 
+    print('Clients created')
+    time.sleep(5)
+
     # with (Client(hv_ip, hv_port) as hv_client,
     #       Client(trigger_switch_ip, trigger_switch_port) if banco else None as trigger_switch_client,
     #       Client(banco_daq_ip, banco_daq_port) if banco else None as banco_daq_client,
     #       Client(dedip196_ip, dedip196_port) as processor_client):
     with (hv_client as hv, trigger_switch_client as trigger_switch, banco_daq_client as banco_daq,
           processor_client as processor):
+        print('Clients connected')
+        time.sleep(5)
         hv.send('Connected to daq_control')
         hv.receive()
         hv.send_json(config.hv_info)
