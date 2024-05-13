@@ -48,8 +48,8 @@ class Config:
         self.hv_info = {
             'ip': '192.168.10.1',
             'port': 1100,
-            'hv_username': 'admin',
-            'hv_password': 'admin',
+            'username': 'admin',
+            'password': 'admin',
             'n_cards': 4,
             'n_channels_per_card': 12,
         }

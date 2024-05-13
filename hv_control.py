@@ -46,7 +46,7 @@ def main():
 
 
 def set_hvs(hv_info, hvs):
-    ip_address, username, password = hv_info['hv_ip_address'], hv_info['hv_username'], hv_info['hv_password']
+    ip_address, username, password = hv_info['ip'], hv_info['username'], hv_info['password']
     with CAENHVController(ip_address, username, password) as caen_hv:
         for slot, channel_v0s in hvs.items():
             for channel, v0 in channel_v0s.items():
@@ -69,7 +69,7 @@ def set_hvs(hv_info, hvs):
 
 
 def power_off_hvs(hv_info):
-    ip_address, username, password = hv_info['hv_ip_address'], hv_info['hv_username'], hv_info['hv_password']
+    ip_address, username, password = hv_info['ip'], hv_info['username'], hv_info['password']
     print('Powering off HV...')
     with CAENHVController(ip_address, username, password) as caen_hv:
         for slot in range(hv_info['n_cards']):
