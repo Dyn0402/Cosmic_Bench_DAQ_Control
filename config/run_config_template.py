@@ -46,7 +46,7 @@ class Config:
         }
 
         self.hv_info = {
-            'ip': '192.168.10.81',
+            'ip': '192.168.10.1',
             'port': 1100,
             'hv_username': 'admin',
             'hv_password': 'admin',
