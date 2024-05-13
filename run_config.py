@@ -121,8 +121,7 @@ class Config:
             'banco_arm_length_y': 230,  # mm from left edge of banco arm to right edge of banco arm
         }
 
-        self.included_detectors = ['banco', 'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2',
-                                   'asacusa_plein_1', 'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
+        self.included_detectors = ['m3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
 
         self.detectors = [
             {
