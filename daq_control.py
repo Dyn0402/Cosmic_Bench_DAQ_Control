@@ -23,8 +23,10 @@ def main():
     hv_ip, hv_port = '192.168.10.1', 1100
     trigger_switch_ip, trigger_switch_port = '192.168.10.101', 1100
     banco_daq_ip, banco_daq_port = '132.166.30.82', 1100
+    dedip196_ip, dedip196_port = '132.166.10.196', 1100
     with (Client(hv_ip, hv_port) as hv_client, Client(trigger_switch_ip, trigger_switch_port) as trigger_switch_client,
-          Client(banco_daq_ip, banco_daq_port) as banco_daq_client):
+          Client(banco_daq_ip, banco_daq_port) as banco_daq_client,
+          Client(dedip196_ip, dedip196_port) as processor_client):
         hv_client.send('Connected to daq_control')
         hv_client.receive()
         hv_client.send_json(config.hv_info)
@@ -37,11 +39,20 @@ def main():
             banco_daq_client.receive()
             banco_daq_client.send_json(config.banco_info)
 
+        processor_client.send('Connected to daq_control')
+        processor_client.receive()
+        processor_client.send_json(config.processor_info)
+
         create_dir_if_not_exist(config.run_dir)
+        create_dir_if_not_exist(config.run_out_dir)
         for sub_run in config.sub_runs:
             sub_run_name = sub_run['sub_run_name']
-            sub_dir = f'{config.run_dir}{sub_run_name}/'
-            create_dir_if_not_exist(sub_dir)
+            sub_run_dir = f'{config.run_dir}{sub_run_name}/'
+            create_dir_if_not_exist(sub_run_dir)
+            sub_top_out_dir = f'{config.run_out_dir}{sub_run_name}/'
+            create_dir_if_not_exist(sub_top_out_dir)
+            sub_out_dir = f'{sub_top_out_dir}{config.raw_daq_inner_dir}/'
+            create_dir_if_not_exist(sub_out_dir)
             if banco:
                 trigger_switch_client.send('off')  # Turn off trigger to make sure daqs are synced
                 trigger_switch_client.receive()
@@ -56,7 +67,8 @@ def main():
                     banco_daq_client.send(f'Start {sub_run_name}')
                     banco_daq_client.receive()
 
-                daq_controller = DAQController(config.daq_config_path, sub_run['run_time'], sub_run_name, sub_dir)
+                daq_controller = DAQController(config.daq_config_path, sub_run['run_time'],
+                                               sub_run_name, sub_run_dir, sub_out_dir)
                 if banco:
                     daq_controller.run(trigger_switch_client)
                 else:

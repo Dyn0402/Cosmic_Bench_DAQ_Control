@@ -10,12 +10,14 @@ Created as Cosmic_Bench_DAQ_Control/DAQController.py
 
 import os
 from subprocess import Popen, PIPE
+import shutil
 from time import time, sleep
 
 
 class DAQController:
-    def __init__(self, cfg_file_path, run_time=10, out_name=None, run_directory=None):
-        self.run_directory = run_directory  # Relative to run_directory if not None
+    def __init__(self, cfg_file_path, run_time=10, out_name=None, run_dir=None, out_dir=None):
+        self.run_directory = run_dir  # Relative to run_directory if not None
+        self.out_directory = out_dir
         self.original_working_directory = os.getcwd()
 
         self.run_time = run_time  # minutes
@@ -70,8 +72,18 @@ class DAQController:
                 process.kill()
                 run_successful = False
                 break
+
         os.chdir(self.original_working_directory)
+
+        if run_successful:
+            move_data_files(self.run_directory, self.out_directory)
 
         return run_successful
 
 
+def move_data_files(src_dir, dest_dir):
+    for file in os.listdir(src_dir):
+        if file.endswith('.fdf'):
+            # shutil.move(f'{src_dir}/{file}', f'{dest_dir}/{file}')
+            # Copy for now, maybe move and clean up later when more confident
+            shutil.copy(f'{src_dir}/{file}', f'{dest_dir}/{file}')

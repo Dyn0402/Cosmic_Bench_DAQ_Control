@@ -17,10 +17,27 @@ class Config:
         self.daq_dir = '/home/clas12/dylan/Run/'
         self.run_dir = f'{self.daq_dir}{self.run_name}/'
         self.daq_config_path = '../../config/CosmicTb_TPOT.cfg'
+        self.data_out_dir = '/mnt/cosmic_data/Run/'
+        self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
+        self.raw_daq_inner_dir = 'raw_daq_data'
+        self.decoded_root_inner_dir = 'decoded_root'
+        self.m3_tracking_inner_dir = 'm3_tracking'
 
         self.banco_info = {
             'daq_run_path': '/home/banco/Test_Beam/framework/bin/test_multi_noiseocc_int',
-            'data_out_dir': '/home/banco/dylan/Run/',
+            'data_temp_dir': '/home/banco/Test_Beam/data',
+            'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
+            'data_inner_dir': self.raw_daq_inner_dir
+        }
+
+        self.processor_info = {
+            'run_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
+            'raw_daq_inner_dir': self.raw_daq_inner_dir,
+            'decoded_root_inner_dir': self.decoded_root_inner_dir,
+            'm3_tracking_inner_dir': self.decoded_root_inner_dir,
+            'decode_path': '~/dylan/decode/decode.cpp',
+            'convert_path': '~/dylan/decode/convert.cpp',
+            'out_type': 'both',  # 'vec', 'array', or 'both'
         }
 
         self.hv_info = {

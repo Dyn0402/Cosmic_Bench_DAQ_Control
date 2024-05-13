@@ -23,11 +23,12 @@ def main():
     # config = Config()
     port = 1100
     # run_path = config.banco_daq_run_path
-    with Server(port=port) as server:
+    with (Server(port=port) as server):
         server.receive()
         server.send('Banco DAQ control connected')
         banco_info = server.receive_json()
-        run_path, out_dir = banco_info['run_path'], banco_info['data_out_dir']
+        run_path = banco_info['daq_run_path']
+        temp_dir, out_dir = banco_info['data_temp_dir'], banco_info['data_out_dir']
         create_dir_if_not_exist(out_dir)
 
         res = server.receive()
@@ -37,6 +38,8 @@ def main():
                 sub_run_name = res.split()[-1]
                 sub_run_out_dir = f'{out_dir}{sub_run_name}/'
                 create_dir_if_not_exist(sub_run_out_dir)
+                sub_run_raw_out_dir = f'{sub_run_out_dir}{banco_info["data_inner_dir"]}/'
+                create_dir_if_not_exist(sub_run_raw_out_dir)
                 process = Popen(run_path, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
                 server.send('Banco DAQ started')
                 res = server.receive()
@@ -52,7 +55,7 @@ def main():
                         print('DAQ process finished.')
                         break
                 end_time = datetime.now()
-                move_data_files(run_path, sub_run_out_dir, start_time, end_time)
+                move_data_files(temp_dir, sub_run_raw_out_dir, start_time, end_time)
 
                 server.send('Banco DAQ stopped')
             else:
