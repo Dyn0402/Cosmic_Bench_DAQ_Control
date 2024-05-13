@@ -79,12 +79,11 @@ def main():
                     banco_daq.send(f'Start {sub_run_name}')
                     banco_daq.receive()
 
-                daq_controller = DAQController(config.daq_config_path, sub_run['run_time'],
-                                               sub_run_name, sub_run_dir, sub_out_dir)
-                if banco:
-                    daq_controller.run(trigger_switch)
-                else:
-                    daq_controller.run()
+                daq_trigger_switch = trigger_switch if banco else None
+                daq_controller = DAQController(config.dream_daq_info['daq_config_template_path'], sub_run['run_time'],
+                                               sub_run_name, sub_run_dir, sub_out_dir, daq_trigger_switch)
+
+                daq_controller.run()
 
                 if banco:
                     banco_daq.send('Stop')

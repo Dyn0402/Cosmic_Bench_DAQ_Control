@@ -16,12 +16,16 @@ class Config:
         self.run_name = 'm3_hv_scan'
         self.daq_dir = '/home/clas12/dylan/Run/'
         self.run_dir = f'{self.daq_dir}{self.run_name}/'
-        self.daq_config_path = '../../config/CosmicTb_TPOT.cfg'
+        # self.daq_config_path = '../../config/CosmicTb_TPOT.cfg'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
         self.raw_daq_inner_dir = 'raw_daq_data'
         self.decoded_root_inner_dir = 'decoded_root'
         self.m3_tracking_inner_dir = 'm3_tracking'
+
+        self.dream_daq_info = {
+            'daq_config_template_path': '../../config/CosmicTb_TPOT.cfg',
+        }
 
         self.banco_info = {
             'ip': '132.166.30.82',

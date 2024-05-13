@@ -15,18 +15,26 @@ from time import time, sleep
 
 
 class DAQController:
-    def __init__(self, cfg_file_path, run_time=10, out_name=None, run_dir=None, out_dir=None):
+    def __init__(self, cfg_template_file_path, run_time=10, out_name=None, run_dir=None, out_dir=None,
+                 trigger_switch_client=None):
+        self.cfg_template_file_path = cfg_template_file_path
         self.run_directory = run_dir  # Relative to run_directory if not None
         self.out_directory = out_dir
+        self.trigger_switch_client = trigger_switch_client
         self.original_working_directory = os.getcwd()
 
         self.run_time = run_time  # minutes
         self.max_run_time = self.run_time * 2  # minutes After this time assume stuck and kill
 
+        # If trigger switch is used, need to run past run time to bracket the trigger switch on/off. Else just run time.
+        self.cfg_file_run_time = self.run_time * 60 if self.trigger_switch_client is None else self.run_time * 60 + 60
+        self.cfg_file_path = None
+        self.make_config_from_template()
+
         if out_name is None:
-            self.run_command = f'RunCtrl -c {cfg_file_path}'
+            self.run_command = f'RunCtrl -c {self.cfg_file_path}'
         else:
-            self.run_command = f'RunCtrl -c {cfg_file_path} -f {out_name}'
+            self.run_command = f'RunCtrl -c {self.cfg_file_path} -f {out_name}'
 
     def __enter__(self):
         return self
@@ -34,7 +42,7 @@ class DAQController:
     def __exit__(self, exc_type, exc_val, exc_tb):
         os.chdir(self.original_working_directory)
 
-    def run(self, trigger_switch_client=None):
+    def run(self):
         if self.run_directory is not None:
             os.chdir(self.run_directory)
         process = Popen(self.run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
@@ -43,15 +51,15 @@ class DAQController:
         while True:
             if sent_continue:
                 if run_start is not None and time() - run_start >= self.run_time * 60:
-                    print('Turning off trigger switch.')
-                    if trigger_switch_client is not None:
-                        trigger_switch_client.send('off')
-                        trigger_switch_client.receive()
-                    sleep(5)
-                    print('Run finished.')
-                    process.stdin.write('g')  # Signal to stop run
-                    process.stdin.flush()
-                sleep(1)
+                    if self.trigger_switch_client is not None:
+                        print('Turning off trigger switch.')
+                        self.trigger_switch_client.send('off')
+                        self.trigger_switch_client.receive()
+                        print('Run finished.')
+                    # sleep(5)
+                    # process.stdin.write('g')  # Signal to stop run
+                    # process.stdin.flush()
+                # sleep(1)
             output = process.stdout.readline()
             if output == '' and process.poll() is not None:
                 print('DAQ process finished.')
@@ -65,10 +73,10 @@ class DAQController:
                 print(' Got the continue. Writing C.')
                 process.stdin.write('C')  # Signal to start data taking
                 process.stdin.flush()
-                sleep(5)
-                if trigger_switch_client is not None:
-                    trigger_switch_client.send('on')
-                    trigger_switch_client.receive()
+                if self.trigger_switch_client is not None:
+                    sleep(30)  # Need to wait a bit for DAQ to start
+                    self.trigger_switch_client.send('on')
+                    self.trigger_switch_client.receive()
                 run_start = time()
             if output.strip() != '':
                 print(output.strip())
@@ -86,6 +94,20 @@ class DAQController:
             move_data_files(self.run_directory, self.out_directory)
 
         return run_successful
+
+    def make_config_from_template(self):
+        dest = self.run_directory if self.run_directory is not None else self.original_working_directory
+        cfg_file_name = os.path.basename(self.cfg_template_file_path)
+        self.cfg_file_path = f'{dest}/{cfg_file_name}'
+        shutil.copy(self.cfg_template_file_path, self.cfg_file_path)
+        with open(self.cfg_file_path, 'r') as file:
+            cfg_lines = file.readlines()
+        for i, line in enumerate(cfg_lines):
+            if 'Sys DaqRun Time' in line:
+                cfg_lines[i] = cfg_lines[i].replace('  0  ', f'  {self.cfg_file_run_time}  ')
+        with open(self.cfg_file_path, 'w') as file:
+            file.writelines(cfg_lines)
+
 
 
 def move_data_files(src_dir, dest_dir):
