@@ -65,7 +65,7 @@ def set_hvs(hv_info, hvs):
                     vmon = caen_hv.get_ch_vmon(int(slot), int(channel))
                     if abs(vmon - v0) > 1.5:  # Make sure within 1.5 V of set value
                         all_ramped = False
-                        print(f' Slot {slot}, Channel {channel} not ramped: {vmon} V --> {v0} V')
+                        print(f' Slot {slot}, Channel {channel} not ramped: {vmon:.2f} V --> {v0} V')
             if not all_ramped:
                 print('Waiting for HV to ramp...')
                 time.sleep(10)  # Make sure not to wait too long, after 15s crate times out

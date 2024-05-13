@@ -90,7 +90,8 @@ def main():
                     banco_daq.send('Stop')
                     banco_daq.receive()
 
-                processor.send(f'Decode FDFs Run M3 Tracking {sub_run_name}')
+                processor.send(f'Decode FDFs {sub_run_name}')
+                # processor.send(f'Decode FDFs Run M3 Tracking {sub_run_name}')
                 processor.receive()
                 if banco:
                     pass  # Process banco data
