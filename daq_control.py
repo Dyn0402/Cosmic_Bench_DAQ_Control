@@ -26,7 +26,7 @@ def main():
     banco_daq_ip, banco_daq_port = config.banco_info['ip'], config.banco_info['port']
     dedip196_ip, dedip196_port = config.processor_info['ip'], config.processor_info['port']
 
-    with (Client(hv_ip, hv_port) as hv_client if True else None,
+    with (Client(hv_ip, hv_port) as hv_client,
           Client(trigger_switch_ip, trigger_switch_port) if banco else None as trigger_switch_client,
           Client(banco_daq_ip, banco_daq_port) if banco else None as banco_daq_client,
           Client(dedip196_ip, dedip196_port) as processor_client):
