@@ -44,6 +44,7 @@ class Config:
             'm3_tracking_inner_dir': self.decoded_root_inner_dir,
             'decode_path': '/local/home/banco/dylan/decode/decode',
             'convert_path': '/local/home/banco/dylan/decode/convert_vec_tree_to_array',
+            'tracking_run_dir': '/local/home/banco/dylan/m3_tracking/',
             'tracking_sh_path': '/local/home/banco/dylan/m3_tracking/run_tracking_single.sh',
             'out_type': 'both',  # 'vec', 'array', or 'both'
         }

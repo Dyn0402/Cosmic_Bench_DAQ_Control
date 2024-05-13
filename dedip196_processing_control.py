@@ -18,6 +18,7 @@ from common_functions import *
 
 def main():
     port = 1100
+    options = ['Decode FDFs', 'Run M3 Tracking']
     while True:
         try:
             with Server(port=port) as server:
@@ -27,26 +28,27 @@ def main():
 
                 res = server.receive()
                 while 'Finished' not in res:
-                    if 'Decode FDFs' in res:
-                        sub_run = res.strip().split()[-1]
-                        sub_run_dir = f"{run_info['run_dir']}/{sub_run}/"
-                        fdf_dir = f"{sub_run_dir}{run_info['raw_daq_inner_dir']}/"
-                        out_dir = f"{sub_run_dir}{run_info['decoded_root_inner_dir']}/"
-                        create_dir_if_not_exist(out_dir)
-                        print(f'\n\nDecoding FDFs in {fdf_dir} to {out_dir}')
-                        decode_fdfs(fdf_dir, run_info['decode_path'], run_info['convert_path'], out_dir,
-                                    out_type=run_info['out_type'])
-                        server.send('FDFs Decoded')
-                    elif 'Run M3 Tracking' in res:
-                        sub_run = res.strip().split()[-1]
-                        sub_run_dir = f"{run_info['run_dir']}/{sub_run}/"
-                        fdf_dir = f"{sub_run_dir}{run_info['raw_daq_inner_dir']}/"
-                        out_dir = f"{sub_run_dir}{run_info['m3_tracking_inner_dir']}/"
-                        create_dir_if_not_exist(out_dir)
-                        m3_tracking(fdf_dir, run_info['tracking_sh_path'], out_dir)
-                        server.send('M3 Tracking Complete')
-                    else:
+                    run_options = [option for option in options if option in res]
+                    if len(run_options) == 0:
                         server.send('Unknown Command')
+                    else:
+                        server.send(f"{' and '.join(run_options)} Started...")
+                        sub_run = res.strip().split()[-1]
+                        sub_run_dir = f"{run_info['run_dir']}/{sub_run}/"
+                        fdf_dir = f"{sub_run_dir}{run_info['raw_daq_inner_dir']}/"
+                        if 'Decode FDFs' in run_options:
+                            out_dir = f"{sub_run_dir}{run_info['decoded_root_inner_dir']}/"
+                            create_dir_if_not_exist(out_dir)
+                            print(f'\n\nDecoding FDFs in {fdf_dir} to {out_dir}')
+                            decode_fdfs(fdf_dir, run_info['decode_path'], run_info['convert_path'], out_dir,
+                                        out_type=run_info['out_type'])
+                            print('Decoding Complete')
+                        if 'Run M3 Tracking' in run_options:
+                            out_dir = f"{sub_run_dir}{run_info['m3_tracking_inner_dir']}/"
+                            create_dir_if_not_exist(out_dir)
+                            print(f'\n\nRunning M3 Tracking on FDFs in {fdf_dir} to {out_dir}')
+                            m3_tracking(fdf_dir, run_info['tracking_sh_path'], run_info['tracking_run_dir'], out_dir)
+                            print('M3 Tracking Complete')
                     res = server.receive()
         except Exception as e:
             print(f'Error: {e}\nRestarting processing control server...')
@@ -99,11 +101,12 @@ def decode_fdfs(fdf_dir, decode_path, convert_path=None, out_dir=None, feu_nums=
     os.chdir(og_dir)
 
 
-def m3_tracking(fdf_dir, tracking_sh_ref_path, out_dir=None, m3_fdf_num=1):
+def m3_tracking(fdf_dir, tracking_sh_ref_path, tracking_run_dir, out_dir=None, m3_fdf_num=1):
     """
 
     :param fdf_dir:
     :param tracking_sh_ref_path:
+    :param tracking_run_dir:
     :param out_dir:
     :param m3_fdf_num:
     :return:
@@ -117,7 +120,7 @@ def m3_tracking(fdf_dir, tracking_sh_ref_path, out_dir=None, m3_fdf_num=1):
         run_name = get_run_name_from_fdf_file_name(file)
         file_num = get_file_num_from_fdf_file_name(file)
         out_dir = fdf_dir if out_dir is None else out_dir
-        get_rays_from_fdf(run_name, tracking_sh_ref_path, [file_num], out_dir, fdf_dir)
+        get_rays_from_fdf(run_name, tracking_sh_ref_path, [file_num], out_dir, tracking_run_dir)
 
 
 def get_rays_from_fdf(fdf_run, tracking_sh_file, file_nums, output_root_dir, run_dir, verbose=False):
