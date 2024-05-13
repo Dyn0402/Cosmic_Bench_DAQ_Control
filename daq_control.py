@@ -26,25 +26,32 @@ def main():
     banco_daq_ip, banco_daq_port = config.banco_info['ip'], config.banco_info['port']
     dedip196_ip, dedip196_port = config.processor_info['ip'], config.processor_info['port']
 
-    with (Client(hv_ip, hv_port) as hv_client,
-          Client(trigger_switch_ip, trigger_switch_port) if banco else None as trigger_switch_client,
-          Client(banco_daq_ip, banco_daq_port) if banco else None as banco_daq_client,
-          Client(dedip196_ip, dedip196_port) as processor_client):
-        hv_client.send('Connected to daq_control')
-        hv_client.receive()
-        hv_client.send_json(config.hv_info)
+    hv_client = Client(hv_ip, hv_port)
+    trigger_switch_client = Client(trigger_switch_ip, trigger_switch_port) if banco else None
+    banco_daq_client = Client(banco_daq_ip, banco_daq_port) if banco else None
+    processor_client = Client(dedip196_ip, dedip196_port)
+
+    # with (Client(hv_ip, hv_port) as hv_client,
+    #       Client(trigger_switch_ip, trigger_switch_port) if banco else None as trigger_switch_client,
+    #       Client(banco_daq_ip, banco_daq_port) if banco else None as banco_daq_client,
+    #       Client(dedip196_ip, dedip196_port) as processor_client):
+    with (hv_client as hv, trigger_switch_client as trigger_switch, banco_daq_client as banco_daq,
+          processor_client as processor):
+        hv.send('Connected to daq_control')
+        hv.receive()
+        hv.send_json(config.hv_info)
 
         if banco:
-            trigger_switch_client.send('Connected to daq_control')
-            trigger_switch_client.receive()
+            trigger_switch.send('Connected to daq_control')
+            trigger_switch.receive()
 
-            banco_daq_client.send('Connected to daq_control')
-            banco_daq_client.receive()
-            banco_daq_client.send_json(config.banco_info)
+            banco_daq.send('Connected to daq_control')
+            banco_daq.receive()
+            banco_daq.send_json(config.banco_info)
 
-        processor_client.send('Connected to daq_control')
-        processor_client.receive()
-        processor_client.send_json(config.processor_info)
+        processor.send('Connected to daq_control')
+        processor.receive()
+        processor.send_json(config.processor_info)
 
         create_dir_if_not_exist(config.run_dir)
         create_dir_if_not_exist(config.run_out_dir)
@@ -57,39 +64,39 @@ def main():
             sub_out_dir = f'{sub_top_out_dir}{config.raw_daq_inner_dir}/'
             create_dir_if_not_exist(sub_out_dir)
             if banco:
-                trigger_switch_client.send('off')  # Turn off trigger to make sure daqs are synced
-                trigger_switch_client.receive()
+                trigger_switch.send('off')  # Turn off trigger to make sure daqs are synced
+                trigger_switch.receive()
             # sub_run_name = sub_run['sub_run_name']
-            # hv_client.send(f'Start {sub_run_name}')
-            hv_client.send('Start')
-            hv_client.receive()
-            hv_client.send_json(sub_run)
-            res = hv_client.receive()
+            # hv.send(f'Start {sub_run_name}')
+            hv.send('Start')
+            hv.receive()
+            hv.send_json(sub_run)
+            res = hv.receive()
             if 'HV Set' in res:
                 if banco:
-                    banco_daq_client.send(f'Start {sub_run_name}')
-                    banco_daq_client.receive()
+                    banco_daq.send(f'Start {sub_run_name}')
+                    banco_daq.receive()
 
                 daq_controller = DAQController(config.daq_config_path, sub_run['run_time'],
                                                sub_run_name, sub_run_dir, sub_out_dir)
                 if banco:
-                    daq_controller.run(trigger_switch_client)
+                    daq_controller.run(trigger_switch)
                 else:
                     daq_controller.run()
 
                 if banco:
-                    banco_daq_client.send('Stop')
-                    banco_daq_client.receive()
+                    banco_daq.send('Stop')
+                    banco_daq.receive()
 
-                processor_client.send(f'Decode FDFs {sub_run_name}')
-                processor_client.receive()
-                processor_client.send(f'Run M3 Tracking {sub_run_name}')
-                processor_client.receive()
+                processor.send(f'Decode FDFs {sub_run_name}')
+                processor.receive()
+                processor.send(f'Run M3 Tracking {sub_run_name}')
+                processor.receive()
                 if banco:
                     pass  # Process banco data
 
                 print('DAQ Done')
-        hv_client.send(f'Finished')
+        hv.send(f'Finished')
     print('donzo')
 
 
