@@ -22,7 +22,7 @@ def main():
     config = Config()
     banco = 'banco' in config.included_detectors
 
-    hv_ip, hv_port = config.hv_info['ip'], config.hv_info['port']
+    hv_ip, hv_port = config.hv_control_info['ip'], config.hv_control_info['port']
     trigger_switch_ip, trigger_switch_port = config.trigger_switch_info['ip'], config.trigger_switch_info['port']
     banco_daq_ip, banco_daq_port = config.banco_info['ip'], config.banco_info['port']
     dedip196_ip, dedip196_port = config.processor_info['ip'], config.processor_info['port']

@@ -45,9 +45,13 @@ class Config:
             'out_type': 'both',  # 'vec', 'array', or 'both'
         }
 
-        self.hv_info = {
+        self.hv_control_info = {
             'ip': '192.168.10.1',
             'port': 1100,
+        }
+
+        self.hv_info = {
+            'ip': '192.168.10.81',
             'username': 'admin',
             'password': 'admin',
             'n_cards': 4,
