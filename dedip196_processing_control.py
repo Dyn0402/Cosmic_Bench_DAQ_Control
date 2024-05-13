@@ -33,7 +33,14 @@ def main():
                             out_type=run_info['out_type'])
                 server.send('FDFs Decoded')
             elif 'Run M3 Tracking' in res:
-                pass
+                sub_run = res.strip().split()[-1]
+                sub_run_dir = f"{run_info['run_dir']}{sub_run}/"
+                fdf_dir = f"{sub_run_dir}{run_info['raw_daq_inner_dir']}"
+                out_dir = f"{sub_run_dir}{run_info['m3_tracking_inner_dir']}"
+                m3_tracking(fdf_dir, run_info['tracking_sh_path'], out_dir)
+                server.send('M3 Tracking Complete')
+            else:
+                server.send('Unknown Command')
     print('donzo')
 
 

@@ -13,22 +13,50 @@ import json
 
 class Config:
     def __init__(self):
-        self.run_name = 'm3_hv_mapping'
+        self.run_name = 'm3_hv_scan'
         self.daq_dir = '/home/clas12/dylan/Run/'
         self.run_dir = f'{self.daq_dir}{self.run_name}/'
         self.daq_config_path = '../../config/CosmicTb_TPOT.cfg'
+        self.data_out_dir = '/mnt/cosmic_data/Run/'
+        self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
+        self.raw_daq_inner_dir = 'raw_daq_data'
+        self.decoded_root_inner_dir = 'decoded_root'
+        self.m3_tracking_inner_dir = 'm3_tracking'
 
         self.banco_info = {
+            'banco_ip': '132.166.30.82',
+            'banco_port': 1100,
             'daq_run_path': '/home/banco/Test_Beam/framework/bin/test_multi_noiseocc_int',
-            'data_out_dir': '/home/banco/dylan/Run/',
+            'data_temp_dir': '/home/banco/Test_Beam/data',
+            'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
+            'data_inner_dir': self.raw_daq_inner_dir
+        }
+
+        self.processor_info = {
+            'dedip196_ip': '132.166.10.196',
+            'dedip196_port': 1100,
+            'run_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
+            'raw_daq_inner_dir': self.raw_daq_inner_dir,
+            'decoded_root_inner_dir': self.decoded_root_inner_dir,
+            'm3_tracking_inner_dir': self.decoded_root_inner_dir,
+            'decode_path': '~/dylan/decode/decode.cpp',
+            'convert_path': '~/dylan/decode/convert.cpp',
+            'tracking_sh_path': '~/dylan/m3_tracking/run_tracking_single.sh',
+            'out_type': 'both',  # 'vec', 'array', or 'both'
         }
 
         self.hv_info = {
             'hv_ip_address': '192.168.10.81',
+            'hv_port': 1100,
             'hv_username': 'admin',
             'hv_password': 'admin',
             'n_cards': 4,
             'n_channels_per_card': 12,
+        }
+
+        self.trigger_switch_info = {
+            'trigger_switch_ip': '192.168.10.101',
+            'trigger_switch_port': 1100,
         }
 
         self.sub_runs = [
@@ -38,15 +66,9 @@ class Config:
                 'hvs': {
                     0: {
                         8: 500,
-                        9: 0,
-                        10: 0,
-                        11: 0
                     },
                     3: {
                         8: 460,
-                        9: 0,
-                        10: 0,
-                        11: 0
                     }
                 }
             },
@@ -55,16 +77,10 @@ class Config:
                 'run_time': 2,  # Minutes
                 'hvs': {
                     0: {
-                        8: 0,
                         9: 500,
-                        10: 0,
-                        11: 0
                     },
                     3: {
-                        8: 0,
                         9: 460,
-                        10: 0,
-                        11: 0
                     }
                 }
             },
@@ -73,16 +89,10 @@ class Config:
                 'run_time': 2,  # Minutes
                 'hvs': {
                     0: {
-                        8: 0,
-                        9: 0,
                         10: 500,
-                        11: 0
                     },
                     3: {
-                        8: 0,
-                        9: 0,
                         10: 460,
-                        11: 0
                     }
                 }
             },
@@ -91,15 +101,9 @@ class Config:
                 'run_time': 2,  # Minutes
                 'hvs': {
                     0: {
-                        8: 0,
-                        9: 0,
-                        10: 0,
                         11: 500
                     },
                     3: {
-                        8: 0,
-                        9: 0,
-                        10: 0,
                         11: 460
                     }
                 }
@@ -117,7 +121,8 @@ class Config:
             'banco_arm_length_y': 230,  # mm from left edge of banco arm to right edge of banco arm
         }
 
-        self.included_detectors = ['m3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
+        self.included_detectors = ['banco', 'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2',
+                                   'asacusa_plein_1', 'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
 
         self.detectors = [
             {

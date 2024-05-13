@@ -20,10 +20,13 @@ from run_config import Config
 def main():
     config = Config()
     banco = 'banco' in config.included_detectors
-    hv_ip, hv_port = '192.168.10.1', 1100
-    trigger_switch_ip, trigger_switch_port = '192.168.10.101', 1100
-    banco_daq_ip, banco_daq_port = '132.166.30.82', 1100
-    dedip196_ip, dedip196_port = '132.166.10.196', 1100
+    
+    hv_ip, hv_port = config.hv_info['hv_ip'], config.hv_info['hv_port']
+    trigger_switch_ip = config.trigger_switch_info['trigger_switch_ip']
+    trigger_switch_port = config.trigger_switch_info['trigger_switch_port']
+    banco_daq_ip, banco_daq_port = config.banco_info['banco_ip'], config.banco_info['banco_port']
+    dedip196_ip, dedip196_port = config.processor_info['dedip196_ip'], config.processor_info['dedip196_port']
+
     with (Client(hv_ip, hv_port) as hv_client, Client(trigger_switch_ip, trigger_switch_port) as trigger_switch_client,
           Client(banco_daq_ip, banco_daq_port) as banco_daq_client,
           Client(dedip196_ip, dedip196_port) as processor_client):
@@ -77,6 +80,14 @@ def main():
                 if banco:
                     banco_daq_client.send('Stop')
                     banco_daq_client.receive()
+
+                processor_client.send(f'Decode FDFs {sub_run_name}')
+                processor_client.receive()
+                processor_client.send(f'Run M3 Tracking {sub_run_name}')
+                processor_client.receive()
+                if banco:
+                    pass  # Process banco data
+
                 print('DAQ Done')
         hv_client.send(f'Finished')
     print('donzo')
