@@ -31,16 +31,9 @@ def main():
                 sub_run = server.receive_json()
                 set_hvs(hv_info, sub_run['hvs'])
                 server.send(f'HV Set {sub_run["sub_run_name"]}')
-                # sub_run_name = res.split()[1]
-                # for sub_run in config.sub_runs:
-                #     if sub_run['sub_run_name'] == sub_run_name:
-                #         set_hvs(config.hv_info, sub_run['hvs'])
-                #         server.send(f'HV Set {sub_run_name}')
-                #         break
             else:
                 server.send('Unknown Command')
             res = server.receive()
-    # power_off_hvs(config.hv_info)
     power_off_hvs(hv_info)
     print('donzo')
 
@@ -50,10 +43,14 @@ def set_hvs(hv_info, hvs):
     with CAENHVController(ip_address, username, password) as caen_hv:
         for slot, channel_v0s in hvs.items():
             for channel, v0 in channel_v0s.items():
-                caen_hv.set_ch_v0(int(slot), int(channel), v0)
-                power = caen_hv.get_ch_power(int(slot), int(channel))
-                if not power:
-                    caen_hv.set_ch_pw(int(slot), int(channel), 1)
+                if v0 == 0:  # If 0 V, turn off channel without setting voltage
+                    if power:
+                        caen_hv.set_ch_pw(int(slot), int(channel), 0)
+                else:
+                    caen_hv.set_ch_v0(int(slot), int(channel), v0)
+                    power = caen_hv.get_ch_power(int(slot), int(channel))
+                    if not power:
+                        caen_hv.set_ch_pw(int(slot), int(channel), 1)
 
         all_ramped = False
         while not all_ramped:
