@@ -16,7 +16,6 @@ class Config:
         self.run_name = 'm3_hv_scan'
         self.daq_dir = '/home/clas12/dylan/Run/'
         self.run_dir = f'{self.daq_dir}{self.run_name}/'
-        # self.daq_config_path = '../../config/CosmicTb_TPOT.cfg'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
         self.raw_daq_inner_dir = 'raw_daq_data'
