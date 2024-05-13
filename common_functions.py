@@ -14,6 +14,7 @@ import os
 def create_dir_if_not_exist(dir_path):
     if not os.path.isdir(dir_path):
         os.makedirs(dir_path)
+        os.chmod(dir_path, 0o777)
 
 
 def get_date_from_fdf_file_name(file_name):
