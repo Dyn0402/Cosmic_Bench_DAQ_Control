@@ -65,14 +65,16 @@ class DAQController:
                 print('DAQ process finished.')
                 break
             if not sent_go and output.strip() == '***':  # Start of run, begin taking pedestals
-                sleep(1)
+                sleep(2)
                 print(' Got the stars. Writing G.')  # Signal to start run
+                sleep(1)
                 process.stdin.write('G')
                 process.stdin.flush()  # Ensure the command is sent immediately
                 sent_go = True
             elif not sent_continue and 'Press C to Continue' in output.strip():  # End of pedestals, begin taking data
-                sleep(1)
+                sleep(2)
                 print(' Got the continue. Writing C.')
+                sleep(1)
                 process.stdin.write('C')  # Signal to start data taking
                 process.stdin.flush()
                 if self.trigger_switch_client is not None:
