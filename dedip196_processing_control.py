@@ -30,22 +30,24 @@ def main():
                     if 'Decode FDFs' in res:
                         sub_run = res.strip().split()[-1]
                         sub_run_dir = f"{run_info['run_dir']}/{sub_run}/"
-                        fdf_dir = f"{sub_run_dir}{run_info['raw_daq_inner_dir']}"
-                        out_dir = f"{sub_run_dir}{run_info['decoded_root_inner_dir']}"
+                        fdf_dir = f"{sub_run_dir}{run_info['raw_daq_inner_dir']}/"
+                        out_dir = f"{sub_run_dir}{run_info['decoded_root_inner_dir']}/"
                         create_dir_if_not_exist(out_dir)
+                        print(f'\n\nDecoding FDFs in {fdf_dir} to {out_dir}')
                         decode_fdfs(fdf_dir, run_info['decode_path'], run_info['convert_path'], out_dir,
                                     out_type=run_info['out_type'])
                         server.send('FDFs Decoded')
                     elif 'Run M3 Tracking' in res:
                         sub_run = res.strip().split()[-1]
                         sub_run_dir = f"{run_info['run_dir']}/{sub_run}/"
-                        fdf_dir = f"{sub_run_dir}{run_info['raw_daq_inner_dir']}"
-                        out_dir = f"{sub_run_dir}{run_info['m3_tracking_inner_dir']}"
+                        fdf_dir = f"{sub_run_dir}{run_info['raw_daq_inner_dir']}/"
+                        out_dir = f"{sub_run_dir}{run_info['m3_tracking_inner_dir']}/"
                         create_dir_if_not_exist(out_dir)
                         m3_tracking(fdf_dir, run_info['tracking_sh_path'], out_dir)
                         server.send('M3 Tracking Complete')
                     else:
                         server.send('Unknown Command')
+                    res = server.receive()
         except Exception as e:
             print(f'Error: {e}\nRestarting processing control server...')
     print('donzo')
@@ -81,6 +83,7 @@ def decode_fdfs(fdf_dir, decode_path, convert_path=None, out_dir=None, feu_nums=
                 continue
         out_name = file.replace('.fdf', '_decoded.root')
         command = f"{decode_path} {fdf_dir}{file} {out_name}"
+        print(f'\nDecoding {file} to {out_name}')
         print(command)
         os.system(command)
         if out_type in ['array', 'both']:
