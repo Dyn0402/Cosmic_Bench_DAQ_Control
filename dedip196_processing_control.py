@@ -89,13 +89,16 @@ def decode_fdfs(fdf_dir, decode_path, convert_path=None, out_dir=None, feu_nums=
         print(f'\nDecoding {file} to {out_name}')
         print(command)
         os.system(command)
+        os.chmod(out_name, 0o777)
         if out_type in ['array', 'both']:
             if convert_path is None:
                 print('Error! Need convert path for vec->array! Skipping')
             else:
-                command = f"{convert_path} {out_name} {out_name}_array.root"
+                array_out_name = out_name.replace('.root', '_array.root')
+                command = f"{convert_path} {out_name} {array_out_name}"
                 print(command)
                 os.system(command)
+                os.chmod(array_out_name, 0o777)
             if out_type == 'array':  # Remove vector formatted root file
                 os.remove(out_name)
 
@@ -144,7 +147,9 @@ def get_rays_from_fdf(fdf_run, tracking_sh_file, file_nums, output_root_dir, run
         if not verbose:
             cmd += ' > /dev/null'
         os.system(cmd)
-        shutil.move(f'output_{i:03d}.root', f'{output_root_dir}{fdf_run}_{i:03d}_rays.root')
+        out_root_path = f'{output_root_dir}{fdf_run}_{i:03d}_rays.root'
+        shutil.move(f'output_{i:03d}.root', out_root_path)
+        os.chmod(out_root_path, 0o777)
     os.chdir(og_dir)
 
 
