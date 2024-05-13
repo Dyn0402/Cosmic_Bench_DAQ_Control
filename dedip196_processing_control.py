@@ -25,6 +25,7 @@ def main():
                 server.receive()
                 server.send('Processing control connected')
                 run_info = server.receive_json()
+                os.system(f'source {run_info["source_root_path"]}')  # Source root
 
                 res = server.receive()
                 while 'Finished' not in res:

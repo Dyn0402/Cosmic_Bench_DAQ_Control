@@ -69,6 +69,7 @@ def set_hvs(hv_info, hvs):
             if not all_ramped:
                 print('Waiting for HV to ramp...')
                 time.sleep(10)  # Make sure not to wait too long, after 15s crate times out
+        print('HV Ramped')
 
 
 def power_off_hvs(hv_info):

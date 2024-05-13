@@ -42,6 +42,7 @@ class Config:
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
             'decoded_root_inner_dir': self.decoded_root_inner_dir,
             'm3_tracking_inner_dir': self.decoded_root_inner_dir,
+            'source_root_path': '/local/home/banco/P2/root/bin/thisroot.sh',
             'decode_path': '/local/home/banco/dylan/decode/decode',
             'convert_path': '/local/home/banco/dylan/decode/convert_vec_tree_to_array',
             'tracking_run_dir': '/local/home/banco/dylan/m3_tracking/',
