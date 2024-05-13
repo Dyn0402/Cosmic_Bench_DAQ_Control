@@ -42,9 +42,9 @@ class Config:
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
             'decoded_root_inner_dir': self.decoded_root_inner_dir,
             'm3_tracking_inner_dir': self.decoded_root_inner_dir,
-            'decode_path': '~/dylan/decode/decode.cpp',
-            'convert_path': '~/dylan/decode/convert.cpp',
-            'tracking_sh_path': '~/dylan/m3_tracking/run_tracking_single.sh',
+            'decode_path': '/local/home/banco/dylan/decode/decode',
+            'convert_path': '/local/home/banco/dylan/decode/convert_vec_tree_to_array',
+            'tracking_sh_path': '/local/home/banco/dylan/m3_tracking/run_tracking_single.sh',
             'out_type': 'both',  # 'vec', 'array', or 'both'
         }
 

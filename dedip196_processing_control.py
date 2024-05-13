@@ -79,19 +79,19 @@ def decode_fdfs(fdf_dir, decode_path, convert_path=None, out_dir=None, feu_nums=
         if fdf_type != 'all':
             if fdf_type not in file.split('_'):
                 continue
-        out_name = file.replace('.fdf', 'decoded')
-        command = f"{decode_path} {fdf_dir}{file.replace('.fdf', '')} {out_name}"
+        out_name = file.replace('.fdf', '_decoded.root')
+        command = f"{decode_path} {fdf_dir}{file} {out_name}"
         print(command)
         os.system(command)
         if out_type in ['array', 'both']:
             if convert_path is None:
                 print('Error! Need convert path for vec->array! Skipping')
             else:
-                command = f"{convert_path} {out_name} {out_name}_array"
+                command = f"{convert_path} {out_name} {out_name}_array.root"
                 print(command)
                 os.system(command)
             if out_type == 'array':  # Remove vector formatted root file
-                os.remove(f'{out_name}.root')
+                os.remove(out_name)
 
     os.chdir(og_dir)
 
