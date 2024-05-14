@@ -47,7 +47,9 @@ class DAQController:
             os.chdir(self.run_directory)
         process = Popen(self.run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
         start, run_start, sent_go_time, sent_continue_time = time(), None, None, None
-        sent_go, sent_continue, run_successful, triggered = False, False, True, False
+        sent_go, sent_continue, run_successful, triggered, triggered_off = False, False, True, False, False
+        if self.trigger_switch_client is not None:
+            self.trigger_switch_client.silent = True
         while True:
             # if sent_continue:
             #     if run_start is not None and time() - run_start >= self.run_time * 60:
@@ -82,18 +84,19 @@ class DAQController:
 
             # Need to wait a bit for DAQ to start
             if (not triggered and self.trigger_switch_client is not None and sent_continue
-                    and time() - sent_continue_time > 40):
+                    and time() - sent_continue_time > 20):  # Takes 0 seconds to start, 20 to be safe
                 self.trigger_switch_client.send('on')
                 self.trigger_switch_client.receive()
                 triggered = True
                 run_start = time()  # Reset run time if trigger used
 
-            if self.trigger_switch_client is not None and sent_continue:
+            if self.trigger_switch_client is not None and sent_continue and triggered and not triggered_off:
                 if run_start is not None and time() - run_start >= self.run_time * 60:
-                    print('Turning off trigger switch.')
+                    # print('Turning off trigger switch.')
                     self.trigger_switch_client.send('off')
                     self.trigger_switch_client.receive()
-                    print('Run finished.')
+                    triggered_off = True
+                    # print('Run finished.')
 
             if output.strip() != '':
                 print(output.strip())
@@ -109,6 +112,8 @@ class DAQController:
                 break
 
         os.chdir(self.original_working_directory)
+        if self.trigger_switch_client is not None:
+            self.trigger_switch_client.silent = False
 
         if run_successful:
             move_data_files(self.run_directory, self.out_directory)
