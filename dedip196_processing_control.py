@@ -159,7 +159,7 @@ def get_rays_from_fdf(fdf_run, tracking_sh_file, file_nums, output_root_dir, run
         #     cmd += ' > /dev/null'
         # Construct the source command if root_source_path is not None
         if root_source_path is not None:
-            source_cmd = f'source {root_source_path}source_root.sh && '
+            source_cmd = f'source {root_source_path} && '
         else:
             source_cmd = ''
 
