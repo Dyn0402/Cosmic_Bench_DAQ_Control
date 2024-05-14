@@ -61,7 +61,8 @@ def main():
                             res = server.receive()
                         print('Stopping Banco DAQ')
                         # process.send_signal(signal.SIGINT)  # Send ctrl-c to stop banco_daq
-                        process.send_signal(signal.SIGTERM)  # Send ctrl-c to stop banco_daq
+                        # process.send_signal(signal.SIGTERM)  # Send ctrl-c to stop banco_daq
+                        process.terminate()
 
                         # Wait for the process to handle the signal and clean up
                         try:
