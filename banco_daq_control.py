@@ -12,7 +12,7 @@ import shutil
 from subprocess import Popen, TimeoutExpired
 import signal
 import psutil
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from Server import Server
 from common_functions import *
@@ -91,7 +91,7 @@ def move_data_files(src_dir, dest_dir, start_time, end_time):
             file_time = datetime.strptime('_'.join(file.split('-')[0].split('_')[1:3]), '%y%m%d_%H%M%S')
             if file_time > datetime(2024, 5, 14, 22, 53):
                 print(f'File: {file}\nTime: {file_time}')
-            if start_time <= file_time <= end_time:
+            if start_time - timedelta(minutes=1) <= file_time < end_time:  # Files are tagged at start
                 # Copy file, maybe move and clean up later if confident
                 shutil.copy(f'{src_dir}/{file}', f'{dest_dir}/{file}')
 
