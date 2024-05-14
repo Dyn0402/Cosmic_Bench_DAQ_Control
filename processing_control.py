@@ -122,7 +122,7 @@ def m3_tracking(fdf_dir, tracking_sh_ref_path, tracking_run_dir, out_dir=None, m
     :return:
     """
     for file in os.listdir(fdf_dir):
-        if not file.endswith('.fdf'):
+        if not file.endswith('.fdf') or '_datrun_' not in file:
             continue
         feu_num = get_feu_num_from_fdf_file_name(file)
         if feu_num != m3_fdf_num:

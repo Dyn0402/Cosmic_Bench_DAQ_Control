@@ -15,7 +15,6 @@ from run_config import Config
 def main():
     config = Config()
     sedip28_ip, sedip28_port = config.sedip28_processor_info['ip'], config.sedip28_processor_info['port']
-    sedip28_port = 1200
     with Client(sedip28_ip, sedip28_port) as processor_client:
         processor_client.send('Connected to run_processor')
         processor_client.receive()

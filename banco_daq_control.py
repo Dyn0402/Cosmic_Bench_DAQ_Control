@@ -8,11 +8,9 @@ Created as Cosmic_Bench_DAQ_Control/banco_daq_control.py
 @author: Dylan Neff, Dylan
 """
 
-import os
 import shutil
-from subprocess import Popen, PIPE, TimeoutExpired
+from subprocess import Popen, TimeoutExpired
 import signal
-import threading
 import psutil
 from datetime import datetime
 
@@ -23,9 +21,7 @@ from common_functions import *
 
 
 def main():
-    # config = Config()
     port = 1100
-    # run_path = config.banco_daq_run_path
     while True:
         try:
             with Server(port=port) as server:
@@ -45,16 +41,8 @@ def main():
                         create_dir_if_not_exist(sub_run_out_dir)
                         sub_run_raw_out_dir = f'{sub_run_out_dir}{banco_info["data_inner_dir"]}/'
                         create_dir_if_not_exist(sub_run_raw_out_dir)
-                        # process = Popen(run_path, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
-                        # process = Popen(run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE,
-                        #                 universal_newlines=True)  # Python < 3.7
                         process = Popen(run_command, shell=True)
-                        # Create threads to print stdout and stderr
-                        # stdout_thread = threading.Thread(target=print_output, args=(process.stdout, "STDOUT"))
-                        # stderr_thread = threading.Thread(target=print_output, args=(process.stderr, "STDERR"))
 
-                        # stdout_thread.start()
-                        # stderr_thread.start()
                         server.send('Banco DAQ started')
                         res = server.receive()
                         while 'Stop' not in res:
@@ -72,8 +60,6 @@ def main():
                                 # If the process doesn't terminate in time, force kill it
                                 print(f'Force killing {child.pid}')
                                 child.kill()
-                        # process.send_signal(signal.SIGINT)  # Send ctrl-c to stop banco_daq
-                        # process.send_signal(signal.SIGTERM)  # Send ctrl-c to stop banco_daq
 
                         # Wait for the process to handle the signal and clean up
                         try:
@@ -85,9 +71,6 @@ def main():
                             print('Force killing Banco DAQ')
                             process.kill()
                             process.wait()
-                        # Ensure all output is printed
-                        # stdout_thread.join()
-                        # stderr_thread.join()
 
                         end_time = datetime.now()
                         move_data_files(temp_dir, sub_run_raw_out_dir, start_time, end_time)
@@ -121,11 +104,6 @@ def find_child_processes(pid):
     except psutil.NoSuchProcess:
         pass
     return child_processes
-
-
-def print_output(stream, prefix):
-    for line in stream:
-        print(f"{prefix}: {line}", end='')
 
 
 if __name__ == '__main__':

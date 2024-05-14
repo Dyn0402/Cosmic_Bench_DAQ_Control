@@ -9,7 +9,7 @@ Created as Cosmic_Bench_DAQ_Control/daq_control.py
 """
 
 import os
-import time
+from time import sleep
 from contextlib import nullcontext
 
 from Client import Client
@@ -105,7 +105,8 @@ def main():
                 if banco:
                     pass  # Process banco data
 
-                print('DAQ Done')
+                print(f'Finished {sub_run_name}, waiting 30 seconds before next run')
+                sleep(30)
         hv.send(f'Finished')
     print('donzo')
 

@@ -13,7 +13,7 @@ import json
 
 class Config:
     def __init__(self):
-        self.run_name = 'banco_fast_hv_scan_test_5_14'
+        self.run_name = 'banco_hour_test'
         self.daq_dir = '/home/clas12/dylan/Run/'
         self.run_dir = f'{self.daq_dir}{self.run_name}/'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -76,8 +76,8 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'HV7',
-                'run_time': 0.5,  # Minutes
+                'sub_run_name': 'hour_test',
+                'run_time': 60,  # Minutes
                 'hvs': {
                     0: {
                         0: 600,
@@ -100,102 +100,6 @@ class Config:
                         4: 450,
                         5: 450,
                         6: 450,
-                        8: 460,
-                        9: 460,
-                        10: 460,
-                        11: 460,
-                    }
-                }
-            },
-            {
-                'sub_run_name': 'HV6',
-                'run_time': 2,  # Minutes
-                'hvs': {
-                    0: {
-                        0: 600,
-                        1: 600,
-                        2: 800,
-                        3: 800,
-                        6: 800,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500,
-                    },
-                    2: {
-                        0: 445,
-                    },
-                    3: {
-                        1: 360,
-                        2: 405,
-                        3: 445,
-                        4: 445,
-                        5: 445,
-                        6: 445,
-                        8: 460,
-                        9: 460,
-                        10: 460,
-                        11: 460,
-                    }
-                }
-            },
-            {
-                'sub_run_name': 'HV5',
-                'run_time': 2,  # Minutes
-                'hvs': {
-                    0: {
-                        0: 600,
-                        1: 600,
-                        2: 800,
-                        3: 800,
-                        6: 800,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500,
-                    },
-                    2: {
-                        0: 440,
-                    },
-                    3: {
-                        1: 355,
-                        2: 400,
-                        3: 440,
-                        4: 440,
-                        5: 440,
-                        6: 440,
-                        8: 460,
-                        9: 460,
-                        10: 460,
-                        11: 460,
-                    }
-                }
-            },
-            {
-                'sub_run_name': 'HV4',
-                'run_time': 2,  # Minutes
-                'hvs': {
-                    0: {
-                        0: 600,
-                        1: 600,
-                        2: 800,
-                        3: 800,
-                        6: 800,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500
-                    },
-                    2: {
-                        0: 435,
-                    },
-                    3: {
-                        1: 350,
-                        2: 395,
-                        3: 435,
-                        4: 435,
-                        5: 435,
-                        6: 435,
                         8: 460,
                         9: 460,
                         10: 460,
