@@ -10,6 +10,7 @@ Created as Cosmic_Bench_DAQ_Control/dedip196_processing_control
 
 import os
 import sys
+import subprocess
 import shutil
 from datetime import datetime
 
@@ -178,7 +179,8 @@ def get_rays_from_fdf(fdf_run, tracking_sh_file, file_nums, output_root_dir, run
 
         print(f'Running command: {cmd}')
 
-        os.system(cmd)
+        # os.system(cmd)
+        subprocess.run(cmd, shell=True)
 
         out_root_path = f'{output_root_dir}{fdf_run}_{i:03d}_rays.root'
         shutil.move(f'output_{i:03d}.root', out_root_path)
