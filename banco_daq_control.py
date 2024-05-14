@@ -22,6 +22,7 @@ from common_functions import *
 
 def main():
     port = 1100
+    # Need to call setup-o2-root before running this script
     while True:
         try:
             with Server(port=port) as server:
