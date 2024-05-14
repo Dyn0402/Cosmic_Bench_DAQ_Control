@@ -24,7 +24,7 @@ def main():
     # config = Config()
     port = 1100
     # run_path = config.banco_daq_run_path
-    with (Server(port=port) as server):
+    with Server(port=port) as server:
         server.receive()
         server.send('Banco DAQ control connected')
         banco_info = server.receive_json()

@@ -55,8 +55,7 @@ def main():
                             out_dir = f"{sub_run_dir}{run_info['m3_tracking_inner_dir']}/"
                             create_dir_if_not_exist(out_dir)
                             print(f'\n\nRunning M3 Tracking on FDFs in {fdf_dir} to {out_dir}')
-                            m3_tracking(fdf_dir, run_info['tracking_sh_path'], run_info['tracking_run_dir'], out_dir,
-                                        run_info["source_root_path"])
+                            m3_tracking(fdf_dir, run_info['tracking_sh_path'], run_info['tracking_run_dir'], out_dir)
                             print('M3 Tracking Complete')
                     res = server.receive()
         except Exception as e:
@@ -113,14 +112,13 @@ def decode_fdfs(fdf_dir, decode_path, convert_path=None, out_dir=None, feu_nums=
     os.chdir(og_dir)
 
 
-def m3_tracking(fdf_dir, tracking_sh_ref_path, tracking_run_dir, out_dir=None, root_source_path=None, m3_fdf_num=1):
+def m3_tracking(fdf_dir, tracking_sh_ref_path, tracking_run_dir, out_dir=None, m3_fdf_num=1):
     """
 
     :param fdf_dir:
     :param tracking_sh_ref_path:
     :param tracking_run_dir:
     :param out_dir:
-    :param root_source_path:
     :param m3_fdf_num:
     :return:
     """
@@ -133,12 +131,11 @@ def m3_tracking(fdf_dir, tracking_sh_ref_path, tracking_run_dir, out_dir=None, r
         run_name = get_run_name_from_fdf_file_name(file)
         file_num = get_file_num_from_fdf_file_name(file)
         out_dir = fdf_dir if out_dir is None else out_dir
-        get_rays_from_fdf(run_name, tracking_sh_ref_path, [file_num], out_dir, tracking_run_dir,
-                          root_source_path, verbose=True, fdf_dir=fdf_dir)
+        get_rays_from_fdf(run_name, tracking_sh_ref_path, [file_num], out_dir, tracking_run_dir, verbose=True,
+                          fdf_dir=fdf_dir)
 
 
-def get_rays_from_fdf(fdf_run, tracking_sh_file, file_nums, output_root_dir, run_dir, root_source_path=None,
-                      verbose=False, fdf_dir=None):
+def get_rays_from_fdf(fdf_run, tracking_sh_file, file_nums, output_root_dir, run_dir, verbose=False, fdf_dir=None):
     """
     Get rays from fdf files and write to root file.
     :param fdf_run:
@@ -146,38 +143,25 @@ def get_rays_from_fdf(fdf_run, tracking_sh_file, file_nums, output_root_dir, run
     :param file_nums:
     :param output_root_dir:
     :param run_dir:
-    :param root_source_path:
     :param verbose:
     :param fdf_dir:
     :return:
     """
     og_dir = os.getcwd()
     os.chdir(run_dir)
-    print(f'Running tracking on {fdf_run}')
-    print(f'Running in directory {run_dir}')
     for i in file_nums:
-        print(f'Processing file {i}')
+        print(f'Processing file {i} of {len(file_nums)} for run {fdf_run}...')
         ped_in_dir = fdf_dir if fdf_dir is not None else None
         data_in_dir = fdf_dir if fdf_dir is not None else None
         temp_sh_file = make_temp_sh_file(fdf_run, tracking_sh_file, i, 'tracking',
                                          ped_in_dir=ped_in_dir, data_in_dir=data_in_dir)
-        # cmd = f'{temp_sh_file}'
-        # if not verbose:
-        #     cmd += ' > /dev/null'
-        # Construct the source command if root_source_path is not None
-        print(f'Running {temp_sh_file}')
-        if root_source_path is not None:
-            source_cmd = f'source {root_source_path} && '
-        else:
-            source_cmd = ''
 
         # Construct the final command based on verbosity
         if not verbose:
-            cmd = f'bash -c "{source_cmd}{temp_sh_file} > /dev/null"'
+            cmd = f'{temp_sh_file} > /dev/null"'
         else:
-            cmd = f'bash -c "{source_cmd}{temp_sh_file}"'
+            cmd = f'{temp_sh_file}"'
 
-        cmd = f'{temp_sh_file}'
         print(f'Running command: {cmd}')
 
         # os.system(cmd)
