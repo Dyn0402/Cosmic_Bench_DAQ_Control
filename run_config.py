@@ -13,7 +13,7 @@ import json
 
 class Config:
     def __init__(self):
-        self.run_name = 'banco_fast_hv_scan_test_5_14'
+        self.run_name = 'banco_overnight_hv_scan_test_5_15'
         self.daq_dir = '/home/clas12/dylan/Run/'
         self.run_dir = f'{self.daq_dir}{self.run_name}/'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -77,7 +77,7 @@ class Config:
         self.sub_runs = [
             {
                 'sub_run_name': 'HV7',
-                'run_time': 0.5,  # Minutes
+                'run_time': 90,  # Minutes
                 'hvs': {
                     0: {
                         0: 600,
@@ -109,7 +109,7 @@ class Config:
             },
             {
                 'sub_run_name': 'HV6',
-                'run_time': 2,  # Minutes
+                'run_time': 90,  # Minutes
                 'hvs': {
                     0: {
                         0: 600,
@@ -141,7 +141,7 @@ class Config:
             },
             {
                 'sub_run_name': 'HV5',
-                'run_time': 2,  # Minutes
+                'run_time': 90,  # Minutes
                 'hvs': {
                     0: {
                         0: 600,
@@ -173,7 +173,7 @@ class Config:
             },
             {
                 'sub_run_name': 'HV4',
-                'run_time': 2,  # Minutes
+                'run_time': 90,  # Minutes
                 'hvs': {
                     0: {
                         0: 600,
@@ -196,6 +196,102 @@ class Config:
                         4: 435,
                         5: 435,
                         6: 435,
+                        8: 460,
+                        9: 460,
+                        10: 460,
+                        11: 460,
+                    }
+                }
+            },
+            {
+                'sub_run_name': 'HV3',
+                'run_time': 90,  # Minutes
+                'hvs': {
+                    0: {
+                        0: 600,
+                        1: 600,
+                        2: 800,
+                        3: 800,
+                        6: 800,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500
+                    },
+                    2: {
+                        0: 430,
+                    },
+                    3: {
+                        1: 345,
+                        2: 390,
+                        3: 430,
+                        4: 430,
+                        5: 430,
+                        6: 430,
+                        8: 460,
+                        9: 460,
+                        10: 460,
+                        11: 460,
+                    }
+                }
+            },
+            {
+                'sub_run_name': 'HV2',
+                'run_time': 90,  # Minutes
+                'hvs': {
+                    0: {
+                        0: 600,
+                        1: 600,
+                        2: 800,
+                        3: 800,
+                        6: 800,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500
+                    },
+                    2: {
+                        0: 425,
+                    },
+                    3: {
+                        1: 340,
+                        2: 385,
+                        3: 425,
+                        4: 425,
+                        5: 425,
+                        6: 425,
+                        8: 460,
+                        9: 460,
+                        10: 460,
+                        11: 460,
+                    }
+                }
+            },
+            {
+                'sub_run_name': 'HV1',
+                'run_time': 90,  # Minutes
+                'hvs': {
+                    0: {
+                        0: 600,
+                        1: 600,
+                        2: 800,
+                        3: 800,
+                        6: 800,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500
+                    },
+                    2: {
+                        0: 420,
+                    },
+                    3: {
+                        1: 335,
+                        2: 380,
+                        3: 420,
+                        4: 420,
+                        5: 420,
+                        6: 420,
                         8: 460,
                         9: 460,
                         10: 460,

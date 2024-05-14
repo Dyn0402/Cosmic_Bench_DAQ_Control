@@ -105,8 +105,8 @@ def main():
                 if banco:
                     pass  # Process banco data
 
-                print(f'Finished {sub_run_name}, waiting 300 seconds before next run')
-                sleep(300)
+                print(f'Finished {sub_run_name}, waiting 10 seconds before next run')
+                sleep(10)
         hv.send(f'Finished')
     print('donzo')
 

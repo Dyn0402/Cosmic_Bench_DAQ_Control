@@ -94,6 +94,7 @@ def move_data_files(src_dir, dest_dir, start_time, end_time):
             if start_time - timedelta(minutes=1) <= file_time < end_time:  # Files are tagged at start
                 # Copy file, maybe move and clean up later if confident
                 shutil.copy(f'{src_dir}/{file}', f'{dest_dir}/{file}')
+                os.chmod(f'{dest_dir}/{file}', 0o777)
 
 
 # Function to recursively find all child processes of a given process
