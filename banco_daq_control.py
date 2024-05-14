@@ -48,11 +48,11 @@ def main():
                         process = Popen(run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE,
                                         universal_newlines=True)  # Python < 3.7
                         # Create threads to print stdout and stderr
-                        stdout_thread = threading.Thread(target=print_output, args=(process.stdout, "STDOUT"))
-                        stderr_thread = threading.Thread(target=print_output, args=(process.stderr, "STDERR"))
+                        # stdout_thread = threading.Thread(target=print_output, args=(process.stdout, "STDOUT"))
+                        # stderr_thread = threading.Thread(target=print_output, args=(process.stderr, "STDERR"))
 
-                        stdout_thread.start()
-                        stderr_thread.start()
+                        # stdout_thread.start()
+                        # stderr_thread.start()
                         server.send('Banco DAQ started')
                         res = server.receive()
                         while 'Stop' not in res:
@@ -72,8 +72,8 @@ def main():
                             process.kill()
                             process.wait()
                         # Ensure all output is printed
-                        stdout_thread.join()
-                        stderr_thread.join()
+                        # stdout_thread.join()
+                        # stderr_thread.join()
 
                         end_time = datetime.now()
                         move_data_files(temp_dir, sub_run_raw_out_dir, start_time, end_time)
