@@ -46,16 +46,16 @@ class DAQController:
         if self.run_directory is not None:
             os.chdir(self.run_directory)
         process = Popen(self.run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
-        start, run_start = time(), None
+        start, run_start, sent_go_time, sent_continue_time = time(), None, None, None
         sent_go, sent_continue, run_successful = False, False, True
         while True:
-            if sent_continue:
-                if run_start is not None and time() - run_start >= self.run_time * 60:
-                    if self.trigger_switch_client is not None:
-                        print('Turning off trigger switch.')
-                        self.trigger_switch_client.send('off')
-                        self.trigger_switch_client.receive()
-                        print('Run finished.')
+            # if sent_continue:
+            #     if run_start is not None and time() - run_start >= self.run_time * 60:
+            #         if self.trigger_switch_client is not None:
+            #             print('Turning off trigger switch.')
+            #             self.trigger_switch_client.send('off')
+            #             self.trigger_switch_client.receive()
+            #             print('Run finished.')
                     # sleep(5)
                     # process.stdin.write('g')  # Signal to stop run
                     # process.stdin.flush()
@@ -65,26 +65,40 @@ class DAQController:
                 print('DAQ process finished.')
                 break
             if not sent_go and output.strip() == '***':  # Start of run, begin taking pedestals
-                sleep(2)
-                print(' Got the stars. Writing G.')  # Signal to start run
-                sleep(1)
+                # sleep(2)
+                # print(' Got the stars. Writing G.')  # Signal to start run
+                # sleep(1)
                 process.stdin.write('G')
                 process.stdin.flush()  # Ensure the command is sent immediately
-                sent_go = True
+                sent_go, sent_go_time = True, time()
             elif not sent_continue and 'Press C to Continue' in output.strip():  # End of pedestals, begin taking data
-                sleep(2)
-                print(' Got the continue. Writing C.')
-                sleep(1)
+                # sleep(2)
+                # print(' Got the continue. Writing C.')
+                # sleep(1)
                 process.stdin.write('C')  # Signal to start data taking
                 process.stdin.flush()
-                if self.trigger_switch_client is not None:
-                    sleep(30)  # Need to wait a bit for DAQ to start
-                    self.trigger_switch_client.send('on')
-                    self.trigger_switch_client.receive()
+                sent_continue, sent_continue_time = True, time()
                 run_start = time()
+
+            # Need to wait a bit for DAQ to start
+            if self.trigger_switch_client is not None and sent_continue and time() - sent_continue_time > 30:
+                self.trigger_switch_client.send('on')
+                self.trigger_switch_client.receive()
+                run_start = time()  # Reset run time if trigger used
+
+            if self.trigger_switch_client is not None and sent_continue:
+                if run_start is not None and time() - run_start >= self.run_time * 60:
+                    print('Turning off trigger switch.')
+                    self.trigger_switch_client.send('off')
+                    self.trigger_switch_client.receive()
+                    print('Run finished.')
+
             if output.strip() != '':
                 print(output.strip())
-            if time() - start > self.max_run_time * 60:
+
+            go_time_out = time() - sent_go_time > 120 if sent_go and not sent_continue else False
+            run_time_out = time() - start > self.max_run_time * 60
+            if go_time_out or run_time_out:
                 print('DAQ process timed out.')
                 process.kill()
                 sleep(5)
