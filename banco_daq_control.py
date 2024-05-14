@@ -13,6 +13,7 @@ import shutil
 from subprocess import Popen, PIPE, TimeoutExpired
 import signal
 import threading
+import psutil
 from datetime import datetime
 
 from Server import Server
@@ -60,9 +61,19 @@ def main():
                             server.send('Banco DAQ running! Need to stop it before anything else can be done!')
                             res = server.receive()
                         print('Stopping Banco DAQ')
+                        child_processes = find_child_processes(process.pid)
+                        for child in child_processes:
+                            child.send_signal(signal.SIGINT)  # Send ctrl-c to stop banco_daq
+                            try:
+                                print(f'Waiting for {child.pid} to stop')
+                                child.wait(timeout=30)  # Adjust timeout as necessary
+                                print(f'{child.pid} stopped')
+                            except TimeoutExpired:
+                                # If the process doesn't terminate in time, force kill it
+                                print(f'Force killing {child.pid}')
+                                child.kill()
                         # process.send_signal(signal.SIGINT)  # Send ctrl-c to stop banco_daq
                         # process.send_signal(signal.SIGTERM)  # Send ctrl-c to stop banco_daq
-                        process.terminate()
 
                         # Wait for the process to handle the signal and clean up
                         try:
@@ -97,6 +108,19 @@ def move_data_files(src_dir, dest_dir, start_time, end_time):
             if start_time <= file_time <= end_time:
                 # Copy file, maybe move and clean up later if confident
                 shutil.copy(f'{src_dir}{file}', f'{dest_dir}{file}')
+
+
+# Function to recursively find all child processes of a given process
+def find_child_processes(pid):
+    child_processes = []
+    try:
+        parent_process = psutil.Process(pid)
+        for child in parent_process.children(recursive=True):
+            child_processes.append(child)
+            child_processes.extend(find_child_processes(child.pid))
+    except psutil.NoSuchProcess:
+        pass
+    return child_processes
 
 
 def print_output(stream, prefix):
