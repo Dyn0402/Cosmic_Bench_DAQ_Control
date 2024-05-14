@@ -24,7 +24,7 @@ class DAQController:
         self.original_working_directory = os.getcwd()
 
         self.run_time = run_time  # minutes
-        self.max_run_time = self.run_time * 2  # minutes After this time assume stuck and kill
+        self.max_run_time = self.run_time + 5  # minutes After this time assume stuck and kill
 
         # If trigger switch is used, need to run past run time to bracket the trigger switch on/off. Else just run time.
         # DAQ resets timer when first trigger received, so only need short pause to be sure.
