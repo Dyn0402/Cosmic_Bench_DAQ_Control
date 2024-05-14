@@ -93,7 +93,7 @@ def move_data_files(src_dir, dest_dir, start_time, end_time):
                 print(f'File: {file}\nTime: {file_time}')
             if start_time <= file_time <= end_time:
                 # Copy file, maybe move and clean up later if confident
-                shutil.copy(f'{src_dir}{file}', f'{dest_dir}{file}')
+                shutil.copy(f'{src_dir}/{file}', f'{dest_dir}/{file}')
 
 
 # Function to recursively find all child processes of a given process
