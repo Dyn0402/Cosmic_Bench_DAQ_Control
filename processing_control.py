@@ -157,9 +157,9 @@ def get_rays_from_fdf(fdf_run, tracking_sh_file, file_nums, output_root_dir, run
 
         # Construct the final command based on verbosity
         if not verbose:
-            cmd = f'{temp_sh_file} > /dev/null"'
+            cmd = f'{temp_sh_file} > /dev/null'
         else:
-            cmd = f'{temp_sh_file}"'
+            cmd = f'{temp_sh_file}'
 
         print(f'Running command: {cmd}')
 
