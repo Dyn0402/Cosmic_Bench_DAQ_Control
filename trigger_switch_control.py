@@ -48,11 +48,13 @@ def trigger_switch(state, pin=17):
     if state == 'on':
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(pin, GPIO.OUT)
-        GPIO.output(pin, GPIO.LOW)
+        # GPIO.output(pin, GPIO.LOW)
+        GPIO.output(pin, GPIO.HIGH)
     elif state == 'off':
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(pin, GPIO.OUT)
-        GPIO.output(pin, GPIO.HIGH)
+        # GPIO.output(pin, GPIO.HIGH)
+        GPIO.output(pin, GPIO.LOW)
     else:
         print('Unknown trigger switch state')
 
