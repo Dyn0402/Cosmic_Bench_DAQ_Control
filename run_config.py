@@ -77,7 +77,7 @@ class Config:
         self.sub_runs = [
             {
                 'sub_run_name': 'HV7',
-                'run_time': 2,  # Minutes
+                'run_time': 0.5,  # Minutes
                 'hvs': {
                     0: {
                         0: 600,

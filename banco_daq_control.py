@@ -45,8 +45,9 @@ def main():
                         sub_run_raw_out_dir = f'{sub_run_out_dir}{banco_info["data_inner_dir"]}/'
                         create_dir_if_not_exist(sub_run_raw_out_dir)
                         # process = Popen(run_path, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
-                        process = Popen(run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE,
-                                        universal_newlines=True)  # Python < 3.7
+                        # process = Popen(run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE,
+                        #                 universal_newlines=True)  # Python < 3.7
+                        process = Popen(run_command, shell=True)
                         # Create threads to print stdout and stderr
                         # stdout_thread = threading.Thread(target=print_output, args=(process.stdout, "STDOUT"))
                         # stderr_thread = threading.Thread(target=print_output, args=(process.stderr, "STDERR"))
