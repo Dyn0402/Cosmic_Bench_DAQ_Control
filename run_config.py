@@ -77,7 +77,7 @@ class Config:
         self.sub_runs = [
             {
                 'sub_run_name': 'HV7',
-                'run_time': 5,  # Minutes
+                'run_time': 2,  # Minutes
                 'hvs': {
                     0: {
                         0: 600,
@@ -109,7 +109,7 @@ class Config:
             },
             {
                 'sub_run_name': 'HV6',
-                'run_time': 5,  # Minutes
+                'run_time': 2,  # Minutes
                 'hvs': {
                     0: {
                         0: 600,
@@ -141,7 +141,7 @@ class Config:
             },
             {
                 'sub_run_name': 'HV5',
-                'run_time': 5,  # Minutes
+                'run_time': 2,  # Minutes
                 'hvs': {
                     0: {
                         0: 600,
@@ -173,7 +173,7 @@ class Config:
             },
             {
                 'sub_run_name': 'HV4',
-                'run_time': 5,  # Minutes
+                'run_time': 2,  # Minutes
                 'hvs': {
                     0: {
                         0: 600,
