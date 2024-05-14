@@ -151,6 +151,8 @@ def get_rays_from_fdf(fdf_run, tracking_sh_file, file_nums, output_root_dir, run
     """
     og_dir = os.getcwd()
     os.chdir(run_dir)
+    print(f'Running tracking on {fdf_run}')
+    print(f'Running in directory {run_dir}')
     for i in file_nums:
         print(f'Processing file {i}')
         temp_sh_file = make_temp_sh_file(fdf_run, tracking_sh_file, i, 'tracking')
@@ -158,6 +160,7 @@ def get_rays_from_fdf(fdf_run, tracking_sh_file, file_nums, output_root_dir, run
         # if not verbose:
         #     cmd += ' > /dev/null'
         # Construct the source command if root_source_path is not None
+        print(f'Running {temp_sh_file}')
         if root_source_path is not None:
             source_cmd = f'source {root_source_path} && '
         else:
@@ -168,6 +171,8 @@ def get_rays_from_fdf(fdf_run, tracking_sh_file, file_nums, output_root_dir, run
             cmd = f'bash -c "{source_cmd}{temp_sh_file} > /dev/null"'
         else:
             cmd = f'bash -c "{source_cmd}{temp_sh_file}"'
+
+        print(f'Running command: {cmd}')
 
         os.system(cmd)
 
