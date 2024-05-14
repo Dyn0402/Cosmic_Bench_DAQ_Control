@@ -18,7 +18,7 @@ from common_functions import *
 
 
 def main():
-    port = 1100
+    port = 1200
     if len(sys.argv) > 1:
         try:
             port = int(sys.argv[1])

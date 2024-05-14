@@ -14,12 +14,12 @@ from run_config import Config
 
 def main():
     config = Config()
-    dedip196_ip, dedip196_port = config.processor_info['ip'], config.processor_info['port']
-    dedip196_port = 1200
-    with Client(dedip196_ip, dedip196_port) as processor_client:
+    sedip28_ip, sedip28_port = config.sedip28_processor_info['ip'], config.sedip28_processor_info['port']
+    sedip28_port = 1200
+    with Client(sedip28_ip, sedip28_port) as processor_client:
         processor_client.send('Connected to run_processor')
         processor_client.receive()
-        processor_client.send_json(config.processor_info)
+        processor_client.send_json(config.sedip28_processor_info)
 
         processor_client.send('Run M3 Tracking HV7')
         processor_client.receive()

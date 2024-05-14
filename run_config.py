@@ -20,7 +20,7 @@ class Config:
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
         self.raw_daq_inner_dir = 'raw_daq_data'
         self.decoded_root_inner_dir = 'decoded_root'
-        self.m3_tracking_inner_dir = 'm3_tracking'
+        self.m3_tracking_inner_dir = 'm3_tracking_root'
 
         self.dream_daq_info = {
             'daq_config_template_path': '/home/clas12/dylan/Run/config/CosmicTb_TPOT.cfg',
@@ -35,19 +35,26 @@ class Config:
             'data_inner_dir': self.raw_daq_inner_dir
         }
 
-        self.processor_info = {
+        self.dedip196_processor_info = {
             'ip': '132.166.10.196',
-            'port': 1100,
+            'port': 1200,
             'run_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
             'decoded_root_inner_dir': self.decoded_root_inner_dir,
-            'm3_tracking_inner_dir': self.decoded_root_inner_dir,
-            'source_root_path': '/local/home/banco/P2/root/bin/thisroot.sh',
             'decode_path': '/local/home/banco/dylan/decode/decode',
             'convert_path': '/local/home/banco/dylan/decode/convert_vec_tree_to_array',
+            'out_type': 'both',  # 'vec', 'array', or 'both'
+        }
+
+        self.sedip28_processor_info = {
+            'ip': '192.168.10.1',
+            'port': 1200,
+            'run_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
+            'raw_daq_inner_dir': self.raw_daq_inner_dir,
+            'm3_tracking_inner_dir': self.m3_tracking_inner_dir,
+            'source_root_path': '/local/home/banco/P2/root/bin/thisroot.sh',
             'tracking_run_dir': '/local/home/banco/dylan/m3_tracking/',
             'tracking_sh_path': '/local/home/banco/dylan/m3_tracking/run_tracking_single.sh',
-            'out_type': 'both',  # 'vec', 'array', or 'both'
         }
 
         self.hv_control_info = {

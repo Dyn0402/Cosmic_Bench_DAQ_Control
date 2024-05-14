@@ -26,19 +26,21 @@ def main():
     hv_ip, hv_port = config.hv_control_info['ip'], config.hv_control_info['port']
     trigger_switch_ip, trigger_switch_port = config.trigger_switch_info['ip'], config.trigger_switch_info['port']
     banco_daq_ip, banco_daq_port = config.banco_info['ip'], config.banco_info['port']
-    dedip196_ip, dedip196_port = config.processor_info['ip'], config.processor_info['port']
+    dedip196_ip, dedip196_port = config.dedip196_processor_info['ip'], config.dedip196_processor_info['port']
+    sedip28_ip, sedip28_port = config.sedip28_processor_info['ip'], config.sedip28_processor_info['port']
 
     hv_client = Client(hv_ip, hv_port)
     trigger_switch_client = Client(trigger_switch_ip, trigger_switch_port) if banco else nullcontext()
     banco_daq_client = Client(banco_daq_ip, banco_daq_port) if banco else nullcontext()
-    processor_client = Client(dedip196_ip, dedip196_port)
+    dedip196_processor_client = Client(dedip196_ip, dedip196_port)
+    sedip28_processor_client = Client(sedip28_ip, sedip28_port)
 
     # with (Client(hv_ip, hv_port) as hv_client,
     #       Client(trigger_switch_ip, trigger_switch_port) if banco else None as trigger_switch_client,
     #       Client(banco_daq_ip, banco_daq_port) if banco else None as banco_daq_client,
-    #       Client(dedip196_ip, dedip196_port) as processor_client):
+    #       Client(dedip196_ip, dedip196_port) as dedip196_processor_client):
     with (hv_client as hv, trigger_switch_client as trigger_switch, banco_daq_client as banco_daq,
-          processor_client as processor):
+          dedip196_processor_client as dedip196_processor, sedip28_processor_client as sedip28_processor):
         hv.send('Connected to daq_control')
         hv.receive()
         hv.send_json(config.hv_info)
@@ -51,9 +53,13 @@ def main():
             banco_daq.receive()
             banco_daq.send_json(config.banco_info)
 
-        processor.send('Connected to daq_control')
-        processor.receive()
-        processor.send_json(config.processor_info)
+        dedip196_processor.send('Connected to daq_control')
+        dedip196_processor.receive()
+        dedip196_processor.send_json(config.dedip196_processor_info)
+
+        sedip28_processor.send('Connected to daq_control')
+        sedip28_processor.receive()
+        sedip28_processor.send_json(config.sedip28_processor_info)
 
         create_dir_if_not_exist(config.run_dir)
         create_dir_if_not_exist(config.run_out_dir)
@@ -84,15 +90,18 @@ def main():
                 daq_controller = DAQController(config.dream_daq_info['daq_config_template_path'], sub_run['run_time'],
                                                sub_run_name, sub_run_dir, sub_out_dir, daq_trigger_switch)
 
-                daq_controller.run()
+                daq_success = False
+                while not daq_success:  # Rerun if failure
+                    daq_success = daq_controller.run()
 
                 if banco:
                     banco_daq.send('Stop')
                     banco_daq.receive()
 
-                processor.send(f'Decode FDFs {sub_run_name}')
-                # processor.send(f'Decode FDFs Run M3 Tracking {sub_run_name}')
-                processor.receive()
+                dedip196_processor.send(f'Decode FDFs {sub_run_name}')
+                dedip196_processor.receive()
+                sedip28_processor.send(f'Run M3 Tracking {sub_run_name}')
+                sedip28_processor.receive()
                 if banco:
                     pass  # Process banco data
 
