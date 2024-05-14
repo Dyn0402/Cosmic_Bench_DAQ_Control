@@ -10,7 +10,7 @@ Created as Cosmic_Bench_DAQ_Control/banco_daq_control.py
 
 import os
 import shutil
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, TimeoutExpired
 import signal
 from datetime import datetime
 
@@ -51,14 +51,18 @@ def main():
                         while 'Stop' not in res:
                             server.send('Banco DAQ running! Need to stop it before anything else can be done!')
                             res = server.receive()
-                        os.kill(process.pid, signal.SIGINT)  # Send ctrl-c to stop banco_daq
+                        process.send_signal(signal.SIGINT)  # Send ctrl-c to stop banco_daq
+
+                        # Wait for the process to handle the signal and clean up
+                        try:
+                            process.wait(timeout=30)  # Adjust timeout as necessary
+                        except TimeoutExpired:
+                            # If the process doesn't terminate in time, force kill it
+                            process.kill()
+                            process.wait()
+                        # os.kill(process.pid, signal.SIGINT)  # Send ctrl-c to stop banco_daq
                         # process.stdin.write('q')  # Don't know signal to stop banco_daq!!!!!!!! FIX THIS
                         # process.stdin.flush()
-                        while True:
-                            output = process.stdout.readline()
-                            if output == '' and process.poll() is not None:
-                                print('DAQ process finished.')
-                                break
                         end_time = datetime.now()
                         move_data_files(temp_dir, sub_run_raw_out_dir, start_time, end_time)
 
