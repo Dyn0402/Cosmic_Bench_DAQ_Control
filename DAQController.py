@@ -27,7 +27,8 @@ class DAQController:
         self.max_run_time = self.run_time * 2  # minutes After this time assume stuck and kill
 
         # If trigger switch is used, need to run past run time to bracket the trigger switch on/off. Else just run time.
-        self.cfg_file_run_time = self.run_time * 60 if self.trigger_switch_client is None else self.run_time * 60 + 60
+        # DAQ resets timer when first trigger received, so only need short pause to be sure.
+        self.cfg_file_run_time = self.run_time * 60 if self.trigger_switch_client is None else self.run_time * 60 + 5
         self.cfg_file_path = None
         self.make_config_from_template()
 
@@ -84,7 +85,7 @@ class DAQController:
 
             # Need to wait a bit for DAQ to start
             if (not triggered and self.trigger_switch_client is not None and sent_continue
-                    and time() - sent_continue_time > 20):  # Takes 0 seconds to start, 20 to be safe
+                    and time() - sent_continue_time > 5):  # Takes 0 seconds to start, 5 to be safe
                 self.trigger_switch_client.send('on')
                 self.trigger_switch_client.receive()
                 triggered = True
