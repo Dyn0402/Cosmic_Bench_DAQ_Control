@@ -177,6 +177,7 @@ def get_rays_from_fdf(fdf_run, tracking_sh_file, file_nums, output_root_dir, run
         else:
             cmd = f'bash -c "{source_cmd}{temp_sh_file}"'
 
+        cmd = f'{temp_sh_file}'
         print(f'Running command: {cmd}')
 
         # os.system(cmd)
