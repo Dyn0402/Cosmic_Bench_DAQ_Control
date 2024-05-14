@@ -14,8 +14,8 @@ import RPi.GPIO as GPIO
 
 def main():
     port, gpio_pin = 1100, 17
-    try:
-        while True:
+    while True:
+        try:
             with Server(port=port) as server:
                 server.receive()
                 server.send('Trigger switch control connected')
@@ -31,10 +31,10 @@ def main():
                     else:
                         server.send('Unknown Command')
                     res = server.receive()
-    except Exception as e:
-        print(f'Error: {e}')
-    trigger_switch('on', pin=gpio_pin)  # Make sure to leave trigger on by default
-    GPIO.cleanup()
+        except Exception as e:
+            print(f'Error: {e}')
+        trigger_switch('on', pin=gpio_pin)  # Make sure to leave trigger on by default
+        GPIO.cleanup()
     print('donzo')
 
 

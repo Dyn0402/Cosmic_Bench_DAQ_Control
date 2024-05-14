@@ -24,44 +24,50 @@ def main():
     # config = Config()
     port = 1100
     # run_path = config.banco_daq_run_path
-    with Server(port=port) as server:
-        server.receive()
-        server.send('Banco DAQ control connected')
-        banco_info = server.receive_json()
-        run_path = banco_info['daq_run_path']
-        temp_dir, out_dir = banco_info['data_temp_dir'], banco_info['data_out_dir']
-        create_dir_if_not_exist(out_dir)
+    while True:
+        try:
+            with Server(port=port) as server:
+                server.receive()
+                server.send('Banco DAQ control connected')
+                banco_info = server.receive_json()
+                run_path = banco_info['daq_run_path']
+                temp_dir, out_dir = banco_info['data_temp_dir'], banco_info['data_out_dir']
+                create_dir_if_not_exist(out_dir)
 
-        res = server.receive()
-        while 'Finished' not in res:
-            if 'Start' in res:
-                start_time = datetime.now()
-                sub_run_name = res.split()[-1]
-                sub_run_out_dir = f'{out_dir}{sub_run_name}/'
-                create_dir_if_not_exist(sub_run_out_dir)
-                sub_run_raw_out_dir = f'{sub_run_out_dir}{banco_info["data_inner_dir"]}/'
-                create_dir_if_not_exist(sub_run_raw_out_dir)
-                process = Popen(run_path, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
-                server.send('Banco DAQ started')
                 res = server.receive()
-                while 'Stop' not in res:
-                    server.send('Banco DAQ running! Need to stop it before anything else can be done!')
-                    res = server.receive()
-                os.kill(process.pid, signal.SIGINT)  # Send ctrl-c to stop banco_daq
-                # process.stdin.write('q')  # Don't know signal to stop banco_daq!!!!!!!! FIX THIS
-                # process.stdin.flush()
-                while True:
-                    output = process.stdout.readline()
-                    if output == '' and process.poll() is not None:
-                        print('DAQ process finished.')
-                        break
-                end_time = datetime.now()
-                move_data_files(temp_dir, sub_run_raw_out_dir, start_time, end_time)
+                while 'Finished' not in res:
+                    if 'Start' in res:
+                        start_time = datetime.now()
+                        sub_run_name = res.split()[-1]
+                        sub_run_out_dir = f'{out_dir}/{sub_run_name}/'
+                        create_dir_if_not_exist(sub_run_out_dir)
+                        sub_run_raw_out_dir = f'{sub_run_out_dir}{banco_info["data_inner_dir"]}/'
+                        create_dir_if_not_exist(sub_run_raw_out_dir)
+                        # process = Popen(run_path, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
+                        process = Popen(run_path, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE,
+                                        universal_newlines=True)  # Python < 3.7
+                        server.send('Banco DAQ started')
+                        res = server.receive()
+                        while 'Stop' not in res:
+                            server.send('Banco DAQ running! Need to stop it before anything else can be done!')
+                            res = server.receive()
+                        os.kill(process.pid, signal.SIGINT)  # Send ctrl-c to stop banco_daq
+                        # process.stdin.write('q')  # Don't know signal to stop banco_daq!!!!!!!! FIX THIS
+                        # process.stdin.flush()
+                        while True:
+                            output = process.stdout.readline()
+                            if output == '' and process.poll() is not None:
+                                print('DAQ process finished.')
+                                break
+                        end_time = datetime.now()
+                        move_data_files(temp_dir, sub_run_raw_out_dir, start_time, end_time)
 
-                server.send('Banco DAQ stopped')
-            else:
-                server.send('Unknown Command')
-            res = server.receive()
+                        server.send('Banco DAQ stopped')
+                    else:
+                        server.send('Unknown Command')
+                    res = server.receive()
+        except Exception as e:
+            print(f'Error: {e}')
     print('donzo')
 
 

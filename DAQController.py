@@ -47,7 +47,7 @@ class DAQController:
             os.chdir(self.run_directory)
         process = Popen(self.run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
         start, run_start, sent_go_time, sent_continue_time = time(), None, None, None
-        sent_go, sent_continue, run_successful = False, False, True
+        sent_go, sent_continue, run_successful, trigger_on = False, False, True, False
         while True:
             # if sent_continue:
             #     if run_start is not None and time() - run_start >= self.run_time * 60:
@@ -81,7 +81,8 @@ class DAQController:
                 run_start = time()
 
             # Need to wait a bit for DAQ to start
-            if self.trigger_switch_client is not None and sent_continue and time() - sent_continue_time > 30:
+            if (not trigger_on and self.trigger_switch_client is not None and sent_continue
+                    and time() - sent_continue_time > 30):
                 self.trigger_switch_client.send('on')
                 self.trigger_switch_client.receive()
                 run_start = time()  # Reset run time if trigger used
