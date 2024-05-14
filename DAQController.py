@@ -85,6 +85,7 @@ class DAQController:
                     and time() - sent_continue_time > 30):
                 self.trigger_switch_client.send('on')
                 self.trigger_switch_client.receive()
+                trigger_on = True
                 run_start = time()  # Reset run time if trigger used
 
             if self.trigger_switch_client is not None and sent_continue:
@@ -92,6 +93,7 @@ class DAQController:
                     print('Turning off trigger switch.')
                     self.trigger_switch_client.send('off')
                     self.trigger_switch_client.receive()
+                    trigger_on = False  # Unnecessary, but for clarity
                     print('Run finished.')
 
             if output.strip() != '':
