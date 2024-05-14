@@ -133,11 +133,11 @@ def m3_tracking(fdf_dir, tracking_sh_ref_path, tracking_run_dir, out_dir=None, r
         file_num = get_file_num_from_fdf_file_name(file)
         out_dir = fdf_dir if out_dir is None else out_dir
         get_rays_from_fdf(run_name, tracking_sh_ref_path, [file_num], out_dir, tracking_run_dir,
-                          root_source_path)
+                          root_source_path, verbose=True)
 
 
 def get_rays_from_fdf(fdf_run, tracking_sh_file, file_nums, output_root_dir, run_dir, root_source_path=None,
-                      verbose=False):
+                      verbose=False, fdf_dir=None):
     """
     Get rays from fdf files and write to root file.
     :param fdf_run:
@@ -147,6 +147,7 @@ def get_rays_from_fdf(fdf_run, tracking_sh_file, file_nums, output_root_dir, run
     :param run_dir:
     :param root_source_path:
     :param verbose:
+    :param fdf_dir:
     :return:
     """
     og_dir = os.getcwd()
@@ -155,7 +156,10 @@ def get_rays_from_fdf(fdf_run, tracking_sh_file, file_nums, output_root_dir, run
     print(f'Running in directory {run_dir}')
     for i in file_nums:
         print(f'Processing file {i}')
-        temp_sh_file = make_temp_sh_file(fdf_run, tracking_sh_file, i, 'tracking')
+        ped_in_dir = fdf_dir if fdf_dir is not None else None
+        data_in_dir = fdf_dir if fdf_dir is not None else None
+        temp_sh_file = make_temp_sh_file(fdf_run, tracking_sh_file, i, 'tracking',
+                                         ped_in_dir=ped_in_dir, data_in_dir=data_in_dir)
         # cmd = f'{temp_sh_file}'
         # if not verbose:
         #     cmd += ' > /dev/null'
@@ -182,7 +186,8 @@ def get_rays_from_fdf(fdf_run, tracking_sh_file, file_nums, output_root_dir, run
     os.chdir(og_dir)
 
 
-def make_temp_sh_file(fdf_run, ref_sh_file, file_num, sh_file_type='tracking', feu='01'):
+def make_temp_sh_file(fdf_run, ref_sh_file, file_num, sh_file_type='tracking', feu='01',
+                      ped_in_dir=None, data_in_dir=None):
     """
     Make the tracking shell script file to run the tracking program from reference file.
     :param fdf_run:
@@ -190,6 +195,8 @@ def make_temp_sh_file(fdf_run, ref_sh_file, file_num, sh_file_type='tracking', f
     :param file_num:
     :param sh_file_type:
     :param feu:
+    :param ped_in_dir:
+    :param data_in_dir:
     :return:
     """
     # Copy tracking_sh_file to new file
@@ -204,6 +211,10 @@ def make_temp_sh_file(fdf_run, ref_sh_file, file_num, sh_file_type='tracking', f
     file_text = file_text.replace('CosTb_380V_stats_pedthr_240212_11H42',
                                   fdf_run.replace('_datrun_', '_pedthr_'))
     file_text = file_text.replace('file_num=0', f'file_num={file_num}')
+    if ped_in_dir is not None:
+        file_text = file_text.replace('/mnt/nas_clas12/DATA/CosmicBench/2024/W05/', ped_in_dir)
+    if data_in_dir is not None:
+        file_text = file_text.replace('/mnt/nas_clas12/DATA/CosmicBench/2024/W05/', data_in_dir)
     if 'feu="03"' in file_text:
         file_text = file_text.replace('feu="03"', f'feu="{feu}"')
     # Write new file
