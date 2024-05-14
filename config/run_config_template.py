@@ -53,8 +53,8 @@ class Config:
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
             'm3_tracking_inner_dir': self.m3_tracking_inner_dir,
             'source_root_path': '/local/home/banco/P2/root/bin/thisroot.sh',
-            'tracking_run_dir': '/local/home/banco/dylan/m3_tracking/',
-            'tracking_sh_path': '/local/home/banco/dylan/m3_tracking/run_tracking_single.sh',
+            'tracking_run_dir': '/local/home/usernsw/dylan/m3_tracking/',
+            'tracking_sh_path': '/local/home/usernsw/dylan/m3_tracking/run_tracking_single.sh',
         }
 
         self.hv_control_info = {
