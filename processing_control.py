@@ -133,7 +133,7 @@ def m3_tracking(fdf_dir, tracking_sh_ref_path, tracking_run_dir, out_dir=None, r
         file_num = get_file_num_from_fdf_file_name(file)
         out_dir = fdf_dir if out_dir is None else out_dir
         get_rays_from_fdf(run_name, tracking_sh_ref_path, [file_num], out_dir, tracking_run_dir,
-                          root_source_path, verbose=True)
+                          root_source_path, verbose=True, fdf_dir=fdf_dir)
 
 
 def get_rays_from_fdf(fdf_run, tracking_sh_file, file_nums, output_root_dir, run_dir, root_source_path=None,
