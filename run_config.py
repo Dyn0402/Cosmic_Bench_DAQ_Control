@@ -76,8 +76,8 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'HV7',
-                'run_time': 90,  # Minutes
+                'sub_run_name': 'max_hv_stats',
+                'run_time': 5.5 * 24 * 60,  # Minutes
                 'hvs': {
                     0: {
                         0: 600,
@@ -107,207 +107,15 @@ class Config:
                     }
                 }
             },
-            {
-                'sub_run_name': 'HV6',
-                'run_time': 90,  # Minutes
-                'hvs': {
-                    0: {
-                        0: 600,
-                        1: 600,
-                        2: 800,
-                        3: 800,
-                        6: 800,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500,
-                    },
-                    2: {
-                        0: 445,
-                    },
-                    3: {
-                        1: 360,
-                        2: 405,
-                        3: 445,
-                        4: 445,
-                        5: 445,
-                        6: 445,
-                        8: 460,
-                        9: 460,
-                        10: 460,
-                        11: 460,
-                    }
-                }
-            },
-            {
-                'sub_run_name': 'HV5',
-                'run_time': 90,  # Minutes
-                'hvs': {
-                    0: {
-                        0: 600,
-                        1: 600,
-                        2: 800,
-                        3: 800,
-                        6: 800,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500,
-                    },
-                    2: {
-                        0: 440,
-                    },
-                    3: {
-                        1: 355,
-                        2: 400,
-                        3: 440,
-                        4: 440,
-                        5: 440,
-                        6: 440,
-                        8: 460,
-                        9: 460,
-                        10: 460,
-                        11: 460,
-                    }
-                }
-            },
-            {
-                'sub_run_name': 'HV4',
-                'run_time': 90,  # Minutes
-                'hvs': {
-                    0: {
-                        0: 600,
-                        1: 600,
-                        2: 800,
-                        3: 800,
-                        6: 800,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500
-                    },
-                    2: {
-                        0: 435,
-                    },
-                    3: {
-                        1: 350,
-                        2: 395,
-                        3: 435,
-                        4: 435,
-                        5: 435,
-                        6: 435,
-                        8: 460,
-                        9: 460,
-                        10: 460,
-                        11: 460,
-                    }
-                }
-            },
-            {
-                'sub_run_name': 'HV3',
-                'run_time': 90,  # Minutes
-                'hvs': {
-                    0: {
-                        0: 600,
-                        1: 600,
-                        2: 800,
-                        3: 800,
-                        6: 800,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500
-                    },
-                    2: {
-                        0: 430,
-                    },
-                    3: {
-                        1: 345,
-                        2: 390,
-                        3: 430,
-                        4: 430,
-                        5: 430,
-                        6: 430,
-                        8: 460,
-                        9: 460,
-                        10: 460,
-                        11: 460,
-                    }
-                }
-            },
-            {
-                'sub_run_name': 'HV2',
-                'run_time': 90,  # Minutes
-                'hvs': {
-                    0: {
-                        0: 600,
-                        1: 600,
-                        2: 800,
-                        3: 800,
-                        6: 800,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500
-                    },
-                    2: {
-                        0: 425,
-                    },
-                    3: {
-                        1: 340,
-                        2: 385,
-                        3: 425,
-                        4: 425,
-                        5: 425,
-                        6: 425,
-                        8: 460,
-                        9: 460,
-                        10: 460,
-                        11: 460,
-                    }
-                }
-            },
-            {
-                'sub_run_name': 'HV1',
-                'run_time': 90,  # Minutes
-                'hvs': {
-                    0: {
-                        0: 600,
-                        1: 600,
-                        2: 800,
-                        3: 800,
-                        6: 800,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500
-                    },
-                    2: {
-                        0: 420,
-                    },
-                    3: {
-                        1: 335,
-                        2: 380,
-                        3: 420,
-                        4: 420,
-                        5: 420,
-                        6: 420,
-                        8: 460,
-                        9: 460,
-                        10: 460,
-                        11: 460,
-                    }
-                }
-            },
         ]
 
         self.bench_geometry = {
             'p1_z': 227,  # mm  To the top of P1 from the top of PB
             'bottom_level_z': 82,  # mm  From the top of P1 to the bottom level of stand
             'level_z_spacing': 97,  # mm  Spacing between levels on stand
-            'board_thickness': 5,  # mm  Thickness of PCB for test boards
-            'banco_arm_bottom_to_center': 10,  # mm from bottom of lower banco arm to center of banco arm Guess!
-            'banco_arm_separation_z': 71 - 44,  # mm from bottom of lower banco arm to bottom of upper banco arm
+            'board_thickness': 5,  # mm  Thickness of PCB for test boards  Guess!
+            'banco_arm_bottom_to_center': (193 - 172) / 2,  # mm from bottom of lower banco arm to center of banco arm
+            'banco_arm_separation_z': 172 - 41,  # mm from bottom of lower banco arm to bottom of upper banco arm
             'banco_arm_right_y': 34 + 100,  # mm from center of banco to right edge of banco arm
             'banco_arm_length_y': 230,  # mm from left edge of banco arm to right edge of banco arm
         }
@@ -323,7 +131,7 @@ class Config:
                     # y is measured from the right edge of the banco arm and center computed from measured length
                     'y': self.bench_geometry['banco_arm_right_y'] - self.bench_geometry['banco_arm_length_y'] / 2,  # mm
                     'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
-                         5 * self.bench_geometry['level_z_spacing'] + 44,  # mm  To bottom of carbon on lower banco arm
+                         5 * self.bench_geometry['level_z_spacing'] + 41,  # mm  To bottom of carbon on lower banco arm
                 },
                 'hv_channels': 'banco',
                 'dream_feus': 'banco',
