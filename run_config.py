@@ -13,7 +13,7 @@ import json
 
 class Config:
     def __init__(self):
-        self.run_name = 'banco_overnight_hv_scan_test_5_15'
+        self.run_name = 'max_hv_stats_5_25_24'
         self.daq_dir = '/home/clas12/dylan/Run/'
         self.run_dir = f'{self.daq_dir}{self.run_name}/'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -77,7 +77,7 @@ class Config:
         self.sub_runs = [
             {
                 'sub_run_name': 'max_hv_stats',
-                'run_time': 5.5 * 24 * 60,  # Minutes
+                'run_time': (4 * 24 + 5) * 60,  # Minutes
                 'hvs': {
                     0: {
                         0: 600,
