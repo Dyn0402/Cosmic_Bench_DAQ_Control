@@ -77,7 +77,7 @@ class Config:
         self.sub_runs = [
             {
                 'sub_run_name': 'max_hv_stats',
-                'run_time': (4 * 24 + 5) * 60,  # Minutes
+                'run_time': (4 * 24 + 11) * 60,  # Minutes
                 'hvs': {
                     0: {
                         0: 600,
