@@ -107,7 +107,8 @@ def main():
 
                 print(f'Finished {sub_run_name}, waiting 10 seconds before next run')
                 sleep(10)
-        hv.send(f'Finished')
+        hv.send('Finished')
+        banco_daq.send('Finished')
     print('donzo')
 
 
