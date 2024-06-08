@@ -14,11 +14,11 @@ from run_config import Config
 
 def main():
     # run_m3_tracking_hv7()
-    run_m3_filtering_hv7()
+    run_m3_filtering_max_hv_stats()
     print('donzo')
 
 
-def run_m3_filtering_hv7():
+def run_m3_filtering_max_hv_stats():
     config = Config()
     dedip196_ip, dedip196_port = config.dedip196_processor_info['ip'], config.dedip196_processor_info['port']
     with Client(dedip196_ip, dedip196_port) as processor_client:
@@ -26,7 +26,7 @@ def run_m3_filtering_hv7():
         processor_client.receive()
         processor_client.send_json(config.dedip196_processor_info)
 
-        processor_client.send('Filter By M3 HV7')
+        processor_client.send('Filter By M3 max_hv_stats')
         processor_client.receive()
 
 
