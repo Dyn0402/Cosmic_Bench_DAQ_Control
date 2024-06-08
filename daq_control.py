@@ -21,7 +21,7 @@ from common_functions import *
 
 def main():
     config = Config()
-    banco = 'banco' in config.included_detectors
+    banco = any(['banco' in detector_name for detector_name in config.included_detectors])
 
     hv_ip, hv_port = config.hv_control_info['ip'], config.hv_control_info['port']
     trigger_switch_ip, trigger_switch_port = config.trigger_switch_info['ip'], config.trigger_switch_info['port']

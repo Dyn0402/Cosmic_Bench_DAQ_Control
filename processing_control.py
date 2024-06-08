@@ -13,9 +13,16 @@ import sys
 import subprocess
 import shutil
 from datetime import datetime
+import numpy as np
+import json
+
+import uproot
+import awkward as ak
+import ROOT
 
 from Server import Server
 from common_functions import *
+from M3RefTracking import M3RefTracking
 
 
 def main():
@@ -25,7 +32,7 @@ def main():
             port = int(sys.argv[1])
         except ValueError:
             print(f'Invalid port number {sys.argv[1]}. Using default port {port}')
-    options = ['Decode FDFs', 'Run M3 Tracking']
+    options = ['Decode FDFs', 'Run M3 Tracking', 'Filter By M3']
     while True:
         try:
             with Server(port=port) as server:
@@ -56,6 +63,14 @@ def main():
                             print(f'\n\nRunning M3 Tracking on FDFs in {fdf_dir} to {out_dir}')
                             m3_tracking(fdf_dir, run_info['tracking_sh_path'], run_info['tracking_run_dir'], out_dir)
                             print('M3 Tracking Complete')
+                        if 'Filter By M3' in run_options:
+                            decoded_dir = f"{sub_run_dir}{run_info['decoded_root_inner_dir']}/"
+                            out_dir = f"{sub_run_dir}{run_info['filtered_root_inner_dir']}/"
+                            create_dir_if_not_exist(out_dir)
+                            print(f'\n\nFiltering decoded files in {decoded_dir} by M3 tracking in {out_dir}')
+                            filter_by_m3(out_dir, decoded_dir, run_info['detectors'],
+                                         run_info['detector_info_dir'], run_info['include_detectors'])
+                            print('Filtering Complete')
                     res = server.receive()
         except Exception as e:
             print(f'Error: {e}\nRestarting processing control server...')
@@ -132,6 +147,181 @@ def m3_tracking(fdf_dir, tracking_sh_ref_path, tracking_run_dir, out_dir=None, m
         out_dir = fdf_dir if out_dir is None else out_dir
         get_rays_from_fdf(run_name, tracking_sh_ref_path, [file_num], out_dir, tracking_run_dir, verbose=True,
                           fdf_dir=fdf_dir)
+
+
+def filter_by_m3(m3_tracking_dir, decoded_dir, detectors, det_info_dir, included_detectors=None):
+    for m3_file in os.listdir(m3_tracking_dir):
+        run_name = get_run_name_from_fdf_file_name(m3_file)
+        feu_num = get_feu_num_from_fdf_file_name(m3_file)
+        detector_geometries = get_detector_geometries(detectors, det_info_dir, included_detectors)
+        traversing_event_ids = get_m3_det_traversing_events(f'{m3_tracking_dir}{m3_file}', detector_geometries)
+        for det_file in os.listdir(decoded_dir):
+            if not det_file.endswith('_array.root') or '_datrun_' not in det_file:
+                continue
+            if get_feu_num_from_fdf_file_name(det_file) != feu_num:
+                continue
+            if get_run_name_from_fdf_file_name(det_file) != run_name:
+                continue
+            print(f'Filtering {det_file} to {det_file.replace("_array", "_traversing")}')
+            filter_dream_file_pyroot(f'{decoded_dir}{det_file}', traversing_event_ids,
+                                     f'{decoded_dir}{det_file.replace("_array", "_traversing")}')
+
+
+def get_m3_det_traversing_events(file_path, detector_geometries, det_bound_cushion=0.08):
+    """
+    Get event ids of events traversing any of the detectors in detector_geometries.
+    :param file_path: Path to m3 tracking file
+    :param detector_geometries: List of detector geometries to check for traversing events
+    :param det_bound_cushion: Fractional cushion to add to detector bounds
+    :return: List of event ids of events traversing any of the detectors
+    """
+    m3_track_data = M3RefTracking(file_path)
+    masks = []
+    for detector in detector_geometries:
+        x, y = m3_track_data.get_xy_positions(detector['z'])
+        x_range, y_range = detector['x_max'] - detector['x_min'], detector['y_max'] - detector['y_min']
+        x_min, x_max = detector['x_min'] - x_range * det_bound_cushion, detector['x_max'] + x_range * det_bound_cushion
+        y_min, y_max = detector['y_min'] - y_range * det_bound_cushion, detector['y_max'] + y_range * det_bound_cushion
+        masks.append((x > x_min) & (x < x_max) & (y > y_min) & (y < y_max))
+    mask = np.any(masks, axis=0)
+    event_ids = m3_track_data.ray_data['evn'][mask]
+    return event_ids
+
+
+def get_detector_geometries(detectors, det_info_dir, included_detectors=None):
+    """
+    Get detector geometries from run data in a format easier to check for traversing tracks.
+    :param detectors: List of all detectors in config file with all run info, including geometry
+    :param det_info_dir: Directory containing detector info files
+    :param included_detectors: List of detectors to include in check. If None, all detectors are included.
+    :return:
+    """
+    if included_detectors is None:
+        included_detectors = [det['name'] for det in detectors]
+    detector_geometries = []
+    for det in detectors:
+        if det['name'] in included_detectors and det['det_type'] != 'm3':
+            det_info_path = f'{det_info_dir}{det["det_type"]}.json'
+            with open(det_info_path, 'r') as file:
+                det_info = json.load(file)
+            x_size, y_size = det_info['det_size']['x'], det_info['det_size']['y']
+            z = det['det_center_coords']['z']
+            x_center, y_center = det['det_center_coords']['x'], det['det_center_coords']['y']
+            x_angle, y_angle, z_angle = [det['det_orientation'][key] for key in ['x', 'y', 'z']]
+            x_min, x_max, y_min, y_max = get_xy_max_min(x_size, y_size, x_center, y_center, x_angle, y_angle, z_angle)
+            det_geom = {'z': z, 'x_min': x_min, 'x_max': x_max, 'y_min': y_min, 'y_max': y_max}
+            detector_geometries.append(det_geom)
+    return detector_geometries
+
+
+def get_xy_max_min(x_size, y_size, x_center, y_center, x_angle, y_angle, z_angle):
+    """
+    Get the min and max x and y values of a detector given its size, center, and orientation.
+    :param x_size: Size of detector in x direction
+    :param y_size: Size of detector in y direction
+    :param x_center: Center of detector in x direction
+    :param y_center: Center of detector in y direction
+    :param x_angle: Angle of detector in x direction
+    :param y_angle: Angle of detector in y direction
+    :param z_angle: Angle of detector in z direction
+    :return:
+    """
+    # Calculate x, y, z coordinates of detector corners
+    x_corners = np.array([-x_size / 2, x_size / 2, x_size / 2, -x_size / 2])
+    y_corners = np.array([-y_size / 2, -y_size / 2, y_size / 2, y_size / 2])
+    z_corners = np.array([0, 0, 0, 0])
+    x_corners, y_corners, z_corners = rotate_3d(x_corners, y_corners, z_corners, x_angle, y_angle, z_angle)
+    x_corners += x_center
+    y_corners += y_center
+    # Get min and max x, y values
+    x_min, x_max = np.min(x_corners), np.max(x_corners)
+    y_min, y_max = np.min(y_corners), np.max(y_corners)
+    return x_min, x_max, y_min, y_max
+
+
+def rotate_3d(x, y, z, x_angle, y_angle, z_angle):
+    """
+    Rotate 3d coordinates about the x, y, and z axes.
+    :param x: x coordinates
+    :param y: y coordinates
+    :param z: z coordinates
+    :param x_angle: Angle to rotate about x axis
+    :param y_angle: Angle to rotate about y axis
+    :param z_angle: Angle to rotate about z axis
+    :return: Rotated x, y, z coordinates
+    """
+    # Rotate about x axis
+    y, z = rotate_2d(y, z, x_angle)
+    # Rotate about y axis
+    x, z = rotate_2d(x, z, y_angle)
+    # Rotate about z axis
+    x, y = rotate_2d(x, y, z_angle)
+    return x, y, z
+
+
+def rotate_2d(x, y, angle):
+    """
+    Rotate 2d coordinates about the z axis.
+    :param x: x coordinates
+    :param y: y coordinates
+    :param angle: Angle to rotate about z axis
+    :return: Rotated x, y coordinates
+    """
+    x_rot = x * np.cos(angle) - y * np.sin(angle)
+    y_rot = x * np.sin(angle) + y * np.cos(angle)
+    return x_rot, y_rot
+
+
+def filter_dream_file_uproot(file_path, events, out_file_path, event_branch_name='evn'):
+    """
+    DOESN'T WORK. Uproot can't write trees it reads.
+    :param file_path: Path to dream file to filter
+    :param events: List of events to keep
+    :param out_file_path: Path to write filtered dream file
+    :param event_branch_name: Name of event branch in dream file
+    :return:
+    """
+    with uproot.open(file_path) as file:
+        tree_name = f"{file.keys()[0].split(';')[0]};{max([int(key.split(';')[-1]) for key in file.keys()])}"
+        tree = file[tree_name]
+        data = tree.arrays(library='ak')
+        tree_events = ak.to_numpy(data[event_branch_name])
+        mask = np.isin(events, tree_events)
+        data = data[mask]
+        # for key in data.keys():
+        #     data[key] = data[key][mask]
+        with uproot.recreate(out_file_path) as out_file:
+            out_file[tree_name] = data
+
+
+def filter_dream_file_pyroot(file_path, events, out_file_path, event_branch_name='evn'):
+    """
+    Filter a decoded dream file based on a list of events. Shame that uproot doesn't work, because this is a slow
+    python loop.
+    :param file_path: Path to dream file to filter
+    :param events: List of events to keep
+    :param out_file_path: Path to write filtered dream file
+    :param event_branch_name: Name of event branch in dream file
+    :return:
+    """
+    in_file = ROOT.TFile.Open(file_path, 'READ')
+    in_tree_name = [x.ReadObj().GetName() for x in in_file.GetListOfKeys()][0]
+    in_tree = in_file.Get(in_tree_name)
+
+    out_file = ROOT.TFile(out_file_path, 'RECREATE')
+    out_tree = in_tree.CloneTree(0)
+
+    event_num_branch = in_tree.GetBranch(event_branch_name)
+
+    for i in range(in_tree.GetEntries()):
+        in_tree.GetEntry(i)
+        event_id = event_num_branch.GetLeaf(event_branch_name).GetValue()
+        if event_id in events:
+            out_tree.Fill()
+
+    out_file.Write()
+    out_file.Close()
+    in_file.Close()
 
 
 def get_rays_from_fdf(fdf_run, tracking_sh_file, file_nums, output_root_dir, run_dir, verbose=False, fdf_dir=None):
