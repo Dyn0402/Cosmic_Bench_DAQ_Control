@@ -70,10 +70,11 @@ def main():
                             print('M3 Tracking Complete')
                         if 'Filter By M3' in run_options:
                             decoded_dir = f"{sub_run_dir}{run_info['decoded_root_inner_dir']}/"
+                            m3_tracking_dir = f"{sub_run_dir}{run_info['m3_tracking_inner_dir']}/"
                             out_dir = f"{sub_run_dir}{run_info['filtered_root_inner_dir']}/"
                             create_dir_if_not_exist(out_dir)
                             print(f'\n\nFiltering decoded files in {decoded_dir} by M3 tracking in {out_dir}')
-                            filter_by_m3(out_dir, decoded_dir, run_info['detectors'],
+                            filter_by_m3(out_dir, m3_tracking_dir, decoded_dir, run_info['detectors'],
                                          run_info['detector_info_dir'], run_info['included_detectors'])
                             print('Filtering Complete')
                     res = server.receive()
@@ -154,8 +155,11 @@ def m3_tracking(fdf_dir, tracking_sh_ref_path, tracking_run_dir, out_dir=None, m
                           fdf_dir=fdf_dir)
 
 
-def filter_by_m3(m3_tracking_dir, decoded_dir, detectors, det_info_dir, included_detectors=None):
+def filter_by_m3(out_dir, m3_tracking_dir, decoded_dir, detectors, det_info_dir, included_detectors=None):
     for m3_file in os.listdir(m3_tracking_dir):
+        if not m3_file.endswith('_rays.root') or '_datrun_' not in m3_file:
+            continue
+        print(f'\n\nFiltering decoded files by M3 tracking in {m3_file}')
         run_name = get_run_name_from_fdf_file_name(m3_file)
         feu_num = get_feu_num_from_fdf_file_name(m3_file)
         detector_geometries = get_detector_geometries(detectors, det_info_dir, included_detectors)
@@ -169,7 +173,7 @@ def filter_by_m3(m3_tracking_dir, decoded_dir, detectors, det_info_dir, included
                 continue
             print(f'Filtering {det_file} to {det_file.replace("_array", "_traversing")}')
             filter_dream_file_pyroot(f'{decoded_dir}{det_file}', traversing_event_ids,
-                                     f'{decoded_dir}{det_file.replace("_array", "_traversing")}')
+                                     f'{out_dir}{det_file.replace("_array", "_traversing")}')
 
 
 def get_m3_det_traversing_events(file_path, detector_geometries, det_bound_cushion=0.08):
