@@ -20,17 +20,17 @@ def main():
 def define_dets():
     detectors = [
         {
-            'name': 'banco',
+            'det_type': 'banco',
             'strip_map_type': 'banco',
             'resist_map_type': 'banco',
             'det_size': {  # Size of detector based on the extent of the readout pads (active area may be smaller)
-                'x': 130,  # mm
-                'y': 130,  # mm
-                'z': 4,  # mm
+                'x': 15,  # mm
+                'y': 150,  # mm
+                'z': 2,  # mm
             },
         },
         {
-            'name': 'urw_strip',
+            'det_type': 'urw_strip',
             'strip_map_type': 'strip',
             'resist_map_type': 'plein',
             'det_size': {  # Size of detector based on the extent of the readout pads (active area may be smaller)
@@ -40,7 +40,7 @@ def define_dets():
             },
         },
         {
-            'name': 'urw_inter',
+            'det_type': 'urw_inter',
             'strip_map_type': 'inter',
             'resist_map_type': 'plein',
             'det_size': {  # Size of detector based on the extent of the readout pads (active area may be smaller)
@@ -50,7 +50,7 @@ def define_dets():
             },
         },
         {
-            'name': 'asacusa_strip_1',
+            'det_type': 'asacusa_strip',
             'strip_map_type': 'asacusa',
             'resist_map_type': 'strip',
             'det_size': {  # Size of detector based on the extent of the readout pads (active area may be smaller)
@@ -60,17 +60,7 @@ def define_dets():
             },
         },
         {
-            'name': 'asacusa_strip_2',
-            'strip_map_type': 'asacusa',
-            'resist_map_type': 'strip',
-            'det_size': {  # Size of detector based on the extent of the readout pads (active area may be smaller)
-                'x': 130,  # mm
-                'y': 130,  # mm
-                'z': 4,  # mm
-            },
-        },
-        {
-            'name': 'asacusa_plein_1',
+            'det_type': 'asacusa_plein',
             'strip_map_type': 'asacusa',
             'resist_map_type': 'plein',
             'det_size': {  # Size of detector based on the extent of the readout pads (active area may be smaller)
@@ -80,37 +70,7 @@ def define_dets():
             },
         },
         {
-            'name': 'm3_bot_bot',
-            'strip_map_type': 'm3',
-            'resist_map_type': 'm3',
-            'det_size': {  # Size of detector based on the extent of the readout pads (active area may be smaller)
-                'x': 500,  # mm
-                'y': 500,  # mm
-                'z': 4,  # mm  Guess
-            },
-        },
-        {
-            'name': 'm3_bot_top',
-            'strip_map_type': 'm3',
-            'resist_map_type': 'm3',
-            'det_size': {  # Size of detector based on the extent of the readout pads (active area may be smaller)
-                'x': 500,  # mm
-                'y': 500,  # mm
-                'z': 4,  # mm  Guess
-            },
-        },
-        {
-            'name': 'm3_top_bot',
-            'strip_map_type': 'm3',
-            'resist_map_type': 'm3',
-            'det_size': {  # Size of detector based on the extent of the readout pads (active area may be smaller)
-                'x': 500,  # mm
-                'y': 500,  # mm
-                'z': 4,  # mm  Guess
-            },
-        },
-        {
-            'name': 'm3_top_top',
+            'det_type': 'm3',
             'strip_map_type': 'm3',
             'resist_map_type': 'm3',
             'det_size': {  # Size of detector based on the extent of the readout pads (active area may be smaller)
@@ -126,7 +86,7 @@ def define_dets():
 
 def write_detectors(detectors):
     for detector in detectors:
-        with open(f'{detector["name"]}.json', 'w') as file:
+        with open(f'{detector["det_type"]}.json', 'w') as file:
             json.dump(detector, file, indent=4)
 
 

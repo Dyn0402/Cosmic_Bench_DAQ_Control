@@ -20,7 +20,9 @@ class Config:
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
         self.raw_daq_inner_dir = 'raw_daq_data'
         self.decoded_root_inner_dir = 'decoded_root'
+        self.filtered_root_inner_dir = 'filtered_root'
         self.m3_tracking_inner_dir = 'm3_tracking_root'
+        self.detector_info_dir = f'/mnt/cosmic_data/config/detectors/'
 
         self.dream_daq_info = {
             'daq_config_template_path': '/home/clas12/dylan/Run/config/CosmicTb_TPOT.cfg',
@@ -120,29 +122,100 @@ class Config:
             'banco_arm_length_y': 230,  # mm from left edge of banco arm to right edge of banco arm
         }
 
-        self.included_detectors = ['banco', 'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2',
-                                   'asacusa_plein_1', 'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
+        self.included_detectors = ['banco_arm1', 'banco_arm2',
+                                   'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'asacusa_plein_1',
+                                   'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
 
         self.detectors = [
             {
-                'name': 'banco',
+                'name': 'banco_ladder160',
+                'det_type': 'banco',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm  Centered by eye on top test detector's center screw
+                    # y is measured from the right edge of the banco arm and center computed from measured length
+                    'y': self.bench_geometry['banco_arm_right_y'] - self.bench_geometry['banco_arm_length_y'] / 2,  # mm
+                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +  # mm
+                         5 * self.bench_geometry['level_z_spacing'] + 41,  # To bottom of bot carbon on lower banco arm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': 'banco',
+                'dream_feus': 'banco',
+            },
+            {
+                'name': 'banco_ladder163',
+                'det_type': 'banco',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm  Centered by eye on top test detector's center screw
+                    # y is measured from the right edge of the banco arm and center computed from measured length
+                    'y': self.bench_geometry['banco_arm_right_y'] - self.bench_geometry['banco_arm_length_y'] / 2,  # mm
+                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +  # mm
+                         5 * self.bench_geometry['level_z_spacing'] + 41 +  # To top of top carbon on lower banco arm
+                         self.bench_geometry['banco_arm_bottom_to_center'] * 2,
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': 'banco',
+                'dream_feus': 'banco',
+            },
+            {
+                'name': 'banco_ladder157',
+                'det_type': 'banco',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm  Centered by eye on top test detector's center screw
+                    # y is measured from the right edge of the banco arm and center computed from measured length
+                    'y': self.bench_geometry['banco_arm_right_y'] - self.bench_geometry['banco_arm_length_y'] / 2,  # mm
+                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +  # mm
+                         5 * self.bench_geometry['level_z_spacing'] + 41 +
+                         self.bench_geometry['banco_arm_separation_z'],  # To bottom of bot carbon on upper banco arm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': 'banco',
+                'dream_feus': 'banco',
+            },
+            {
+                'name': 'banco_ladder162',
+                'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm  Centered by eye on top test detector's center screw
                     # y is measured from the right edge of the banco arm and center computed from measured length
                     'y': self.bench_geometry['banco_arm_right_y'] - self.bench_geometry['banco_arm_length_y'] / 2,  # mm
                     'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
-                         5 * self.bench_geometry['level_z_spacing'] + 41,  # mm  To bottom of carbon on lower banco arm
+                         5 * self.bench_geometry['level_z_spacing'] + 41 +
+                         self.bench_geometry['banco_arm_separation_z'] +
+                         self.bench_geometry['banco_arm_separation_z'],  # mm  To top of top carbon on upper banco arm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': 'banco',
                 'dream_feus': 'banco',
             },
             {
                 'name': 'urw_strip',
+                'det_type': 'urw_strip',
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
                     'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
                          5 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
                     'drift': (0, 0),
@@ -157,11 +230,17 @@ class Config:
             },
             {
                 'name': 'urw_inter',
+                'det_type': 'urw_inter',
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
                     'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
                          4 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
                     'drift': (0, 1),
@@ -176,11 +255,17 @@ class Config:
             },
             {
                 'name': 'asacusa_strip_1',
+                'det_type': 'asacusa_strip',
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
                     'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
                          3 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
                     'drift': (0, 2),
@@ -196,11 +281,17 @@ class Config:
             },
             {
                 'name': 'asacusa_strip_2',
+                'det_type': 'asacusa_strip',
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
                     'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
                          2 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
                     'drift': (0, 3),
@@ -216,11 +307,17 @@ class Config:
             },
             {
                 'name': 'asacusa_plein_1',
+                'det_type': 'asacusa_plein',
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
                     'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
                          1 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
                     'drift': (0, 4),
@@ -236,10 +333,16 @@ class Config:
             },
             {
                 'name': 'm3_bot_bot',
+                'det_type': 'm3',
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
                     'z': 24,  # mm  28 from geometry diagram, 24 from m3 config json
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {  # Don't know HTM# matching to geometric layout, guessing
                     'drift': (0, 8),
@@ -252,10 +355,16 @@ class Config:
             },
             {
                 'name': 'm3_bot_top',
+                'det_type': 'm3',
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
                     'z': 144,  # mm  145 from geometry diagram, 144 from m3 config json
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {  # Don't know HTM# matching to geometric layout, guessing
                     'drift': (0, 9),
@@ -268,10 +377,16 @@ class Config:
             },
             {
                 'name': 'm3_top_bot',
+                'det_type': 'm3',
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
                     'z': 1185,  # mm  1163 + 28 from geometry diagram, 1185 from m3 config json
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {  # Don't know HTM# matching to geometric layout, guessing
                     'drift': (0, 10),
@@ -284,10 +399,16 @@ class Config:
             },
             {
                 'name': 'm3_top_top',
+                'det_type': 'm3',
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
                     'z': 1302,  # mm  1163 + 145 from geometry diagram, 1302 from m3 config json
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {  # Don't know HTM# matching to geometric layout, guessing
                     'drift': (0, 11),

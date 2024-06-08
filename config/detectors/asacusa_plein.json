@@ -1,7 +1,7 @@
 {
-    "name": "asacusa_strip_1",
+    "det_type": "asacusa_plein",
     "strip_map_type": "asacusa",
-    "resist_map_type": "strip",
+    "resist_map_type": "plein",
     "det_size": {
         "x": 130,
         "y": 130,

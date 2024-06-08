@@ -1,5 +1,5 @@
 {
-    "name": "urw_strip",
+    "det_type": "urw_strip",
     "strip_map_type": "strip",
     "resist_map_type": "plein",
     "det_size": {
