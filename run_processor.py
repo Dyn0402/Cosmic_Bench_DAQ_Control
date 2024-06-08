@@ -25,6 +25,8 @@ def run_m3_filtering_max_hv_stats():
         processor_client.send('Connected to run_processor')
         processor_client.receive()
         processor_client.send_json(config.dedip196_processor_info)
+        processor_client.send_json(config.included_detectors)
+        processor_client.send_json(config.detectors)
 
         processor_client.send('Filter By M3 max_hv_stats')
         processor_client.receive()

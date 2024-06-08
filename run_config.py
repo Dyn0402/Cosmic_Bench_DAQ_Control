@@ -45,6 +45,8 @@ class Config:
             'decoded_root_inner_dir': self.decoded_root_inner_dir,
             'decode_path': '/local/home/banco/dylan/decode/decode',
             'convert_path': '/local/home/banco/dylan/decode/convert_vec_tree_to_array',
+            'detector_info_dir': self.detector_info_dir,
+            'filtered_root_inner_dir': self.filtered_root_inner_dir,
             'out_type': 'both',  # 'vec', 'array', or 'both'
         }
 
@@ -122,7 +124,7 @@ class Config:
             'banco_arm_length_y': 230,  # mm from left edge of banco arm to right edge of banco arm
         }
 
-        self.included_detectors = ['banco_arm1', 'banco_arm2',
+        self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
                                    'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'asacusa_plein_1',
                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
 

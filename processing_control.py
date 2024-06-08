@@ -39,6 +39,8 @@ def main():
                 server.receive()
                 server.send('Processing control connected')
                 run_info = server.receive_json()
+                run_info['include_detectors'] = server.receive_json()
+                run_info['detectors'] = server.receive_json()
 
                 res = server.receive()
                 while 'Finished' not in res:

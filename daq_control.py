@@ -56,6 +56,8 @@ def main():
         dedip196_processor.send('Connected to daq_control')
         dedip196_processor.receive()
         dedip196_processor.send_json(config.dedip196_processor_info)
+        dedip196_processor.send_json(config.included_detectors)
+        dedip196_processor.send_json(config.detectors)
 
         sedip28_processor.send('Connected to daq_control')
         sedip28_processor.receive()
