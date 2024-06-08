@@ -102,6 +102,7 @@ def main():
                 dedip196_processor.receive()
                 sedip28_processor.send(f'Run M3 Tracking {sub_run_name}')
                 sedip28_processor.receive()
+                # Run filtering
                 if banco:
                     pass  # Process banco data
 

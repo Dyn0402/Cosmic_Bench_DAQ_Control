@@ -13,6 +13,24 @@ from run_config import Config
 
 
 def main():
+    # run_m3_tracking_hv7()
+    run_m3_filtering_hv7()
+    print('donzo')
+
+
+def run_m3_filtering_hv7():
+    config = Config()
+    dedip196_ip, dedip196_port = config.dedip196_processor_info['ip'], config.dedip196_processor_info['port']
+    with Client(dedip196_ip, dedip196_port) as processor_client:
+        processor_client.send('Connected to run_processor')
+        processor_client.receive()
+        processor_client.send_json(config.dedip196_processor_info)
+
+        processor_client.send('Filter By M3 HV7')
+        processor_client.receive()
+
+
+def run_m3_tracking_hv7():
     config = Config()
     sedip28_ip, sedip28_port = config.sedip28_processor_info['ip'], config.sedip28_processor_info['port']
     with Client(sedip28_ip, sedip28_port) as processor_client:
@@ -22,7 +40,6 @@ def main():
 
         processor_client.send('Run M3 Tracking HV7')
         processor_client.receive()
-    print('donzo')
 
 
 if __name__ == '__main__':
