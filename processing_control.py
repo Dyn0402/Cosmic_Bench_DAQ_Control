@@ -39,8 +39,8 @@ def main():
                 server.receive()
                 server.send('Processing control connected')
                 run_info = server.receive_json()
-                run_info['include_detectors'] = server.receive_json()
-                run_info['detectors'] = server.receive_json()
+                run_info.update(server.receive_json())
+                run_info.update(server.receive_json())
 
                 res = server.receive()
                 while 'Finished' not in res:
@@ -71,7 +71,7 @@ def main():
                             create_dir_if_not_exist(out_dir)
                             print(f'\n\nFiltering decoded files in {decoded_dir} by M3 tracking in {out_dir}')
                             filter_by_m3(out_dir, decoded_dir, run_info['detectors'],
-                                         run_info['detector_info_dir'], run_info['include_detectors'])
+                                         run_info['detector_info_dir'], run_info['included_detectors'])
                             print('Filtering Complete')
                     res = server.receive()
         except Exception as e:
