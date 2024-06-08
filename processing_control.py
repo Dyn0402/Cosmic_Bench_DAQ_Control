@@ -39,8 +39,11 @@ def main():
                 server.receive()
                 server.send('Processing control connected')
                 run_info = server.receive_json()
+                server.send('Received run info')
                 run_info.update(server.receive_json())
+                server.send('Received run info')
                 run_info.update(server.receive_json())
+                server.send('Received run info')
 
                 res = server.receive()
                 while 'Finished' not in res:
