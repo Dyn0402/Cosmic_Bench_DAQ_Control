@@ -40,10 +40,10 @@ def main():
                 server.send('Processing control connected')
                 run_info = server.receive_json()
                 server.send('Received run info')
-                run_info.update(server.receive_json())
-                server.send('Received run info')
-                run_info.update(server.receive_json())
-                server.send('Received run info')
+                run_info.update(server.receive_json())  # Update run info with included detectors
+                server.send('Received included detectors')
+                run_info.update(server.receive_json())  # Update run info with detector info
+                server.send('Received detector info')
 
                 res = server.receive()
                 while 'Finished' not in res:
