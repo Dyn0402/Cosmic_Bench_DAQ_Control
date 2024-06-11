@@ -20,7 +20,7 @@ class Server:
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client_socket = None
         self.client_address = None
-        self.max_recv = 1024 * 10000  # Max bytes to receive
+        self.max_recv = 1024 * 1000  # Max bytes to receive
 
     def __enter__(self):
         self.start()
@@ -59,8 +59,8 @@ class Server:
         while True:
             packet = self.client_socket.recv(self.max_recv)
             data += packet
-            if len(packet) < self.max_recv:
-                print(f'Max packet size of {self.max_recv} exceeded with {len(packet)}, breaking early!!')
+            if len(data) > self.max_recv:
+                print(f'Max packet size of {self.max_recv} exceeded with {len(data)}, breaking early!!')
                 break
         data = json.loads(data.decode())
         print(f"Received: {data}")

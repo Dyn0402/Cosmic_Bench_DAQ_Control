@@ -18,11 +18,15 @@ import json
 
 import uproot
 import awkward as ak
-import ROOT
 
 from Server import Server
 from common_functions import *
 from M3RefTracking import M3RefTracking
+
+print('Importing pyROOT...')
+import ROOT
+print('pyROOT imported')
+
 
 
 def main():
