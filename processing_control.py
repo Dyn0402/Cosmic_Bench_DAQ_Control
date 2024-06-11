@@ -32,7 +32,7 @@ def main():
             port = int(sys.argv[1])
         except ValueError:
             print(f'Invalid port number {sys.argv[1]}. Using default port {port}')
-    options = ['Decode FDFs', 'Run M3 Tracking', 'Filter By M3']
+    options = ['Decode FDFs', 'Run M3 Tracking', 'Filter By M3', 'Clean Up Unfiltered']
     while True:
         try:
             with Server(port=port) as server:
@@ -77,6 +77,10 @@ def main():
                             filter_by_m3(out_dir, m3_tracking_dir, decoded_dir, run_info['detectors'],
                                          run_info['detector_info_dir'], run_info['included_detectors'])
                             print('Filtering Complete')
+                        if 'Clean Up Unfiltered' in run_options:
+                            decoded_dir = f"{sub_run_dir}{run_info['decoded_root_inner_dir']}/"
+                            remove_files(fdf_dir, 'fdf')  # Raw dream fdfs
+                            remove_files(decoded_dir)  # Decoded but unfiltered root files
                     res = server.receive()
         except Exception as e:
             print(f'Error: {e}\nRestarting processing control server...')
@@ -176,18 +180,18 @@ def filter_by_m3(out_dir, m3_tracking_dir, decoded_dir, detectors, det_info_dir,
                                      f'{out_dir}{det_file.replace("_array", "_traversing")}')
 
 
-def get_m3_det_traversing_events(file_path, detector_geometries, det_bound_cushion=0.08):
+def get_m3_det_traversing_events(ray_directory, detector_geometries, det_bound_cushion=0.08):
     """
     Get event ids of events traversing any of the detectors in detector_geometries.
-    :param file_path: Path to m3 tracking file
+    :param ray_directory: Path to directory containing m3 tracking files
     :param detector_geometries: List of detector geometries to check for traversing events
     :param det_bound_cushion: Fractional cushion to add to detector bounds
     :return: List of event ids of events traversing any of the detectors
     """
-    m3_track_data = M3RefTracking(file_path)
+    m3_track_data = M3RefTracking(ray_directory)
     masks = []
     for detector in detector_geometries:
-        x, y = m3_track_data.get_xy_positions(detector['z'])
+        x, y, event_nums = m3_track_data.get_xy_positions(detector['z'])
         x_range, y_range = detector['x_max'] - detector['x_min'], detector['y_max'] - detector['y_min']
         x_min, x_max = detector['x_min'] - x_range * det_bound_cushion, detector['x_max'] + x_range * det_bound_cushion
         y_min, y_max = detector['y_min'] - y_range * det_bound_cushion, detector['y_max'] + y_range * det_bound_cushion
@@ -218,7 +222,7 @@ def get_detector_geometries(detectors, det_info_dir, included_detectors=None):
             x_center, y_center = det['det_center_coords']['x'], det['det_center_coords']['y']
             x_angle, y_angle, z_angle = [det['det_orientation'][key] for key in ['x', 'y', 'z']]
             x_min, x_max, y_min, y_max = get_xy_max_min(x_size, y_size, x_center, y_center, x_angle, y_angle, z_angle)
-            det_geom = {'z': z, 'x_min': x_min, 'x_max': x_max, 'y_min': y_min, 'y_max': y_max}
+            det_geom = {'z': z, 'x_min': x_min, 'x_max': x_max, 'y_min': y_min, 'y_max': y_max, 'det_name': det['name']}
             detector_geometries.append(det_geom)
     return detector_geometries
 
@@ -408,6 +412,20 @@ def make_temp_sh_file(fdf_run, ref_sh_file, file_num, sh_file_type='tracking', f
     # Make file executable
     os.system(f'chmod +x {temp_file_name}')
     return temp_file_name
+
+
+def remove_files(directory, extension=None):
+    """
+    Remove all files in directory with given file extension
+    :param directory: Directory from which to remove files
+    :param extension: Only remove files with given extension. Remove all files if extension is None
+    :return:
+    """
+    for file_name in os.listdir(directory):
+        if extension is not None and not file_name.endswith(extension):
+            continue
+        print(f'Removing {directory}{file_name}')
+        os.remove(f'{directory}{file_name}')
 
 
 if __name__ == '__main__':
