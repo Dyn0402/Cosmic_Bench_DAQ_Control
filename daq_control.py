@@ -108,6 +108,11 @@ def main():
                 sedip28_processor.send(f'Run M3 Tracking {sub_run_name}')
                 sedip28_processor.receive()
                 # Run filtering
+                dedip196_processor.send(f'Filter By M3 {sub_run_name}')
+                dedip196_processor.receive()
+                # Remove all but filtered filtes
+                dedip196_processor.send(f'Clean Up Unfiltered {sub_run_name}')
+                dedip196_processor.receive()
                 if banco:
                     pass  # Process banco data
 

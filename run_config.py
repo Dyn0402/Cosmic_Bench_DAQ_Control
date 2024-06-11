@@ -34,7 +34,7 @@ class Config:
             'daq_run_command': 'cd /home/banco/Test_Beam/framework/bin && ./test_multi_noiseocc_int',
             'data_temp_dir': '/home/banco/Test_Beam/data',
             'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
-            'data_inner_dir': self.raw_daq_inner_dir
+            'data_inner_dir': 'banco_data'
         }
 
         self.dedip196_processor_info = {
@@ -141,7 +141,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
+                    'y': 180,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': 'banco',
@@ -179,7 +179,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
+                    'y': 180,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': 'banco',
@@ -192,10 +192,10 @@ class Config:
                     'x': 0,  # mm  Centered by eye on top test detector's center screw
                     # y is measured from the right edge of the banco arm and center computed from measured length
                     'y': self.bench_geometry['banco_arm_right_y'] - self.bench_geometry['banco_arm_length_y'] / 2,  # mm
-                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
+                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +  # mm
                          5 * self.bench_geometry['level_z_spacing'] + 41 +
-                         self.bench_geometry['banco_arm_separation_z'] +
-                         self.bench_geometry['banco_arm_separation_z'],  # mm  To top of top carbon on upper banco arm
+                         self.bench_geometry['banco_arm_separation_z'] +  # To top of top carbon on upper banco arm
+                         self.bench_geometry['banco_arm_bottom_to_center'] * 2,
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
