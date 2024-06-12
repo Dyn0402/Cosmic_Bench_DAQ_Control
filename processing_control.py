@@ -156,7 +156,7 @@ def m3_tracking(fdf_dir, tracking_sh_ref_path, tracking_run_dir, out_dir=None, m
         if feu_num != m3_fdf_num:
             continue
         run_name = get_run_name_from_fdf_file_name(file)
-        file_num = get_file_num_from_fdf_file_name(file)
+        file_num = get_file_num_from_fdf_file_name(file, -1)
         out_dir = fdf_dir if out_dir is None else out_dir
         get_rays_from_fdf(run_name, tracking_sh_ref_path, [file_num], out_dir, tracking_run_dir, verbose=True,
                           fdf_dir=fdf_dir)
@@ -168,7 +168,7 @@ def filter_by_m3(out_dir, m3_tracking_dir, decoded_dir, detectors, det_info_dir,
             continue
         print(f'\n\nFiltering decoded files by M3 tracking in {m3_file}')
         run_name = get_run_name_from_fdf_file_name(m3_file)
-        file_num = get_file_num_from_fdf_file_name(m3_file)
+        file_num = get_file_num_from_fdf_file_name(m3_file, -1)
         detector_geometries = get_detector_geometries(detectors, det_info_dir, included_detectors)
         traversing_event_ids = get_m3_det_traversing_events(m3_tracking_dir, detector_geometries, file_nums=[file_num])
         for det_file in os.listdir(decoded_dir):
@@ -176,9 +176,9 @@ def filter_by_m3(out_dir, m3_tracking_dir, decoded_dir, detectors, det_info_dir,
             if not det_file.endswith('_array.root') or '_datrun_' not in det_file:
                 print(f'Skipping {det_file}, not array root file or not datrun')
                 continue
-            if get_file_num_from_fdf_file_name(det_file) != file_num:
+            if get_file_num_from_fdf_file_name(det_file, -2) != file_num:
                 print(f'Skipping {det_file}, not same file number as {m3_file}: '
-                      f'{file_num} != {get_file_num_from_fdf_file_name(det_file)}')
+                      f'{file_num} != {get_file_num_from_fdf_file_name(det_file, -2)}')
                 continue
             if get_run_name_from_fdf_file_name(det_file) != run_name:
                 print(f'Skipping {det_file}, not same run name as {m3_file}: '

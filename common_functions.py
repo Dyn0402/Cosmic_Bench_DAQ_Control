@@ -52,11 +52,12 @@ def get_file_num_from_fdf_file_name(file_name, num_index=-1):
         try:
             file_nums.append(int(file_split[check_index]))
         except ValueError:
-            check_index -= 1
+            pass
+        check_index -= 1
     num_index = abs(num_index) - 1
     if len(file_nums) < num_index + 1:
         return None
-    return file_nums[abs(num_index) - 1]
+    return file_nums[num_index]
 
 
 def get_run_name_from_fdf_file_name(file_name):
