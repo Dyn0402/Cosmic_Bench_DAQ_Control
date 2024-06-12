@@ -43,6 +43,7 @@ class Config:
             'run_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
             'decoded_root_inner_dir': self.decoded_root_inner_dir,
+            'm3_tracking_inner_dir': self.m3_tracking_inner_dir,
             'decode_path': '/local/home/banco/dylan/decode/decode',
             'convert_path': '/local/home/banco/dylan/decode/convert_vec_tree_to_array',
             'detector_info_dir': self.detector_info_dir,
