@@ -86,7 +86,7 @@ def main():
                             remove_files(fdf_dir, 'fdf')  # Raw dream fdfs
                             remove_files(decoded_dir)  # Decoded but unfiltered root files
                     res = server.receive()
-        except Exception as e:
+        except TypeError as e:
             print(f'Error: {e}\nRestarting processing control server...')
     print('donzo')
 
@@ -173,6 +173,7 @@ def filter_by_m3(out_dir, m3_tracking_dir, decoded_dir, detectors, det_info_dir,
         detector_geometries = get_detector_geometries(detectors, det_info_dir, included_detectors)
         traversing_event_ids = get_m3_det_traversing_events(m3_tracking_dir, detector_geometries, file_nums=[file_num])
         for det_file in os.listdir(decoded_dir):
+            print(f'Checking {det_file}')
             if not det_file.endswith('_array.root') or '_datrun_' not in det_file:
                 continue
             if get_file_num_from_fdf_file_name(det_file) != file_num:
