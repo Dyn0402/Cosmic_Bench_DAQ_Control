@@ -54,8 +54,8 @@ class Client:
         while True:
             packet = self.client.recv(self.max_recv)
             data += packet
-            if len(data) > self.max_recv:
-                print(f'Max packet size of {self.max_recv} exceeded with {len(data)}, breaking early!!')
+            print(f'Sub-packet: {packet}')
+            if len(packet) < self.max_recv:
                 break
         data = json.loads(data.decode())
         if not self.silent:
