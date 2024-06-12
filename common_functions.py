@@ -61,6 +61,22 @@ def get_file_num_from_fdf_file_name(file_name, num_index=-1):
 
 
 def get_run_name_from_fdf_file_name(file_name):
-    # Should work for fdfs, maybe other file types
-    run_name = file_name[:file_name.rfind('_', 0, file_name.rfind('_'))].split('/')[-1]
+    file_name_split = file_name.split('_')
+    # Find xxHxx in file name split
+    run_name_end_index = 0
+    for i, part in enumerate(file_name_split):
+        print(f'{i}: {part}')
+        if len(part) == 5 and part[2] == 'H' and is_convertible_to_int(part[:2]) and is_convertible_to_int(part[3:]):
+            print(f'Found H flag: {i} {part}')
+            run_name_end_index = i
+            break
+    run_name = '_'.join(file_name_split[:run_name_end_index + 1])
     return run_name
+
+
+def is_convertible_to_int(s):
+    try:
+        int(s)
+        return True
+    except ValueError:
+        return False
