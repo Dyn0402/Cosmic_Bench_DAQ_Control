@@ -11,6 +11,7 @@ Created as Cosmic_Bench_DAQ_Control/Client.py
 import socket
 import time
 import json
+import struct
 
 
 class Client:
@@ -50,13 +51,19 @@ class Client:
         return data
 
     def receive_json(self):
+        # Read the length header first
+        length_header = self.client.recv(4)
+        if not length_header:
+            return None
+
+        length = struct.unpack('!I', length_header)[0]
         data = b''
-        while True:
+
+        while len(data) < length:
             packet = self.client.recv(self.max_recv)
             data += packet
-            print(f'Sub-packet: {packet}')
-            if len(packet) < self.max_recv:
-                break
+            print(f'Sub-packet (len {len(packet)}): {packet}')
+
         data = json.loads(data.decode())
         if not self.silent:
             print(f"Received: {data}")
@@ -68,6 +75,8 @@ class Client:
             print(f"Sent: {data}")
 
     def send_json(self, data):
-        self.client.sendall(json.dumps(data).encode())
+        json_data = json.dumps(data).encode()
+        length = struct.pack('!I', len(json_data))  # Pack length as a 4-byte unsigned integer
+        self.client.sendall(length + json_data)
         if not self.silent:
             print(f"Sent: {data}")
