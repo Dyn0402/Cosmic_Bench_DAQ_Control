@@ -41,10 +41,17 @@ def get_feu_num_from_fdf_file_name(file_name):
 def get_file_num_from_fdf_file_name(file_name):
     """
     Get fdf style file number from file name with format ...xxx_xxx_240212_11H42_000_01.xxx
+    Updated to more robustly get first number from back.
     :param file_name:
     :return:
     """
-    file_num = int(file_name.split('_')[-2])
+    file_split = file_name.split('_')
+    file_num, check_index, split_len = None, -2, len(file_split)
+    while file_num is None and check_index > -split_len:
+        try:
+            file_num = int(file_split[check_index])
+        except ValueError:
+            check_index -= 1
     return file_num
 
 
