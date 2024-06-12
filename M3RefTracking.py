@@ -17,7 +17,7 @@ import awkward as ak
 class M3RefTracking:
     def __init__(self, ray_dir, file_nums='all', variables=None, single_track=True):
         self.ray_dir = ray_dir
-        self.file_nums = file_nums
+        self.file_nums = 'all' if file_nums is None else file_nums
         self.single_track = single_track
         self.chi2_cut = 1.5
         self.detector_xy_extent_cuts = {'x': [-250, 250], 'y': [-250, 250]}

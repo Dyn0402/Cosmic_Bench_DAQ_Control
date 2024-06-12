@@ -62,7 +62,6 @@ class Client:
         while len(data) < length:
             packet = self.client.recv(self.max_recv)
             data += packet
-            print(f'Sub-packet (len {len(packet)}): {packet}')
 
         data = json.loads(data.decode())
         if not self.silent:

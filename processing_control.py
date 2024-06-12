@@ -171,7 +171,8 @@ def filter_by_m3(out_dir, m3_tracking_dir, decoded_dir, detectors, det_info_dir,
         run_name = get_run_name_from_fdf_file_name(m3_file)
         file_num = get_file_num_from_fdf_file_name(m3_file)
         detector_geometries = get_detector_geometries(detectors, det_info_dir, included_detectors)
-        traversing_event_ids = get_m3_det_traversing_events(f'{m3_tracking_dir}{m3_file}', detector_geometries)
+        traversing_event_ids = get_m3_det_traversing_events(f'{m3_tracking_dir}{m3_file}', detector_geometries,
+                                                            file_nums=[file_num])
         for det_file in os.listdir(decoded_dir):
             if not det_file.endswith('_array.root') or '_datrun_' not in det_file:
                 continue
@@ -184,15 +185,16 @@ def filter_by_m3(out_dir, m3_tracking_dir, decoded_dir, detectors, det_info_dir,
                                      f'{out_dir}{det_file.replace("_array", "_traversing")}')
 
 
-def get_m3_det_traversing_events(ray_directory, detector_geometries, det_bound_cushion=0.08):
+def get_m3_det_traversing_events(ray_directory, detector_geometries, file_nums=None, det_bound_cushion=0.08):
     """
     Get event ids of events traversing any of the detectors in detector_geometries.
     :param ray_directory: Path to directory containing m3 tracking files
     :param detector_geometries: List of detector geometries to check for traversing events
+    :param file_nums: List of file numbers to check for traversing events. If 'all', check all files in directory.
     :param det_bound_cushion: Fractional cushion to add to detector bounds
     :return: List of event ids of events traversing any of the detectors
     """
-    m3_track_data = M3RefTracking(ray_directory)
+    m3_track_data = M3RefTracking(ray_directory, file_nums=file_nums)
     masks = []
     for detector in detector_geometries:
         x, y, event_nums = m3_track_data.get_xy_positions(detector['z'])
