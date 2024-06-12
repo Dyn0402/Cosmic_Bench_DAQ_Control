@@ -34,6 +34,8 @@ def run_m3_filtering_max_hv_stats():
         processor_client.send('Filter By M3 max_hv_stats')
         processor_client.receive()
 
+        processor_client.send('Finished')
+
 
 def run_m3_tracking_hv7():
     config = Config()
