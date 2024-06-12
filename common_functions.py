@@ -62,12 +62,9 @@ def get_file_num_from_fdf_file_name(file_name, num_index=-1):
 
 def get_run_name_from_fdf_file_name(file_name):
     file_name_split = file_name.split('_')
-    # Find xxHxx in file name split
     run_name_end_index = 0
-    for i, part in enumerate(file_name_split):
-        print(f'{i}: {part}')
+    for i, part in enumerate(file_name_split):  # Find xxHxx in file name split
         if len(part) == 5 and part[2] == 'H' and is_convertible_to_int(part[:2]) and is_convertible_to_int(part[3:]):
-            print(f'Found H flag: {i} {part}')
             run_name_end_index = i
             break
     run_name = '_'.join(file_name_split[:run_name_end_index + 1])
