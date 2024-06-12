@@ -171,8 +171,7 @@ def filter_by_m3(out_dir, m3_tracking_dir, decoded_dir, detectors, det_info_dir,
         run_name = get_run_name_from_fdf_file_name(m3_file)
         file_num = get_file_num_from_fdf_file_name(m3_file)
         detector_geometries = get_detector_geometries(detectors, det_info_dir, included_detectors)
-        traversing_event_ids = get_m3_det_traversing_events(f'{m3_tracking_dir}{m3_file}', detector_geometries,
-                                                            file_nums=[file_num])
+        traversing_event_ids = get_m3_det_traversing_events(m3_tracking_dir, detector_geometries, file_nums=[file_num])
         for det_file in os.listdir(decoded_dir):
             if not det_file.endswith('_array.root') or '_datrun_' not in det_file:
                 continue
