@@ -314,8 +314,7 @@ def filter_dream_file_uproot(file_path, events, out_file_path, event_branch_name
 
 def filter_dream_file_pyroot(file_path, events, out_file_path, event_branch_name='evn'):
     """
-    Filter a decoded dream file based on a list of events. Shame that uproot doesn't work, because this is a slow
-    python loop.
+    Filter a dream file based on a mask.
     :param file_path: Path to dream file to filter
     :param events: List of events to keep
     :param out_file_path: Path to write filtered dream file
@@ -329,14 +328,29 @@ def filter_dream_file_pyroot(file_path, events, out_file_path, event_branch_name
     out_file = ROOT.TFile(out_file_path, 'RECREATE')
     out_tree = in_tree.CloneTree(0)
 
+    events = sorted(list(events))
+
     event_num_branch = in_tree.GetBranch(event_branch_name)
+    event_num_leaf = event_num_branch.GetLeaf(event_branch_name)
+
+    print(events)
 
     for i in range(in_tree.GetEntries()):
+        if len(events) == 0:
+            break
         in_tree.GetEntry(i)
-        event_id = event_num_branch.GetLeaf(event_branch_name).GetValue()
-        if event_id in events:
+        event_num = int(event_num_leaf.GetValue())
+        print(event_num)
+        while events[0] < event_num:
+            events.pop(0)
+            if len(events) == 0:
+                break
+        if events[0] == event_num:
             out_tree.Fill()
+            print(f'Event {event_num} written')
+            events.pop(0)
 
+    print(f'Writing {out_file_path}')
     out_file.Write()
     out_file.Close()
     in_file.Close()
