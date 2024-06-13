@@ -85,7 +85,7 @@ def main():
                             remove_files(fdf_dir, 'fdf')  # Raw dream fdfs
                             remove_files(decoded_dir)  # Decoded but unfiltered root files
                     res = server.receive()
-        except TypeError as e:
+        except Exception as e:
             print(f'Error: {e}\nRestarting processing control server...')
     print('donzo')
 
@@ -178,9 +178,9 @@ def filter_by_m3(out_dir, m3_tracking_dir, decoded_dir, detectors, det_info_dir,
                 continue
             if get_run_name_from_fdf_file_name(det_file) != run_name:
                 continue
-            print(f'Filtering {det_file} to {det_file.replace("_array", "_traversing")}')
+            print(f'Filtering {det_file} to {det_file.replace("_array", "_filtered")}')
             filter_dream_file_pyroot(f'{decoded_dir}{det_file}', traversing_event_ids,
-                                     f'{out_dir}{det_file.replace("_array", "_traversing")}',
+                                     f'{out_dir}{det_file.replace("_array", "_filtered")}',
                                      event_branch_name='eventId')
 
 
@@ -333,24 +333,19 @@ def filter_dream_file_pyroot(file_path, events, out_file_path, event_branch_name
     event_num_branch = in_tree.GetBranch(event_branch_name)
     event_num_leaf = event_num_branch.GetLeaf(event_branch_name)
 
-    print(events)
-
     for i in range(in_tree.GetEntries()):
         if len(events) == 0:
             break
         in_tree.GetEntry(i)
         event_num = int(event_num_leaf.GetValue())
-        print(event_num)
         while events[0] < event_num:
             events.pop(0)
             if len(events) == 0:
                 break
         if events[0] == event_num:
             out_tree.Fill()
-            print(f'Event {event_num} written')
             events.pop(0)
 
-    print(f'Writing {out_file_path}')
     out_file.Write()
     out_file.Close()
     in_file.Close()
