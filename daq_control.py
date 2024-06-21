@@ -91,6 +91,9 @@ def main():
                     banco_daq.send(f'Start {sub_run_name}')
                     banco_daq.receive()
 
+                dedip196_processor.send(f'Dedip196 Decode and Filter On The Fly {sub_run_name}')
+                sedip28_processor.send(f'Sedip28 M3 Tracking On The Fly {sub_run_name}')
+
                 daq_trigger_switch = trigger_switch if banco else None
                 daq_controller = DAQController(config.dream_daq_info['daq_config_template_path'], sub_run['run_time'],
                                                sub_run_name, sub_run_dir, sub_out_dir, daq_trigger_switch)
@@ -103,16 +106,16 @@ def main():
                     banco_daq.send('Stop')
                     banco_daq.receive()
 
-                dedip196_processor.send(f'Decode FDFs {sub_run_name}')
-                dedip196_processor.receive()
-                sedip28_processor.send(f'Run M3 Tracking {sub_run_name}')
-                sedip28_processor.receive()
-                # Run filtering
-                dedip196_processor.send(f'Filter By M3 {sub_run_name}')
-                dedip196_processor.receive()
-                # Remove all but filtered filtes
-                dedip196_processor.send(f'Clean Up Unfiltered {sub_run_name}')
-                dedip196_processor.receive()
+                # dedip196_processor.send(f'Decode FDFs {sub_run_name}')
+                # dedip196_processor.receive()
+                # sedip28_processor.send(f'Run M3 Tracking {sub_run_name}')
+                # sedip28_processor.receive()
+                # # Run filtering
+                # dedip196_processor.send(f'Filter By M3 {sub_run_name}')
+                # dedip196_processor.receive()
+                # # Remove all but filtered files
+                # dedip196_processor.send(f'Clean Up Unfiltered {sub_run_name}')
+                # dedip196_processor.receive()
                 if banco:
                     pass  # Process banco data
 
@@ -120,6 +123,8 @@ def main():
                 sleep(10)
         hv.send('Finished')
         banco_daq.send('Finished')
+        dedip196_processor.send('Finished')
+        sedip28_processor.send('Finished')
     print('donzo')
 
 

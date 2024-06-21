@@ -13,6 +13,7 @@ import sys
 import subprocess
 import shutil
 from datetime import datetime
+from time import sleep
 import numpy as np
 import json
 
@@ -35,7 +36,8 @@ def main():
             port = int(sys.argv[1])
         except ValueError:
             print(f'Invalid port number {sys.argv[1]}. Using default port {port}')
-    options = ['Decode FDFs', 'Run M3 Tracking', 'Filter By M3', 'Clean Up Unfiltered']
+    options = ['Decode FDFs', 'Run M3 Tracking', 'Filter By M3', 'Clean Up Unfiltered',
+               'Dedip196 Decode and Filter On The Fly', 'Sedip28 M3 Tracking On The Fly']
     while True:
         try:
             with Server(port=port) as server:
@@ -83,11 +85,137 @@ def main():
                         if 'Clean Up Unfiltered' in run_options:
                             decoded_dir = f"{sub_run_dir}{run_info['decoded_root_inner_dir']}/"
                             remove_files(fdf_dir, 'fdf')  # Raw dream fdfs
-                            remove_files(decoded_dir)  # Decoded but unfiltered root files
+                            remove_files(decoded_dir, 'root')  # Decoded but unfiltered root files
+                        if 'Dedip196 Decode and Filter On The Fly' in run_options:
+                            decode_and_filter_on_the_fly(run_info, sub_run_dir)
+                        if 'Sedip28 M3 Tracking On The Fly' in run_options:
+                            decode_and_filter_on_the_fly(run_info, sub_run_dir)
                     res = server.receive()
         except Exception as e:
             print(f'Error: {e}\nRestarting processing control server...')
     print('donzo')
+
+
+def m3_tracking_on_the_fly(run_info, sub_run_dir):
+    """
+
+    :param run_info:
+    :param sub_run_dir:
+    :return:
+    """
+    fdf_dir = f"{sub_run_dir}{run_info['raw_daq_inner_dir']}/"
+    decoded_dir = f"{sub_run_dir}{run_info['decoded_root_inner_dir']}/"
+    m3_tracking_dir = f"{sub_run_dir}{run_info['m3_tracking_inner_dir']}/"
+    filter_dir = f"{sub_run_dir}{run_info['filtered_root_inner_dir']}/"
+
+    sleep(60 * 2)  # Wait on start for daq to start running
+    file_num, running = 0, True
+    while running:
+        if not file_num_still_running(fdf_dir, file_num):
+            # Run M3 tracking
+            create_dir_if_not_exist(m3_tracking_dir)
+            print(f'\n\nRunning M3 Tracking on FDFs in {fdf_dir} to {m3_tracking_dir}')
+            m3_tracking(fdf_dir, run_info['tracking_sh_path'], run_info['tracking_run_dir'], m3_tracking_dir)
+            print('M3 Tracking Complete')
+
+            if found_file_num(fdf_dir, file_num + 1):
+                file_num += 1  # Move on to next file
+            else:
+                running = False  # Subrun over, exit
+
+
+def decode_and_filter_on_the_fly(run_info, sub_run_dir):
+    """
+    Perform decoding and filtering of dream fdf files as the files are produced (on the fly). Check for the nth file's
+    existence and wait for the m3 fdf to stop getting bigger, at which point decode the fdfs, filter the root files,
+    then clen up the unfiltered files. Move on to the next file once complete if it exists. If not, assume subrun over
+    and exit.
+    :param run_info: Dictionary with all relevant information about run
+    :param sub_run_dir: Base directory containing all sub-run files
+    :return:
+    """
+    fdf_dir = f"{sub_run_dir}{run_info['raw_daq_inner_dir']}/"
+    decoded_dir = f"{sub_run_dir}{run_info['decoded_root_inner_dir']}/"
+    m3_tracking_dir = f"{sub_run_dir}{run_info['m3_tracking_inner_dir']}/"
+    filter_dir = f"{sub_run_dir}{run_info['filtered_root_inner_dir']}/"
+
+    sleep(60 * 2)  # Wait on start for daq to start running
+    file_num, running = 0, True
+    while running:
+        if not file_num_still_running(fdf_dir, file_num):
+            # Decode fdfs and put decoded root files in decode_dir
+            create_dir_if_not_exist(decoded_dir)
+            print(f'\n\nDecoding FDFs in {fdf_dir} to {decoded_dir}')
+            decode_fdfs(fdf_dir, run_info['decode_path'], run_info['convert_path'], decoded_dir,
+                        out_type=run_info['out_type'])
+            print('Decoding Complete')
+
+            # Wait for M3 tracking file
+            while (not found_file_num(m3_tracking_dir, file_num) and
+                   file_num_still_running(m3_tracking_dir, wait_time=10)):
+                print(f'Waiting for m3 tracking file {file_num}...')
+                sleep(10)
+
+            # Filter by M3
+            create_dir_if_not_exist(filter_dir)
+            print(f'\n\nFiltering decoded files in {decoded_dir} by M3 tracking in {filter_dir}')
+            filter_by_m3(filter_dir, m3_tracking_dir, decoded_dir, run_info['detectors'],
+                         run_info['detector_info_dir'], run_info['included_detectors'])
+            print('Filtering Complete')
+
+            # Clean Up
+            remove_files(fdf_dir, 'fdf', file_num=file_num)  # Raw dream fdfs
+            remove_files(decoded_dir, 'root', file_num=file_num)  # Decoded but unfiltered root files
+
+            if found_file_num(fdf_dir, file_num + 1):
+                file_num += 1  # Move on to next file
+            else:
+                running = False  # Subrun over, exit
+
+
+def found_file_num(fdf_dir, file_num):
+    """
+    Look for file number in fdf dir. Return True if found, False if not
+    :param fdf_dir: Directory containing fdf files
+    :param file_num:
+    :return:
+    """
+    for file_name in os.listdir(fdf_dir):
+        if not file_name.endswith('.fdf') or '_datrun_' not in file_name:
+            continue
+        if file_num == get_file_num_from_fdf_file_name(file_name):
+            return True
+    return False
+
+
+def file_num_still_running(fdf_dir, m3_tracking_feu_num=1, wait_time=30):
+    """
+    Check if dream DAQ is still running by finding m3 fdf and checking to see if file size increases within wait_time
+    :param fdf_dir: Directory containing fdf files
+    :param m3_tracking_feu_num: FEU number of m3 tracking fdf
+    :param wait_time: Time to wait for file size increase
+    :return: True if size increased over wait time (still running), False if not.
+    """
+    m3_fdf = None
+    for file in os.listdir(fdf_dir):
+        if not file.endswith('.fdf') or '_datrun_' not in file:
+            continue
+        if get_feu_num_from_fdf_file_name(file) == m3_tracking_feu_num:
+            m3_fdf = file
+            break
+
+    if m3_fdf is None:
+        print(f'No M3 tracking fdf found in {fdf_dir}')
+        return False
+
+    original_size = os.path.getsize(f'{fdf_dir}{m3_fdf}')
+    sleep(wait_time)
+    new_size = os.path.getsize(f'{fdf_dir}{m3_fdf}')
+
+    if new_size > original_size:
+        return True
+    else:
+        return False
 
 
 def decode_fdfs(fdf_dir, decode_path, convert_path=None, out_dir=None, feu_nums='all', fdf_type='all', out_type='vec'):
@@ -428,15 +556,18 @@ def make_temp_sh_file(fdf_run, ref_sh_file, file_num, sh_file_type='tracking', f
     return temp_file_name
 
 
-def remove_files(directory, extension=None):
+def remove_files(directory, extension=None, file_num=None):
     """
     Remove all files in directory with given file extension
     :param directory: Directory from which to remove files
     :param extension: Only remove files with given extension. Remove all files if extension is None
+    :param file_num: Specific fdf file number to remove if not None.
     :return:
     """
     for file_name in os.listdir(directory):
         if extension is not None and not file_name.endswith(extension):
+            continue
+        if file_num is not None and get_file_num_from_fdf_file_name(file_name) != file_num:
             continue
         print(f'Removing {directory}{file_name}')
         os.remove(f'{directory}{file_name}')
