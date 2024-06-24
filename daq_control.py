@@ -210,34 +210,44 @@ def found_file_num(fdf_dir, file_num):
     return False
 
 
-def file_num_still_running(fdf_dir, m3_tracking_feu_num=1, wait_time=30):
+def file_num_still_running(fdf_dir, file_num, wait_time=30):
     """
-    Check if dream DAQ is still running by finding m3 fdf and checking to see if file size increases within wait_time
+    Check if dream DAQ is still running by finding all fdfs with file_num and checking to see if any file size
+    increases within wait_time
     :param fdf_dir: Directory containing fdf files
-    :param m3_tracking_feu_num: FEU number of m3 tracking fdf
+    :param file_num: File number to check for
     :param wait_time: Time to wait for file size increase
     :return: True if size increased over wait time (still running), False if not.
     """
-    m3_fdf = None
+    file_paths = []
     for file in os.listdir(fdf_dir):
         if not file.endswith('.fdf') or '_datrun_' not in file:
-            continue
-        if get_feu_num_from_fdf_file_name(file) == m3_tracking_feu_num:
-            m3_fdf = file
-            break
+            continue  # Skip non fdf data files
+        if get_file_num_from_fdf_file_name(file) == file_num:
+            file_paths.append(f'{fdf_dir}{file}')
 
-    if m3_fdf is None:
-        print(f'No M3 tracking fdf found in {fdf_dir}')
+    if len(file_paths) == 0:
+        print(f'No fdfs with file num {file_num} found in {fdf_dir}')
         return False
 
-    original_size = os.path.getsize(f'{fdf_dir}{m3_fdf}')
+    old_sizes = []
+    for fdf_path in file_paths:
+        old_sizes.append(os.path.getsize(fdf_path))
+        print(f'File: {fdf_path} Original Size: {old_sizes[-1]}')
+
     sleep(wait_time)
-    new_size = os.path.getsize(f'{fdf_dir}{m3_fdf}')
 
-    if new_size > original_size:
-        return True
-    else:
-        return False
+    new_sizes = []
+    for fdf_path in file_paths:
+        new_sizes.append(os.path.getsize(fdf_path))
+        print(f'File: {fdf_path} New Size: {new_sizes[-1]}')
+
+    for i in range(len(old_sizes)):
+        print(f'File: {file_paths[i]} Original Size: {old_sizes[i]} New Size: {new_sizes[i]}')
+        print(f'Increased? {new_sizes[i] > old_sizes[i]}')
+        if new_sizes[i] > old_sizes[i]:
+            return True
+    return False
 
 
 if __name__ == '__main__':

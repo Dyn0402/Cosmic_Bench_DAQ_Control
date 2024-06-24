@@ -23,6 +23,7 @@ class Config:
         self.filtered_root_inner_dir = 'filtered_root'
         self.m3_tracking_inner_dir = 'm3_tracking_root'
         self.detector_info_dir = f'/mnt/cosmic_data/config/detectors/'
+        self.m3_feu_num = 1
 
         self.dream_daq_info = {
             'daq_config_template_path': '/home/clas12/dylan/Run/config/CosmicTb_TPOT.cfg',
@@ -49,6 +50,7 @@ class Config:
             'detector_info_dir': self.detector_info_dir,
             'filtered_root_inner_dir': self.filtered_root_inner_dir,
             'out_type': 'both',  # 'vec', 'array', or 'both'
+            'm3_feu_num': self.m3_feu_num,
         }
 
         self.sedip28_processor_info = {
@@ -59,6 +61,7 @@ class Config:
             'm3_tracking_inner_dir': self.m3_tracking_inner_dir,
             'tracking_run_dir': '/local/home/usernsw/dylan/m3_tracking/',
             'tracking_sh_path': '/local/home/usernsw/dylan/m3_tracking/run_tracking_single.sh',
+            'm3_fewu_num': self.m3_feu_num,
         }
 
         self.hv_control_info = {

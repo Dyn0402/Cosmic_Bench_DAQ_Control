@@ -31,10 +31,6 @@ def main():
                 server.send('Processing control connected')
                 run_info = server.receive_json()
                 server.send('Received run info')
-                # run_info.update(server.receive_json())  # Update run info with included detectors
-                # server.send('Received included detectors')
-                # run_info.update(server.receive_json())  # Update run info with detector info
-                # server.send('Received detector info')
 
                 res = server.receive()
                 while 'Finished' not in res:
@@ -54,7 +50,7 @@ def main():
                             create_dir_if_not_exist(out_dir)
                             print(f'\n\nRunning M3 Tracking on FDFs in {fdf_dir} to {out_dir}')
                             m3_tracking(fdf_dir, run_info['tracking_sh_path'], run_info['tracking_run_dir'], out_dir,
-                                        file_num=file_num)
+                                        m3_feu_num=run_info['m3_feu_num'], file_num=file_num)
                             print('M3 Tracking Complete')
                     res = server.receive()
         except Exception as e:
@@ -62,14 +58,14 @@ def main():
     print('donzo')
 
 
-def m3_tracking(fdf_dir, tracking_sh_ref_path, tracking_run_dir, out_dir=None, m3_fdf_num=1, file_num=None):
+def m3_tracking(fdf_dir, tracking_sh_ref_path, tracking_run_dir, out_dir=None, m3_feu_num=1, file_num=None):
     """
 
     :param fdf_dir:
     :param tracking_sh_ref_path:
     :param tracking_run_dir:
     :param out_dir:
-    :param m3_fdf_num:
+    :param m3_feu_num:
     :param file_num:
     :return:
     """
@@ -77,7 +73,7 @@ def m3_tracking(fdf_dir, tracking_sh_ref_path, tracking_run_dir, out_dir=None, m
         if not file.endswith('.fdf') or '_datrun_' not in file:
             continue
         feu_num = get_feu_num_from_fdf_file_name(file)
-        if feu_num != m3_fdf_num:
+        if feu_num != m3_feu_num:
             continue
         run_name = get_run_name_from_fdf_file_name(file)
         file_num_i = get_file_num_from_fdf_file_name(file, -2)

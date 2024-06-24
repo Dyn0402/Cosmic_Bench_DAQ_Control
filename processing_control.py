@@ -63,7 +63,8 @@ def main():
                             create_dir_if_not_exist(out_dir)
                             print(f'\n\nDecoding FDFs in {fdf_dir} to {out_dir}')
                             decode_fdfs(fdf_dir, run_info['decode_path'], run_info['convert_path'], out_dir,
-                                        out_type=run_info['out_type'], file_num=file_num)
+                                        out_type=run_info['out_type'], file_num=file_num,
+                                        exclude_feu_nums=[run_info['m3_feu_num']])
                             print('Decoding Complete')
                         if 'Filter By M3' in run_options:
                             decoded_dir = f"{sub_run_dir}{run_info['decoded_root_inner_dir']}/"
@@ -86,7 +87,7 @@ def main():
 
 
 def decode_fdfs(fdf_dir, decode_path, convert_path=None, out_dir=None, feu_nums='all', fdf_type='all', out_type='vec',
-                file_num=None):
+                file_num=None, exclude_feu_nums=None):
     """
     Decode fdfs from a directory.
     :param fdf_dir: Directory containing fdf files
@@ -97,6 +98,7 @@ def decode_fdfs(fdf_dir, decode_path, convert_path=None, out_dir=None, feu_nums=
     :param fdf_type:
     :param out_type: 'vec', 'array', or both
     :param file_num:
+    :param exclude_feu_nums:
     :return:
     """
     og_dir = os.getcwd()
@@ -108,9 +110,12 @@ def decode_fdfs(fdf_dir, decode_path, convert_path=None, out_dir=None, feu_nums=
     for file in os.listdir(fdf_dir):
         if not file.endswith('.fdf'):
             continue
+        fdf_num = get_feu_num_from_fdf_file_name(file)
         if isinstance(feu_nums, list):
-            fdf_num = get_feu_num_from_fdf_file_name(file)
             if fdf_num not in feu_nums:
+                continue
+        if exclude_feu_nums is not None:
+            if fdf_num in exclude_feu_nums:
                 continue
         if fdf_type != 'all':
             if fdf_type not in file.split('_'):
