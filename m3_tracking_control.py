@@ -80,7 +80,7 @@ def m3_tracking(fdf_dir, tracking_sh_ref_path, tracking_run_dir, out_dir=None, m
         if feu_num != m3_fdf_num:
             continue
         run_name = get_run_name_from_fdf_file_name(file)
-        file_num_i = get_file_num_from_fdf_file_name(file, -1)
+        file_num_i = get_file_num_from_fdf_file_name(file, -2)
         if file_num is not None and file_num_i != file_num:
             continue
         out_dir = fdf_dir if out_dir is None else out_dir

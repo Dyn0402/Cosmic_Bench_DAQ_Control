@@ -9,6 +9,7 @@ Created as Cosmic_Bench_DAQ_Control/common_functions.py
 """
 
 import os
+from datetime import datetime
 
 
 def create_dir_if_not_exist(dir_path):
@@ -38,7 +39,7 @@ def get_feu_num_from_fdf_file_name(file_name):
     return fdf_num
 
 
-def get_file_num_from_fdf_file_name(file_name, num_index=-1):
+def get_file_num_from_fdf_file_name(file_name, num_index=-2):
     """
     Get fdf style file number from file name with format ...xxx_xxx_240212_11H42_000_01.xxx
     Updated to more robustly get first number from back.
@@ -46,18 +47,26 @@ def get_file_num_from_fdf_file_name(file_name, num_index=-1):
     :param num_index:
     :return:
     """
-    file_split = file_name.split('_')
-    file_nums, check_index, split_len = [], -2, len(file_split)
-    while check_index > -split_len:
+    file_split = remove_after_last_dot(file_name).split('_')
+    file_nums = []
+    for x in file_split:
         try:
-            file_nums.append(int(file_split[check_index]))
+            file_nums.append(int(x))
         except ValueError:
             pass
-        check_index -= 1
-    num_index = abs(num_index) - 1
-    if len(file_nums) < num_index + 1:
-        return None
     return file_nums[num_index]
+
+
+def remove_after_last_dot(input_string):
+    # Find the index of the last dot
+    last_dot_index = input_string.rfind('.')
+
+    # If there's no dot, return the original string
+    if last_dot_index == -1:
+        return input_string
+
+    # Return the substring up to the last dot (not including the dot)
+    return input_string[:last_dot_index]
 
 
 def get_run_name_from_fdf_file_name(file_name):

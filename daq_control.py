@@ -93,15 +93,16 @@ def main():
                     banco_daq.send(f'Start {sub_run_name}')
                     banco_daq.receive()
 
-                dedip196_processor.send(f'Dedip196 Decode and Filter On The Fly {sub_run_name}')
-                sedip28_processor.send(f'Sedip28 M3 Tracking On The Fly {sub_run_name}')
+                # dedip196_processor.send(f'Dedip196 Decode and Filter On The Fly {sub_run_name}')
+                # sedip28_processor.send(f'Sedip28 M3 Tracking On The Fly {sub_run_name}')
 
                 daq_trigger_switch = trigger_switch if banco else None
                 daq_control_args = (config.dream_daq_info['daq_config_template_path'], sub_run['run_time'],
                                     sub_run_name, sub_run_dir, sub_out_dir, daq_trigger_switch)
                 daq_controller_thread = threading.Thread(target=run_daq_controller, args=daq_control_args)
                 process_files_args = (sub_run_dir, sub_out_dir)
-                process_files_on_the_fly_thread = threading.Thread(target=process_files_on_the_fly, args=process_files_args)
+                process_files_on_the_fly_thread = threading.Thread(target=process_files_on_the_fly,
+                                                                   args=process_files_args)
 
                 daq_controller_thread.start()
                 process_files_on_the_fly_thread.start()
@@ -163,12 +164,16 @@ def process_files_on_the_fly(sub_run_dir, sub_out_dir, sub_run_name, dedip196_pr
     """
 
     create_dir_if_not_exist(sub_out_dir)
-    sleep(60 * 2)  # Wait on start for daq to start running
+    sleep(60)  # Wait on start for daq to start running
     file_num, running = 0, True
+    dedip196_processor.send('Starting on fly processing', silent=True)  # Debug
+    dedip196_processor.receive(silent=True)
     while running:
-        if not file_num_still_running(sub_run_dir, file_num):
+        if file_num_still_running(sub_run_dir, file_num):
+            sleep(60)  # Wait for file to finish
+        else:  # File is done, process it
             for file_name in os.listdir(sub_run_dir):
-                if file_name.endswith('.fdf') and get_file_num_from_fdf_file_name(file_name) == file_num:
+                if file_name.endswith('.fdf') and get_file_num_from_fdf_file_name(file_name, -2) == file_num:
                     shutil.move(f'{sub_run_dir}{file_name}', f'{sub_out_dir}{file_name}')
 
             dedip196_processor.send(f'Decode FDFs {file_num} {sub_run_name}', silent=True)
@@ -186,8 +191,8 @@ def process_files_on_the_fly(sub_run_dir, sub_out_dir, sub_run_name, dedip196_pr
                 file_num += 1  # Move on to next file
             else:
                 running = False  # Subrun over, exit
-        else:
-            sleep(60)
+        dedip196_processor.send(f'On fly processing running={running}', silent=True)  # Debug
+        dedip196_processor.receive(silent=True)
 
 
 def found_file_num(fdf_dir, file_num):
@@ -200,7 +205,7 @@ def found_file_num(fdf_dir, file_num):
     for file_name in os.listdir(fdf_dir):
         if not file_name.endswith('.fdf') or '_datrun_' not in file_name:
             continue
-        if file_num == get_file_num_from_fdf_file_name(file_name):
+        if file_num == get_file_num_from_fdf_file_name(file_name, -2):
             return True
     return False
 

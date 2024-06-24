@@ -115,7 +115,7 @@ def decode_fdfs(fdf_dir, decode_path, convert_path=None, out_dir=None, feu_nums=
         if fdf_type != 'all':
             if fdf_type not in file.split('_'):
                 continue
-        if file_num is not None and get_file_num_from_fdf_file_name(file) != file_num:
+        if file_num is not None and get_file_num_from_fdf_file_name(file, -2) != file_num:
             continue
         out_name = file.replace('.fdf', '_decoded.root')
         command = f"{decode_path} {fdf_dir}{file} {out_name}"
@@ -143,7 +143,7 @@ def filter_by_m3(out_dir, m3_tracking_dir, decoded_dir, detectors, det_info_dir,
     for m3_file in os.listdir(m3_tracking_dir):
         if not m3_file.endswith('_rays.root') or '_datrun_' not in m3_file:
             continue
-        if file_num is not None and get_file_num_from_fdf_file_name(m3_file) != file_num:
+        if file_num is not None and get_file_num_from_fdf_file_name(m3_file, -1) != file_num:
             continue
         print(f'\n\nFiltering decoded files by M3 tracking in {m3_file}')
         run_name = get_run_name_from_fdf_file_name(m3_file)
@@ -330,7 +330,7 @@ def filter_dream_file_pyroot(file_path, events, out_file_path, event_branch_name
     in_file.Close()
 
 
-def remove_files(directory, extension=None, file_num=None):
+def remove_files(directory, extension=None, file_num=None, file_num_index=-2):
     """
     Remove all files in directory with given file extension
     :param directory: Directory from which to remove files
@@ -341,7 +341,7 @@ def remove_files(directory, extension=None, file_num=None):
     for file_name in os.listdir(directory):
         if extension is not None and not file_name.endswith(extension):
             continue
-        if file_num is not None and get_file_num_from_fdf_file_name(file_name) != file_num:
+        if file_num is not None and get_file_num_from_fdf_file_name(file_name, file_num_index) != file_num:
             continue
         print(f'Removing {directory}{file_name}')
         os.remove(f'{directory}{file_name}')
