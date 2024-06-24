@@ -100,7 +100,7 @@ def main():
                 daq_control_args = (config.dream_daq_info['daq_config_template_path'], sub_run['run_time'],
                                     sub_run_name, sub_run_dir, sub_out_dir, daq_trigger_switch)
                 daq_controller_thread = threading.Thread(target=run_daq_controller, args=daq_control_args)
-                process_files_args = (sub_run_dir, sub_out_dir)
+                process_files_args = (sub_run_dir, sub_out_dir, sub_run_name, dedip196_processor, sedip28_processor)
                 process_files_on_the_fly_thread = threading.Thread(target=process_files_on_the_fly,
                                                                    args=process_files_args)
 
