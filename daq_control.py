@@ -101,11 +101,11 @@ def main():
                                     sub_run_name, sub_run_dir, sub_out_dir, daq_trigger_switch)
                 daq_trigger_switch = trigger_switch if banco else None
                 daq_controller_thread = threading.Thread(target=run_daq_controller, args=daq_control_args)
-                move_files_args = (sub_run_dir, sub_out_dir)
-                move_files_on_the_fly_thread = threading.Thread(target=move_files_on_the_fly, args=move_files_args)
+                process_files_args = (sub_run_dir, sub_out_dir)
+                process_files_on_the_fly_thread = threading.Thread(target=process_files_on_the_fly, args=process_files_args)
 
                 daq_controller_thread.start()
-                move_files_on_the_fly_thread.start()
+                process_files_on_the_fly_thread.start()
 
                 daq_controller_thread.join()
                 # daq_controller = DAQController(config.dream_daq_info['daq_config_template_path'], sub_run['run_time'],
@@ -131,7 +131,7 @@ def main():
                 # dedip196_processor.receive()
                 if banco:
                     pass  # Process banco data
-                move_files_on_the_fly_thread.join()
+                process_files_on_the_fly_thread.join()
 
                 print(f'Finished {sub_run_name}, waiting 10 seconds before next run')
                 sleep(10)
@@ -151,9 +151,14 @@ def run_daq_controller(config_template_path, run_time, sub_run_name, sub_run_dir
         daq_success = daq_controller.run()
 
 
-def move_files_on_the_fly(sub_run_dir, sub_out_dir):
+def process_files_on_the_fly(sub_run_dir, sub_out_dir, sub_run_name, dedip196_processor, sedip28_processor):
     """
-
+    Process files on the fly as they are created by the DAQ.
+    :param sub_run_dir: Directory where DAQ is writing files.
+    :param sub_out_dir: Directory where processed files will be moved to.
+    :param sub_run_name: Name of subrun.
+    :param dedip196_processor: Client to dedip196 processor.
+    :param sedip28_processor: Client to sedip28 processor.
     :return:
     """
 
@@ -166,21 +171,23 @@ def move_files_on_the_fly(sub_run_dir, sub_out_dir):
                 if file_name.endswith('.fdf') and get_file_num_from_fdf_file_name(file_name) == file_num:
                     shutil.move(f'{sub_run_dir}{file_name}', f'{sub_out_dir}{file_name}')
 
-            dedip196_processor.send(f'Decode FDFs {sub_run_name}')
-            dedip196_processor.receive()
-            sedip28_processor.send(f'Run M3 Tracking {sub_run_name}')
-            sedip28_processor.receive()
+            dedip196_processor.send(f'Decode FDFs {file_num} {sub_run_name}', silent=True)
+            dedip196_processor.receive(silent=True)
+            sedip28_processor.send(f'Run M3 Tracking {file_num} {sub_run_name}', silent=True)
+            sedip28_processor.receive(silent=True)
             # Run filtering
-            dedip196_processor.send(f'Filter By M3 {sub_run_name}')
-            dedip196_processor.receive()
+            dedip196_processor.send(f'Filter By M3 {file_num} {sub_run_name}', silent=True)
+            dedip196_processor.receive(silent=True)
             # Remove all but filtered files
-            dedip196_processor.send(f'Clean Up Unfiltered {sub_run_name}')
-            dedip196_processor.receive()
+            dedip196_processor.send(f'Clean Up Unfiltered {file_num} {sub_run_name}', silent=True)
+            dedip196_processor.receive(silent=True)
 
             if found_file_num(sub_run_dir, file_num + 1):
                 file_num += 1  # Move on to next file
             else:
                 running = False  # Subrun over, exit
+        else:
+            sleep(60)
 
 
 if __name__ == '__main__':

@@ -44,9 +44,9 @@ class Client:
             if not self.silent:
                 print(f"Failed to connect to {self.host}:{self.port}. {e}")
 
-    def receive(self):
+    def receive(self, silent=False):
         data = self.client.recv(self.max_recv).decode()
-        if not self.silent:
+        if not (self.silent or silent):
             print(f"Received: {data}")
         return data
 
@@ -68,9 +68,9 @@ class Client:
             print(f"Received: {data}")
         return data
 
-    def send(self, data):
+    def send(self, data, silent=False):
         self.client.send(data.encode())
-        if not self.silent:
+        if not (self.silent or silent):
             print(f"Sent: {data}")
 
     def send_json(self, data):
