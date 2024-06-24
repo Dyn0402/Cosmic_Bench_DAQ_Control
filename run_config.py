@@ -31,8 +31,8 @@ class Config:
         self.banco_info = {
             'ip': '132.166.30.82',
             'port': 1100,
-            'daq_run_command': 'cd /home/banco/Test_Beam/framework/bin && ./test_multi_noiseocc_int',
-            'data_temp_dir': '/home/banco/Test_Beam/data',
+            'daq_run_command': 'cd /home/banco/dylan/Run/framework/bin && ./test_multi_noiseocc_int',
+            'data_temp_dir': '/home/banco/dylan/Run/data',
             'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
             'data_inner_dir': 'banco_data'
         }
