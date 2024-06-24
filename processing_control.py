@@ -330,51 +330,6 @@ def filter_dream_file_pyroot(file_path, events, out_file_path, event_branch_name
     in_file.Close()
 
 
-def found_file_num(fdf_dir, file_num):
-    """
-    Look for file number in fdf dir. Return True if found, False if not
-    :param fdf_dir: Directory containing fdf files
-    :param file_num:
-    :return:
-    """
-    for file_name in os.listdir(fdf_dir):
-        if not file_name.endswith('.fdf') or '_datrun_' not in file_name:
-            continue
-        if file_num == get_file_num_from_fdf_file_name(file_name):
-            return True
-    return False
-
-
-def file_num_still_running(fdf_dir, m3_tracking_feu_num=1, wait_time=30):
-    """
-    Check if dream DAQ is still running by finding m3 fdf and checking to see if file size increases within wait_time
-    :param fdf_dir: Directory containing fdf files
-    :param m3_tracking_feu_num: FEU number of m3 tracking fdf
-    :param wait_time: Time to wait for file size increase
-    :return: True if size increased over wait time (still running), False if not.
-    """
-    m3_fdf = None
-    for file in os.listdir(fdf_dir):
-        if not file.endswith('.fdf') or '_datrun_' not in file:
-            continue
-        if get_feu_num_from_fdf_file_name(file) == m3_tracking_feu_num:
-            m3_fdf = file
-            break
-
-    if m3_fdf is None:
-        print(f'No M3 tracking fdf found in {fdf_dir}')
-        return False
-
-    original_size = os.path.getsize(f'{fdf_dir}{m3_fdf}')
-    sleep(wait_time)
-    new_size = os.path.getsize(f'{fdf_dir}{m3_fdf}')
-
-    if new_size > original_size:
-        return True
-    else:
-        return False
-
-
 def remove_files(directory, extension=None, file_num=None):
     """
     Remove all files in directory with given file extension
