@@ -9,7 +9,9 @@ Created as Cosmic_Bench_DAQ_Control/daq_control.py
 """
 
 import os
+import shutil
 from time import sleep
+import threading
 from contextlib import nullcontext
 
 from Client import Client
@@ -17,6 +19,7 @@ from DAQController import DAQController
 
 from run_config import Config
 from common_functions import *
+from processing_control import file_num_still_running, found_file_num
 
 
 def main():
@@ -94,13 +97,23 @@ def main():
                 dedip196_processor.send(f'Dedip196 Decode and Filter On The Fly {sub_run_name}')
                 sedip28_processor.send(f'Sedip28 M3 Tracking On The Fly {sub_run_name}')
 
+                daq_control_args = (config.dream_daq_info['daq_config_template_path'], sub_run['run_time'],
+                                    sub_run_name, sub_run_dir, sub_out_dir, daq_trigger_switch)
                 daq_trigger_switch = trigger_switch if banco else None
-                daq_controller = DAQController(config.dream_daq_info['daq_config_template_path'], sub_run['run_time'],
-                                               sub_run_name, sub_run_dir, sub_out_dir, daq_trigger_switch)
+                daq_controller_thread = threading.Thread(target=run_daq_controller, args=daq_control_args)
+                move_files_args = (sub_run_dir, sub_out_dir)
+                move_files_on_the_fly_thread = threading.Thread(target=move_files_on_the_fly, args=move_files_args)
 
-                daq_success = False
-                while not daq_success:  # Rerun if failure
-                    daq_success = daq_controller.run()
+                daq_controller_thread.start()
+                move_files_on_the_fly_thread.start()
+
+                daq_controller_thread.join()
+                # daq_controller = DAQController(config.dream_daq_info['daq_config_template_path'], sub_run['run_time'],
+                #                                sub_run_name, sub_run_dir, sub_out_dir, daq_trigger_switch)
+                #
+                # daq_success = False
+                # while not daq_success:  # Rerun if failure
+                #     daq_success = daq_controller.run()
 
                 if banco:
                     banco_daq.send('Stop')
@@ -118,6 +131,7 @@ def main():
                 # dedip196_processor.receive()
                 if banco:
                     pass  # Process banco data
+                move_files_on_the_fly_thread.join()
 
                 print(f'Finished {sub_run_name}, waiting 10 seconds before next run')
                 sleep(10)
@@ -126,6 +140,47 @@ def main():
         dedip196_processor.send('Finished')
         sedip28_processor.send('Finished')
     print('donzo')
+
+
+def run_daq_controller(config_template_path, run_time, sub_run_name, sub_run_dir, sub_out_dir, daq_trigger_switch):
+    daq_controller = DAQController(config_template_path, run_time, sub_run_name, sub_run_dir, sub_out_dir,
+                                   daq_trigger_switch)
+
+    daq_success = False
+    while not daq_success:  # Rerun if failure
+        daq_success = daq_controller.run()
+
+
+def move_files_on_the_fly(sub_run_dir, sub_out_dir):
+    """
+
+    :return:
+    """
+
+    create_dir_if_not_exist(sub_out_dir)
+    sleep(60 * 2)  # Wait on start for daq to start running
+    file_num, running = 0, True
+    while running:
+        if not file_num_still_running(sub_run_dir, file_num):
+            for file_name in os.listdir(sub_run_dir):
+                if file_name.endswith('.fdf') and get_file_num_from_fdf_file_name(file_name) == file_num:
+                    shutil.move(f'{sub_run_dir}{file_name}', f'{sub_out_dir}{file_name}')
+
+            dedip196_processor.send(f'Decode FDFs {sub_run_name}')
+            dedip196_processor.receive()
+            sedip28_processor.send(f'Run M3 Tracking {sub_run_name}')
+            sedip28_processor.receive()
+            # Run filtering
+            dedip196_processor.send(f'Filter By M3 {sub_run_name}')
+            dedip196_processor.receive()
+            # Remove all but filtered files
+            dedip196_processor.send(f'Clean Up Unfiltered {sub_run_name}')
+            dedip196_processor.receive()
+
+            if found_file_num(sub_run_dir, file_num + 1):
+                file_num += 1  # Move on to next file
+            else:
+                running = False  # Subrun over, exit
 
 
 if __name__ == '__main__':

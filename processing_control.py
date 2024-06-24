@@ -58,6 +58,9 @@ def main():
                     else:
                         server.send(f"{' and '.join(run_options)} Started...")
                         sub_run = res.strip().split()[-1]
+                        file_num = None
+                        if 'file_num=' in res.strip().split()[-2]:
+                            file_num = int(res.strip().split()[-2].replace('file_num=', ''))
                         sub_run_dir = f"{run_info['run_dir']}/{sub_run}/"
                         fdf_dir = f"{sub_run_dir}{run_info['raw_daq_inner_dir']}/"
                         if 'Decode FDFs' in run_options:
@@ -65,13 +68,14 @@ def main():
                             create_dir_if_not_exist(out_dir)
                             print(f'\n\nDecoding FDFs in {fdf_dir} to {out_dir}')
                             decode_fdfs(fdf_dir, run_info['decode_path'], run_info['convert_path'], out_dir,
-                                        out_type=run_info['out_type'])
+                                        out_type=run_info['out_type'], file_num=file_num)
                             print('Decoding Complete')
                         if 'Run M3 Tracking' in run_options:
                             out_dir = f"{sub_run_dir}{run_info['m3_tracking_inner_dir']}/"
                             create_dir_if_not_exist(out_dir)
                             print(f'\n\nRunning M3 Tracking on FDFs in {fdf_dir} to {out_dir}')
-                            m3_tracking(fdf_dir, run_info['tracking_sh_path'], run_info['tracking_run_dir'], out_dir)
+                            m3_tracking(fdf_dir, run_info['tracking_sh_path'], run_info['tracking_run_dir'], out_dir,
+                                        file_num=file_num)
                             print('M3 Tracking Complete')
                         if 'Filter By M3' in run_options:
                             decoded_dir = f"{sub_run_dir}{run_info['decoded_root_inner_dir']}/"
@@ -80,7 +84,8 @@ def main():
                             create_dir_if_not_exist(out_dir)
                             print(f'\n\nFiltering decoded files in {decoded_dir} by M3 tracking in {out_dir}')
                             filter_by_m3(out_dir, m3_tracking_dir, decoded_dir, run_info['detectors'],
-                                         run_info['detector_info_dir'], run_info['included_detectors'])
+                                         run_info['detector_info_dir'], run_info['included_detectors'],
+                                         file_num=file_num)
                             print('Filtering Complete')
                         if 'Clean Up Unfiltered' in run_options:
                             decoded_dir = f"{sub_run_dir}{run_info['decoded_root_inner_dir']}/"
@@ -89,7 +94,7 @@ def main():
                         if 'Dedip196 Decode and Filter On The Fly' in run_options:
                             decode_and_filter_on_the_fly(run_info, sub_run_dir)
                         if 'Sedip28 M3 Tracking On The Fly' in run_options:
-                            decode_and_filter_on_the_fly(run_info, sub_run_dir)
+                            m3_tracking_on_the_fly(run_info, sub_run_dir)
                     res = server.receive()
         except Exception as e:
             print(f'Error: {e}\nRestarting processing control server...')
@@ -104,9 +109,7 @@ def m3_tracking_on_the_fly(run_info, sub_run_dir):
     :return:
     """
     fdf_dir = f"{sub_run_dir}{run_info['raw_daq_inner_dir']}/"
-    decoded_dir = f"{sub_run_dir}{run_info['decoded_root_inner_dir']}/"
     m3_tracking_dir = f"{sub_run_dir}{run_info['m3_tracking_inner_dir']}/"
-    filter_dir = f"{sub_run_dir}{run_info['filtered_root_inner_dir']}/"
 
     sleep(60 * 2)  # Wait on start for daq to start running
     file_num, running = 0, True
@@ -218,7 +221,8 @@ def file_num_still_running(fdf_dir, m3_tracking_feu_num=1, wait_time=30):
         return False
 
 
-def decode_fdfs(fdf_dir, decode_path, convert_path=None, out_dir=None, feu_nums='all', fdf_type='all', out_type='vec'):
+def decode_fdfs(fdf_dir, decode_path, convert_path=None, out_dir=None, feu_nums='all', fdf_type='all', out_type='vec',
+                file_num=None):
     """
     Decode fdfs from a directory.
     :param fdf_dir: Directory containing fdf files
@@ -228,6 +232,7 @@ def decode_fdfs(fdf_dir, decode_path, convert_path=None, out_dir=None, feu_nums=
     :param feu_nums:
     :param fdf_type:
     :param out_type: 'vec', 'array', or both
+    :param file_num:
     :return:
     """
     og_dir = os.getcwd()
@@ -246,6 +251,8 @@ def decode_fdfs(fdf_dir, decode_path, convert_path=None, out_dir=None, feu_nums=
         if fdf_type != 'all':
             if fdf_type not in file.split('_'):
                 continue
+        if file_num is not None and get_file_num_from_fdf_file_name(file) != file_num:
+            continue
         out_name = file.replace('.fdf', '_decoded.root')
         command = f"{decode_path} {fdf_dir}{file} {out_name}"
         print(f'\nDecoding {file} to {out_name}')
@@ -267,7 +274,7 @@ def decode_fdfs(fdf_dir, decode_path, convert_path=None, out_dir=None, feu_nums=
     os.chdir(og_dir)
 
 
-def m3_tracking(fdf_dir, tracking_sh_ref_path, tracking_run_dir, out_dir=None, m3_fdf_num=1):
+def m3_tracking(fdf_dir, tracking_sh_ref_path, tracking_run_dir, out_dir=None, m3_fdf_num=1, file_num=None):
     """
 
     :param fdf_dir:
@@ -275,6 +282,7 @@ def m3_tracking(fdf_dir, tracking_sh_ref_path, tracking_run_dir, out_dir=None, m
     :param tracking_run_dir:
     :param out_dir:
     :param m3_fdf_num:
+    :param file_num:
     :return:
     """
     for file in os.listdir(fdf_dir):
@@ -284,15 +292,20 @@ def m3_tracking(fdf_dir, tracking_sh_ref_path, tracking_run_dir, out_dir=None, m
         if feu_num != m3_fdf_num:
             continue
         run_name = get_run_name_from_fdf_file_name(file)
-        file_num = get_file_num_from_fdf_file_name(file, -1)
+        file_num_i = get_file_num_from_fdf_file_name(file, -1)
+        if file_num is not None and file_num_i != file_num:
+            continue
         out_dir = fdf_dir if out_dir is None else out_dir
-        get_rays_from_fdf(run_name, tracking_sh_ref_path, [file_num], out_dir, tracking_run_dir, verbose=True,
+        get_rays_from_fdf(run_name, tracking_sh_ref_path, [file_num_i], out_dir, tracking_run_dir, verbose=True,
                           fdf_dir=fdf_dir)
 
 
-def filter_by_m3(out_dir, m3_tracking_dir, decoded_dir, detectors, det_info_dir, included_detectors=None):
+def filter_by_m3(out_dir, m3_tracking_dir, decoded_dir, detectors, det_info_dir, included_detectors=None,
+                 file_num=None):
     for m3_file in os.listdir(m3_tracking_dir):
         if not m3_file.endswith('_rays.root') or '_datrun_' not in m3_file:
+            continue
+        if file_num is not None and get_file_num_from_fdf_file_name(m3_file) != file_num:
             continue
         print(f'\n\nFiltering decoded files by M3 tracking in {m3_file}')
         run_name = get_run_name_from_fdf_file_name(m3_file)
