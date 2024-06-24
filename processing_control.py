@@ -32,7 +32,7 @@ def main():
             port = int(sys.argv[1])
         except ValueError:
             print(f'Invalid port number {sys.argv[1]}. Using default port {port}')
-    options = ['Decode FDFs', 'Run M3 Tracking', 'Clean Up Unfiltered']
+    options = ['Decode FDFs', 'Filter By M3', 'Clean Up Unfiltered']
     while True:
         try:
             with Server(port=port) as server:

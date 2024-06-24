@@ -93,9 +93,6 @@ def main():
                     banco_daq.send(f'Start {sub_run_name}')
                     banco_daq.receive()
 
-                # dedip196_processor.send(f'Dedip196 Decode and Filter On The Fly {sub_run_name}')
-                # sedip28_processor.send(f'Sedip28 M3 Tracking On The Fly {sub_run_name}')
-
                 daq_trigger_switch = trigger_switch if banco else None
                 daq_control_args = (config.dream_daq_info['daq_config_template_path'], sub_run['run_time'],
                                     sub_run_name, sub_run_dir, sub_out_dir, daq_trigger_switch)
@@ -108,27 +105,11 @@ def main():
                 process_files_on_the_fly_thread.start()
 
                 daq_controller_thread.join()
-                # daq_controller = DAQController(config.dream_daq_info['daq_config_template_path'], sub_run['run_time'],
-                #                                sub_run_name, sub_run_dir, sub_out_dir, daq_trigger_switch)
-                #
-                # daq_success = False
-                # while not daq_success:  # Rerun if failure
-                #     daq_success = daq_controller.run()
 
                 if banco:
                     banco_daq.send('Stop')
                     banco_daq.receive()
 
-                # dedip196_processor.send(f'Decode FDFs {sub_run_name}')
-                # dedip196_processor.receive()
-                # sedip28_processor.send(f'Run M3 Tracking {sub_run_name}')
-                # sedip28_processor.receive()
-                # # Run filtering
-                # dedip196_processor.send(f'Filter By M3 {sub_run_name}')
-                # dedip196_processor.receive()
-                # # Remove all but filtered files
-                # dedip196_processor.send(f'Clean Up Unfiltered {sub_run_name}')
-                # dedip196_processor.receive()
                 if banco:
                     pass  # Process banco data
                 process_files_on_the_fly_thread.join()
@@ -166,10 +147,8 @@ def process_files_on_the_fly(sub_run_dir, sub_out_dir, sub_run_name, dedip196_pr
     create_dir_if_not_exist(sub_out_dir)
     sleep(60)  # Wait on start for daq to start running
     file_num, running = 0, True
-    dedip196_processor.send('Starting on fly processing', silent=True)  # Debug
-    dedip196_processor.receive(silent=True)
     while running:
-        if file_num_still_running(sub_run_dir, file_num):
+        if file_num_still_running(sub_run_dir, file_num, silent=True):
             sleep(60)  # Wait for file to finish
         else:  # File is done, process it
             for file_name in os.listdir(sub_run_dir):
@@ -180,6 +159,7 @@ def process_files_on_the_fly(sub_run_dir, sub_out_dir, sub_run_name, dedip196_pr
             dedip196_processor.receive(silent=True)
             sedip28_processor.send(f'Run M3 Tracking {file_num} {sub_run_name}', silent=True)
             sedip28_processor.receive(silent=True)
+            sedip28_processor.receive(silent=True)  # Wait for tracking to finish
             # Run filtering
             dedip196_processor.send(f'Filter By M3 {file_num} {sub_run_name}', silent=True)
             dedip196_processor.receive(silent=True)
@@ -191,8 +171,6 @@ def process_files_on_the_fly(sub_run_dir, sub_out_dir, sub_run_name, dedip196_pr
                 file_num += 1  # Move on to next file
             else:
                 running = False  # Subrun over, exit
-        dedip196_processor.send(f'On fly processing running={running}', silent=True)  # Debug
-        dedip196_processor.receive(silent=True)
 
 
 def found_file_num(fdf_dir, file_num):
@@ -210,13 +188,14 @@ def found_file_num(fdf_dir, file_num):
     return False
 
 
-def file_num_still_running(fdf_dir, file_num, wait_time=30):
+def file_num_still_running(fdf_dir, file_num, wait_time=30, silent=False):
     """
     Check if dream DAQ is still running by finding all fdfs with file_num and checking to see if any file size
     increases within wait_time
     :param fdf_dir: Directory containing fdf files
     :param file_num: File number to check for
     :param wait_time: Time to wait for file size increase
+    :param silent: Print debug info
     :return: True if size increased over wait time (still running), False if not.
     """
     file_paths = []
@@ -227,24 +206,28 @@ def file_num_still_running(fdf_dir, file_num, wait_time=30):
             file_paths.append(f'{fdf_dir}{file}')
 
     if len(file_paths) == 0:
-        print(f'No fdfs with file num {file_num} found in {fdf_dir}')
+        if not silent:
+            print(f'No fdfs with file num {file_num} found in {fdf_dir}')
         return False
 
     old_sizes = []
     for fdf_path in file_paths:
         old_sizes.append(os.path.getsize(fdf_path))
-        print(f'File: {fdf_path} Original Size: {old_sizes[-1]}')
+        if not silent:
+            print(f'File: {fdf_path} Original Size: {old_sizes[-1]}')
 
     sleep(wait_time)
 
     new_sizes = []
     for fdf_path in file_paths:
         new_sizes.append(os.path.getsize(fdf_path))
-        print(f'File: {fdf_path} New Size: {new_sizes[-1]}')
+        if not silent:
+            print(f'File: {fdf_path} New Size: {new_sizes[-1]}')
 
     for i in range(len(old_sizes)):
-        print(f'File: {file_paths[i]} Original Size: {old_sizes[i]} New Size: {new_sizes[i]}')
-        print(f'Increased? {new_sizes[i] > old_sizes[i]}')
+        if not silent:
+            print(f'File: {file_paths[i]} Original Size: {old_sizes[i]} New Size: {new_sizes[i]}')
+            print(f'Increased? {new_sizes[i] > old_sizes[i]}')
         if new_sizes[i] > old_sizes[i]:
             return True
     return False

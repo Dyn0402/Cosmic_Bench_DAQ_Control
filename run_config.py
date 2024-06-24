@@ -432,3 +432,11 @@ class Config:
     def write_to_file(self, file_path):
         with open(file_path, 'w') as file:
             json.dump(self.__dict__, file, indent=4)
+
+
+if __name__ == '__main__':
+    # out_dir = '/local/home/dn277127/Bureau/banco_test3/'
+    out_dir = 'C:/Users/Dylan/Desktop/banco_test3/'
+    config = Config()
+    config.write_to_file(f'{out_dir}run_config.json')
+    print('donzo')

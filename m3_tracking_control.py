@@ -52,6 +52,7 @@ def main():
                             m3_tracking(fdf_dir, run_info['tracking_sh_path'], run_info['tracking_run_dir'], out_dir,
                                         m3_feu_num=run_info['m3_feu_num'], file_num=file_num)
                             print('M3 Tracking Complete')
+                            server.send('M3 Tracking Complete')
                     res = server.receive()
         except Exception as e:
             print(f'Error: {e}\nRestarting processing control server...')
