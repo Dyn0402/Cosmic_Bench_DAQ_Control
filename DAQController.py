@@ -146,7 +146,8 @@ class DAQController:
         :return:
         """
         while True:
-            key = self.process.stdin.read(1)
+            # key = self.process.stdin.read(1)
+            key = sys.stdin.read(1)
             self.key_queue.put(key)
 
 
