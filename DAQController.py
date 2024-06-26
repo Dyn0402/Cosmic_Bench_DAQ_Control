@@ -12,6 +12,8 @@ import os
 from subprocess import Popen, PIPE
 import shutil
 from time import time, sleep
+import threading
+import queue
 
 
 class DAQController:
@@ -22,6 +24,8 @@ class DAQController:
         self.out_directory = out_dir
         self.trigger_switch_client = trigger_switch_client
         self.original_working_directory = os.getcwd()
+
+        self.key_queue = queue.Queue()
 
         self.run_time = run_time  # minutes
         self.max_run_time = self.run_time + 5  # minutes After this time assume stuck and kill
@@ -51,66 +55,64 @@ class DAQController:
         sent_go, sent_continue, run_successful, triggered, triggered_off = False, False, True, False, False
         if self.trigger_switch_client is not None:
             self.trigger_switch_client.silent = True
-        while True:
-            # if sent_continue:
-            #     if run_start is not None and time() - run_start >= self.run_time * 60:
-            #         if self.trigger_switch_client is not None:
-            #             print('Turning off trigger switch.')
-            #             self.trigger_switch_client.send('off')
-            #             self.trigger_switch_client.receive()
-            #             print('Run finished.')
-                    # sleep(5)
-                    # process.stdin.write('g')  # Signal to stop run
-                    # process.stdin.flush()
-                # sleep(1)
-            output = process.stdout.readline()
-            if output == '' and process.poll() is not None:
-                print('DAQ process finished.')
-                break
-            if not sent_go and output.strip() == '***':  # Start of run, begin taking pedestals
-                # sleep(2)
-                # print(' Got the stars. Writing G.')  # Signal to start run
-                # sleep(1)
-                process.stdin.write('G')
-                process.stdin.flush()  # Ensure the command is sent immediately
-                sent_go, sent_go_time = True, time()
-            elif not sent_continue and 'Press C to Continue' in output.strip():  # End of pedestals, begin taking data
-                # sleep(2)
-                # print(' Got the continue. Writing C.')
-                # sleep(1)
-                process.stdin.write('C')  # Signal to start data taking
-                process.stdin.flush()
-                sent_continue, sent_continue_time = True, time()
-                run_start = time()
 
-            # Need to wait a bit for DAQ to start
-            if (not triggered and self.trigger_switch_client is not None and sent_continue
-                    and time() - sent_continue_time > 5):  # Takes 0 seconds to start, 5 to be safe
-                self.trigger_switch_client.send('on')
-                self.trigger_switch_client.receive()
-                triggered = True
-                run_start = time()  # Reset run time if trigger used
+        listener_thread = threading.Thread(target=self.keystroke_listener)
+        listener_thread.start()
 
-            if self.trigger_switch_client is not None and sent_continue and triggered and not triggered_off:
-                if run_start is not None and time() - run_start >= self.run_time * 60:
-                    # print('Turning off trigger switch.')
-                    self.trigger_switch_client.send('off')
+        try:
+            while True:
+                output = process.stdout.readline()
+                if output == '' and process.poll() is not None:
+                    print('DAQ process finished.')
+                    break
+                if not self.key_queue.empty():  # Listen for keystrokes and pass them through to the process
+                    key = self.key_queue.get()
+                    if key == 'g':
+                        self.trigger_switch_client.send('off')
+                        self.trigger_switch_client.receive()
+                        triggered_off = True
+                        sleep(1)
+                        process.stdin.write('g')  # Send signal to stop run
+                if not sent_go and output.strip() == '***':  # Start of run, begin taking pedestals
+                    process.stdin.write('G')
+                    process.stdin.flush()  # Ensure the command is sent immediately
+                    sent_go, sent_go_time = True, time()
+                elif not sent_continue and 'Press C to Continue' in output.strip():  # End of pedestals, begin taking data
+                    process.stdin.write('C')  # Signal to start data taking
+                    process.stdin.flush()
+                    sent_continue, sent_continue_time = True, time()
+                    run_start = time()
+
+                # Need to wait a bit for DAQ to start
+                if (not triggered and self.trigger_switch_client is not None and sent_continue
+                        and time() - sent_continue_time > 5):  # Takes 0 seconds to start, 5 to be safe
+                    self.trigger_switch_client.send('on')
                     self.trigger_switch_client.receive()
-                    triggered_off = True
-                    # print('Run finished.')
+                    triggered = True
+                    run_start = time()  # Reset run time if trigger used
 
-            if output.strip() != '':
-                print(output.strip())
+                if self.trigger_switch_client is not None and sent_continue and triggered and not triggered_off:
+                    if run_start is not None and time() - run_start >= self.run_time * 60:
+                        self.trigger_switch_client.send('off')
+                        self.trigger_switch_client.receive()
+                        triggered_off = True
 
-            go_time_out = time() - sent_go_time > 120 if sent_go and not sent_continue else False
-            run_time_out = time() - start > self.max_run_time * 60
-            if go_time_out or run_time_out:
-                print('DAQ process timed out.')
-                process.kill()
-                sleep(5)
-                run_successful = False
-                print('DAQ process timed out.')
-                break
+                if output.strip() != '':
+                    print(output.strip())
+
+                go_time_out = time() - sent_go_time > 120 if sent_go and not sent_continue else False
+                run_time_out = time() - start > self.max_run_time * 60
+                if go_time_out or run_time_out:
+                    print('DAQ process timed out.')
+                    process.kill()
+                    sleep(5)
+                    run_successful = False
+                    print('DAQ process timed out.')
+                    break
+        finally:
+            # Clean up listener thread
+            if listener_thread.is_alive():
+                listener_thread.join(timeout=1)
 
         os.chdir(self.original_working_directory)
         if self.trigger_switch_client is not None:
@@ -134,6 +136,14 @@ class DAQController:
         with open(self.cfg_file_path, 'w') as file:
             file.writelines(cfg_lines)
 
+    def keystroke_listener(self):
+        """
+        Listen for keystrokes and add them to a queue.
+        :return:
+        """
+        while True:
+            key = input()
+            self.key_queue.put(key)
 
 
 def move_data_files(src_dir, dest_dir):

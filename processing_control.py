@@ -65,7 +65,7 @@ def main():
                             decode_fdfs(fdf_dir, run_info['decode_path'], run_info['convert_path'], out_dir,
                                         out_type=run_info['out_type'], file_num=file_num,
                                         exclude_feu_nums=[run_info['m3_feu_num']])
-                            print('Decoding Complete')
+                            print(f'Decoding Complete for {sub_run} {file_num}')
                         if 'Filter By M3' in run_options:
                             decoded_dir = f"{sub_run_dir}{run_info['decoded_root_inner_dir']}/"
                             m3_tracking_dir = f"{sub_run_dir}{run_info['m3_tracking_inner_dir']}/"
@@ -75,11 +75,12 @@ def main():
                             filter_by_m3(out_dir, m3_tracking_dir, decoded_dir, run_info['detectors'],
                                          run_info['detector_info_dir'], run_info['included_detectors'],
                                          file_num=file_num)
-                            print('Filtering Complete')
+                            print(f'Filtering Complete for {sub_run} {file_num}')
                         if 'Clean Up Unfiltered' in run_options:
                             decoded_dir = f"{sub_run_dir}{run_info['decoded_root_inner_dir']}/"
                             remove_files(fdf_dir, 'fdf', file_num=file_num)  # Raw dream fdfs
                             remove_files(decoded_dir, 'root', file_num=file_num)  # Decoded but unfiltered root files
+                            print(f'Clean Up Complete for {sub_run} {file_num}')
                     res = server.receive()
         except Exception as e:
             print(f'Error: {e}\nRestarting processing control server...')
@@ -156,15 +157,15 @@ def filter_by_m3(out_dir, m3_tracking_dir, decoded_dir, detectors, det_info_dir,
         detector_geometries = get_detector_geometries(detectors, det_info_dir, included_detectors)
         traversing_event_ids = get_m3_det_traversing_events(m3_tracking_dir, detector_geometries, file_nums=[file_num])
         for det_file in os.listdir(decoded_dir):
-            if not det_file.endswith('_array.root') or '_datrun_' not in det_file:
+            if not det_file.endswith('.root') or '_datrun_' not in det_file:
                 continue
             if get_file_num_from_fdf_file_name(det_file, -2) != file_num:
                 continue
             if get_run_name_from_fdf_file_name(det_file) != run_name:
                 continue
-            print(f'Filtering {det_file} to {det_file.replace("_array", "_filtered")}')
+            print(f'Filtering {det_file} to {det_file.replace(".root", "_filtered.root")}')
             filter_dream_file_pyroot(f'{decoded_dir}{det_file}', traversing_event_ids,
-                                     f'{out_dir}{det_file.replace("_array", "_filtered")}',
+                                     f'{out_dir}{det_file.replace(".root", "_filtered.root")}',
                                      event_branch_name='eventId')
 
 
