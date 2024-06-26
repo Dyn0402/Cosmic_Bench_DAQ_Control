@@ -61,7 +61,7 @@ class Config:
             'm3_tracking_inner_dir': self.m3_tracking_inner_dir,
             'tracking_run_dir': '/local/home/usernsw/dylan/m3_tracking/',
             'tracking_sh_path': '/local/home/usernsw/dylan/m3_tracking/run_tracking_single.sh',
-            'm3_fewu_num': self.m3_feu_num,
+            'm3_feu_num': self.m3_feu_num,
         }
 
         self.hv_control_info = {
@@ -84,7 +84,7 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'max_hv_6-24-25',
+                'sub_run_name': 'max_hv_6-26-24',
                 'run_time': (2 * 24) * 60,  # Minutes
                 'hvs': {
                     0: {
