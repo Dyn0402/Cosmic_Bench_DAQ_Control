@@ -9,6 +9,7 @@ Created as Cosmic_Bench_DAQ_Control/DAQController.py
 """
 
 import os
+import sys
 from subprocess import Popen, PIPE
 import shutil
 from time import time, sleep
@@ -142,7 +143,7 @@ class DAQController:
         :return:
         """
         while True:
-            key = input()
+            key = sys.stdin.read(1)
             self.key_queue.put(key)
 
 
