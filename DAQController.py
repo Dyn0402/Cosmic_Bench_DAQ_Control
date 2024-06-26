@@ -9,12 +9,10 @@ Created as Cosmic_Bench_DAQ_Control/DAQController.py
 """
 
 import os
-import sys
 from subprocess import Popen, PIPE
 import shutil
 from time import time, sleep
 import threading
-import queue
 
 
 class DAQController:
@@ -25,9 +23,6 @@ class DAQController:
         self.out_directory = out_dir
         self.trigger_switch_client = trigger_switch_client
         self.original_working_directory = os.getcwd()
-
-        self.process = None
-        self.key_queue = queue.Queue()
 
         self.run_time = run_time  # minutes
         self.max_run_time = self.run_time + 5  # minutes After this time assume stuck and kill
@@ -52,38 +47,25 @@ class DAQController:
     def run(self):
         if self.run_directory is not None:
             os.chdir(self.run_directory)
-        self.process = Popen(self.run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
+        process = Popen(self.run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
         start, run_start, sent_go_time, sent_continue_time = time(), None, None, None
         sent_go, sent_continue, run_successful, triggered, triggered_off = False, False, True, False, False
         if self.trigger_switch_client is not None:
             self.trigger_switch_client.silent = True
 
-        listener_thread = threading.Thread(target=self.keystroke_listener)
-        listener_thread.start()
-
         try:
             while True:
-                output = self.process.stdout.readline()
-                if output == '' and self.process.poll() is not None:
+                output = process.stdout.readline()
+                if output == '' and process.poll() is not None:
                     print('DAQ process finished.')
                     break
-                if not self.key_queue.empty():  # Listen for keystrokes and pass them through to the process
-                    key = self.key_queue.get()
-                    print(f'Got key {key}')
-                    sleep(5)
-                    if key == 'g':
-                        self.trigger_switch_client.send('off')
-                        self.trigger_switch_client.receive()
-                        triggered_off = True
-                        sleep(1)
-                        self.process.stdin.write('g')  # Send signal to stop run
                 if not sent_go and output.strip() == '***':  # Start of run, begin taking pedestals
-                    self.process.stdin.write('G')
-                    self.process.stdin.flush()  # Ensure the command is sent immediately
+                    process.stdin.write('G')
+                    process.stdin.flush()  # Ensure the command is sent immediately
                     sent_go, sent_go_time = True, time()
                 elif not sent_continue and 'Press C to Continue' in output.strip():  # End of pedestals, begin taking data
-                    self.process.stdin.write('C')  # Signal to start data taking
-                    self.process.stdin.flush()
+                    process.stdin.write('C')  # Signal to start data taking
+                    process.stdin.flush()
                     sent_continue, sent_continue_time = True, time()
                     run_start = time()
 
@@ -108,15 +90,23 @@ class DAQController:
                 run_time_out = time() - start > self.max_run_time * 60
                 if go_time_out or run_time_out:
                     print('DAQ process timed out.')
-                    self.process.kill()
+                    process.kill()
                     sleep(5)
                     run_successful = False
                     print('DAQ process timed out.')
                     break
-        finally:
-            # Clean up listener thread
-            if listener_thread.is_alive():
-                listener_thread.join(timeout=1)
+        except KeyboardInterrupt:
+            self.trigger_switch_client.send('off')
+            self.trigger_switch_client.receive()
+            sleep(1)
+            process.stdin.write('g')  # Send signal to stop run
+            while True:
+                output = process.stdout.readline()
+                if output == '' and process.poll() is not None:
+                    print('DAQ process finished.')
+                    break
+                if output.strip() != '':
+                    print(output.strip())
 
         os.chdir(self.original_working_directory)
         if self.trigger_switch_client is not None:
@@ -139,16 +129,6 @@ class DAQController:
                 cfg_lines[i] = cfg_lines[i].replace('  0  ', f'  {self.cfg_file_run_time}  ')
         with open(self.cfg_file_path, 'w') as file:
             file.writelines(cfg_lines)
-
-    def keystroke_listener(self):
-        """
-        Listen for keystrokes and add them to a queue.
-        :return:
-        """
-        while True:
-            # key = self.process.stdin.read(1)
-            key = sys.stdin.read(1)
-            self.key_queue.put(key)
 
 
 def move_data_files(src_dir, dest_dir):
