@@ -107,13 +107,13 @@ class DAQController:
                     break
                 if output.strip() != '':
                     print(output.strip())
+        finally:
+            os.chdir(self.original_working_directory)
+            if self.trigger_switch_client is not None:
+                self.trigger_switch_client.silent = False
 
-        os.chdir(self.original_working_directory)
-        if self.trigger_switch_client is not None:
-            self.trigger_switch_client.silent = False
-
-        if run_successful:
-            move_data_files(self.run_directory, self.out_directory)
+            if run_successful:
+                move_data_files(self.run_directory, self.out_directory)
 
         return run_successful
 

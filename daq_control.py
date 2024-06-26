@@ -101,21 +101,24 @@ def main():
                 process_files_on_the_fly_thread = threading.Thread(target=process_files_on_the_fly,
                                                                    args=process_files_args)
 
-                daq_controller_thread.start()
-                process_files_on_the_fly_thread.start()
+                try:
+                    daq_controller_thread.start()
+                    process_files_on_the_fly_thread.start()
 
-                daq_controller_thread.join()
+                    daq_controller_thread.join()
+                except KeyboardInterrupt:
+                    print('Keyboard Interrupt, stopping run')
+                finally:
+                    if banco:
+                        banco_daq.send('Stop')
+                        banco_daq.receive()
 
-                if banco:
-                    banco_daq.send('Stop')
-                    banco_daq.receive()
+                    if banco:
+                        pass  # Process banco data
+                    process_files_on_the_fly_thread.join()
 
-                if banco:
-                    pass  # Process banco data
-                process_files_on_the_fly_thread.join()
-
-                print(f'Finished {sub_run_name}, waiting 10 seconds before next run')
-                sleep(10)
+                    print(f'Finished {sub_run_name}, waiting 10 seconds before next run')
+                    sleep(10)
         hv.send('Finished')
         banco_daq.send('Finished')
         trigger_switch.send('Finished')
