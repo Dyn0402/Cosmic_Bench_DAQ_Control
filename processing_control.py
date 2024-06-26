@@ -79,7 +79,8 @@ def main():
                         if 'Clean Up Unfiltered' in run_options:
                             decoded_dir = f"{sub_run_dir}{run_info['decoded_root_inner_dir']}/"
                             remove_files(fdf_dir, 'fdf', file_num=file_num)  # Raw dream fdfs
-                            remove_files(decoded_dir, 'root', file_num=file_num)  # Decoded but unfiltered root files
+                            # Decoded but unfiltered root data files (leave pedestals in decoded)
+                            remove_files(decoded_dir, 'root', file_flag='_datrun_', file_num=file_num)
                             print(f'Clean Up Complete for {sub_run} {file_num}')
                     res = server.receive()
         except Exception as e:
@@ -336,18 +337,22 @@ def filter_dream_file_pyroot(file_path, events, out_file_path, event_branch_name
     in_file.Close()
 
 
-def remove_files(directory, extension=None, file_num=None, file_num_index=-2):
+def remove_files(directory, extension=None, file_num=None, file_flag=None, file_num_index=-2):
     """
     Remove all files in directory with given file extension
     :param directory: Directory from which to remove files
     :param extension: Only remove files with given extension. Remove all files if extension is None
     :param file_num: Specific fdf file number to remove if not None.
+    :param file_flag: Flag to identify fdf files to delete
+    :param file_num_index: Index of file number in fdf file name
     :return:
     """
     for file_name in os.listdir(directory):
         if extension is not None and not file_name.endswith(extension):
             continue
         if file_num is not None and get_file_num_from_fdf_file_name(file_name, file_num_index) != file_num:
+            continue
+        if file_flag is not None and file_flag not in file_name:
             continue
         print(f'Removing {directory}{file_name}')
         os.remove(f'{directory}{file_name}')

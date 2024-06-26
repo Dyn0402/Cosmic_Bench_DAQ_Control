@@ -28,7 +28,7 @@ def main():
         try:
             with Server(port=port) as server:
                 server.receive()
-                server.send('Processing control connected')
+                server.send('M3 Tracking connected')
                 run_info = server.receive_json()
                 server.send('Received run info')
 
