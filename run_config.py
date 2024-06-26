@@ -84,7 +84,7 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'max_hv_6-26-24',
+                'sub_run_name': 'max_hv_6-27-24',
                 'run_time': (200 * 24) * 60,  # Minutes
                 'hvs': {
                     0: {
