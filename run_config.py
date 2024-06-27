@@ -13,7 +13,7 @@ import json
 
 class Config:
     def __init__(self):
-        self.run_name = 'trigger_test'
+        self.run_name = 'banco_stats2'
         self.daq_dir = '/home/clas12/dylan/Run/'
         self.run_dir = f'{self.daq_dir}{self.run_name}/'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -84,15 +84,47 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'quick_test',
-                'run_time': 2,  # (200 * 24) * 60,  # Minutes
+                'sub_run_name': 'max_hv_13hr',
+                'run_time': 13 * 60,  # Minutes
                 'hvs': {
                     0: {
                         0: 600,
                         1: 600,
                         2: 800,
                         3: 800,
-                        6: 800,
+                        6: 700,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    2: {
+                        0: 450,
+                    },
+                    3: {
+                        1: 365,
+                        2: 410,
+                        3: 450,
+                        4: 450,
+                        5: 450,
+                        6: 450,
+                        8: 460,
+                        9: 460,
+                        10: 460,
+                        11: 460,
+                    }
+                }
+            },
+            {
+                'sub_run_name': 'max_hv_long',
+                'run_time': (200 * 24) * 60,  # Minutes
+                'hvs': {
+                    0: {
+                        0: 600,
+                        1: 600,
+                        2: 800,
+                        3: 800,
+                        6: 700,
                         8: 500,
                         9: 500,
                         10: 500,
