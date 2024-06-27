@@ -68,6 +68,8 @@ def main():
         sedip28_processor.receive()
         sedip28_processor.send_json(config.sedip28_processor_info)
 
+        sleep(2)  # Wait for all clients to do what they need to do (specifically, create directories)
+
         create_dir_if_not_exist(config.run_dir)
         create_dir_if_not_exist(config.run_out_dir)
         config.write_to_file(f'{config.run_out_dir}run_config.json')
@@ -96,16 +98,17 @@ def main():
                 daq_trigger_switch = trigger_switch if banco else None
                 daq_control_args = (config.dream_daq_info['daq_config_template_path'], sub_run['run_time'],
                                     sub_run_name, sub_run_dir, sub_out_dir, daq_trigger_switch)
-                daq_controller_thread = threading.Thread(target=run_daq_controller, args=daq_control_args)
+                # daq_controller_thread = threading.Thread(target=run_daq_controller, args=daq_control_args)
                 process_files_args = (sub_run_dir, sub_out_dir, sub_run_name, dedip196_processor, sedip28_processor)
                 process_files_on_the_fly_thread = threading.Thread(target=process_files_on_the_fly,
                                                                    args=process_files_args)
 
                 try:
-                    daq_controller_thread.start()
+                    # daq_controller_thread.start()
                     process_files_on_the_fly_thread.start()
+                    run_daq_controller(*daq_control_args)
 
-                    daq_controller_thread.join()
+                    # daq_controller_thread.join()
                 except KeyboardInterrupt:
                     print('Keyboard Interrupt, stopping run')
                 finally:
