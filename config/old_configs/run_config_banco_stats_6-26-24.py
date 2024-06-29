@@ -13,7 +13,7 @@ import json
 
 class Config:
     def __init__(self):
-        self.run_name = 'banco_stats3'
+        self.run_name = 'banco_stats'
         self.daq_dir = '/home/clas12/dylan/Run/'
         self.run_dir = f'{self.daq_dir}{self.run_name}/'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -84,7 +84,7 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'max_hv_indefinite',
+                'sub_run_name': 'max_hv_6-26-24',
                 'run_time': (200 * 24) * 60,  # Minutes
                 'hvs': {
                     0: {
@@ -92,7 +92,7 @@ class Config:
                         1: 600,
                         2: 800,
                         3: 800,
-                        6: 700,
+                        6: 800,
                         8: 500,
                         9: 500,
                         10: 500,
@@ -136,10 +136,12 @@ class Config:
             {
                 'name': 'banco_ladder160',
                 'det_type': 'banco',
-                'det_center_coords': {  # Center of detector from alignment of previous runs
-                    'x': -13.3,  # mm
-                    'y': -34.4,  # mm
-                    'z': 841.8,  # mm
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm  Centered by eye on top test detector's center screw
+                    # y is measured from the right edge of the banco arm and center computed from measured length
+                    'y': self.bench_geometry['banco_arm_right_y'] - self.bench_geometry['banco_arm_length_y'] / 2,  # mm
+                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +  # mm
+                         5 * self.bench_geometry['level_z_spacing'] + 41,  # To bottom of bot carbon on lower banco arm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -153,9 +155,12 @@ class Config:
                 'name': 'banco_ladder163',
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
-                    'x': -15.0,  # mm
-                    'y': -34.4,  # mm
-                    'z': 853.0,  # mm
+                    'x': 0,  # mm  Centered by eye on top test detector's center screw
+                    # y is measured from the right edge of the banco arm and center computed from measured length
+                    'y': self.bench_geometry['banco_arm_right_y'] - self.bench_geometry['banco_arm_length_y'] / 2,  # mm
+                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +  # mm
+                         5 * self.bench_geometry['level_z_spacing'] + 41 +  # To top of top carbon on lower banco arm
+                         self.bench_geometry['banco_arm_bottom_to_center'] * 2,
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -169,9 +174,12 @@ class Config:
                 'name': 'banco_ladder157',
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
-                    'x': -13.6,  # mm
-                    'y': -34.3,  # mm
-                    'z': 971.4,  # mm
+                    'x': 0,  # mm  Centered by eye on top test detector's center screw
+                    # y is measured from the right edge of the banco arm and center computed from measured length
+                    'y': self.bench_geometry['banco_arm_right_y'] - self.bench_geometry['banco_arm_length_y'] / 2,  # mm
+                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +  # mm
+                         5 * self.bench_geometry['level_z_spacing'] + 41 +
+                         self.bench_geometry['banco_arm_separation_z'],  # To bottom of bot carbon on upper banco arm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -185,9 +193,13 @@ class Config:
                 'name': 'banco_ladder162',
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
-                    'x': -15.5,  # mm
-                    'y': -34.3,  # mm
-                    'z': 983.1,  # mm
+                    'x': 0,  # mm  Centered by eye on top test detector's center screw
+                    # y is measured from the right edge of the banco arm and center computed from measured length
+                    'y': self.bench_geometry['banco_arm_right_y'] - self.bench_geometry['banco_arm_length_y'] / 2,  # mm
+                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +  # mm
+                         5 * self.bench_geometry['level_z_spacing'] + 41 +
+                         self.bench_geometry['banco_arm_separation_z'] +  # To top of top carbon on upper banco arm
+                         self.bench_geometry['banco_arm_bottom_to_center'] * 2,
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
