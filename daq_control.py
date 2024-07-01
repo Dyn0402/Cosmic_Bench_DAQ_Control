@@ -170,8 +170,8 @@ def process_files_on_the_fly(sub_run_dir, sub_out_dir, sub_run_name, dedip196_pr
             dedip196_processor.send(f'Filter By M3 {file_num} {sub_run_name}', silent=True)
             dedip196_processor.receive(silent=True)
             # Remove all but filtered files
-            # dedip196_processor.send(f'Clean Up Unfiltered {file_num} {sub_run_name}', silent=True)
-            # dedip196_processor.receive(silent=True)
+            dedip196_processor.send(f'Clean Up Unfiltered {file_num} {sub_run_name}', silent=True)
+            dedip196_processor.receive(silent=True)
 
             if found_file_num(sub_run_dir, file_num + 1):
                 file_num += 1  # Move on to next file
