@@ -34,7 +34,7 @@ class DAQController:
         self.make_config_from_template()
 
         if out_name is None:
-            self.run_command = f'RunCtrl -c {self.cfg_file_path}'
+            self.run_command = f'RunCtrl -c {self.cfg_file_path} -f test'  # Think I need an out name
         else:
             self.run_command = f'RunCtrl -c {self.cfg_file_path} -f {out_name}'
 
