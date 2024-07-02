@@ -99,7 +99,9 @@ def main():
                 daq_control_args = (config.dream_daq_info['daq_config_template_path'], sub_run['run_time'],
                                     sub_run_name, sub_run_dir, sub_out_dir, daq_trigger_switch)
                 # daq_controller_thread = threading.Thread(target=run_daq_controller, args=daq_control_args)
-                process_files_args = (sub_run_dir, sub_out_dir, sub_run_name, dedip196_processor, sedip28_processor)
+                daq_finished = threading.Event()
+                process_files_args = (sub_run_dir, sub_out_dir, sub_run_name, dedip196_processor, sedip28_processor,
+                                      daq_finished)
                 process_files_on_the_fly_thread = threading.Thread(target=process_files_on_the_fly,
                                                                    args=process_files_args)
 
@@ -112,6 +114,7 @@ def main():
                 except KeyboardInterrupt:
                     print('Keyboard Interrupt, stopping run')
                 finally:
+                    daq_finished.set()
                     if banco:
                         banco_daq.send('Stop')
                         banco_daq.receive()
@@ -139,7 +142,8 @@ def run_daq_controller(config_template_path, run_time, sub_run_name, sub_run_dir
         daq_success = daq_controller.run()
 
 
-def process_files_on_the_fly(sub_run_dir, sub_out_dir, sub_run_name, dedip196_processor, sedip28_processor):
+def process_files_on_the_fly(sub_run_dir, sub_out_dir, sub_run_name, dedip196_processor, sedip28_processor,
+                             daq_finished):
     """
     Process files on the fly as they are created by the DAQ.
     :param sub_run_dir: Directory where DAQ is writing files.
@@ -147,6 +151,7 @@ def process_files_on_the_fly(sub_run_dir, sub_out_dir, sub_run_name, dedip196_pr
     :param sub_run_name: Name of subrun.
     :param dedip196_processor: Client to dedip196 processor.
     :param sedip28_processor: Client to sedip28 processor.
+    :param daq_finished: Event to signal when DAQ is finished.
     :return:
     """
 
@@ -154,9 +159,12 @@ def process_files_on_the_fly(sub_run_dir, sub_out_dir, sub_run_name, dedip196_pr
     sleep(60)  # Wait on start for daq to start running
     file_num, running = 0, True
     while running:
-        if file_num_still_running(sub_run_dir, file_num, silent=True):
-            sleep(60)  # Wait for file to finish
+        if not daq_finished.is_set() and file_num_still_running(sub_run_dir, file_num, silent=True):
+            if not daq_finished.is_set():  # Check again to see if daq finished while checking if file was still running
+                sleep(30)  # Wait for file to finish
         else:  # File is done, process it
+            if daq_finished.is_set():
+                sleep(3)  # If daq finished, give it a second to finish writing files then process them
             for file_name in os.listdir(sub_run_dir):
                 if file_name.endswith('.fdf') and get_file_num_from_fdf_file_name(file_name, -2) == file_num:
                     shutil.move(f'{sub_run_dir}{file_name}', f'{sub_out_dir}{file_name}')
