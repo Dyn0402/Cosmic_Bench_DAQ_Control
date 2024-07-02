@@ -164,6 +164,7 @@ def process_files_on_the_fly(sub_run_dir, sub_out_dir, sub_run_name, dedip196_pr
                 sleep(30)  # Wait for file to finish
         else:  # File is done, process it
             if daq_finished.is_set():
+                print('DAQ Finished, processing last files')
                 sleep(3)  # If daq finished, give it a second to finish writing files then process them
             for file_name in os.listdir(sub_run_dir):
                 if file_name.endswith('.fdf') and get_file_num_from_fdf_file_name(file_name, -2) == file_num:
