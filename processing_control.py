@@ -78,7 +78,8 @@ def main():
                             print(f'Filtering Complete for {sub_run} {file_num}')
                         if 'Clean Up Unfiltered' in run_options:
                             decoded_dir = f"{sub_run_dir}{run_info['decoded_root_inner_dir']}/"
-                            remove_files(fdf_dir, 'fdf', file_num=file_num)  # Raw dream fdfs
+                            # Raw dream data files (leave pedestals in raw, m3 tracking needs pedestal)
+                            remove_files(fdf_dir, 'fdf', file_flag='_datrun_', file_num=file_num)
                             # Decoded but unfiltered root data files (leave pedestals in decoded)
                             remove_files(decoded_dir, 'root', file_flag='_datrun_', file_num=file_num)
                             print(f'Clean Up Complete for {sub_run} {file_num}')
