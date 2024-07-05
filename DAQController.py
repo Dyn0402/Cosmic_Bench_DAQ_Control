@@ -26,6 +26,8 @@ class DAQController:
 
         self.run_time = run_time  # minutes
         self.max_run_time = self.run_time + 5  # minutes After this time assume stuck and kill
+        self.run_start_time = None
+        self.measured_run_time = None
 
         # If trigger switch is used, need to run past run time to bracket the trigger switch on/off. Else just run time.
         # DAQ resets timer when first trigger received, so only need short pause to be sure.
@@ -73,6 +75,7 @@ class DAQController:
                 if (not triggered and self.trigger_switch_client is not None and sent_continue
                         and time() - sent_continue_time > 5):  # Takes 0 seconds to start, 5 to be safe
                     self.trigger_switch_client.send('on')
+                    self.run_start_time = time()
                     self.trigger_switch_client.receive()
                     triggered = True
                     run_start = time()  # Reset run time if trigger used
@@ -80,6 +83,7 @@ class DAQController:
                 if self.trigger_switch_client is not None and sent_continue and triggered and not triggered_off:
                     if run_start is not None and time() - run_start >= self.run_time * 60:
                         self.trigger_switch_client.send('off')
+                        self.measured_run_time = time() - self.run_start_time
                         self.trigger_switch_client.receive()
                         triggered_off = True
 
@@ -98,6 +102,7 @@ class DAQController:
         except KeyboardInterrupt:
             print('Keyboard interrupt. Stopping DAQ process.')
             self.trigger_switch_client.send('off')
+            self.measured_run_time = time() - self.run_start_time
             self.trigger_switch_client.receive()
             sleep(1)
             process.stdin.write('g')  # Send signal to stop run
@@ -116,6 +121,7 @@ class DAQController:
 
             if run_successful:
                 move_data_files(self.run_directory, self.out_directory)
+                self.write_run_time()
 
         return run_successful
 
@@ -131,6 +137,10 @@ class DAQController:
                 cfg_lines[i] = cfg_lines[i].replace('  0  ', f'  {self.cfg_file_run_time}  ')
         with open(self.cfg_file_path, 'w') as file:
             file.writelines(cfg_lines)
+
+    def write_run_time(self):
+        with open(f'{self.out_directory}/run_time.txt', 'w') as file:
+            file.write(f'{self.measured_run_time:.2f}')
 
 
 def move_data_files(src_dir, dest_dir):
