@@ -13,7 +13,7 @@ import json
 
 class Config:
     def __init__(self):
-        self.run_name = 'banco_stats5'
+        self.run_name = 'hv_scan_7-4-24'
         self.daq_dir = '/home/clas12/dylan/Run/'
         self.run_dir = f'{self.daq_dir}{self.run_name}/'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -84,8 +84,8 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'max_hv_long',
-                'run_time': (200 * 24) * 60,  # Minutes
+                'sub_run_name': 'hv1',
+                'run_time': 3 * 60,  # Minutes
                 'hvs': {
                     0: {
                         0: 600,
@@ -115,6 +115,198 @@ class Config:
                     }
                 }
             },
+            {
+                'sub_run_name': 'hv2',
+                'run_time': 3 * 60,  # Minutes
+                'hvs': {
+                    0: {
+                        0: 600,
+                        1: 600,
+                        2: 800,
+                        3: 800,
+                        6: 700,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    2: {
+                        0: 440,
+                    },
+                    3: {
+                        1: 360,
+                        2: 400,
+                        3: 440,
+                        4: 440,
+                        5: 440,
+                        6: 440,
+                        8: 450,
+                        9: 450,
+                        10: 450,
+                        11: 450,
+                    }
+                }
+            },
+            {
+                'sub_run_name': 'hv3',
+                'run_time': 3 * 60,  # Minutes
+                'hvs': {
+                    0: {
+                        0: 600,
+                        1: 600,
+                        2: 800,
+                        3: 800,
+                        6: 700,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    2: {
+                        0: 430,
+                    },
+                    3: {
+                        1: 355,
+                        2: 390,
+                        3: 430,
+                        4: 430,
+                        5: 430,
+                        6: 430,
+                        8: 440,
+                        9: 440,
+                        10: 440,
+                        11: 440,
+                    }
+                }
+            },
+            {
+                'sub_run_name': 'hv4',
+                'run_time': 3 * 60,  # Minutes
+                'hvs': {
+                    0: {
+                        0: 600,
+                        1: 600,
+                        2: 800,
+                        3: 800,
+                        6: 700,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    2: {
+                        0: 420,
+                    },
+                    3: {
+                        1: 350,
+                        2: 380,
+                        3: 420,
+                        4: 420,
+                        5: 420,
+                        6: 420,
+                        8: 430,
+                        9: 430,
+                        10: 430,
+                        11: 430,
+                    }
+                }
+            },
+            {
+                'sub_run_name': 'hv5',
+                'run_time': 3 * 60,  # Minutes
+                'hvs': {
+                    0: {
+                        0: 600,
+                        1: 600,
+                        2: 800,
+                        3: 800,
+                        6: 700,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    2: {
+                        0: 410,
+                    },
+                    3: {
+                        1: 345,
+                        2: 390,
+                        3: 410,
+                        4: 410,
+                        5: 410,
+                        6: 410,
+                        8: 420,
+                        9: 420,
+                        10: 420,
+                        11: 420,
+                    }
+                }
+            },
+            {
+                'sub_run_name': 'hv6',
+                'run_time': 3 * 60,  # Minutes
+                'hvs': {
+                    0: {
+                        0: 600,
+                        1: 600,
+                        2: 800,
+                        3: 800,
+                        6: 700,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    2: {
+                        0: 400,
+                    },
+                    3: {
+                        1: 340,
+                        2: 380,
+                        3: 400,
+                        4: 400,
+                        5: 400,
+                        6: 400,
+                        8: 410,
+                        9: 410,
+                        10: 410,
+                        11: 410,
+                    }
+                }
+            },
+            {
+                'sub_run_name': 'hv7',
+                'run_time': 3 * 60,  # Minutes
+                'hvs': {
+                    0: {
+                        0: 600,
+                        1: 600,
+                        2: 800,
+                        3: 800,
+                        6: 700,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    2: {
+                        0: 390,
+                    },
+                    3: {
+                        1: 335,
+                        2: 370,
+                        3: 390,
+                        4: 390,
+                        5: 390,
+                        6: 390,
+                        8: 400,
+                        9: 400,
+                        10: 400,
+                        11: 400,
+                    }
+                }
+            },
         ]
 
         self.bench_geometry = {
@@ -137,9 +329,11 @@ class Config:
                 'name': 'banco_ladder160',
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
-                    'x': -13.21,  # mm  Aligned
-                    'y': -34.39,  # mm
-                    'z': 842.20,  # mm
+                    'x': 0,  # mm  Centered by eye on top test detector's center screw
+                    # y is measured from the right edge of the banco arm and center computed from measured length
+                    'y': self.bench_geometry['banco_arm_right_y'] - self.bench_geometry['banco_arm_length_y'] / 2,  # mm
+                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +  # mm
+                         5 * self.bench_geometry['level_z_spacing'] + 41,  # To bottom of bot carbon on lower banco arm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -153,9 +347,12 @@ class Config:
                 'name': 'banco_ladder163',
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
-                    'x': -15.03,  # mm  Aligned
-                    'y': -34.46,  # mm
-                    'z': 853.26,  # mm
+                    'x': 0,  # mm  Centered by eye on top test detector's center screw
+                    # y is measured from the right edge of the banco arm and center computed from measured length
+                    'y': self.bench_geometry['banco_arm_right_y'] - self.bench_geometry['banco_arm_length_y'] / 2,  # mm
+                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +  # mm
+                         5 * self.bench_geometry['level_z_spacing'] + 41 +  # To top of top carbon on lower banco arm
+                         self.bench_geometry['banco_arm_bottom_to_center'] * 2,
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -169,9 +366,12 @@ class Config:
                 'name': 'banco_ladder157',
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
-                    'x': -13.54,  # mm  Aligned
-                    'y': -34.27,  # mm
-                    'z': 971.45,  # mm
+                    'x': 0,  # mm  Centered by eye on top test detector's center screw
+                    # y is measured from the right edge of the banco arm and center computed from measured length
+                    'y': self.bench_geometry['banco_arm_right_y'] - self.bench_geometry['banco_arm_length_y'] / 2,  # mm
+                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +  # mm
+                         5 * self.bench_geometry['level_z_spacing'] + 41 +
+                         self.bench_geometry['banco_arm_separation_z'],  # To bottom of bot carbon on upper banco arm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -185,9 +385,13 @@ class Config:
                 'name': 'banco_ladder162',
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
-                    'x': -15.41,  # mm  Aligned
-                    'y': -34.27,  # mm
-                    'z': 982.50,  # mm
+                    'x': 0,  # mm  Centered by eye on top test detector's center screw
+                    # y is measured from the right edge of the banco arm and center computed from measured length
+                    'y': self.bench_geometry['banco_arm_right_y'] - self.bench_geometry['banco_arm_length_y'] / 2,  # mm
+                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +  # mm
+                         5 * self.bench_geometry['level_z_spacing'] + 41 +
+                         self.bench_geometry['banco_arm_separation_z'] +  # To top of top carbon on upper banco arm
+                         self.bench_geometry['banco_arm_bottom_to_center'] * 2,
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
