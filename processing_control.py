@@ -65,7 +65,7 @@ def main():
                             decode_fdfs(fdf_dir, run_info['decode_path'], run_info['convert_path'], out_dir,
                                         out_type=run_info['out_type'], file_num=file_num,
                                         exclude_feu_nums=[run_info['m3_feu_num']])
-                            print(f'Decoding Complete for {sub_run} {file_num}')
+                            server.send(f'Decoding Complete for {sub_run} {file_num}')
                         if 'Filter By M3' in run_options:
                             decoded_dir = f"{sub_run_dir}{run_info['decoded_root_inner_dir']}/"
                             m3_tracking_dir = f"{sub_run_dir}{run_info['m3_tracking_inner_dir']}/"
@@ -75,14 +75,14 @@ def main():
                             filter_by_m3(out_dir, m3_tracking_dir, decoded_dir, run_info['detectors'],
                                          run_info['detector_info_dir'], run_info['included_detectors'],
                                          file_num=file_num)
-                            print(f'Filtering Complete for {sub_run} {file_num}')
+                            server.send(f'Filtering Complete for {sub_run} {file_num}')
                         if 'Clean Up Unfiltered' in run_options:
                             decoded_dir = f"{sub_run_dir}{run_info['decoded_root_inner_dir']}/"
                             # Raw dream data files (leave pedestals in raw, m3 tracking needs pedestal)
                             remove_files(fdf_dir, 'fdf', file_flag='_datrun_', file_num=file_num)
                             # Decoded but unfiltered root data files (leave pedestals in decoded)
                             remove_files(decoded_dir, 'root', file_flag='_datrun_', file_num=file_num)
-                            print(f'Clean Up Complete for {sub_run} {file_num}')
+                            server.send(f'Clean Up Complete for {sub_run} {file_num}')
                     res = server.receive()
         except Exception as e:
             print(f'Error: {e}\nRestarting processing control server...')

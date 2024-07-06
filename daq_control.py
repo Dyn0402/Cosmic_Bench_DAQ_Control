@@ -175,12 +175,15 @@ def process_files_on_the_fly(sub_run_dir, sub_out_dir, sub_run_name, dedip196_pr
             sedip28_processor.send(f'Run M3 Tracking file_num={file_num} {sub_run_name}', silent=True)
             sedip28_processor.receive(silent=True)
             sedip28_processor.receive(silent=True)  # Wait for tracking to finish
+            dedip196_processor.receive(silent=True)  # Wait for decoding to finish
             # Run filtering
             dedip196_processor.send(f'Filter By M3 file_num={file_num} {sub_run_name}', silent=True)
             dedip196_processor.receive(silent=True)
+            dedip196_processor.receive(silent=True)  # Wait for filtering to finish
             # Remove all but filtered files
             dedip196_processor.send(f'Clean Up Unfiltered file_num={file_num} {sub_run_name}', silent=True)
             dedip196_processor.receive(silent=True)
+            dedip196_processor.receive(silent=True)  # Wait for cleanup to finish
 
             if found_file_num(sub_run_dir, file_num + 1):
                 file_num += 1  # Move on to next file
