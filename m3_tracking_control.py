@@ -48,11 +48,10 @@ def main():
                         if 'Run M3 Tracking' in run_options:
                             out_dir = f"{sub_run_dir}{run_info['m3_tracking_inner_dir']}/"
                             create_dir_if_not_exist(out_dir)
-                            print(f'\n\nRunning M3 Tracking on FDFs in {fdf_dir} to {out_dir}')
+                            print(f'\n\nRunning M3 Tracking on FDFs in {fdf_dir} to {out_dir} file_num={file_num}')
                             m3_tracking(fdf_dir, run_info['tracking_sh_path'], run_info['tracking_run_dir'], out_dir,
                                         m3_feu_num=run_info['m3_feu_num'], file_num=file_num)
-                            print('M3 Tracking Complete')
-                            server.send('M3 Tracking Complete')
+                            server.send(f'M3 Tracking Complete for {sub_run} file_num={file_num}')
                     res = server.receive()
         except Exception as e:
             print(f'Error: {e}\nRestarting processing control server...')

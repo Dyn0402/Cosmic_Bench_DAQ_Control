@@ -170,16 +170,16 @@ def process_files_on_the_fly(sub_run_dir, sub_out_dir, sub_run_name, dedip196_pr
                 if file_name.endswith('.fdf') and get_file_num_from_fdf_file_name(file_name, -2) == file_num:
                     shutil.move(f'{sub_run_dir}{file_name}', f'{sub_out_dir}{file_name}')
 
-            dedip196_processor.send(f'Decode FDFs {file_num} {sub_run_name}', silent=True)
+            dedip196_processor.send(f'Decode FDFs file_num={file_num} {sub_run_name}', silent=True)
             dedip196_processor.receive(silent=True)
-            sedip28_processor.send(f'Run M3 Tracking {file_num} {sub_run_name}', silent=True)
+            sedip28_processor.send(f'Run M3 Tracking file_num={file_num} {sub_run_name}', silent=True)
             sedip28_processor.receive(silent=True)
             sedip28_processor.receive(silent=True)  # Wait for tracking to finish
             # Run filtering
-            dedip196_processor.send(f'Filter By M3 {file_num} {sub_run_name}', silent=True)
+            dedip196_processor.send(f'Filter By M3 file_num={file_num} {sub_run_name}', silent=True)
             dedip196_processor.receive(silent=True)
             # Remove all but filtered files
-            dedip196_processor.send(f'Clean Up Unfiltered {file_num} {sub_run_name}', silent=True)
+            dedip196_processor.send(f'Clean Up Unfiltered file_num={file_num} {sub_run_name}', silent=True)
             dedip196_processor.receive(silent=True)
 
             if found_file_num(sub_run_dir, file_num + 1):
