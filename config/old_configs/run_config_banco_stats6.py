@@ -13,7 +13,7 @@ import json
 
 class Config:
     def __init__(self):
-        self.run_name = 'banco_flipped_7-8-24'
+        self.run_name = 'banco_stats6'
         self.daq_dir = '/home/clas12/dylan/Run/'
         self.run_dir = f'{self.daq_dir}{self.run_name}/'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -134,44 +134,12 @@ class Config:
 
         self.detectors = [
             {
-                'name': 'banco_ladder157',
-                'det_type': 'banco',
-                'det_center_coords': {  # Center of detector
-                    'x': -13.54,  # mm  Guess from previous alignment
-                    'y': -34.27,  # mm
-                    'z': 842.20,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 180,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': 'banco',
-                'dream_feus': 'banco',
-            },
-            {
-                'name': 'banco_ladder162',
-                'det_type': 'banco',
-                'det_center_coords': {  # Center of detector
-                    'x': -15.41,  # mm  Guess from previous alignment
-                    'y': -34.27,  # mm
-                    'z': 853.26,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': 'banco',
-                'dream_feus': 'banco',
-            },
-            {
                 'name': 'banco_ladder160',
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
-                    'x': -13.21,  # mm  Guess from previous alignment
+                    'x': -13.21,  # mm  Aligned
                     'y': -34.39,  # mm
-                    'z': 971.45,  # mm
+                    'z': 842.20,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -185,8 +153,40 @@ class Config:
                 'name': 'banco_ladder163',
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
-                    'x': -15.03,  # mm  Guess from previous alignment
+                    'x': -15.03,  # mm  Aligned
                     'y': -34.46,  # mm
+                    'z': 853.26,  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': 'banco',
+                'dream_feus': 'banco',
+            },
+            {
+                'name': 'banco_ladder157',
+                'det_type': 'banco',
+                'det_center_coords': {  # Center of detector
+                    'x': -13.54,  # mm  Aligned
+                    'y': -34.27,  # mm
+                    'z': 971.45,  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 180,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': 'banco',
+                'dream_feus': 'banco',
+            },
+            {
+                'name': 'banco_ladder162',
+                'det_type': 'banco',
+                'det_center_coords': {  # Center of detector
+                    'x': -15.41,  # mm  Aligned
+                    'y': -34.27,  # mm
                     'z': 982.50,  # mm
                 },
                 'det_orientation': {
