@@ -166,7 +166,7 @@ class Config:
 
         self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
                                    'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'asacusa_plein_1',
-                                   'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
+                                   'strip_grid_1', 'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
 
         self.detectors = [
             {
@@ -359,6 +359,31 @@ class Config:
                     'x_2': (3, 6),
                     'y_1': (3, 7),  # Runs along y direction, indicates x hit location
                     'y_2': (3, 8),
+                },
+            },
+            {
+                'name': 'strip_grid_1',
+                'det_type': 'strip_grid',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
+                         0 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': {
+                    'drift': (0, 7),
+                    'resist_2': (2, 2)
+                },
+                'dream_feus': {
+                    'x_1': (3, 1),  # Runs along x direction, indicates y hit location
+                    'x_2': (3, 2),
+                    'y_1': (3, 3),  # Runs along y direction, indicates x hit location
+                    'y_2': (3, 4),
                 },
             },
             {
