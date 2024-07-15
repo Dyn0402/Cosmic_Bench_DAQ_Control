@@ -45,7 +45,7 @@ def run_filtering_cleanup_sg1_hv_scan():
 
         for drift_hv in drift_hvs:
             for resist_hv in resist_hvs:
-                if drift_hv == 700 and (resist_hv == 460 or resist_hv == 450):
+                if drift_hv == 700 and resist_hv in [460, 450, 440, 430]:
                     continue
                 sub_run_name = f'drift_{drift_hv}_resist_{resist_hv}'
                 dedip196_processor.send(f'Decode FDFs {sub_run_name}', silent=False)

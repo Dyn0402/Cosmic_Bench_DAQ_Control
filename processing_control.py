@@ -129,29 +129,12 @@ def decode_fdfs(fdf_dir, decode_path, convert_path=None, out_dir=None, feu_nums=
         if file_num is not None and get_file_num_from_fdf_file_name(file, -2) != file_num:
             continue
         decode_fdf_files.append(file)
-        # out_name = file.replace('.fdf', '_decoded.root')
-        # command = f"{decode_path} {fdf_dir}{file} {out_name}"
-        # print(f'\nDecoding {file} to {out_name}')
-        # print(command)
-        # os.system(command)
-        # os.chmod(out_name, 0o777)
-        # if out_type in ['array', 'both']:
-        #     if convert_path is None:
-        #         print('Error! Need convert path for vec->array! Skipping')
-        #     else:
-        #         array_out_name = out_name.replace('.root', '_array.root')
-        #         command = f"{convert_path} {out_name} {array_out_name}"
-        #         print(command)
-        #         os.system(command)
-        #         os.chmod(array_out_name, 0o777)
-        #     if out_type == 'array':  # Remove vector formatted root file
-        #         os.remove(out_name)
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         futures = []
         for fdf_file in decode_fdf_files:
             futures.append(executor.submit(decode_fdf, fdf_file, fdf_dir, decode_path, convert_path, out_type))
-            sleep(2)  # Wait 2 seconds between starting decodes to space out print statements
+            sleep(0.1)  # Wait 0.1 seconds between starting decodes to space out print statements
         concurrent.futures.wait(futures)
 
     os.chdir(og_dir)
@@ -188,27 +171,44 @@ def decode_fdf(fdf_file_name, fdf_dir, decode_path, convert_path=None, out_type=
 
 def filter_by_m3(out_dir, m3_tracking_dir, decoded_dir, detectors, det_info_dir, included_detectors=None,
                  file_num=None):
-    for m3_file in os.listdir(m3_tracking_dir):
-        if not m3_file.endswith('_rays.root') or '_datrun_' not in m3_file:
-            continue
-        if file_num is not None and get_file_num_from_fdf_file_name(m3_file, -1) != file_num:
-            continue
-        print(f'\n\nFiltering decoded files by M3 tracking in {m3_file}')
-        run_name = get_run_name_from_fdf_file_name(m3_file)
-        file_num = get_file_num_from_fdf_file_name(m3_file, -1)
-        detector_geometries = get_detector_geometries(detectors, det_info_dir, included_detectors)
-        traversing_event_ids = get_m3_det_traversing_events(m3_tracking_dir, detector_geometries, file_nums=[file_num])
-        for det_file in os.listdir(decoded_dir):
-            if not det_file.endswith('.root') or '_datrun_' not in det_file:
+    """
+    Filter decoded files by events traversing any of the detectors in detector_geometries.
+    :param out_dir:
+    :param m3_tracking_dir:
+    :param decoded_dir:
+    :param detectors:
+    :param det_info_dir:
+    :param included_detectors:
+    :param file_num:
+    :return:
+    """
+
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        futures = []
+        for m3_file in os.listdir(m3_tracking_dir):
+            if not m3_file.endswith('_rays.root') or '_datrun_' not in m3_file:
                 continue
-            if get_file_num_from_fdf_file_name(det_file, -2) != file_num:
+            if file_num is not None and get_file_num_from_fdf_file_name(m3_file, -1) != file_num:
                 continue
-            if get_run_name_from_fdf_file_name(det_file) != run_name:
-                continue
-            print(f'Filtering {det_file} to {det_file.replace(".root", "_filtered.root")}')
-            filter_dream_file_pyroot(f'{decoded_dir}{det_file}', traversing_event_ids,
-                                     f'{out_dir}{det_file.replace(".root", "_filtered.root")}',
-                                     event_branch_name='eventId')
+            print(f'\n\nFiltering decoded files by M3 tracking in {m3_file}')
+            run_name = get_run_name_from_fdf_file_name(m3_file)
+            file_num = get_file_num_from_fdf_file_name(m3_file, -1)
+            detector_geometries = get_detector_geometries(detectors, det_info_dir, included_detectors)
+            traversing_event_ids = get_m3_det_traversing_events(m3_tracking_dir, detector_geometries,
+                                                                file_nums=[file_num])
+            for det_file in os.listdir(decoded_dir):
+                if not det_file.endswith('.root') or '_datrun_' not in det_file:
+                    continue
+                if get_file_num_from_fdf_file_name(det_file, -2) != file_num:
+                    continue
+                if get_run_name_from_fdf_file_name(det_file) != run_name:
+                    continue
+                print(f'Filtering {det_file} to {det_file.replace(".root", "_filtered.root")}')
+                in_file_path = f'{decoded_dir}{det_file}'
+                out_file_path = f'{out_dir}{det_file.replace(".root", "_filtered.root")}'
+                futures.append(executor.submit(filter_dream_file_pyroot, in_file_path, traversing_event_ids,
+                                               out_file_path, event_branch_name='eventId'))
+        concurrent.futures.wait(futures)
 
 
 def get_m3_det_traversing_events(ray_directory, detector_geometries, file_nums=None, det_bound_cushion=0.08):
