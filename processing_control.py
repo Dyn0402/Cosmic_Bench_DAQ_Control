@@ -9,6 +9,8 @@ Created as Cosmic_Bench_DAQ_Control/dedip196_processing_control
 """
 
 import sys
+import os
+import concurrent.futures
 from time import sleep
 import numpy as np
 import json
@@ -110,6 +112,7 @@ def decode_fdfs(fdf_dir, decode_path, convert_path=None, out_dir=None, feu_nums=
     else:
         os.chdir(out_dir)
 
+    decode_fdf_files = []
     for file in os.listdir(fdf_dir):
         if not file.endswith('.fdf'):
             continue
@@ -125,25 +128,62 @@ def decode_fdfs(fdf_dir, decode_path, convert_path=None, out_dir=None, feu_nums=
                 continue
         if file_num is not None and get_file_num_from_fdf_file_name(file, -2) != file_num:
             continue
-        out_name = file.replace('.fdf', '_decoded.root')
-        command = f"{decode_path} {fdf_dir}{file} {out_name}"
-        print(f'\nDecoding {file} to {out_name}')
-        print(command)
-        os.system(command)
-        os.chmod(out_name, 0o777)
-        if out_type in ['array', 'both']:
-            if convert_path is None:
-                print('Error! Need convert path for vec->array! Skipping')
-            else:
-                array_out_name = out_name.replace('.root', '_array.root')
-                command = f"{convert_path} {out_name} {array_out_name}"
-                print(command)
-                os.system(command)
-                os.chmod(array_out_name, 0o777)
-            if out_type == 'array':  # Remove vector formatted root file
-                os.remove(out_name)
+        decode_fdf_files.append(file)
+        # out_name = file.replace('.fdf', '_decoded.root')
+        # command = f"{decode_path} {fdf_dir}{file} {out_name}"
+        # print(f'\nDecoding {file} to {out_name}')
+        # print(command)
+        # os.system(command)
+        # os.chmod(out_name, 0o777)
+        # if out_type in ['array', 'both']:
+        #     if convert_path is None:
+        #         print('Error! Need convert path for vec->array! Skipping')
+        #     else:
+        #         array_out_name = out_name.replace('.root', '_array.root')
+        #         command = f"{convert_path} {out_name} {array_out_name}"
+        #         print(command)
+        #         os.system(command)
+        #         os.chmod(array_out_name, 0o777)
+        #     if out_type == 'array':  # Remove vector formatted root file
+        #         os.remove(out_name)
+
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        futures = []
+        for fdf_file in decode_fdf_files:
+            futures.append(executor.submit(decode_fdf, fdf_file, fdf_dir, decode_path, convert_path, out_type))
+            sleep(2)  # Wait 2 seconds between starting decodes to space out print statements
+        concurrent.futures.wait(futures)
 
     os.chdir(og_dir)
+
+
+def decode_fdf(fdf_file_name, fdf_dir, decode_path, convert_path=None, out_type='vec'):
+    """
+    Decode a single fdf file.
+    :param fdf_file_name: Name of fdf file to decode
+    :param fdf_dir: Directory containing fdf file
+    :param decode_path: Path to decode executable
+    :param convert_path: Path to convert executable
+    :param out_type: 'vec', 'array', or both
+    :return:
+    """
+    out_name = fdf_file_name.replace('.fdf', '_decoded.root')
+    command = f"{decode_path} {fdf_dir}{fdf_file_name} {out_name}"
+    print(f'\nDecoding {fdf_file_name} to {out_name}')
+    print(command)
+    os.system(command)
+    os.chmod(out_name, 0o777)
+    if out_type in ['array', 'both']:
+        if convert_path is None:
+            print('Error! Need convert path for vec->array! Skipping')
+        else:
+            array_out_name = out_name.replace('.root', '_array.root')
+            command = f"{convert_path} {out_name} {array_out_name}"
+            print(command)
+            os.system(command)
+            os.chmod(array_out_name, 0o777)
+        if out_type == 'array':  # Remove vector formatted root file
+            os.remove(out_name)
 
 
 def filter_by_m3(out_dir, m3_tracking_dir, decoded_dir, detectors, det_info_dir, included_detectors=None,
