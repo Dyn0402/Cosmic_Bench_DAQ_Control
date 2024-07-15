@@ -48,20 +48,20 @@ def run_filtering_cleanup_sg1_hv_scan():
                 if drift_hv == 700 and resist_hv in [460, 450, 440, 430]:
                     continue
                 sub_run_name = f'drift_{drift_hv}_resist_{resist_hv}'
-                dedip196_processor.send(f'Decode FDFs {sub_run_name}', silent=False)
-                dedip196_processor.receive(silent=False)
-                sedip28_processor.send(f'Run M3 Tracking {sub_run_name}', silent=False)
-                sedip28_processor.receive(silent=False)
-                sedip28_processor.receive(silent=False)  # Wait for tracking to finish
-                dedip196_processor.receive(silent=False)  # Wait for decoding to finish
-                # Run filtering
-                dedip196_processor.send(f'Filter By M3 {sub_run_name}', silent=False)
-                dedip196_processor.receive(silent=False)
-                dedip196_processor.receive(silent=False)  # Wait for filtering to finish
-                # Remove all but filtered files
-                # dedip196_processor.send(f'Clean Up Unfiltered {sub_run_name}', silent=False)
+                # dedip196_processor.send(f'Decode FDFs {sub_run_name}', silent=False)
                 # dedip196_processor.receive(silent=False)
-                # dedip196_processor.receive(silent=False)  # Wait for cleanup to finish
+                # sedip28_processor.send(f'Run M3 Tracking {sub_run_name}', silent=False)
+                # sedip28_processor.receive(silent=False)
+                # sedip28_processor.receive(silent=False)  # Wait for tracking to finish
+                # dedip196_processor.receive(silent=False)  # Wait for decoding to finish
+                # # Run filtering
+                # dedip196_processor.send(f'Filter By M3 {sub_run_name}', silent=False)
+                # dedip196_processor.receive(silent=False)
+                # dedip196_processor.receive(silent=False)  # Wait for filtering to finish
+                # Remove all but filtered files
+                dedip196_processor.send(f'Clean Up Unfiltered {sub_run_name}', silent=False)
+                dedip196_processor.receive(silent=False)
+                dedip196_processor.receive(silent=False)  # Wait for cleanup to finish
 
         dedip196_processor.send('Finished')
         sedip28_processor.send('Finished')
