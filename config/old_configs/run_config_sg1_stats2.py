@@ -13,7 +13,7 @@ import json
 
 class Config:
     def __init__(self):
-        self.run_name = 'ig1_test1'
+        self.run_name = 'sg1_stats2'
         self.daq_dir = '/home/clas12/dylan/Run/'
         self.run_dir = f'{self.daq_dir}{self.run_name}/'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -84,41 +84,7 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'quick_test',
-                'run_time': 30,  # Minutes
-                'hvs': {
-                    0: {
-                        0: 600,
-                        1: 600,
-                        2: 800,
-                        3: 800,
-                        6: 600,
-                        7: 650,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500,
-                    },
-                    2: {
-                        0: 450,
-                        2: 450,
-                    },
-                    3: {
-                        1: 365,
-                        2: 410,
-                        3: 450,
-                        4: 450,
-                        5: 450,
-                        6: 450,
-                        8: 460,
-                        9: 460,
-                        10: 460,
-                        11: 460,
-                    }
-                }
-            },
-            {
-                'sub_run_name': 'mx_hv_long',
+                'sub_run_name': 'max_hv_long',
                 'run_time': (200 * 24) * 60,  # Minutes
                 'hvs': {
                     0: {
@@ -126,7 +92,7 @@ class Config:
                         1: 600,
                         2: 800,
                         3: 800,
-                        6: 600,
+                        6: 700,
                         7: 650,
                         8: 500,
                         9: 500,
@@ -165,7 +131,7 @@ class Config:
         }
 
         self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
-                                   'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'inter_grid_1',
+                                   'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'asacusa_plein_1',
                                    'strip_grid_1', 'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
 
         self.detectors = [
@@ -336,8 +302,8 @@ class Config:
                 },
             },
             {
-                'name': 'inter_grid_1',
-                'det_type': 'inter_grid',
+                'name': 'asacusa_plein_1',
+                'det_type': 'asacusa_plein',
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
@@ -351,7 +317,7 @@ class Config:
                 },
                 'hv_channels': {
                     'drift': (0, 6),
-                    # 'resist_1': (3, 7),
+                    'resist_1': (3, 7),
                     'resist_2': (2, 0)
                 },
                 'dream_feus': {

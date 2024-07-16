@@ -70,6 +70,26 @@ def define_dets():
             },
         },
         {
+            'det_type': 'strip_grid',
+            'strip_map_type': 'strip',
+            'resist_map_type': 'grid',
+            'det_size': {  # Size of detector based on the extent of the readout pads (active area may be smaller)
+                'x': 130,  # mm
+                'y': 130,  # mm
+                'z': 4,  # mm
+            },
+        },
+        {
+            'det_type': 'inter_grid',
+            'strip_map_type': 'inter',
+            'resist_map_type': 'grid',
+            'det_size': {  # Size of detector based on the extent of the readout pads (active area may be smaller)
+                'x': 130,  # mm
+                'y': 130,  # mm
+                'z': 4,  # mm
+            },
+        },
+        {
             'det_type': 'm3',
             'strip_map_type': 'm3',
             'resist_map_type': 'm3',
