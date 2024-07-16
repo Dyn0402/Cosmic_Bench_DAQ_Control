@@ -1,0 +1,10 @@
+{
+    "det_type": "inter_plein",
+    "strip_map_type": "inter",
+    "resist_map_type": "plein",
+    "det_size": {
+        "x": 130,
+        "y": 130,
+        "z": 4
+    }
+}
