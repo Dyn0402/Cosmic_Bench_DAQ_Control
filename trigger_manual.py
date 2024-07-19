@@ -18,7 +18,7 @@ def main():
         print('No command given')
         return
     state = argv[1]
-    trigger_switch_ip, trigger_switch_port = '169.254.91.5', 1100
+    trigger_switch_ip, trigger_switch_port = '192.168.10.101', 1100
     with Client(trigger_switch_ip, trigger_switch_port) as trigger_switch_client:
         trigger_switch_client.send('Connected to trigger manual control')
         trigger_switch_client.receive()
