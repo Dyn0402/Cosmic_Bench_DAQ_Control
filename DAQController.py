@@ -26,6 +26,7 @@ class DAQController:
 
         self.run_time = run_time  # minutes
         self.max_run_time = self.run_time + 5  # minutes After this time assume stuck and kill
+        self.go_timeout = 5 * 60  # seconds
         self.run_start_time = None
         self.measured_run_time = None
 
