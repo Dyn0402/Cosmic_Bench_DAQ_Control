@@ -20,7 +20,7 @@ def main():
         return
     state = argv[1]
     if len(argv) > 2:
-        sleep_time = argv[2]
+        sleep_time = int(argv[2])
     else:
         sleep_time = 5
     trigger_switch_ip, trigger_switch_port = '192.168.10.101', 1100
