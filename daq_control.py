@@ -156,7 +156,7 @@ def process_files_on_the_fly(sub_run_dir, sub_out_dir, sub_run_name, dedip196_pr
     """
 
     create_dir_if_not_exist(sub_out_dir)
-    sleep(60)  # Wait on start for daq to start running
+    sleep(60 * 5)  # Wait on start for daq to start running
     file_num, running = 0, True
     while running:
         if not daq_finished.is_set() and file_num_still_running(sub_run_dir, file_num, silent=True):
