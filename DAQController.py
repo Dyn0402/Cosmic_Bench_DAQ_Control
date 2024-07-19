@@ -26,7 +26,7 @@ class DAQController:
 
         self.run_time = run_time  # minutes
         self.max_run_time = self.run_time + 5  # minutes After this time assume stuck and kill
-        self.go_timeout = 5 * 60  # seconds
+        self.go_timeout = 8 * 60  # seconds
         self.run_start_time = None
         self.measured_run_time = None
 
@@ -91,7 +91,7 @@ class DAQController:
                 if output.strip() != '':
                     print(output.strip())
 
-                go_time_out = time() - sent_go_time > 120 if sent_go and not sent_continue else False
+                go_time_out = time() - sent_go_time > self.go_timeout if sent_go and not sent_continue else False
                 run_time_out = time() - start > self.max_run_time * 60
                 if go_time_out or run_time_out:
                     print('DAQ process timed out.')
