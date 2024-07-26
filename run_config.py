@@ -13,7 +13,7 @@ import json
 
 class Config:
     def __init__(self):
-        self.run_name = 'ig1_sg1_stats5'
+        self.run_name = 'sg1_stats_7-26-24'
         self.daq_dir = '/home/clas12/dylan/Run/'
         self.run_dir = f'{self.daq_dir}{self.run_name}/'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -84,24 +84,23 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'quick_test',
-                'run_time': 30,  # Minutes
+                'sub_run_name': 'max_hv_long_1',
+                'run_time': (200 * 24) * 60,  # Minutes
                 'hvs': {
                     0: {
                         0: 600,
                         1: 600,
                         2: 800,
                         3: 800,
-                        6: 700,
-                        7: 700,
+                        6: 800,
+                        7: 800,
                         8: 500,
                         9: 500,
                         10: 500,
                         11: 500,
                     },
                     2: {
-                        0: 460,
-                        2: 460,
+                        0: 480,
                     },
                     3: {
                         1: 365,
@@ -110,6 +109,7 @@ class Config:
                         4: 450,
                         5: 450,
                         6: 450,
+                        7: 480,
                         8: 460,
                         9: 460,
                         10: 460,
@@ -118,7 +118,7 @@ class Config:
                 }
             },
             {
-                'sub_run_name': 'max_hv_long',
+                'sub_run_name': 'max_hv_long_2',
                 'run_time': (200 * 24) * 60,  # Minutes
                 'hvs': {
                     0: {
@@ -126,16 +126,15 @@ class Config:
                         1: 600,
                         2: 800,
                         3: 800,
-                        6: 600,
-                        7: 600,
+                        6: 800,
+                        7: 800,
                         8: 500,
                         9: 500,
                         10: 500,
                         11: 500,
                     },
                     2: {
-                        0: 440,
-                        2: 440,
+                        0: 480,
                     },
                     3: {
                         1: 365,
@@ -144,13 +143,82 @@ class Config:
                         4: 450,
                         5: 450,
                         6: 450,
+                        7: 480,
                         8: 460,
                         9: 460,
                         10: 460,
                         11: 460,
                     }
                 }
-            }
+            },
+            {
+                'sub_run_name': 'max_hv_long_3',
+                'run_time': (200 * 24) * 60,  # Minutes
+                'hvs': {
+                    0: {
+                        0: 600,
+                        1: 600,
+                        2: 800,
+                        3: 800,
+                        6: 800,
+                        7: 800,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    2: {
+                        0: 480,
+                    },
+                    3: {
+                        1: 365,
+                        2: 410,
+                        3: 450,
+                        4: 450,
+                        5: 450,
+                        6: 450,
+                        7: 480,
+                        8: 460,
+                        9: 460,
+                        10: 460,
+                        11: 460,
+                    }
+                }
+            },
+            {
+                'sub_run_name': 'max_hv_long_4',
+                'run_time': (200 * 24) * 60,  # Minutes
+                'hvs': {
+                    0: {
+                        0: 600,
+                        1: 600,
+                        2: 800,
+                        3: 800,
+                        6: 800,
+                        7: 800,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    2: {
+                        0: 480,
+                    },
+                    3: {
+                        1: 365,
+                        2: 410,
+                        3: 450,
+                        4: 450,
+                        5: 450,
+                        6: 450,
+                        7: 480,
+                        8: 460,
+                        9: 460,
+                        10: 460,
+                        11: 460,
+                    }
+                }
+            },
         ]
 
         self.bench_geometry = {
@@ -377,7 +445,7 @@ class Config:
                 },
                 'hv_channels': {
                     'drift': (0, 7),
-                    'resist_2': (2, 2)
+                    'resist_2': (3, 7)
                 },
                 'dream_feus': {
                     'x_1': (3, 1),  # Runs along x direction, indicates y hit location
