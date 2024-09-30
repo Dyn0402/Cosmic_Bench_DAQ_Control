@@ -44,20 +44,21 @@ def run_filtering_cleanup_banco_shift():
         sedip28_processor.send_json(config.sedip28_processor_info)
 
         sub_run_name = f'max_hv_long_1'
-        dedip196_processor.send(f'Decode FDFs {sub_run_name}', silent=False)
-        dedip196_processor.receive(silent=False)
-        sedip28_processor.send(f'Run M3 Tracking {sub_run_name}', silent=False)
-        sedip28_processor.receive(silent=False)
-        sedip28_processor.receive(silent=False)  # Wait for tracking to finish
-        dedip196_processor.receive(silent=False)  # Wait for decoding to finish
-        # Run filtering
-        dedip196_processor.send(f'Filter By M3 {sub_run_name}', silent=False)
-        dedip196_processor.receive(silent=False)
-        dedip196_processor.receive(silent=False)  # Wait for filtering to finish
-        # Remove all but filtered files
-        dedip196_processor.send(f'Clean Up Unfiltered {sub_run_name}', silent=False)
-        dedip196_processor.receive(silent=False)
-        dedip196_processor.receive(silent=False)  # Wait for cleanup to finish
+        for file_num in range(1, 60):
+            dedip196_processor.send(f'Decode FDFs file_num={file_num} {sub_run_name}', silent=False)
+            dedip196_processor.receive(silent=False)
+            sedip28_processor.send(f'Run M3 Tracking file_num={file_num} {sub_run_name}', silent=False)
+            sedip28_processor.receive(silent=False)
+            sedip28_processor.receive(silent=False)  # Wait for tracking to finish
+            dedip196_processor.receive(silent=False)  # Wait for decoding to finish
+            # Run filtering
+            dedip196_processor.send(f'Filter By M3 file_num={file_num} {sub_run_name}', silent=False)
+            dedip196_processor.receive(silent=False)
+            dedip196_processor.receive(silent=False)  # Wait for filtering to finish
+            # Remove all but filtered files
+            dedip196_processor.send(f'Clean Up Unfiltered file_num={file_num} {sub_run_name}', silent=False)
+            dedip196_processor.receive(silent=False)
+            dedip196_processor.receive(silent=False)  # Wait for cleanup to finish
 
 
 def run_filtering_cleanup_sg1_hv_scan():
