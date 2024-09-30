@@ -13,7 +13,7 @@ import json
 
 class Config:
     def __init__(self):
-        self.run_name = 'urw_fine_strip_align_9-30-24'
+        self.run_name = 'banco_x_slide_9-4-24'
         self.daq_dir = '/home/clas12/dylan/Run/'
         self.run_dir = f'{self.daq_dir}{self.run_name}/'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -151,6 +151,40 @@ class Config:
                     }
                 }
             },
+            {
+                'sub_run_name': 'max_hv_long_3',
+                'run_time': (200 * 24) * 60,  # Minutes
+                'hvs': {
+                    0: {
+                        0: 600,
+                        1: 600,
+                        2: 800,
+                        3: 800,
+                        6: 800,
+                        7: 800,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    2: {
+                        0: 460,
+                    },
+                    3: {
+                        1: 365,
+                        2: 410,
+                        3: 450,
+                        4: 450,
+                        5: 450,
+                        6: 450,
+                        7: 460,
+                        8: 460,
+                        9: 460,
+                        10: 460,
+                        11: 460,
+                    }
+                }
+            },
         ]
 
         self.bench_geometry = {
@@ -173,7 +207,7 @@ class Config:
                 'name': 'banco_ladder157',
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
-                    'x': -13.54 + 10,  # mm  Guess from previous alignment plus shift measurement
+                    'x': -13.54 - 50,  # mm  Guess from previous alignment plus shift measurement
                     'y': -34.27,  # mm
                     'z': 842.20,  # mm
                 },
@@ -189,7 +223,7 @@ class Config:
                 'name': 'banco_ladder162',
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
-                    'x': -15.41 + 10,  # mm  Guess from previous alignment plus shift measurement
+                    'x': -15.41 - 50,  # mm  Guess from previous alignment plus shift measurement
                     'y': -34.27,  # mm
                     'z': 853.26,  # mm
                 },
@@ -205,7 +239,7 @@ class Config:
                 'name': 'banco_ladder160',
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
-                    'x': -13.21 + 10,  # mm  Guess from previous alignment plus shift measurement
+                    'x': -13.21 - 50,  # mm  Guess from previous alignment plus shift measurement
                     'y': -34.39,  # mm
                     'z': 971.45,  # mm
                 },
@@ -221,7 +255,7 @@ class Config:
                 'name': 'banco_ladder163',
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
-                    'x': -15.03 + 10,  # mm  Guess from previous alignment plus shift measurement
+                    'x': -15.03 - 50,  # mm  Guess from previous alignment plus shift measurement
                     'y': -34.46,  # mm
                     'z': 982.50,  # mm
                 },
