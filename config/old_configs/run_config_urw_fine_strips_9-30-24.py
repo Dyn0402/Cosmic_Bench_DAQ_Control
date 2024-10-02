@@ -13,7 +13,7 @@ import json
 
 class Config:
     def __init__(self):
-        self.run_name = 'urw_inter_test_10-2-24'
+        self.run_name = 'urw_fine_strip_align_9-30-24'
         self.daq_dir = '/home/clas12/dylan/Run/'
         self.run_dir = f'{self.daq_dir}{self.run_name}/'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -84,15 +84,15 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'test_1',
+                'sub_run_name': 'max_hv_long_1',
                 'run_time': (200 * 24) * 60,  # Minutes
                 'hvs': {
                     0: {
                         0: 600,
-                        1: 600,
+                        # 1: 600,
                         2: 800,
-                        # 3: 800,
-                        # 6: 800,
+                        3: 800,
+                        6: 800,
                         # 7: 800,
                         8: 500,
                         9: 500,
@@ -100,15 +100,15 @@ class Config:
                         11: 500,
                     },
                     2: {
-                        # 0: 460,
+                        0: 460,
                     },
                     3: {
                         1: 365,
-                        2: 410,
+                        # 2: 410,
                         3: 450,
                         4: 450,
-                        # 5: 450,
-                        # 6: 450,
+                        5: 450,
+                        6: 450,
                         # 7: 460,
                         8: 460,
                         9: 460,
@@ -118,32 +118,32 @@ class Config:
                 }
             },
             {
-                'sub_run_name': 'test_2',
+                'sub_run_name': 'max_hv_long_2',
                 'run_time': (200 * 24) * 60,  # Minutes
                 'hvs': {
                     0: {
                         0: 600,
                         1: 600,
                         2: 800,
-                        # 3: 800,
-                        # 6: 800,
-                        # 7: 800,
+                        3: 800,
+                        6: 800,
+                        7: 800,
                         8: 500,
                         9: 500,
                         10: 500,
                         11: 500,
                     },
                     2: {
-                        # 0: 460,
+                        0: 460,
                     },
                     3: {
                         1: 365,
                         2: 410,
                         3: 450,
                         4: 450,
-                        # 5: 450,
-                        # 6: 450,
-                        # 7: 460,
+                        5: 450,
+                        6: 450,
+                        7: 460,
                         8: 460,
                         9: 460,
                         10: 460,
@@ -165,7 +165,7 @@ class Config:
         }
 
         self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
-                                   'urw_strip', 'urw_inter', 'asacusa_strip_1',
+                                   'urw_strip', 'asacusa_strip_1', 'asacusa_strip_2', 'inter_grid_1',
                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
 
         self.detectors = [
