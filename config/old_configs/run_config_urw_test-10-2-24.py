@@ -13,7 +13,7 @@ import json
 
 class Config:
     def __init__(self):
-        self.run_name = 'urw_inter_sp1_test_10-14-24'
+        self.run_name = 'urw_inter_test_10-2-24'
         self.daq_dir = '/home/clas12/dylan/Run/'
         self.run_dir = f'{self.daq_dir}{self.run_name}/'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -91,8 +91,8 @@ class Config:
                         0: 600,
                         1: 600,
                         2: 800,
-                        3: 800,
-                        6: 800,
+                        # 3: 800,
+                        # 6: 800,
                         # 7: 800,
                         8: 500,
                         9: 500,
@@ -103,13 +103,47 @@ class Config:
                         # 0: 460,
                     },
                     3: {
-                        1: 400,
+                        1: 365,
                         2: 410,
                         3: 450,
                         4: 450,
-                        5: 450,
-                        6: 450,
-                        7: 460,
+                        # 5: 450,
+                        # 6: 450,
+                        # 7: 460,
+                        8: 460,
+                        9: 460,
+                        10: 460,
+                        11: 460,
+                    }
+                }
+            },
+            {
+                'sub_run_name': 'test_2',
+                'run_time': (200 * 24) * 60,  # Minutes
+                'hvs': {
+                    0: {
+                        0: 600,
+                        1: 600,
+                        2: 800,
+                        # 3: 800,
+                        # 6: 800,
+                        # 7: 800,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    2: {
+                        # 0: 460,
+                    },
+                    3: {
+                        1: 365,
+                        2: 410,
+                        3: 450,
+                        4: 450,
+                        # 5: 450,
+                        # 6: 450,
+                        # 7: 460,
                         8: 460,
                         9: 460,
                         10: 460,
@@ -131,7 +165,7 @@ class Config:
         }
 
         self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
-                                   'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
+                                   'urw_strip', 'urw_inter', 'asacusa_strip_1',
                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
 
         self.detectors = [
@@ -302,8 +336,8 @@ class Config:
                 },
             },
             {
-                'name': 'strip_plein_1',
-                'det_type': 'strip_plein',
+                'name': 'inter_grid_1',
+                'det_type': 'inter_grid',
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
@@ -317,7 +351,8 @@ class Config:
                 },
                 'hv_channels': {
                     'drift': (0, 6),
-                    'resist_2': (3, 7),
+                    # 'resist_1': (3, 7),
+                    'resist_2': (2, 0)
                 },
                 'dream_feus': {
                     'x_1': (3, 5),  # Runs along x direction, indicates y hit location
@@ -326,57 +361,31 @@ class Config:
                     'y_2': (3, 8),
                 },
             },
-            # {
-            #     'name': 'inter_grid_1',
-            #     'det_type': 'inter_grid',
-            #     'det_center_coords': {  # Center of detector
-            #         'x': 0,  # mm
-            #         'y': 0,  # mm
-            #         'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
-            #              1 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
-            #     },
-            #     'det_orientation': {
-            #         'x': 0,  # deg  Rotation about x axis
-            #         'y': 0,  # deg  Rotation about y axis
-            #         'z': 0,  # deg  Rotation about z axis
-            #     },
-            #     'hv_channels': {
-            #         'drift': (0, 6),
-            #         # 'resist_1': (3, 7),
-            #         'resist_2': (2, 0)
-            #     },
-            #     'dream_feus': {
-            #         'x_1': (3, 5),  # Runs along x direction, indicates y hit location
-            #         'x_2': (3, 6),
-            #         'y_1': (3, 7),  # Runs along y direction, indicates x hit location
-            #         'y_2': (3, 8),
-            #     },
-            # },
-            # {
-            #     'name': 'strip_grid_1',
-            #     'det_type': 'strip_grid',
-            #     'det_center_coords': {  # Center of detector
-            #         'x': 0,  # mm
-            #         'y': 0,  # mm
-            #         'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
-            #              0 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
-            #     },
-            #     'det_orientation': {
-            #         'x': 0,  # deg  Rotation about x axis
-            #         'y': 0,  # deg  Rotation about y axis
-            #         'z': 0,  # deg  Rotation about z axis
-            #     },
-            #     'hv_channels': {
-            #         'drift': (0, 7),
-            #         'resist_2': (3, 7)
-            #     },
-            #     'dream_feus': {
-            #         'x_1': (3, 1),  # Runs along x direction, indicates y hit location
-            #         'x_2': (3, 2),
-            #         'y_1': (3, 3),  # Runs along y direction, indicates x hit location
-            #         'y_2': (3, 4),
-            #     },
-            # },
+            {
+                'name': 'strip_grid_1',
+                'det_type': 'strip_grid',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
+                         0 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': {
+                    'drift': (0, 7),
+                    'resist_2': (3, 7)
+                },
+                'dream_feus': {
+                    'x_1': (3, 1),  # Runs along x direction, indicates y hit location
+                    'x_2': (3, 2),
+                    'y_1': (3, 3),  # Runs along y direction, indicates x hit location
+                    'y_2': (3, 4),
+                },
+            },
             {
                 'name': 'm3_bot_bot',
                 'det_type': 'm3',
