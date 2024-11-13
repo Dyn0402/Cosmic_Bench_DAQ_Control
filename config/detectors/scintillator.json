@@ -1,0 +1,10 @@
+{
+    "det_type": "scintillator",
+    "strip_map_type": "scintillator",
+    "resist_map_type": "scintillator",
+    "det_size": {
+        "x": 600,
+        "y": 600,
+        "z": 4
+    }
+}

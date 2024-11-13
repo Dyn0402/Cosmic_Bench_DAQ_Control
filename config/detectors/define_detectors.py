@@ -149,6 +149,16 @@ def define_dets():
                 'z': 4,  # mm  Guess
             },
         },
+        {
+            'det_type': 'scintillator',
+            'strip_map_type': 'scintillator',
+            'resist_map_type': 'scintillator',
+            'det_size': {  # Roughly
+                'x': 600,  # mm
+                'y': 600,  # mm
+                'z': 4,  # mm  Guess
+            },
+        },
     ]
 
     return detectors

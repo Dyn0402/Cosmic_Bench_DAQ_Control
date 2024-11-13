@@ -9,11 +9,12 @@ Created as Cosmic_Bench_DAQ_Control/run_config_template.py
 """
 
 import json
+import numpy as np
 
 
 class Config:
     def __init__(self):
-        self.run_name = 'urw_stats_10-31-24'
+        self.run_name = 'drift_scan_11-13-24'
         self.daq_dir = '/home/clas12/dylan/Run/'
         self.run_dir = f'{self.daq_dir}{self.run_name}/'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -84,12 +85,12 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'long_run',
-                'run_time': (200 * 24) * 60,  # Minutes
+                'sub_run_name': 'drift_800',
+                'run_time': 10 * 60,  # Minutes
                 'hvs': {
                     0: {
-                        0: 600,
-                        1: 600,
+                        0: 800,
+                        1: 800,
                         2: 800,
                         3: 800,
                         6: 800,
@@ -116,8 +117,19 @@ class Config:
                         11: 460,
                     }
                 }
-            },
+            }
         ]
+
+        # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
+        template = self.sub_runs[0]
+        for drift_v in np.arange(750, 0, -50):
+            sub_run = template.copy()
+            sub_run['sub_run_name'] = f'drift_{drift_v}'
+            card = 0
+            for channel in sub_run['hvs'][card]:
+                if channel in [0, 1, 2, 3, 6]:
+                    sub_run['hvs'][card][channel] = drift_v
+            self.sub_runs.append(sub_run)
 
         self.bench_geometry = {
             'p1_z': 227,  # mm  To the top of P1 from the top of PB
@@ -132,7 +144,7 @@ class Config:
 
         self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
                                    'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
-                                   'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
+                                   'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
 
         self.detectors = [
             {
@@ -463,6 +475,23 @@ class Config:
                 'dream_feus': {  # Guesses
                     'x_1': (1, 7),  # Runs along x direction, indicates y hit location
                     'y_1': (1, 8),  # Runs along y direction, indicates x hit location
+                },
+            },
+            {
+                'name': 'scintillator_top',
+                'det_type': 'scintillator',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': 1412,  # mm  1163 + 145 + 110 from geometry diagram
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'dream_feus': {
+                    'xy': (3, 4),
                 },
             },
         ]
