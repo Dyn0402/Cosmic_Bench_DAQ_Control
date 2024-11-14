@@ -16,7 +16,8 @@ def main():
     # run_m3_tracking_hv7()
     # run_m3_filtering_max_hv_stats()
     # run_filtering_cleanup_sg1_hv_scan()
-    run_filtering_cleanup_banco_shift()
+    # run_filtering_cleanup_banco_shift()
+    run_processing_drift_scan()
     print('donzo')
 
 
@@ -43,7 +44,8 @@ def run_processing_drift_scan():
         sedip28_processor.receive()
         sedip28_processor.send_json(config.sedip28_processor_info)
 
-        sub_run_names = ['drift_800', 'drift_750']
+        # sub_run_names = ['drift_800', 'drift_750']
+        sub_run_names = ['drift_800']
         for sub_run_name in sub_run_names:
             dedip196_processor.send(f'Decode FDFs {sub_run_name}', silent=False)
             dedip196_processor.receive(silent=False)
