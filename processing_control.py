@@ -246,7 +246,7 @@ def get_detector_geometries(detectors, det_info_dir, included_detectors=None):
         included_detectors = [det['name'] for det in detectors]
     detector_geometries = []
     for det in detectors:
-        if det['name'] in included_detectors and det['det_type'] != 'm3':
+        if det['name'] in included_detectors and det['det_type'] != 'm3' and det['det_type'] != 'scintillator':
             det_info_path = f'{det_info_dir}{det["det_type"]}.json'
             with open(det_info_path, 'r') as file:
                 det_info = json.load(file)
