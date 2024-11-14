@@ -84,15 +84,15 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'drift_800',
+                'sub_run_name': 'drift_700',
                 'run_time': 10 * 60,  # Minutes
                 'hvs': {
                     0: {
-                        0: 800,
-                        1: 800,
-                        2: 800,
-                        3: 800,
-                        6: 800,
+                        0: 700,
+                        1: 700,
+                        2: 700,
+                        3: 700,
+                        6: 700,
                         # 7: 800,
                         8: 500,
                         9: 500,
@@ -121,7 +121,7 @@ class Config:
 
         # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
         template = self.sub_runs[0]
-        for drift_v in [750, 700, 650, 600, 550, 500, 450, 400, 350, 300, 250, 200, 150, 100, 50]:
+        for drift_v in [650, 600, 550, 500, 450, 400, 350, 300, 250, 200, 150, 100, 50]:
             sub_run = template.copy()
             sub_run['sub_run_name'] = f'drift_{drift_v}'
             card = 0

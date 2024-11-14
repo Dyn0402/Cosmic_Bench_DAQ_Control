@@ -20,6 +20,47 @@ def main():
     print('donzo')
 
 
+def run_processing_drift_scan():
+    config = Config()
+
+    dedip196_ip, dedip196_port = config.dedip196_processor_info['ip'], config.dedip196_processor_info['port']
+    sedip28_ip, sedip28_port = config.sedip28_processor_info['ip'], config.sedip28_processor_info['port']
+
+    dedip196_processor_client = Client(dedip196_ip, dedip196_port)
+    sedip28_processor_client = Client(sedip28_ip, sedip28_port)
+
+    with dedip196_processor_client as dedip196_processor, sedip28_processor_client as sedip28_processor:
+        dedip196_processor.send('Connected to run_processor')
+        dedip196_processor.receive()
+        dedip196_processor.send_json(config.dedip196_processor_info)
+        dedip196_processor.receive()
+        dedip196_processor.send_json({'included_detectors': config.included_detectors})
+        dedip196_processor.receive()
+        dedip196_processor.send_json({'detectors': config.detectors})
+        dedip196_processor.receive()
+
+        sedip28_processor.send('Connected to run_processor')
+        sedip28_processor.receive()
+        sedip28_processor.send_json(config.sedip28_processor_info)
+
+        sub_run_names = ['drift_800', 'drift_750']
+        for sub_run_name in sub_run_names:
+            dedip196_processor.send(f'Decode FDFs {sub_run_name}', silent=False)
+            dedip196_processor.receive(silent=False)
+            sedip28_processor.send(f'Run M3 Tracking {sub_run_name}', silent=False)
+            sedip28_processor.receive(silent=False)
+            sedip28_processor.receive(silent=False)  # Wait for tracking to finish
+            dedip196_processor.receive(silent=False)  # Wait for decoding to finish
+            # Run filtering
+            dedip196_processor.send(f'Filter By M3 {sub_run_name}', silent=False)
+            dedip196_processor.receive(silent=False)
+            dedip196_processor.receive(silent=False)  # Wait for filtering to finish
+            # Remove all but filtered files
+            dedip196_processor.send(f'Clean Up Unfiltered {sub_run_name}', silent=False)
+            dedip196_processor.receive(silent=False)
+            dedip196_processor.receive(silent=False)  # Wait for cleanup to finish
+
+
 def run_filtering_cleanup_banco_shift():
     config = Config()
 
