@@ -44,23 +44,25 @@ def run_processing_drift_scan():
         sedip28_processor.receive()
         sedip28_processor.send_json(config.sedip28_processor_info)
 
-        # sub_run_names = ['drift_800', 'drift_750']
-        sub_run_names = ['drift_800']
-        for sub_run_name in sub_run_names:
-            dedip196_processor.send(f'Decode FDFs {sub_run_name}', silent=False)
-            dedip196_processor.receive(silent=False)
-            sedip28_processor.send(f'Run M3 Tracking {sub_run_name}', silent=False)
-            sedip28_processor.receive(silent=False)
-            sedip28_processor.receive(silent=False)  # Wait for tracking to finish
-            dedip196_processor.receive(silent=False)  # Wait for decoding to finish
-            # Run filtering
-            dedip196_processor.send(f'Filter By M3 {sub_run_name}', silent=False)
-            dedip196_processor.receive(silent=False)
-            dedip196_processor.receive(silent=False)  # Wait for filtering to finish
-            # Remove all but filtered files
-            dedip196_processor.send(f'Clean Up Unfiltered {sub_run_name}', silent=False)
-            dedip196_processor.receive(silent=False)
-            dedip196_processor.receive(silent=False)  # Wait for cleanup to finish
+        sub_run_names = ['drift_800', 'drift_750']
+        sub_run_files = [7, 7]
+        # sub_run_names = ['drift_800']
+        for sub_run_name, run_files in zip(sub_run_names, sub_run_files):
+            for file_num in range(run_files + 1):
+                dedip196_processor.send(f'Decode FDFs file_num={file_num} {sub_run_name}', silent=False)
+                dedip196_processor.receive(silent=False)
+                sedip28_processor.send(f'Run M3 Tracking file_num={file_num} {sub_run_name}', silent=False)
+                sedip28_processor.receive(silent=False)
+                sedip28_processor.receive(silent=False)  # Wait for tracking to finish
+                dedip196_processor.receive(silent=False)  # Wait for decoding to finish
+                # Run filtering
+                dedip196_processor.send(f'Filter By M3 file_num={file_num} {sub_run_name}', silent=False)
+                dedip196_processor.receive(silent=False)
+                dedip196_processor.receive(silent=False)  # Wait for filtering to finish
+                # Remove all but filtered files
+                dedip196_processor.send(f'Clean Up Unfiltered file_num={file_num} {sub_run_name}', silent=False)
+                dedip196_processor.receive(silent=False)
+                dedip196_processor.receive(silent=False)  # Wait for cleanup to finish
 
 
 def run_filtering_cleanup_banco_shift():
