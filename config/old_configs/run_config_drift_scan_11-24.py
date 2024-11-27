@@ -13,7 +13,7 @@ import json
 
 class Config:
     def __init__(self):
-        self.run_name = 'urw_stats_11-27-24'
+        self.run_name = 'drift_scan_11-13-24'
         self.daq_dir = '/home/clas12/dylan/Run/'
         self.run_dir = f'{self.daq_dir}{self.run_name}/'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -84,15 +84,15 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'long_run_1',
-                'run_time': 200 * 24 * 60,  # Minutes
+                'sub_run_name': 'drift_700',
+                'run_time': 10 * 60,  # Minutes
                 'hvs': {
                     0: {
-                        0: 800,
-                        1: 800,
-                        2: 800,
-                        3: 800,
-                        6: 800,
+                        0: 700,
+                        1: 700,
+                        2: 700,
+                        3: 700,
+                        6: 700,
                         # 7: 800,
                         8: 500,
                         9: 500,
@@ -118,6 +118,17 @@ class Config:
                 }
             }
         ]
+
+        # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
+        template = self.sub_runs[0]
+        for drift_v in [650, 600, 550, 500, 450, 400, 350, 300, 250, 200, 150, 100, 50]:
+            sub_run = template.copy()
+            sub_run['sub_run_name'] = f'drift_{drift_v}'
+            card = 0
+            for channel in sub_run['hvs'][card]:
+                if channel in [0, 1, 2, 3, 6]:
+                    sub_run['hvs'][card][channel] = drift_v
+            self.sub_runs.append(sub_run)
 
         self.bench_geometry = {
             'p1_z': 227,  # mm  To the top of P1 from the top of PB
