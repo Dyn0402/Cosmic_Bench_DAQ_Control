@@ -13,7 +13,7 @@ import json
 
 class Config:
     def __init__(self):
-        self.run_name = 'urw_stats_11-27-24'
+        self.run_name = 'ss1_test_12-18-24'
         self.daq_dir = '/home/clas12/dylan/Run/'
         self.run_dir = f'{self.daq_dir}{self.run_name}/'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -88,10 +88,10 @@ class Config:
                 'run_time': 200 * 24 * 60,  # Minutes
                 'hvs': {
                     0: {
-                        0: 800,
-                        1: 800,
-                        2: 800,
-                        3: 800,
+                        # 0: 800,
+                        # 1: 800,
+                        # 2: 800,
+                        # 3: 800,
                         6: 800,
                         # 7: 800,
                         8: 500,
@@ -100,16 +100,16 @@ class Config:
                         11: 500,
                     },
                     2: {
-                        0: 500,
+                        0: 450,
                     },
                     3: {
-                        1: 410,
-                        2: 410,
-                        3: 450,
-                        4: 450,
-                        5: 450,
-                        6: 450,
-                        7: 500,
+                        # 1: 410,
+                        # 2: 410,
+                        # 3: 450,
+                        # 4: 450,
+                        # 5: 450,
+                        # 6: 450,
+                        7: 450,
                         8: 460,
                         9: 460,
                         10: 460,
@@ -130,9 +130,11 @@ class Config:
             'banco_arm_length_y': 230,  # mm from left edge of banco arm to right edge of banco arm
         }
 
-        self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
-                                   'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
-                                   'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
+        # self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
+        #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
+        #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
+        self.included_detectors = ['strip_strip_1',
+                                   'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
 
         self.detectors = [
             {
@@ -377,6 +379,31 @@ class Config:
             #         'y_2': (3, 4),
             #     },
             # },
+            {
+                'name': 'strip_strip_1',
+                'det_type': 'strip_strip',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
+                         5 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': {
+                    'drift': (0, 6),
+                    'resist_2': (3, 7),
+                },
+                'dream_feus': {
+                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
+                    'x_2': (6, 2),
+                    'y_1': (6, 3),  # Runs along y direction, indicates x hit location
+                    'y_2': (6, 4),
+                },
+            },
             {
                 'name': 'm3_bot_bot',
                 'det_type': 'm3',
