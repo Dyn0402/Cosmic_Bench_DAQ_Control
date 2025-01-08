@@ -71,6 +71,7 @@ class DAQController:
                     process.stdin.flush()
                     sent_continue, sent_continue_time = True, time()
                     run_start = time()
+                    self.run_start_time = run_start
 
                 # Need to wait a bit for DAQ to start
                 if (not triggered and self.trigger_switch_client is not None and sent_continue
@@ -123,6 +124,9 @@ class DAQController:
             if run_successful:
                 move_data_files(self.run_directory, self.out_directory)
                 self.write_run_time()
+
+            if self.measured_run_time is None:
+                self.measured_run_time = time() - self.run_start_time
 
         return run_successful
 
