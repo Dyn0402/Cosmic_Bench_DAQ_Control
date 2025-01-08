@@ -13,7 +13,7 @@ import json
 
 class Config:
     def __init__(self):
-        self.run_name = 'ss1_test_12-18-24'
+        self.run_name = 'ss1_test_1-8-25'
         self.daq_dir = '/home/clas12/dylan/Run/'
         self.run_dir = f'{self.daq_dir}{self.run_name}/'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -100,7 +100,7 @@ class Config:
                         11: 500,
                     },
                     2: {
-                        0: 450,
+                        0: 460,
                     },
                     3: {
                         # 1: 410,
@@ -109,7 +109,7 @@ class Config:
                         # 4: 450,
                         # 5: 450,
                         # 6: 450,
-                        7: 450,
+                        7: 460,
                         8: 460,
                         9: 460,
                         10: 460,
