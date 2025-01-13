@@ -121,12 +121,12 @@ class DAQController:
             if self.trigger_switch_client is not None:
                 self.trigger_switch_client.silent = False
 
+            if self.measured_run_time is None:
+                self.measured_run_time = time() - self.run_start_time
+
             if run_successful:
                 move_data_files(self.run_directory, self.out_directory)
                 self.write_run_time()
-
-            if self.measured_run_time is None:
-                self.measured_run_time = time() - self.run_start_time
 
         return run_successful
 
@@ -145,7 +145,10 @@ class DAQController:
 
     def write_run_time(self):
         with open(f'{self.out_directory}/run_time.txt', 'w') as file:
-            file.write(f'{self.measured_run_time:.2f}')
+            if self.measured_run_time is not None:
+                file.write(f'{self.measured_run_time:.2f}')
+            else:
+                file.write('None')
 
 
 def move_data_files(src_dir, dest_dir):
