@@ -103,9 +103,11 @@ class DAQController:
                     break
         except KeyboardInterrupt:
             print('Keyboard interrupt. Stopping DAQ process.')
-            self.trigger_switch_client.send('off')
+            if self.trigger_switch_client is not None:
+                self.trigger_switch_client.send('off')
             self.measured_run_time = time() - self.run_start_time
-            self.trigger_switch_client.receive()
+            if self.trigger_switch_client is not None:
+                self.trigger_switch_client.receive()
             sleep(1)
             process.stdin.write('g')  # Send signal to stop run
             print('DAQ process stopped.')
