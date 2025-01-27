@@ -126,8 +126,9 @@ def main():
                     print(f'Finished {sub_run_name}, waiting 10 seconds before next run')
                     sleep(10)
         hv.send('Finished')
-        banco_daq.send('Finished')
-        trigger_switch.send('Finished')
+        if banco:
+            banco_daq.send('Finished')
+            trigger_switch.send('Finished')
         dedip196_processor.send('Finished')
         sedip28_processor.send('Finished')
     print('donzo')
