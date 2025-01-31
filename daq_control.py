@@ -125,6 +125,10 @@ def main():
 
                     print(f'Finished {sub_run_name}, waiting 10 seconds before next run')
                     sleep(10)
+        if config.power_off_hv_at_end:
+            hv.send('Power Off')
+            hv.receive()  # Starting power off
+            hv.receive()  # Finished power off
         hv.send('Finished')
         if banco:
             banco_daq.send('Finished')

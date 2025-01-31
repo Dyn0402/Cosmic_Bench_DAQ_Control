@@ -33,10 +33,14 @@ def main():
                         sub_run = server.receive_json()
                         set_hvs(hv_info, sub_run['hvs'])
                         server.send(f'HV Set {sub_run["sub_run_name"]}')
+                    elif 'Power Off' in res:
+                        server.send('HV ready to power off')
+                        power_off_hvs(hv_info)
+                        server.send('HV Powered Off')
                     else:
                         server.send('Unknown Command')
                     res = server.receive()
-            power_off_hvs(hv_info)
+            # power_off_hvs(hv_info)
         except Exception as e:
             print(f'Error: {e}\nRestarting hv control server...')
     print('donzo')

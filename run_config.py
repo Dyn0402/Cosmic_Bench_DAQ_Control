@@ -13,7 +13,7 @@ import json
 
 class Config:
     def __init__(self):
-        self.run_name = 'ss1_test_1-29-25'
+        self.run_name = 'ss1_test_1-31-25'
         self.daq_dir = '/home/clas12/dylan/Run/'
         self.run_dir = f'{self.daq_dir}{self.run_name}/'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -24,6 +24,7 @@ class Config:
         self.m3_tracking_inner_dir = 'm3_tracking_root'
         self.detector_info_dir = f'/mnt/cosmic_data/config/detectors/'
         self.m3_feu_num = 1
+        self.power_off_hv_at_end = False  # True to power off HV at end of run
 
         self.dream_daq_info = {
             'daq_config_template_path': '/home/clas12/dylan/Run/config/CosmicTb_TPOT.cfg',
@@ -383,10 +384,11 @@ class Config:
                 'name': 'strip_strip_1',
                 'det_type': 'strip_strip',
                 'det_center_coords': {  # Center of detector
-                    'x': 0,  # mm
-                    'y': 0,  # mm
-                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
-                         5 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
+                    'x': 9.2,  # mm
+                    'y': 38.4,  # mm
+                    # 'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
+                    #      5 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
+                    'z': 712,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
