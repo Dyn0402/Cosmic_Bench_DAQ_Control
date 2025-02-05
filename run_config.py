@@ -13,7 +13,7 @@ import json
 
 class Config:
     def __init__(self):
-        self.run_name = 'ss1_test_2-4-25'
+        self.run_name = 'ss1_test_2-5-25'
         self.daq_dir = '/home/clas12/dylan/Run/'
         self.run_dir = f'{self.daq_dir}{self.run_name}/'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -388,7 +388,7 @@ class Config:
                     'y': 38.4,  # mm
                     # 'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
                     #      5 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
-                    'z': 712,  # mm
+                    'z': 712.7,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
