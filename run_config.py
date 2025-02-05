@@ -134,7 +134,8 @@ class Config:
         # self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
-        self.included_detectors = ['strip_strip_1',
+        self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
+                                   'strip_strip_1',
                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
 
         self.detectors = [
@@ -142,8 +143,8 @@ class Config:
                 'name': 'banco_ladder157',
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
-                    'x': -13.54 + 10,  # mm  Guess from previous alignment plus shift measurement
-                    'y': -34.27,  # mm
+                    'x': -13.54 - 40,  # mm  Guess from previous alignment plus shift measurement
+                    'y': -34.27 + 30,  # mm
                     'z': 842.20,  # mm
                 },
                 'det_orientation': {
@@ -158,8 +159,8 @@ class Config:
                 'name': 'banco_ladder162',
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
-                    'x': -15.41 + 10,  # mm  Guess from previous alignment plus shift measurement
-                    'y': -34.27,  # mm
+                    'x': -15.41 - 40,  # mm  Guess from previous alignment plus shift measurement
+                    'y': -34.27 + 30,  # mm
                     'z': 853.26,  # mm
                 },
                 'det_orientation': {
@@ -174,8 +175,8 @@ class Config:
                 'name': 'banco_ladder160',
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
-                    'x': -13.21 + 10,  # mm  Guess from previous alignment plus shift measurement
-                    'y': -34.39,  # mm
+                    'x': -13.21 - 40,  # mm  Guess from previous alignment plus shift measurement
+                    'y': -34.39 + 30,  # mm
                     'z': 971.45,  # mm
                 },
                 'det_orientation': {
@@ -190,8 +191,8 @@ class Config:
                 'name': 'banco_ladder163',
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
-                    'x': -15.03 + 10,  # mm  Guess from previous alignment plus shift measurement
-                    'y': -34.46,  # mm
+                    'x': -15.03 - 40,  # mm  Guess from previous alignment plus shift measurement
+                    'y': -34.46 + 30,  # mm
                     'z': 982.50,  # mm
                 },
                 'det_orientation': {
