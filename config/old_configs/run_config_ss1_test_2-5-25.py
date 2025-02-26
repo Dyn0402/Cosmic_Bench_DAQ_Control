@@ -13,7 +13,7 @@ import json
 
 class Config:
     def __init__(self):
-        self.run_name = 'ip1_test_2-26-25'
+        self.run_name = 'ss1_test_2-5-25'
         self.daq_dir = '/home/clas12/dylan/Run/'
         self.run_dir = f'{self.daq_dir}{self.run_name}/'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -133,9 +133,9 @@ class Config:
 
         # self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
-        #                            'strip_strip_1',
         #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
-        self.included_detectors = ['inter_plein_1',
+        self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
+                                   'strip_strip_1',
                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
 
         self.detectors = [
@@ -384,32 +384,6 @@ class Config:
             {
                 'name': 'strip_strip_1',
                 'det_type': 'strip_strip',
-                'det_center_coords': {  # Center of detector
-                    'x': 9.2,  # mm
-                    'y': 38.4,  # mm
-                    # 'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
-                    #      5 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
-                    'z': 712.7,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (0, 6),
-                    'resist_2': (3, 7),
-                },
-                'dream_feus': {
-                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (6, 2),
-                    'y_1': (6, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (6, 4),
-                },
-            },
-            {
-                'name': 'inter_plein_1',
-                'det_type': 'inter_plein',
                 'det_center_coords': {  # Center of detector
                     'x': 9.2,  # mm
                     'y': 38.4,  # mm
