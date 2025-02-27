@@ -13,7 +13,7 @@ import json
 
 class Config:
     def __init__(self):
-        self.run_name = 'ip1_test_2-26-25'
+        self.run_name = 'ip1_test_2-27-25'
         self.daq_dir = '/home/clas12/dylan/Run/'
         self.run_dir = f'{self.daq_dir}{self.run_name}/'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -101,7 +101,7 @@ class Config:
                         11: 500,
                     },
                     2: {
-                        0: 450,
+                        0: 460,
                     },
                     3: {
                         # 1: 410,
@@ -110,7 +110,7 @@ class Config:
                         # 4: 450,
                         # 5: 450,
                         # 6: 450,
-                        7: 450,
+                        7: 460,
                         8: 460,
                         9: 460,
                         10: 460,
@@ -411,11 +411,11 @@ class Config:
                 'name': 'inter_plein_1',
                 'det_type': 'inter_plein',
                 'det_center_coords': {  # Center of detector
-                    'x': 9.2,  # mm
-                    'y': 38.4,  # mm
+                    'x': 15.3,  # mm
+                    'y': 66.15,  # mm
                     # 'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
                     #      5 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
-                    'z': 712.7,  # mm
+                    'z': 707.9,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
