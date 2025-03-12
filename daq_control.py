@@ -104,14 +104,16 @@ def main():
                                     sub_run_name, sub_run_dir, sub_out_dir, daq_trigger_switch)
                 # daq_controller_thread = threading.Thread(target=run_daq_controller, args=daq_control_args)
                 daq_finished = threading.Event()
-                process_files_args = (sub_run_dir, sub_out_dir, sub_run_name, dedip196_processor, sedip28_processor,
-                                      daq_finished, m3, config.filtering_by_m3)
-                process_files_on_the_fly_thread = threading.Thread(target=process_files_on_the_fly,
+                if config.process_on_fly:
+                    process_files_args = (sub_run_dir, sub_out_dir, sub_run_name, dedip196_processor, sedip28_processor,
+                                          daq_finished, m3, config.filtering_by_m3)
+                    process_files_on_the_fly_thread = threading.Thread(target=process_files_on_the_fly,
                                                                    args=process_files_args)
 
                 try:
                     # daq_controller_thread.start()
-                    process_files_on_the_fly_thread.start()
+                    if config.process_on_fly:
+                        process_files_on_the_fly_thread.start()
                     run_daq_controller(*daq_control_args)
 
                     # daq_controller_thread.join()
@@ -125,7 +127,8 @@ def main():
 
                     if banco:
                         pass  # Process banco data
-                    process_files_on_the_fly_thread.join()
+                    if config.process_on_fly:
+                        process_files_on_the_fly_thread.join()
 
                     print(f'Finished {sub_run_name}, waiting 10 seconds before next run')
                     sleep(10)
