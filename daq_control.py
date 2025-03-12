@@ -11,6 +11,7 @@ Created as Cosmic_Bench_DAQ_Control/daq_control.py
 import os
 import shutil
 from time import sleep
+from datetime import datetime
 import threading
 from contextlib import nullcontext
 
@@ -23,7 +24,10 @@ from common_functions import *
 
 def main():
     config = Config()
+    config.start_time = datetime.now()
     banco = any(['banco' in detector_name for detector_name in config.included_detectors])
+    m3 = any(['m3' in detector_name for detector_name in config.included_detectors])
+    m3 = False if config.m3_feu_num is None else m3
 
     hv_ip, hv_port = config.hv_control_info['ip'], config.hv_control_info['port']
     trigger_switch_ip, trigger_switch_port = config.trigger_switch_info['ip'], config.trigger_switch_info['port']
@@ -101,7 +105,7 @@ def main():
                 # daq_controller_thread = threading.Thread(target=run_daq_controller, args=daq_control_args)
                 daq_finished = threading.Event()
                 process_files_args = (sub_run_dir, sub_out_dir, sub_run_name, dedip196_processor, sedip28_processor,
-                                      daq_finished)
+                                      daq_finished, m3, config.filtering_by_m3)
                 process_files_on_the_fly_thread = threading.Thread(target=process_files_on_the_fly,
                                                                    args=process_files_args)
 
@@ -148,7 +152,7 @@ def run_daq_controller(config_template_path, run_time, sub_run_name, sub_run_dir
 
 
 def process_files_on_the_fly(sub_run_dir, sub_out_dir, sub_run_name, dedip196_processor, sedip28_processor,
-                             daq_finished):
+                             daq_finished, m3_tracking=True, filtering=True):
     """
     Process files on the fly as they are created by the DAQ.
     :param sub_run_dir: Directory where DAQ is writing files.
@@ -157,6 +161,8 @@ def process_files_on_the_fly(sub_run_dir, sub_out_dir, sub_run_name, dedip196_pr
     :param dedip196_processor: Client to dedip196 processor.
     :param sedip28_processor: Client to sedip28 processor.
     :param daq_finished: Event to signal when DAQ is finished.
+    :param m3_tracking: Run M3 tracking after decoding.
+    :param filtering: Run filtering after tracking.
     :return:
     """
 
@@ -177,14 +183,22 @@ def process_files_on_the_fly(sub_run_dir, sub_out_dir, sub_run_name, dedip196_pr
 
             dedip196_processor.send(f'Decode FDFs file_num={file_num} {sub_run_name}', silent=True)
             dedip196_processor.receive(silent=True)
-            sedip28_processor.send(f'Run M3 Tracking file_num={file_num} {sub_run_name}', silent=True)
-            sedip28_processor.receive(silent=True)
-            sedip28_processor.receive(silent=True)  # Wait for tracking to finish
+            if m3_tracking:
+                sedip28_processor.send(f'Run M3 Tracking file_num={file_num} {sub_run_name}', silent=True)
+                sedip28_processor.receive(silent=True)
+                sedip28_processor.receive(silent=True)  # Wait for tracking to finish
             dedip196_processor.receive(silent=True)  # Wait for decoding to finish
-            # Run filtering
-            dedip196_processor.send(f'Filter By M3 file_num={file_num} {sub_run_name}', silent=True)
-            dedip196_processor.receive(silent=True)
-            dedip196_processor.receive(silent=True)  # Wait for filtering to finish
+
+            if m3_tracking and filtering:
+                # Run filtering
+                dedip196_processor.send(f'Filter By M3 file_num={file_num} {sub_run_name}', silent=True)
+                dedip196_processor.receive(silent=True)
+                dedip196_processor.receive(silent=True)  # Wait for filtering to finish
+            else:
+                dedip196_processor.send(f'Copy To Filtered file_num={file_num} {sub_run_name}', silent=True)
+                dedip196_processor.receive(silent=True)
+                dedip196_processor.receive(silent=True)  # Wait for copy to finish
+
             # Remove all but filtered files
             dedip196_processor.send(f'Clean Up Unfiltered file_num={file_num} {sub_run_name}', silent=True)
             dedip196_processor.receive(silent=True)

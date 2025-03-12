@@ -10,6 +10,7 @@ Created as Cosmic_Bench_DAQ_Control/dedip196_processing_control
 
 import sys
 import os
+import shutil
 import concurrent.futures
 from time import sleep
 import numpy as np
@@ -78,6 +79,13 @@ def main():
                                          run_info['detector_info_dir'], run_info['included_detectors'],
                                          file_num=file_num)
                             server.send(f'Filtering Complete for {sub_run} {file_num}')
+                        if 'Copy To Filtered' in run_options:
+                            decoded_dir = f"{sub_run_dir}{run_info['decoded_root_inner_dir']}/"
+                            out_dir = f"{sub_run_dir}{run_info['filtered_root_inner_dir']}/"
+                            create_dir_if_not_exist(out_dir)
+                            print(f'\n\nCopying non-filtered decoded files in {decoded_dir} to {out_dir}')
+                            copy_to_filtered(out_dir, decoded_dir, file_num=file_num)
+                            server.send(f'Copy of unfiltered decoded files to filtered directory complete for {sub_run} {file_num}')
                         if 'Clean Up Unfiltered' in run_options:
                             decoded_dir = f"{sub_run_dir}{run_info['decoded_root_inner_dir']}/"
                             # Raw dream data files (leave pedestals in raw, m3 tracking needs pedestal)
@@ -210,6 +218,26 @@ def filter_by_m3(out_dir, m3_tracking_dir, decoded_dir, detectors, det_info_dir,
         #         futures.append(executor.submit(filter_dream_file_pyroot, in_file_path, traversing_event_ids,
         #                                        out_file_path, event_branch_name='eventId'))
         # concurrent.futures.wait(futures)
+
+
+def copy_to_filtered(out_dir, decoded_dir, file_num=None):
+    """
+    When not filtering, just copy decoded files to filtered directory.
+    :param out_dir:
+    :param decoded_dir:
+    :param file_num:
+    :return:
+    """
+
+    for det_file in os.listdir(decoded_dir):
+        if not det_file.endswith('.root') or '_datrun_' not in det_file:
+            continue
+        if get_file_num_from_fdf_file_name(det_file, -2) != file_num:
+            continue
+        print(f'Filtering {det_file} to {det_file.replace(".root", "_filtered.root")}')
+        in_file_path = f'{decoded_dir}{det_file}'
+        out_file_path = f'{out_dir}{det_file.replace(".root", "_filtered.root")}'
+        shutil.copy(in_file_path, out_file_path)  # Just copy in_file_path to out_file_path
 
 
 def get_m3_det_traversing_events(ray_directory, detector_geometries, file_nums=None, det_bound_cushion=0.08):

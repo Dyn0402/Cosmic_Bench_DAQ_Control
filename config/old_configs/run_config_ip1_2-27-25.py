@@ -13,7 +13,7 @@ import json
 
 class Config:
     def __init__(self):
-        self.run_name = 'ip1_fe55_selftrig_3-12-25'
+        self.run_name = 'ip1_test_2-26-25'
         self.daq_dir = '/home/clas12/dylan/Run/'
         self.run_dir = f'{self.daq_dir}{self.run_name}/'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -23,10 +23,8 @@ class Config:
         self.filtered_root_inner_dir = 'filtered_root'
         self.m3_tracking_inner_dir = 'm3_tracking_root'
         self.detector_info_dir = f'/mnt/cosmic_data/config/detectors/'
-        self.m3_feu_num = None
+        self.m3_feu_num = 1
         self.power_off_hv_at_end = False  # True to power off HV at end of run
-        self.filtering_by_m3 = False  # True to filter by m3 tracking, False to do no filtering
-        self.start_time = None
 
         self.dream_daq_info = {
             'daq_config_template_path': '/home/clas12/dylan/Run/config/CosmicTb_TPOT.cfg',
@@ -87,212 +85,8 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'hv_420',
-                'run_time': 5,  # Minutes
-                'hvs': {
-                    0: {
-                        # 0: 800,
-                        # 1: 800,
-                        # 2: 800,
-                        # 3: 800,
-                        6: 800,
-                        # 7: 800,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500,
-                    },
-                    2: {
-                        0: 420,
-                    },
-                    3: {
-                        # 1: 410,
-                        # 2: 410,
-                        # 3: 450,
-                        # 4: 450,
-                        # 5: 450,
-                        # 6: 450,
-                        7: 420,
-                        8: 460,
-                        9: 460,
-                        10: 460,
-                        11: 460,
-                    }
-                }
-            },
-            {
-                'sub_run_name': 'hv_425',
-                'run_time': 5,  # Minutes
-                'hvs': {
-                    0: {
-                        # 0: 800,
-                        # 1: 800,
-                        # 2: 800,
-                        # 3: 800,
-                        6: 800,
-                        # 7: 800,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500,
-                    },
-                    2: {
-                        0: 425,
-                    },
-                    3: {
-                        # 1: 410,
-                        # 2: 410,
-                        # 3: 450,
-                        # 4: 450,
-                        # 5: 450,
-                        # 6: 450,
-                        7: 425,
-                        8: 460,
-                        9: 460,
-                        10: 460,
-                        11: 460,
-                    }
-                }
-            },
-            {
-                'sub_run_name': 'hv_430',
-                'run_time': 5,  # Minutes
-                'hvs': {
-                    0: {
-                        # 0: 800,
-                        # 1: 800,
-                        # 2: 800,
-                        # 3: 800,
-                        6: 800,
-                        # 7: 800,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500,
-                    },
-                    2: {
-                        0: 430,
-                    },
-                    3: {
-                        # 1: 410,
-                        # 2: 410,
-                        # 3: 450,
-                        # 4: 450,
-                        # 5: 450,
-                        # 6: 450,
-                        7: 430,
-                        8: 460,
-                        9: 460,
-                        10: 460,
-                        11: 460,
-                    }
-                }
-            },
-            {
-                'sub_run_name': 'hv_435',
-                'run_time': 5,  # Minutes
-                'hvs': {
-                    0: {
-                        # 0: 800,
-                        # 1: 800,
-                        # 2: 800,
-                        # 3: 800,
-                        6: 800,
-                        # 7: 800,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500,
-                    },
-                    2: {
-                        0: 435,
-                    },
-                    3: {
-                        # 1: 410,
-                        # 2: 410,
-                        # 3: 450,
-                        # 4: 450,
-                        # 5: 450,
-                        # 6: 450,
-                        7: 435,
-                        8: 460,
-                        9: 460,
-                        10: 460,
-                        11: 460,
-                    }
-                }
-            },
-            {
-                'sub_run_name': 'hv_440',
-                'run_time': 5,  # Minutes
-                'hvs': {
-                    0: {
-                        # 0: 800,
-                        # 1: 800,
-                        # 2: 800,
-                        # 3: 800,
-                        6: 800,
-                        # 7: 800,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500,
-                    },
-                    2: {
-                        0: 440,
-                    },
-                    3: {
-                        # 1: 410,
-                        # 2: 410,
-                        # 3: 450,
-                        # 4: 450,
-                        # 5: 450,
-                        # 6: 450,
-                        7: 440,
-                        8: 460,
-                        9: 460,
-                        10: 460,
-                        11: 460,
-                    }
-                }
-            },
-            {
-                'sub_run_name': 'hv_445',
-                'run_time': 5,  # Minutes
-                'hvs': {
-                    0: {
-                        # 0: 800,
-                        # 1: 800,
-                        # 2: 800,
-                        # 3: 800,
-                        6: 800,
-                        # 7: 800,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500,
-                    },
-                    2: {
-                        0: 445,
-                    },
-                    3: {
-                        # 1: 410,
-                        # 2: 410,
-                        # 3: 450,
-                        # 4: 450,
-                        # 5: 450,
-                        # 6: 450,
-                        7: 445,
-                        8: 460,
-                        9: 460,
-                        10: 460,
-                        11: 460,
-                    }
-                }
-            },
-            {
-                'sub_run_name': 'hv_450',
-                'run_time': 5,  # Minutes
+                'sub_run_name': 'long_run_1',
+                'run_time': 200 * 24 * 60,  # Minutes
                 'hvs': {
                     0: {
                         # 0: 800,
@@ -323,7 +117,7 @@ class Config:
                         11: 460,
                     }
                 }
-            },
+            }
         ]
 
         self.bench_geometry = {
@@ -341,7 +135,8 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
-        self.included_detectors = ['inter_plein_1']
+        self.included_detectors = ['inter_plein_1',
+                                   'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
 
         self.detectors = [
             {
