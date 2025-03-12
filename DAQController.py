@@ -48,6 +48,7 @@ class DAQController:
         os.chdir(self.original_working_directory)
 
     def run(self):
+        print('Starting DAQ process.')
         if self.run_directory is not None:
             os.chdir(self.run_directory)
         process = Popen(self.run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
@@ -58,6 +59,7 @@ class DAQController:
 
         try:
             while True:
+                print('Checking DAQ process.')
                 output = process.stdout.readline()
                 if output == '' and process.poll() is not None:
                     print('DAQ process finished.')

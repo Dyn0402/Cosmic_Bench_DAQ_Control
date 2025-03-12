@@ -147,11 +147,19 @@ def main():
 
 
 def run_daq_controller(config_template_path, run_time, sub_run_name, sub_run_dir, sub_out_dir, daq_trigger_switch):
+    print('Creating DAQ Controller')
+    print(f'Config Template Path: {config_template_path}')
+    print(f'Run Time: {run_time}')
+    print(f'Sub Run Name: {sub_run_name}')
+    print(f'Sub Run Dir: {sub_run_dir}')
+    print(f'Sub Out Dir: {sub_out_dir}')
+    print(f'DAQ Trigger Switch: {daq_trigger_switch}')
     daq_controller = DAQController(config_template_path, run_time, sub_run_name, sub_run_dir, sub_out_dir,
                                    daq_trigger_switch)
 
     daq_success = False
     while not daq_success:  # Rerun if failure
+        print('Running DAQ')
         daq_success = daq_controller.run()
 
 
