@@ -61,6 +61,7 @@ class DAQController:
             while True:
                 print('Checking DAQ process.')
                 output = process.stdout.readline()
+                print(f'output: {output}')
                 if output == '' and process.poll() is not None:
                     print('DAQ process finished.')
                     break
@@ -75,6 +76,7 @@ class DAQController:
                     run_start = time()
                     self.run_start_time = run_start
 
+                print('Waiting for trigger start?')
                 # Need to wait a bit for DAQ to start
                 if (not triggered and self.trigger_switch_client is not None and sent_continue
                         and time() - sent_continue_time > 5):  # Takes 0 seconds to start, 5 to be safe
