@@ -29,7 +29,7 @@ class Config:
         self.start_time = None
 
         self.dream_daq_info = {
-            'daq_config_template_path': '/home/clas12/dylan/Run/config/CosmicTb_TPOT.cfg',
+            'daq_config_template_path': '/home/clas12/dylan/Run/config/CosmicTb_SelfTrigger.cfg',
         }
 
         self.banco_info = {
