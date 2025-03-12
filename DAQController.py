@@ -87,9 +87,9 @@ class DAQController:
                     run_start = time()  # Reset run time if trigger used
 
                 print('Checking run time')
-                print(f'Run time: {time() - run_start}, Run time limit: {self.run_time * 60}')
+                # print(f'Run time: {time() - run_start}, Run time limit: {self.run_time * 60}')
                 if self.trigger_switch_client is not None and sent_continue and triggered and not triggered_off:
-                    print('Checking run time')
+                    print('Checking run time inner')
                     if run_start is not None and time() - run_start >= self.run_time * 60:
                         self.trigger_switch_client.send('off')
                         self.measured_run_time = time() - self.run_start_time
