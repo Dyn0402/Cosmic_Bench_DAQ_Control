@@ -114,6 +114,7 @@ def main():
                     # daq_controller_thread.start()
                     if config.process_on_fly:
                         process_files_on_the_fly_thread.start()
+                    print('Starting run')
                     run_daq_controller(*daq_control_args)
 
                     # daq_controller_thread.join()
