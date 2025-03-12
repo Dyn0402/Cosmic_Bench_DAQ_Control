@@ -128,8 +128,8 @@ def main():
 
                     if banco:
                         pass  # Process banco data
-                    # if config.process_on_fly:
-                    #     process_files_on_the_fly_thread.join()
+                    if config.process_on_fly:
+                        process_files_on_the_fly_thread.join()
 
                     print(f'Finished {sub_run_name}, waiting 10 seconds before next run')
                     sleep(10)
@@ -141,10 +141,6 @@ def main():
         if banco:
             banco_daq.send('Finished')
             trigger_switch.send('Finished')
-        ############################
-        if config.process_on_fly:
-            process_files_on_the_fly_thread.join()
-        ############################
         dedip196_processor.send('Finished')
         sedip28_processor.send('Finished')
     print('donzo')

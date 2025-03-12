@@ -26,7 +26,7 @@ class Config:
         self.m3_feu_num = None
         self.power_off_hv_at_end = False  # True to power off HV at end of run
         self.filtering_by_m3 = False  # True to filter by m3 tracking, False to do no filtering
-        self.process_on_fly = False  # True to process data on fly, False to process after run
+        self.process_on_fly = True  # True to process data on fly, False to process after run
         self.start_time = None
 
         self.dream_daq_info = {
@@ -89,7 +89,7 @@ class Config:
         self.sub_runs = [
             {
                 'sub_run_name': 'hv_420',
-                'run_time': 2,  # Minutes
+                'run_time': 10,  # Minutes
                 'hvs': {
                     0: {
                         # 0: 800,
@@ -123,7 +123,7 @@ class Config:
             },
             {
                 'sub_run_name': 'hv_425',
-                'run_time': 5,  # Minutes
+                'run_time': 10,  # Minutes
                 'hvs': {
                     0: {
                         # 0: 800,
@@ -157,7 +157,7 @@ class Config:
             },
             {
                 'sub_run_name': 'hv_430',
-                'run_time': 5,  # Minutes
+                'run_time': 10,  # Minutes
                 'hvs': {
                     0: {
                         # 0: 800,
@@ -191,7 +191,7 @@ class Config:
             },
             {
                 'sub_run_name': 'hv_435',
-                'run_time': 5,  # Minutes
+                'run_time': 10,  # Minutes
                 'hvs': {
                     0: {
                         # 0: 800,
@@ -225,7 +225,7 @@ class Config:
             },
             {
                 'sub_run_name': 'hv_440',
-                'run_time': 5,  # Minutes
+                'run_time': 10,  # Minutes
                 'hvs': {
                     0: {
                         # 0: 800,
@@ -259,7 +259,7 @@ class Config:
             },
             {
                 'sub_run_name': 'hv_445',
-                'run_time': 5,  # Minutes
+                'run_time': 10,  # Minutes
                 'hvs': {
                     0: {
                         # 0: 800,
@@ -293,7 +293,7 @@ class Config:
             },
             {
                 'sub_run_name': 'hv_450',
-                'run_time': 5,  # Minutes
+                'run_time': 10,  # Minutes
                 'hvs': {
                     0: {
                         # 0: 800,
