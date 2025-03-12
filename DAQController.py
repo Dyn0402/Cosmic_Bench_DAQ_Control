@@ -59,9 +59,7 @@ class DAQController:
 
         try:
             while True:
-                print('Checking DAQ process.')
                 output = process.stdout.readline()
-                print(f'output: {output}')
                 if output == '' and process.poll() is not None:
                     print('DAQ process finished.')
                     break
@@ -73,10 +71,11 @@ class DAQController:
                     process.stdin.write('C')  # Signal to start data taking
                     process.stdin.flush()
                     sent_continue, sent_continue_time = True, time()
+                    print('DAQ process started.')
                     run_start = time()
                     self.run_start_time = run_start
+                    print(f'Run time: {time() - run_start}, Run time limit: {self.run_time * 60}, self.run_start_time: {self.run_start_time}')
 
-                print('Waiting for trigger start?')
                 # Need to wait a bit for DAQ to start
                 if (not triggered and self.trigger_switch_client is not None and sent_continue
                         and time() - sent_continue_time > 5):  # Takes 0 seconds to start, 5 to be safe
@@ -86,9 +85,8 @@ class DAQController:
                     triggered = True
                     run_start = time()  # Reset run time if trigger used
 
-                print('Checking run time')
-                # print(f'Run time: {time() - run_start}, Run time limit: {self.run_time * 60}')
                 if self.trigger_switch_client is not None and sent_continue and triggered and not triggered_off:
+                    print(f'Run time: {time() - run_start}, Run time limit: {self.run_time * 60}')
                     print('Checking run time inner')
                     if run_start is not None and time() - run_start >= self.run_time * 60:
                         self.trigger_switch_client.send('off')
