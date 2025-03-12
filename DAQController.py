@@ -85,22 +85,14 @@ class DAQController:
                     triggered = True
                     run_start = time()  # Reset run time if trigger used
 
-                if sent_continue:
-                    if self.trigger_switch_client is None or (triggered and not triggered_off):
-                        if run_start is not None and time() - run_start >= self.run_time * 60:
-                            self.trigger_switch_client.send('off')
-                            self.measured_run_time = time() - self.run_start_time
-                            self.trigger_switch_client.receive()
-                            triggered_off = True
-
-                # if self.trigger_switch_client is not None and sent_continue and triggered and not triggered_off:
-                #     print(f'Run time: {time() - run_start}, Run time limit: {self.run_time * 60}')
-                #     print('Checking run time inner')
-                #     if run_start is not None and time() - run_start >= self.run_time * 60:
-                #         self.trigger_switch_client.send('off')
-                #         self.measured_run_time = time() - self.run_start_time
-                #         self.trigger_switch_client.receive()
-                #         triggered_off = True
+                if self.trigger_switch_client is not None and sent_continue and triggered and not triggered_off:
+                    print(f'Run time: {time() - run_start}, Run time limit: {self.run_time * 60}')
+                    print('Checking run time inner')
+                    if run_start is not None and time() - run_start >= self.run_time * 60:
+                        self.trigger_switch_client.send('off')
+                        self.measured_run_time = time() - self.run_start_time
+                        self.trigger_switch_client.receive()
+                        triggered_off = True
 
                 if output.strip() != '':
                     print(output.strip())
@@ -154,7 +146,7 @@ class DAQController:
             cfg_lines = file.readlines()
         for i, line in enumerate(cfg_lines):
             if 'Sys DaqRun Time' in line:
-                cfg_lines[i] = cfg_lines[i].replace('  0  ', f'  {self.cfg_file_run_time}  ')
+                cfg_lines[i] = cfg_lines[i].replace('0', f'{self.cfg_file_run_time}')
         with open(self.cfg_file_path, 'w') as file:
             file.writelines(cfg_lines)
 
