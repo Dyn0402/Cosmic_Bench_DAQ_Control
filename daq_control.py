@@ -121,7 +121,8 @@ def main():
                 except KeyboardInterrupt:
                     print('Keyboard Interrupt, stopping run')
                 finally:
-                    daq_finished.set()
+                    if config.process_on_fly:
+                        daq_finished.set()
                     if banco:
                         banco_daq.send('Stop')
                         banco_daq.receive()
