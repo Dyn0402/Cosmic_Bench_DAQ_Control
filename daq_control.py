@@ -24,7 +24,7 @@ from common_functions import *
 
 def main():
     config = Config()
-    config.start_time = datetime.now()
+    config.start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     banco = any(['banco' in detector_name for detector_name in config.included_detectors])
     m3 = any(['m3' in detector_name for detector_name in config.included_detectors])
     m3 = False if config.m3_feu_num is None else m3
