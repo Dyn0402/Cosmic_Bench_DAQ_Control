@@ -114,7 +114,6 @@ def main():
                     # daq_controller_thread.start()
                     if config.process_on_fly:
                         process_files_on_the_fly_thread.start()
-                    print('Starting run')
                     run_daq_controller(*daq_control_args)
 
                     # daq_controller_thread.join()
@@ -129,8 +128,8 @@ def main():
 
                     if banco:
                         pass  # Process banco data
-                    if config.process_on_fly:
-                        process_files_on_the_fly_thread.join()
+                    # if config.process_on_fly:
+                    #     process_files_on_the_fly_thread.join()
 
                     print(f'Finished {sub_run_name}, waiting 10 seconds before next run')
                     sleep(10)
@@ -142,27 +141,22 @@ def main():
         if banco:
             banco_daq.send('Finished')
             trigger_switch.send('Finished')
+        ############################
+        if config.process_on_fly:
+            process_files_on_the_fly_thread.join()
+        ############################
         dedip196_processor.send('Finished')
         sedip28_processor.send('Finished')
     print('donzo')
 
 
 def run_daq_controller(config_template_path, run_time, sub_run_name, sub_run_dir, sub_out_dir, daq_trigger_switch):
-    print('Creating DAQ Controller')
-    print(f'Config Template Path: {config_template_path}')
-    print(f'Run Time: {run_time}')
-    print(f'Sub Run Name: {sub_run_name}')
-    print(f'Sub Run Dir: {sub_run_dir}')
-    print(f'Sub Out Dir: {sub_out_dir}')
-    print(f'DAQ Trigger Switch: {daq_trigger_switch}')
     daq_controller = DAQController(config_template_path, run_time, sub_run_name, sub_run_dir, sub_out_dir,
                                    daq_trigger_switch)
 
     daq_success = False
     while not daq_success:  # Rerun if failure
-        print('Running DAQ')
         daq_success = daq_controller.run()
-        print('Out of daq')
 
 
 def process_files_on_the_fly(sub_run_dir, sub_out_dir, sub_run_name, dedip196_processor, sedip28_processor,
