@@ -13,7 +13,7 @@ import json
 
 class Config:
     def __init__(self):
-        self.run_name = 'urw_inter_fe55_selftrig_3-26-25'
+        self.run_name = 'ip1_fe55_selftrig_3-12-25'
         self.daq_dir = '/home/clas12/dylan/Run/'
         self.run_dir = f'{self.daq_dir}{self.run_name}/'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -30,7 +30,6 @@ class Config:
         self.start_time = None
 
         self.dream_daq_info = {
-            # 'daq_config_template_path': '/home/clas12/dylan/Run/config/CosmicTb_TPOT.cfg',
             'daq_config_template_path': '/home/clas12/dylan/Run/config/CosmicTb_SelfTrigger.cfg',
         }
 
@@ -89,15 +88,15 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'hv_380',
+                'sub_run_name': 'hv_420',
                 'run_time': 10,  # Minutes
                 'hvs': {
                     0: {
                         # 0: 800,
-                        1: 800,
+                        # 1: 800,
                         # 2: 800,
                         # 3: 800,
-                        # 6: 800,
+                        6: 800,
                         # 7: 800,
                         8: 500,
                         9: 500,
@@ -105,16 +104,16 @@ class Config:
                         11: 500,
                     },
                     2: {
-                        # 0: 420,
+                        0: 420,
                     },
                     3: {
                         # 1: 410,
-                        2: 380,
+                        # 2: 410,
                         # 3: 450,
                         # 4: 450,
                         # 5: 450,
                         # 6: 450,
-                        # 7: 420,
+                        7: 420,
                         8: 460,
                         9: 460,
                         10: 460,
@@ -123,15 +122,15 @@ class Config:
                 }
             },
             {
-                'sub_run_name': 'hv_385',
+                'sub_run_name': 'hv_425',
                 'run_time': 10,  # Minutes
                 'hvs': {
                     0: {
                         # 0: 800,
-                        1: 800,
+                        # 1: 800,
                         # 2: 800,
                         # 3: 800,
-                        # 6: 800,
+                        6: 800,
                         # 7: 800,
                         8: 500,
                         9: 500,
@@ -139,16 +138,16 @@ class Config:
                         11: 500,
                     },
                     2: {
-                        #0: 425,
+                        0: 425,
                     },
                     3: {
                         # 1: 410,
-                        2: 385,
+                        # 2: 410,
                         # 3: 450,
                         # 4: 450,
                         # 5: 450,
                         # 6: 450,
-                        # 7: 425,
+                        7: 425,
                         8: 460,
                         9: 460,
                         10: 460,
@@ -157,15 +156,15 @@ class Config:
                 }
             },
             {
-                'sub_run_name': 'hv_390',
+                'sub_run_name': 'hv_430',
                 'run_time': 10,  # Minutes
                 'hvs': {
                     0: {
                         # 0: 800,
-                        1: 800,
+                        # 1: 800,
                         # 2: 800,
                         # 3: 800,
-                        # 6: 800,
+                        6: 800,
                         # 7: 800,
                         8: 500,
                         9: 500,
@@ -173,16 +172,16 @@ class Config:
                         11: 500,
                     },
                     2: {
-                        #0: 430,
+                        0: 430,
                     },
                     3: {
                         # 1: 410,
-                        2: 390,
+                        # 2: 410,
                         # 3: 450,
                         # 4: 450,
                         # 5: 450,
                         # 6: 450,
-                        # 7: 430,
+                        7: 430,
                         8: 460,
                         9: 460,
                         10: 460,
@@ -191,15 +190,15 @@ class Config:
                 }
             },
             {
-                'sub_run_name': 'hv_395',
+                'sub_run_name': 'hv_435',
                 'run_time': 10,  # Minutes
                 'hvs': {
                     0: {
                         # 0: 800,
-                        1: 800,
+                        # 1: 800,
                         # 2: 800,
                         # 3: 800,
-                        # 6: 800,
+                        6: 800,
                         # 7: 800,
                         8: 500,
                         9: 500,
@@ -207,16 +206,16 @@ class Config:
                         11: 500,
                     },
                     2: {
-                        #0: 435,
+                        0: 435,
                     },
                     3: {
                         # 1: 410,
-                        2: 395,
+                        # 2: 410,
                         # 3: 450,
                         # 4: 450,
                         # 5: 450,
                         # 6: 450,
-                        # 7: 435,
+                        7: 435,
                         8: 460,
                         9: 460,
                         10: 460,
@@ -225,15 +224,15 @@ class Config:
                 }
             },
             {
-                'sub_run_name': 'hv_400',
+                'sub_run_name': 'hv_440',
                 'run_time': 10,  # Minutes
                 'hvs': {
                     0: {
                         # 0: 800,
-                        1: 800,
+                        # 1: 800,
                         # 2: 800,
                         # 3: 800,
-                        # 6: 800,
+                        6: 800,
                         # 7: 800,
                         8: 500,
                         9: 500,
@@ -241,16 +240,16 @@ class Config:
                         11: 500,
                     },
                     2: {
-                        #0: 440,
+                        0: 440,
                     },
                     3: {
                         # 1: 410,
-                        2: 400,
+                        # 2: 410,
                         # 3: 450,
                         # 4: 450,
                         # 5: 450,
                         # 6: 450,
-                        # 7: 440,
+                        7: 440,
                         8: 460,
                         9: 460,
                         10: 460,
@@ -259,15 +258,15 @@ class Config:
                 }
             },
             {
-                'sub_run_name': 'hv_405',
+                'sub_run_name': 'hv_445',
                 'run_time': 10,  # Minutes
                 'hvs': {
                     0: {
                         # 0: 800,
-                        1: 800,
+                        # 1: 800,
                         # 2: 800,
                         # 3: 800,
-                        # 6: 800,
+                        6: 800,
                         # 7: 800,
                         8: 500,
                         9: 500,
@@ -275,16 +274,16 @@ class Config:
                         11: 500,
                     },
                     2: {
-                        #0: 445,
+                        0: 445,
                     },
                     3: {
                         # 1: 410,
-                        2: 405,
+                        # 2: 410,
                         # 3: 450,
                         # 4: 450,
                         # 5: 450,
                         # 6: 450,
-                        # 7: 445,
+                        7: 445,
                         8: 460,
                         9: 460,
                         10: 460,
@@ -293,15 +292,15 @@ class Config:
                 }
             },
             {
-                'sub_run_name': 'hv_410',
+                'sub_run_name': 'hv_450',
                 'run_time': 10,  # Minutes
                 'hvs': {
                     0: {
                         # 0: 800,
-                        1: 800,
+                        # 1: 800,
                         # 2: 800,
                         # 3: 800,
-                        # 6: 800,
+                        6: 800,
                         # 7: 800,
                         8: 500,
                         9: 500,
@@ -309,16 +308,16 @@ class Config:
                         11: 500,
                     },
                     2: {
-                        #0: 450,
+                        0: 450,
                     },
                     3: {
                         # 1: 410,
-                        2: 410,
+                        # 2: 410,
                         # 3: 450,
                         # 4: 450,
                         # 5: 450,
                         # 6: 450,
-                        # 7: 450,
+                        7: 450,
                         8: 460,
                         9: 460,
                         10: 460,
@@ -343,7 +342,7 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
-        self.included_detectors = ['urw_inter']
+        self.included_detectors = ['inter_plein_1']
 
         self.detectors = [
             {
@@ -439,13 +438,10 @@ class Config:
                 'name': 'urw_inter',
                 'det_type': 'urw_inter',
                 'det_center_coords': {  # Center of detector
-                    # 'x': 0,  # mm
-                    # 'y': 0,  # mm
-                    # 'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
-                    #      4 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
-                    'x': 10,  # mm
-                    'y': 40,  # mm
-                    'z': 712.7,  # mm
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
+                         4 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
