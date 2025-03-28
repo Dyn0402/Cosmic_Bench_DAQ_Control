@@ -1,0 +1,3 @@
+connector,connectorChannel,stripNb,axis,pitch(mm),interpitch(mm),neighbours(:separated),xGerber,yGerber
+0,0,0,y,1,0.9:0.75,1,-113.875,-13.45
+0,1,1,y,1,0.9:0.75,0:2,-112.875,-13.45

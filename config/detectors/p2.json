@@ -1,0 +1,10 @@
+{
+    "det_type": "p2",
+    "strip_map_type": "p2",
+    "resist_map_type": "none",
+    "det_size": {
+        "x": 4000,
+        "y": 2000,
+        "z": 4
+    }
+}

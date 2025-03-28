@@ -159,6 +159,16 @@ def define_dets():
                 'z': 4,  # mm  Guess
             },
         },
+        {
+            'det_type': 'p2',
+            'strip_map_type': 'p2',
+            'resist_map_type': 'none',
+            'det_size': {  # Roughly
+                'x': 4000,  # mm
+                'y': 2000,  # mm
+                'z': 4,  # mm  Guess
+            },
+        },
     ]
 
     return detectors

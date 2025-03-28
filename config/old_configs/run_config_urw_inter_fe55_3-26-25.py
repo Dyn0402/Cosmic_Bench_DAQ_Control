@@ -13,7 +13,7 @@ import json
 
 class Config:
     def __init__(self):
-        self.run_name = 'p2_test_3-28-25'
+        self.run_name = 'urw_inter_fe55_selftrig_3-26-25'
         self.daq_dir = '/home/clas12/dylan/Run/'
         self.run_dir = f'{self.daq_dir}{self.run_name}/'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -30,8 +30,8 @@ class Config:
         self.start_time = None
 
         self.dream_daq_info = {
-            'daq_config_template_path': '/home/clas12/dylan/Run/config/CosmicTb_TPOT.cfg',
-            # 'daq_config_template_path': '/home/clas12/dylan/Run/config/CosmicTb_SelfTrigger.cfg',
+            # 'daq_config_template_path': '/home/clas12/dylan/Run/config/CosmicTb_TPOT.cfg',
+            'daq_config_template_path': '/home/clas12/dylan/Run/config/CosmicTb_SelfTrigger.cfg',
         }
 
         self.banco_info = {
@@ -89,12 +89,12 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'hv_410',
+                'sub_run_name': 'hv_380',
                 'run_time': 10,  # Minutes
                 'hvs': {
                     0: {
                         # 0: 800,
-                        # 1: 800,
+                        1: 800,
                         # 2: 800,
                         # 3: 800,
                         # 6: 800,
@@ -104,16 +104,216 @@ class Config:
                         10: 500,
                         11: 500,
                     },
-                    1: {
-                        0: 0,
-                        1: 600,
+                    2: {
+                        # 0: 420,
+                    },
+                    3: {
+                        # 1: 410,
+                        2: 380,
+                        # 3: 450,
+                        # 4: 450,
+                        # 5: 450,
+                        # 6: 450,
+                        # 7: 420,
+                        8: 460,
+                        9: 460,
+                        10: 460,
+                        11: 460,
+                    }
+                }
+            },
+            {
+                'sub_run_name': 'hv_385',
+                'run_time': 10,  # Minutes
+                'hvs': {
+                    0: {
+                        # 0: 800,
+                        1: 800,
+                        # 2: 800,
+                        # 3: 800,
+                        # 6: 800,
+                        # 7: 800,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    2: {
+                        #0: 425,
+                    },
+                    3: {
+                        # 1: 410,
+                        2: 385,
+                        # 3: 450,
+                        # 4: 450,
+                        # 5: 450,
+                        # 6: 450,
+                        # 7: 425,
+                        8: 460,
+                        9: 460,
+                        10: 460,
+                        11: 460,
+                    }
+                }
+            },
+            {
+                'sub_run_name': 'hv_390',
+                'run_time': 10,  # Minutes
+                'hvs': {
+                    0: {
+                        # 0: 800,
+                        1: 800,
+                        # 2: 800,
+                        # 3: 800,
+                        # 6: 800,
+                        # 7: 800,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    2: {
+                        #0: 430,
+                    },
+                    3: {
+                        # 1: 410,
+                        2: 390,
+                        # 3: 450,
+                        # 4: 450,
+                        # 5: 450,
+                        # 6: 450,
+                        # 7: 430,
+                        8: 460,
+                        9: 460,
+                        10: 460,
+                        11: 460,
+                    }
+                }
+            },
+            {
+                'sub_run_name': 'hv_395',
+                'run_time': 10,  # Minutes
+                'hvs': {
+                    0: {
+                        # 0: 800,
+                        1: 800,
+                        # 2: 800,
+                        # 3: 800,
+                        # 6: 800,
+                        # 7: 800,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    2: {
+                        #0: 435,
+                    },
+                    3: {
+                        # 1: 410,
+                        2: 395,
+                        # 3: 450,
+                        # 4: 450,
+                        # 5: 450,
+                        # 6: 450,
+                        # 7: 435,
+                        8: 460,
+                        9: 460,
+                        10: 460,
+                        11: 460,
+                    }
+                }
+            },
+            {
+                'sub_run_name': 'hv_400',
+                'run_time': 10,  # Minutes
+                'hvs': {
+                    0: {
+                        # 0: 800,
+                        1: 800,
+                        # 2: 800,
+                        # 3: 800,
+                        # 6: 800,
+                        # 7: 800,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    2: {
+                        #0: 440,
+                    },
+                    3: {
+                        # 1: 410,
+                        2: 400,
+                        # 3: 450,
+                        # 4: 450,
+                        # 5: 450,
+                        # 6: 450,
+                        # 7: 440,
+                        8: 460,
+                        9: 460,
+                        10: 460,
+                        11: 460,
+                    }
+                }
+            },
+            {
+                'sub_run_name': 'hv_405',
+                'run_time': 10,  # Minutes
+                'hvs': {
+                    0: {
+                        # 0: 800,
+                        1: 800,
+                        # 2: 800,
+                        # 3: 800,
+                        # 6: 800,
+                        # 7: 800,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    2: {
+                        #0: 445,
+                    },
+                    3: {
+                        # 1: 410,
+                        2: 405,
+                        # 3: 450,
+                        # 4: 450,
+                        # 5: 450,
+                        # 6: 450,
+                        # 7: 445,
+                        8: 460,
+                        9: 460,
+                        10: 460,
+                        11: 460,
+                    }
+                }
+            },
+            {
+                'sub_run_name': 'hv_410',
+                'run_time': 10,  # Minutes
+                'hvs': {
+                    0: {
+                        # 0: 800,
+                        1: 800,
+                        # 2: 800,
+                        # 3: 800,
+                        # 6: 800,
+                        # 7: 800,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
                     },
                     2: {
                         #0: 450,
                     },
                     3: {
                         # 1: 410,
-                        # 2: 410,
+                        2: 410,
                         # 3: 450,
                         # 4: 450,
                         # 5: 450,
@@ -143,8 +343,7 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
-        self.included_detectors = ['urw_inter',
-                                   'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
+        self.included_detectors = ['urw_inter']
 
         self.detectors = [
             {
@@ -442,44 +641,6 @@ class Config:
                     'x_2': (6, 2),
                     'y_1': (6, 3),  # Runs along y direction, indicates x hit location
                     'y_2': (6, 4),
-                },
-            },
-            {
-                'name': 'p2_1',
-                'det_type': 'p2',
-                'det_center_coords': {  # Center of detector
-                    'x': 9.2,  # mm
-                    'y': 38.4,  # mm
-                    # 'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
-                    #      5 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
-                    'z': 100.0,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (1, 1),
-                    'mesh': (1, 0),
-                },
-                'dream_feus': {
-                    '1': (3, 1),
-                    '2': (3, 2),
-                    '3': (3, 3),
-                    '4': (3, 4),
-                    '5': (3, 5),
-                    '6': (3, 6),
-                    '7': (3, 7),
-                    '8': (3, 8),
-                    '9': (4, 1),
-                    '10': (4, 2),
-                    '11': (4, 3),
-                    '12': (4, 4),
-                    '13': (4, 5),
-                    '14': (4, 6),
-                    '15': (4, 7),
-                    '16': (4, 8),
                 },
             },
             {
