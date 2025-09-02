@@ -13,7 +13,7 @@ import json
 
 class Config:
     def __init__(self):
-        self.run_name = 'zs_test_9-2-25'
+        self.run_name = 'p2_test_3-28-25'
         self.daq_dir = '/home/clas12/dylan/Run/'
         self.run_dir = f'{self.daq_dir}{self.run_name}/'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -30,8 +30,7 @@ class Config:
         self.start_time = None
 
         self.dream_daq_info = {
-            'daq_config_template_path': '/home/clas12/dylan/Run/config/CosmicTb_beam_dry_run.cfg',
-            # 'daq_config_template_path': '/home/clas12/dylan/Run/config/CosmicTb_TPOT.cfg',
+            'daq_config_template_path': '/home/clas12/dylan/Run/config/CosmicTb_TPOT.cfg',
             # 'daq_config_template_path': '/home/clas12/dylan/Run/config/CosmicTb_SelfTrigger.cfg',
         }
 
@@ -95,35 +94,35 @@ class Config:
                 'hvs': {
                     0: {
                         # 0: 800,
-                        1: 800,
+                        # 1: 800,
                         # 2: 800,
                         # 3: 800,
                         # 6: 800,
                         # 7: 800,
-                        # 8: 500,
-                        # 9: 500,
-                        # 10: 500,
-                        # 11: 500,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
                     },
                     1: {
-                        # 0: 0,
-                        # 1: 600,
+                        0: 0,
+                        1: 600,
                     },
                     2: {
                         #0: 450,
                     },
                     3: {
                         # 1: 410,
-                        2: 410,
+                        # 2: 410,
                         # 3: 450,
                         # 4: 450,
                         # 5: 450,
                         # 6: 450,
                         # 7: 450,
-                        # 8: 460,
-                        # 9: 460,
-                        # 10: 460,
-                        # 11: 460,
+                        8: 460,
+                        9: 460,
+                        10: 460,
+                        11: 460,
                     }
                 }
             },
@@ -145,8 +144,7 @@ class Config:
         #                            'strip_strip_1',
         #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
         self.included_detectors = ['urw_inter',
-                                   ]
-                                   # 'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
+                                   'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
 
         self.detectors = [
             {
