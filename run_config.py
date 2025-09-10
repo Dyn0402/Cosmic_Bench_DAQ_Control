@@ -13,9 +13,9 @@ import json
 
 class Config:
     def __init__(self):
-        self.run_name = 'zs_test_9-2-25'
-        self.daq_dir = '/home/clas12/dylan/Run/'
-        self.run_dir = f'{self.daq_dir}{self.run_name}/'
+        self.run_name = 'p2-3_metal_timing_test_9-10-25'
+        self.daq_dir = '/home/clas12/dylan/Run/'  # Maybe kill
+        self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
         self.data_out_dir = '/mnt/cosmic_data/Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
         self.raw_daq_inner_dir = 'raw_daq_data'
@@ -33,6 +33,9 @@ class Config:
             'daq_config_template_path': '/home/clas12/dylan/Run/config/CosmicTb_beam_dry_run.cfg',
             # 'daq_config_template_path': '/home/clas12/dylan/Run/config/CosmicTb_TPOT.cfg',
             # 'daq_config_template_path': '/home/clas12/dylan/Run/config/CosmicTb_SelfTrigger.cfg',
+            'run_directory': f'/home/clas12/dylan/Run/{self.run_name}/',
+            'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
+            'raw_daq_inner_dir': self.raw_daq_inner_dir,
         }
 
         self.banco_info = {
@@ -90,20 +93,20 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'hv_410',
-                'run_time': 10,  # Minutes
+                'sub_run_name': 'p2_timing_test',
+                'run_time': 10 * 60,  # Minutes
                 'hvs': {
                     0: {
                         # 0: 800,
-                        1: 800,
+                        # 1: 800,
                         # 2: 800,
                         # 3: 800,
-                        # 6: 800,
-                        # 7: 800,
-                        # 8: 500,
-                        # 9: 500,
-                        # 10: 500,
-                        # 11: 500,
+                        6: 800,
+                        7: 400,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
                     },
                     1: {
                         # 0: 0,
@@ -114,16 +117,16 @@ class Config:
                     },
                     3: {
                         # 1: 410,
-                        2: 410,
+                        # 2: 410,
                         # 3: 450,
                         # 4: 450,
                         # 5: 450,
                         # 6: 450,
                         # 7: 450,
-                        # 8: 460,
-                        # 9: 460,
-                        # 10: 460,
-                        # 11: 460,
+                        8: 460,
+                        9: 460,
+                        10: 460,
+                        11: 460,
                     }
                 }
             },
@@ -144,9 +147,8 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
-        self.included_detectors = ['urw_inter',
-                                   ]
-                                   # 'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
+        self.included_detectors = ['p2_3',
+                                   'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
 
         self.detectors = [
             {
@@ -444,6 +446,32 @@ class Config:
                     'x_2': (6, 2),
                     'y_1': (6, 3),  # Runs along y direction, indicates x hit location
                     'y_2': (6, 4),
+                },
+            },
+            {
+                'name': 'p2_3',
+                'det_type': 'p2',
+                'det_center_coords': {  # Center of detector
+                    # 'x': 0,  # mm
+                    # 'y': 0,  # mm
+                    # 'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
+                    #      4 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
+                    'x': 10,  # mm
+                    'y': 40,  # mm
+                    'z': 712.7,  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': {
+                    'drift': (0, 6),
+                    'mesh_1': (0, 7)
+                },
+                'dream_feus': {
+                    'x_1': (6, 1),
+                    'x_2': (6, 2),
                 },
             },
             {
