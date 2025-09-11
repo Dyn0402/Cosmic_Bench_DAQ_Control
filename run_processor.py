@@ -13,11 +13,11 @@ from run_config import Config
 
 
 def main():
-    # run_m3_tracking_hv7()
+    run_m3_tracking_current_config_subrun()
     # run_m3_filtering_max_hv_stats()
     # run_filtering_cleanup_sg1_hv_scan()
     # run_filtering_cleanup_banco_shift()
-    run_processing_drift_scan()
+    # run_processing_drift_scan()
     print('donzo')
 
 
@@ -174,15 +174,16 @@ def run_m3_filtering_max_hv_stats():
         processor_client.send('Finished')
 
 
-def run_m3_tracking_hv7():
+def run_m3_tracking_current_config_subrun():
     config = Config()
+    subrun_name = 'evening_test'
     sedip28_ip, sedip28_port = config.sedip28_processor_info['ip'], config.sedip28_processor_info['port']
     with Client(sedip28_ip, sedip28_port) as processor_client:
         processor_client.send('Connected to run_processor')
         processor_client.receive()
         processor_client.send_json(config.sedip28_processor_info)
 
-        processor_client.send('Run M3 Tracking HV7')
+        processor_client.send(f'Run M3 Tracking {subrun_name}')
         processor_client.receive()
 
 
