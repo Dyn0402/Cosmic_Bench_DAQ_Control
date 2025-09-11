@@ -13,7 +13,7 @@ import json
 
 class Config:
     def __init__(self):
-        self.run_name = 'rd542_plein_1_test_9-11-25'
+        self.run_name = 'rd542_plein_1_overnight_9-11-25'
         self.daq_dir = '/home/clas12/dylan/Run/'  # Maybe kill
         self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -93,84 +93,8 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'quick_test',
-                'run_time': 10,  # Minutes
-                'hvs': {
-                    0: {
-                        # 0: 800,
-                        # 1: 800,
-                        # 2: 800,
-                        # 3: 800,
-                        6: 800,
-                        # 7: 460,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500,
-                    },
-                    1: {
-                        # 0: 0,
-                        # 1: 600,
-                    },
-                    2: {
-                        #0: 450,
-                    },
-                    3: {
-                        # 1: 410,
-                        # 2: 410,
-                        3: 430,
-                        4: 430,
-                        # 5: 450,
-                        # 6: 450,
-                        # 7: 450,
-                        8: 460,
-                        9: 460,
-                        10: 460,
-                        11: 460,
-                    }
-                }
-            },
-            {
-                'sub_run_name': 'evening_test',
-                'run_time': 60 * 4,  # Minutes
-                'hvs': {
-                    0: {
-                        # 0: 800,
-                        # 1: 800,
-                        # 2: 800,
-                        # 3: 800,
-                        6: 800,
-                        # 7: 460,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500,
-                    },
-                    1: {
-                        # 0: 0,
-                        # 1: 600,
-                    },
-                    2: {
-                        # 0: 450,
-                    },
-                    3: {
-                        # 1: 410,
-                        # 2: 410,
-                        3: 430,
-                        4: 430,
-                        # 5: 450,
-                        # 6: 450,
-                        # 7: 450,
-                        8: 460,
-                        9: 460,
-                        10: 460,
-                        11: 460,
-                    }
-                }
-            },
-            {
                 'sub_run_name': 'night_test',
-                'run_time': 60 * 11,  # Minutes
+                'run_time': 60 * 14,  # Minutes
                 'hvs': {
                     0: {
                         # 0: 800,
@@ -194,8 +118,8 @@ class Config:
                     3: {
                         # 1: 410,
                         # 2: 410,
-                        3: 430,
-                        4: 430,
+                        3: 420,
+                        4: 420,
                         # 5: 450,
                         # 6: 450,
                         # 7: 450,
