@@ -13,7 +13,7 @@ import json
 
 class Config:
     def __init__(self):
-        self.run_name = 'rd542_plein_1_test_9-11-25'
+        self.run_name = 'p2-3_metal_timing_test_9-10-25'
         self.daq_dir = '/home/clas12/dylan/Run/'  # Maybe kill
         self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -23,7 +23,7 @@ class Config:
         self.filtered_root_inner_dir = 'filtered_root'
         self.m3_tracking_inner_dir = 'm3_tracking_root'
         self.detector_info_dir = f'/mnt/cosmic_data/config/detectors/'
-        self.m3_feu_num = 1
+        self.m3_feu_num = None
         self.power_off_hv_at_end = False  # True to power off HV at end of run
         self.filtering_by_m3 = False  # True to filter by m3 tracking, False to do no filtering
         self.process_on_fly = True  # True to process data on fly, False to process after run
@@ -93,8 +93,8 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'quick_test',
-                'run_time': 10,  # Minutes
+                'sub_run_name': 'p2_timing_test',
+                'run_time': 10 * 60,  # Minutes
                 'hvs': {
                     0: {
                         # 0: 800,
@@ -102,7 +102,7 @@ class Config:
                         # 2: 800,
                         # 3: 800,
                         6: 800,
-                        # 7: 460,
+                        7: 400,
                         8: 500,
                         9: 500,
                         10: 500,
@@ -118,84 +118,8 @@ class Config:
                     3: {
                         # 1: 410,
                         # 2: 410,
-                        3: 430,
-                        4: 430,
-                        # 5: 450,
-                        # 6: 450,
-                        # 7: 450,
-                        8: 460,
-                        9: 460,
-                        10: 460,
-                        11: 460,
-                    }
-                }
-            },
-            {
-                'sub_run_name': 'evening_test',
-                'run_time': 60 * 4,  # Minutes
-                'hvs': {
-                    0: {
-                        # 0: 800,
-                        # 1: 800,
-                        # 2: 800,
-                        # 3: 800,
-                        6: 800,
-                        # 7: 460,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500,
-                    },
-                    1: {
-                        # 0: 0,
-                        # 1: 600,
-                    },
-                    2: {
-                        # 0: 450,
-                    },
-                    3: {
-                        # 1: 410,
-                        # 2: 410,
-                        3: 430,
-                        4: 430,
-                        # 5: 450,
-                        # 6: 450,
-                        # 7: 450,
-                        8: 460,
-                        9: 460,
-                        10: 460,
-                        11: 460,
-                    }
-                }
-            },
-            {
-                'sub_run_name': 'night_test',
-                'run_time': 60 * 11,  # Minutes
-                'hvs': {
-                    0: {
-                        # 0: 800,
-                        # 1: 800,
-                        # 2: 800,
-                        # 3: 800,
-                        6: 800,
-                        # 7: 460,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500,
-                    },
-                    1: {
-                        # 0: 0,
-                        # 1: 600,
-                    },
-                    2: {
-                        # 0: 450,
-                    },
-                    3: {
-                        # 1: 410,
-                        # 2: 410,
-                        3: 430,
-                        4: 430,
+                        # 3: 450,
+                        # 4: 450,
                         # 5: 450,
                         # 6: 450,
                         # 7: 450,
@@ -207,17 +131,6 @@ class Config:
                 }
             },
         ]
-
-        # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
-        # template = self.sub_runs[0]
-        # for drift_v in [500, 600, 700, 470, 475, 480, 490, 550, 650, 750, 800]:
-        #     sub_run = template.copy()
-        #     sub_run['sub_run_name'] = f'drift_{drift_v}'
-        #     card = 0
-        #     for channel in sub_run['hvs'][card]:
-        #         if channel in [6]:
-        #             sub_run['hvs'][card][channel] = drift_v
-        #     self.sub_runs.append(sub_run)
 
         self.bench_geometry = {
             'p1_z': 227,  # mm  To the top of P1 from the top of PB
@@ -234,7 +147,7 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
-        self.included_detectors = ['rd542_plein_1',
+        self.included_detectors = ['p2_3',
                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
 
         self.detectors = [
@@ -562,31 +475,6 @@ class Config:
                 },
             },
             {
-                'name': 'rd542_plein_1',
-                'det_type': 'rd542_plein',
-                'det_center_coords': {  # Center of detector
-                    'x': 10,  # mm
-                    'y': 40,  # mm
-                    'z': 712.7,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (0, 6),
-                    'resist_1': (3, 3),
-                    'resist_2': (3, 4)
-                },
-                'dream_feus': {
-                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (6, 2),
-                    'y_1': (6, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (6, 4),
-                },
-            },
-            {
                 'name': 'p2_1',
                 'det_type': 'p2',
                 'det_center_coords': {  # Center of detector
@@ -762,8 +650,8 @@ class Config:
 
 
 if __name__ == '__main__':
-    out_dir = '/local/home/dn277127/Bureau/beam_test_25/'
-    # out_dir = 'C:/Users/Dylan/Desktop/banco_test3/'
+    # out_dir = '/local/home/dn277127/Bureau/banco_test3/'
+    out_dir = 'C:/Users/Dylan/Desktop/banco_test3/'
     config = Config()
-    config.write_to_file(f'{out_dir}run_config_test.json')
+    config.write_to_file(f'{out_dir}run_config.json')
     print('donzo')
