@@ -26,7 +26,7 @@ class Config:
         self.m3_tracking_inner_dir = 'm3_tracking_root'
         self.detector_info_dir = f'/mnt/cosmic_data/config/detectors/'
         self.m3_feu_num = 1
-        self.power_off_hv_at_end = False  # True to power off HV at end of run
+        self.power_off_hv_at_end = True  # True to power off HV at end of run
         self.filtering_by_m3 = False  # True to filter by m3 tracking, False to do no filtering
         self.process_on_fly = True  # True to process data on fly, False to process after run
         self.start_time = None
@@ -491,9 +491,9 @@ class Config:
                 'name': 'rd542_plein_1',
                 'det_type': 'rd542_plein',
                 'det_center_coords': {  # Center of detector
-                    'x': 10,  # mm
-                    'y': 40,  # mm
-                    'z': 712.7,  # mm
+                    'x': 24,  # mm
+                    'y': 75.6,  # mm
+                    'z': 720.8,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
