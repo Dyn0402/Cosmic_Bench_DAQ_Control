@@ -10,7 +10,6 @@ Created as Cosmic_Bench_DAQ_Control/run_config_template.py
 
 import json
 import copy
-import numpy as np
 
 
 class Config:
@@ -136,7 +135,7 @@ class Config:
 
         # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
         template = self.sub_runs[0]
-        for drift_v in np.arange(50, 800, 50):
+        for drift_v in range(50, 800, 50):
             sub_run = copy.deepcopy(template)
             sub_run['sub_run_name'] = f'drift_{drift_v}'
             card = 0
