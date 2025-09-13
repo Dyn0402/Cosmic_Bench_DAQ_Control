@@ -82,7 +82,7 @@ def main():
         sleep(2)  # Wait for all clients to do what they need to do (specifically, create directories)
 
         # create_dir_if_not_exist(config.run_dir)
-        # create_dir_if_not_exist(config.run_out_dir)
+        create_dir_if_not_exist(config.run_out_dir)
         config.write_to_file(f'{config.run_out_dir}run_config.json')
         for sub_run in config.sub_runs:
             sub_run_name = sub_run['sub_run_name']
