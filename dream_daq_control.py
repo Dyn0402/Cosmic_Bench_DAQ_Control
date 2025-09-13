@@ -26,7 +26,7 @@ def main():
                 server.send('Dream DAQ control connected')
                 dream_info = server.receive_json()
                 cfg_template_path = dream_info['daq_config_template_path']
-                run_directory = dream_info['daq_run_directory']
+                run_directory = dream_info['run_directory']
                 out_directory = dream_info['data_out_dir']
                 raw_daq_inner_dir = dream_info['raw_daq_inner_dir']
                 go_timeout = dream_info['go_timeout']

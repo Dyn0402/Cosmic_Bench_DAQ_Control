@@ -156,6 +156,7 @@ class DAQController:
             if res != 'Dream DAQ started':
                 print('Error starting DAQ')
                 return False
+            self.run_start_time = time()
 
             if self.trigger_switch_client is not None:
                 sleep(5)  # Wait a bit to ensure DAQ is running before starting trigger
@@ -195,7 +196,10 @@ class DAQController:
                 self.trigger_switch_client.silent = False
 
             if self.measured_run_time is None:
-                self.measured_run_time = time() - self.run_start_time
+                if self.run_start_time is None:
+                    self.measured_run_time = 0
+                else:
+                    self.measured_run_time = time() - self.run_start_time
 
             if run_successful:
                 self.write_run_time()
