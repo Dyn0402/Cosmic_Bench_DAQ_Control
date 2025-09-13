@@ -21,6 +21,7 @@ class DAQController:
         self.cfg_template_file_path = cfg_template_file_path
         self.run_directory = run_dir  # Relative to run_directory if not None
         self.out_directory = out_dir
+        self out_name = out_name
         self.trigger_switch_client = trigger_switch_client
         self.dream_daq_client = dream_daq_client
         self.original_working_directory = os.getcwd()
