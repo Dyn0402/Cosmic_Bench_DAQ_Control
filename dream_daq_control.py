@@ -40,7 +40,9 @@ def main():
                 res = server.receive()
                 while 'Finished' not in res:
                     if 'Start' in res:
+                        print(res)
                         sub_run_name, run_time = res.split()[-2], int(res.split()[-1])
+                        print(f'Sub-run name: {sub_run_name}, Run time: {run_time} minutes')
                         sub_run_out_raw_inner_dir = f'{out_directory}/{sub_run_name}/{raw_daq_inner_dir}'
                         create_dir_if_not_exist(sub_run_out_raw_inner_dir)
 
