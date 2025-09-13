@@ -30,7 +30,7 @@ def main():
                 out_directory = dream_info['data_out_dir']
                 raw_daq_inner_dir = dream_info['raw_daq_inner_dir']
                 go_timeout = dream_info['go_timeout']
-                max_run_time = dream_info['max_run_time']
+                max_run_time_addition = dream_info['max_run_time_addition']
                 copy_on_fly = dream_info['copy_on_fly']
                 original_working_directory = os.getcwd()
 
@@ -59,6 +59,7 @@ def main():
                         start, run_start, sent_go_time, sent_continue_time = time(), None, None, None
                         sent_go, sent_continue, run_successful, triggered, triggered_off = False, False, True, False, False
                         server.send('Dream DAQ starting')
+                        max_run_time = run_time + max_run_time_addition
 
                         if copy_on_fly:
                             daq_finished = threading.Event()
