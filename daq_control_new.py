@@ -107,7 +107,7 @@ def main():
                     banco_daq.receive()
 
                 daq_trigger_switch = trigger_switch if banco else None
-                daq_control_args = (daq_trigger_switch, dream_daq)
+                daq_control_args = (sub_run_name, sub_run['run_time'], daq_trigger_switch, dream_daq)
                 # daq_controller_thread = threading.Thread(target=run_daq_controller, args=daq_control_args)
                 # if config.process_on_fly:
                 #     daq_finished = threading.Event()
@@ -152,8 +152,9 @@ def main():
     print('donzo')
 
 
-def run_daq_controller(daq_trigger_switch, dream_daq_client):
-    daq_controller = DAQController(trigger_switch_client=daq_trigger_switch, dream_daq_client=dream_daq_client)
+def run_daq_controller(sub_run_name, run_time, daq_trigger_switch, dream_daq_client):
+    daq_controller = DAQController(run_time=run_time, out_name=sub_run_name, trigger_switch_client=daq_trigger_switch,
+                                   dream_daq_client=dream_daq_client)
 
     daq_success = False
     while not daq_success:  # Rerun if failure
