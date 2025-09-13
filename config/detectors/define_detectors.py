@@ -130,6 +130,36 @@ def define_dets():
             },
         },
         {
+            'det_type': 'rd542_plein',
+            'strip_map_type': 'rd542',
+            'resist_map_type': 'plein',
+            'det_size': {  # Size of detector based on the extent of the readout pads (active area may be smaller)
+                'x': 1.0 * 128.5,  # mm
+                'y': 1.2 * 128.5,  # mm
+                'z': 4,  # mm
+            },
+        },
+        {
+            'det_type': 'rd542_strip',
+            'strip_map_type': 'rd542',
+            'resist_map_type': 'strip',
+            'det_size': {  # Size of detector based on the extent of the readout pads (active area may be smaller)
+                'x': 1.0 * 128.5,  # mm
+                'y': 1.2 * 128.5,  # mm
+                'z': 4,  # mm
+            },
+        },
+        {
+            'det_type': 'rd542_grid',
+            'strip_map_type': 'rd542',
+            'resist_map_type': 'grid',
+            'det_size': {  # Size of detector based on the extent of the readout pads (active area may be smaller)
+                'x': 1.0 * 128.5,  # mm
+                'y': 1.2 * 128.5,  # mm
+                'z': 4,  # mm
+            },
+        },
+        {
             'det_type': 'inter_plein',
             'strip_map_type': 'inter',
             'resist_map_type': 'plein',
