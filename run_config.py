@@ -31,6 +31,8 @@ class Config:
         self.start_time = None
 
         self.dream_daq_info = {
+            'ip': '192.168.10.100',
+            'port': 1100,
             # 'daq_config_template_path': '/home/clas12/dylan/Run/config/CosmicTb_beam_dry_run.cfg',
             'daq_config_template_path': '/home/clas12/dylan/Run/config/CosmicTb_TPOT.cfg',
             # 'daq_config_template_path': '/home/clas12/dylan/Run/config/CosmicTb_SelfTrigger.cfg',
