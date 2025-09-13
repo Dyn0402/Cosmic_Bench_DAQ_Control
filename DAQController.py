@@ -141,7 +141,7 @@ class DAQController:
             self.trigger_switch_client.silent = True
 
         try:
-            self.dream_daq_client.send(f'Start {self.out_directory} {self.run_time}')
+            self.dream_daq_client.send(f'Start {self.out_name} {self.run_time}')
             res = self.dream_daq_client.receive()
             if res != 'Dream DAQ starting':
                 print('Error starting Dream DAQ')
