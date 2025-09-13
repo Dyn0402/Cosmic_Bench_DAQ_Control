@@ -79,3 +79,6 @@ class Client:
         self.client.sendall(length + json_data)
         if not self.silent:
             print(f"Sent: {data}")
+
+    def set_blocking(self, blocking=True):
+        self.client.setblocking(blocking)

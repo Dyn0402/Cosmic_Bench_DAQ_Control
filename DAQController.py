@@ -16,12 +16,13 @@ import threading
 
 
 class DAQController:
-    def __init__(self, cfg_template_file_path, run_time=10, out_name=None, run_dir=None, out_dir=None,
-                 trigger_switch_client=None):
+    def __init__(self, cfg_template_file_path=None, run_time=10, out_name=None, run_dir=None, out_dir=None,
+                 trigger_switch_client=None, dream_daq_client=None):
         self.cfg_template_file_path = cfg_template_file_path
         self.run_directory = run_dir  # Relative to run_directory if not None
         self.out_directory = out_dir
         self.trigger_switch_client = trigger_switch_client
+        self.dream_daq_client = dream_daq_client
         self.original_working_directory = os.getcwd()
 
         self.run_time = run_time  # minutes
@@ -34,7 +35,8 @@ class DAQController:
         # DAQ resets timer when first trigger received, so only need short pause to be sure.
         self.cfg_file_run_time = self.run_time * 60 if self.trigger_switch_client is None else self.run_time * 60 + 5
         self.cfg_file_path = None
-        self.make_config_from_template()
+        if self.cfg_template_file_path is not None:
+            self.make_config_from_template()
 
         if out_name is None:
             self.run_command = f'RunCtrl -c {self.cfg_file_path} -f test'  # Think I need an out name
@@ -129,6 +131,73 @@ class DAQController:
 
             if run_successful:
                 move_data_files(self.run_directory, self.out_directory)
+                self.write_run_time()
+
+        return run_successful
+
+    def run_new(self):
+        run_successful = True
+        if self.trigger_switch_client is not None:
+            self.trigger_switch_client.silent = True
+
+        try:
+            self.dream_daq_client.send('Start')
+            res = self.dream_daq_client.receive()
+            if res != 'Dream DAQ starting':
+                print('Error starting Dream DAQ')
+                return False
+
+            res = self.dream_daq_client.receive()
+            if res != 'Dream DAQ taking pedestals':
+                print('Error taking pedestals')
+                return False
+
+            res = self.dream_daq_client.receive()
+            if res != 'Dream DAQ started':
+                print('Error starting DAQ')
+                return False
+
+            if self.trigger_switch_client is not None:
+                sleep(5)  # Wait a bit to ensure DAQ is running before starting trigger
+                self.trigger_switch_client.send('on')
+                self.run_start_time = time()
+                self.trigger_switch_client.receive()
+
+            if self.trigger_switch_client:  # Wait for run to finish
+                sleep(self.run_time * 60 - (time() - self.run_start_time))
+                # if time() - self.run_start_time >= self.run_time * 60:
+                self.trigger_switch_client.send('off')
+                self.measured_run_time = time() - self.run_start_time
+                self.trigger_switch_client.receive()
+
+            res = self.dream_daq_client.receive()  # Wait for dream daq to finish
+            if res != 'Dream DAQ stopped':
+                print('Error stopping DAQ')
+                return False
+
+            if self.trigger_switch_client is None:  # Run time dictated by DREAM DAQ if no trigger switch
+                self.measured_run_time = time() - self.run_start_time
+
+        except KeyboardInterrupt:
+            print('Keyboard interrupt. Stopping DAQ process.')
+            if self.trigger_switch_client is not None:
+                self.trigger_switch_client.send('off')
+            self.measured_run_time = time() - self.run_start_time
+            if self.trigger_switch_client is not None:
+                self.trigger_switch_client.receive()
+            sleep(1)
+            self.dream_daq_client.send('Stop')
+            res = self.dream_daq_client.receive()
+            if res != 'Dream DAQ stopped':
+                print('Error stopping Dream DAQ')
+        finally:
+            if self.trigger_switch_client is not None:
+                self.trigger_switch_client.silent = False
+
+            if self.measured_run_time is None:
+                self.measured_run_time = time() - self.run_start_time
+
+            if run_successful:
                 self.write_run_time()
 
         return run_successful

@@ -81,3 +81,6 @@ class Server:
         length = struct.pack('!I', len(json_data))  # Pack length as a 4-byte unsigned integer
         self.client_socket.sendall(length + json_data)
         print(f"Sent: {data}")
+
+    def set_blocking(self, blocking=True):
+        self.server.setblocking(blocking)

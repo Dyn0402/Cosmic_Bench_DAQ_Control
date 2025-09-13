@@ -46,29 +46,26 @@ def main():
 
                         server.send('Banco DAQ started')
                         res = server.receive()
-                        while 'Stop' not in res:
+                        while 'Stop' not in res:  # Wait for stop command, ignore other commands
                             server.send('Banco DAQ running! Need to stop it before anything else can be done!')
                             res = server.receive()
                         print('Stopping Banco DAQ')
-                        child_processes = find_child_processes(process.pid)
+                        child_processes = find_child_processes(process.pid)  # Find sub-processes running banco daq
                         for child in child_processes:
                             child.send_signal(signal.SIGINT)  # Send ctrl-c to stop banco_daq
                             try:
                                 print(f'Waiting for {child.pid} to stop')
                                 child.wait(timeout=30)  # Adjust timeout as necessary
                                 print(f'{child.pid} stopped')
-                            except TimeoutExpired:
-                                # If the process doesn't terminate in time, force kill it
+                            except TimeoutExpired:  # If the process doesn't terminate in time, force kill it
                                 print(f'Force killing {child.pid}')
                                 child.kill()
 
-                        # Wait for the process to handle the signal and clean up
-                        try:
+                        try:  # Wait for the process to handle the signal and clean up
                             print('Waiting for Banco DAQ to stop')
                             process.wait(timeout=30)  # Adjust timeout as necessary
                             print('Banco DAQ stopped')
-                        except TimeoutExpired:
-                            # If the process doesn't terminate in time, force kill it
+                        except TimeoutExpired:  # If the process doesn't terminate in time, force kill it
                             print('Force killing Banco DAQ')
                             process.kill()
                             process.wait()
