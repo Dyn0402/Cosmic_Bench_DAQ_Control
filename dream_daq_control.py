@@ -91,7 +91,8 @@ def main():
 
                             go_time_out = time() - sent_go_time > go_timeout if sent_go and not sent_continue else False
                             run_time_out = time() - start > max_run_time * 60
-                            if go_time_out or run_time_out or (output == '' and process.poll() is not None):
+                            # if go_time_out or run_time_out or (output == '' and process.poll() is not None):
+                            if go_time_out or run_time_out:
                                 print('DAQ process timed out.')
                                 process.kill()
                                 sleep(5)
