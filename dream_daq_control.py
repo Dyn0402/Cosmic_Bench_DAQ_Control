@@ -84,7 +84,7 @@ def main():
                                 process.stdin.write('C')  # Signal to start data taking
                                 process.stdin.flush()
                                 sent_continue, sent_continue_time = True, time()
-                                print('DAQ started.')
+                                # print('DAQ started.')
                                 server.send('Dream DAQ started')
                                 break
 
@@ -105,13 +105,13 @@ def main():
 
                         server.set_blocking(False)
                         while True:  # DAQ running
-                            try:  # Check for stop command from controller
-                                res = server.receive()
-                                if 'Stop' in res:
-                                    print('Stop command received. Stopping DAQ.')
-                                    process.stdin.write('g')  # Send signal to stop run
-                            except (BlockingIOError, SocketError):
-                                pass  # No command received, continue
+                            # try:  # Check for stop command from controller
+                            #     res = server.receive()
+                            #     if 'Stop' in res:
+                            #         print('Stop command received. Stopping DAQ.')
+                            #         process.stdin.write('g')  # Send signal to stop run
+                            # except (BlockingIOError, SocketError):
+                            #     pass  # No command received, continue
 
                             output = process.stdout.readline()
                             if output == '' and process.poll() is not None:
@@ -149,23 +149,27 @@ def move_data_files(src_dir, dest_dir):
             shutil.copy(f'{src_dir}/{file}', f'{dest_dir}/{file}')
 
 
-def copy_files_on_the_fly(sub_run_dir, sud_out_dir, daq_finished_event, check_interval=5):
+def copy_files_on_the_fly(sub_run_dir, sub_out_dir, daq_finished_event, check_interval=5):
     """
     Continuously copy .fdf files from sub_run_dir to sud_out_dir while DAQ is running.
     :param sub_run_dir: Sub-run directory to monitor for new files.
-    :param sud_out_dir: Sub-run output directory to copy files to.
+    :param sub_out_dir: Sub-run output directory to copy files to.
     :param daq_finished_event: threading.Event() that is set when DAQ is finished.
     :param check_interval: Time in seconds between checks for new files.
     :return:
     """
 
-    create_dir_if_not_exist(sud_out_dir)
+    create_dir_if_not_exist(sub_out_dir)
     sleep(60 * 5)  # Wait on start for daq to start running
+    file_num = 0
     while not daq_finished_event.is_set():  # Running
-        for file in os.listdir(sub_run_dir):
-            if file.endswith('.fdf'):
-                # shutil.copy(f'{sub_run_dir}/{file}', f'{sud_out_dir}/{file}')
-                shutil.move(f'{sub_run_dir}/{file}', f'{sud_out_dir}/{file}')
+        if file_num_still_running(sub_run_dir, file_num, silent=True):
+            sleep(check_interval)
+            continue
+        else:
+            for file_name in os.listdir(sub_run_dir):
+                if file_name.endswith('.fdf') and get_file_num_from_fdf_file_name(file_name, -2) == file_num:
+                    shutil.move(f'{sub_run_dir}{file_name}', f'{sub_out_dir}{file_name}')
         sleep(check_interval)  # Check every 5 seconds
 
 
@@ -181,6 +185,51 @@ def make_config_from_template(cfg_template_path, run_directory, run_time):
     with open(cfg_file_path, 'w') as file:
         file.writelines(cfg_lines)
     return cfg_file_path
+
+
+def file_num_still_running(fdf_dir, file_num, wait_time=30, silent=False):
+    """
+    Check if dream DAQ is still running by finding all fdfs with file_num and checking to see if any file size
+    increases within wait_time
+    :param fdf_dir: Directory containing fdf files
+    :param file_num: File number to check for
+    :param wait_time: Time to wait for file size increase
+    :param silent: Print debug info
+    :return: True if size increased over wait time (still running), False if not.
+    """
+    file_paths = []
+    for file in os.listdir(fdf_dir):
+        if not file.endswith('.fdf') or '_datrun_' not in file:
+            continue  # Skip non fdf data files
+        if get_file_num_from_fdf_file_name(file) == file_num:
+            file_paths.append(f'{fdf_dir}{file}')
+
+    if len(file_paths) == 0:
+        if not silent:
+            print(f'No fdfs with file num {file_num} found in {fdf_dir}')
+        return False
+
+    old_sizes = []
+    for fdf_path in file_paths:
+        old_sizes.append(os.path.getsize(fdf_path))
+        if not silent:
+            print(f'File: {fdf_path} Original Size: {old_sizes[-1]}')
+
+    sleep(wait_time)
+
+    new_sizes = []
+    for fdf_path in file_paths:
+        new_sizes.append(os.path.getsize(fdf_path))
+        if not silent:
+            print(f'File: {fdf_path} New Size: {new_sizes[-1]}')
+
+    for i in range(len(old_sizes)):
+        if not silent:
+            print(f'File: {file_paths[i]} Original Size: {old_sizes[i]} New Size: {new_sizes[i]}')
+            print(f'Increased? {new_sizes[i] > old_sizes[i]}')
+        if new_sizes[i] > old_sizes[i]:
+            return True
+    return False
 
 
 if __name__ == '__main__':

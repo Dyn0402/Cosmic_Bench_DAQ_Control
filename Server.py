@@ -72,9 +72,10 @@ class Server:
         print(f"Received: {data}")
         return data
 
-    def send(self, data):
+    def send(self, data, silent=False):
         self.client_socket.send(data.encode())
-        print(f"Sent: {data}")
+        if not silent:
+            print(f"Sent: {data}")
 
     def send_json(self, data):
         json_data = json.dumps(data).encode()
