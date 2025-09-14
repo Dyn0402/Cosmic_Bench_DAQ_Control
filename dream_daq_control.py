@@ -108,6 +108,19 @@ def main():
                         stop_event = threading.Event()
                         server.set_timeout(1.0)  # Set timeout for socket operations
                         print(f'Server timeout: {server.get_timeout()} seconds')
+
+                        for i in range(5):
+                            try:
+                                print("Debug waiting for receive...")  # debug
+                                res = server.receive()
+                                print(f"Debug got: {res!r}")  # debug
+                                if 'Stop' in res:
+                                    print("Debug stop command detected")
+                                    break
+                            except socket.timeout:
+                                print("Debug timeout, looping")  # debug
+                                continue  # just loop again and check stop_event
+
                         sleep(5)
                         stop_thread = threading.Thread(target=listen_for_stop, args=(server, stop_event))
                         stop_thread.start()
