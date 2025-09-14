@@ -111,6 +111,7 @@ def main():
                         sleep(5)
                         stop_thread = threading.Thread(target=listen_for_stop, args=(server, stop_event))
                         stop_thread.start()
+                        sleep(20)
                         while True:  # DAQ running
                             if stop_event.is_set():
                                 process.stdin.write('g')
@@ -162,12 +163,18 @@ def move_data_files(src_dir, dest_dir):
 def listen_for_stop(server, stop_event):
     while not stop_event.is_set():
         try:
+            print("[thread] waiting for receive...")  # debug
             res = server.receive()
+            print(f"[thread] got: {res!r}")  # debug
             if 'Stop' in res:
+                print("[thread] stop command detected")
                 stop_event.set()
                 break
         except socket.timeout:
+            print("[thread] timeout, looping")  # debug
             continue  # just loop again and check stop_event
+    print("[thread] exiting loop")  # debug
+
 
 
 def copy_files_on_the_fly(sub_run_dir, sub_out_dir, daq_finished_event, check_interval=5):
