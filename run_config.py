@@ -25,7 +25,7 @@ class Config:
         self.m3_tracking_inner_dir = 'm3_tracking_root'
         self.detector_info_dir = f'/mnt/cosmic_data/config/detectors/'
         self.m3_feu_num = 1
-        self.power_off_hv_at_end = True  # True to power off HV at end of run
+        self.power_off_hv_at_end = False  # True to power off HV at end of run
         self.filtering_by_m3 = False  # True to filter by m3 tracking, False to do no filtering
         self.process_on_fly = True  # True to process data on fly, False to process after run
         self.save_fdfs = True  # True to save FDF files, False to delete after decoding

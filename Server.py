@@ -84,10 +84,10 @@ class Server:
         print(f"Sent: {data}")
 
     def set_blocking(self, blocking=True):
-        self.server.setblocking(blocking)
+        self.client_socket.setblocking(blocking)
 
     def set_timeout(self, timeout):
-        self.server.settimeout(timeout)
+        self.client_socket.settimeout(timeout)
 
     def get_timeout(self):
-        return self.server.gettimeout()
+        return self.client_socket.gettimeout()

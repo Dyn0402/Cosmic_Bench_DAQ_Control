@@ -107,21 +107,7 @@ def main():
                         # server.set_blocking(False)
                         stop_event = threading.Event()
                         server.set_timeout(1.0)  # Set timeout for socket operations
-                        print(f'Server timeout: {server.get_timeout()} seconds')
 
-                        for i in range(5):
-                            try:
-                                print("Debug waiting for receive...")  # debug
-                                res = server.receive()
-                                print(f"Debug got: {res!r}")  # debug
-                                if 'Stop' in res:
-                                    print("Debug stop command detected")
-                                    break
-                            except socket.timeout:
-                                print("Debug timeout, looping")  # debug
-                                continue  # just loop again and check stop_event
-
-                        sleep(5)
                         stop_thread = threading.Thread(target=listen_for_stop, args=(server, stop_event))
                         stop_thread.start()
                         sleep(20)
@@ -141,12 +127,13 @@ def main():
                         # server.set_blocking(True)
                         print('Waiting for DAQ process to terminate.')
                         stop_event.set()  # Tell the listener thread to stop
-                        print(f'Server timeout: {server.get_timeout()} seconds')
                         stop_thread.join()
+                        print('Listener thread joined.')
                         server.set_timeout(None)
 
                         # DAQ finished
                         if copy_on_fly:
+                            print('Waiting for on-the-fly copy thread to finish.')
                             daq_finished.set()
                             copy_files_on_the_fly_thread.join()
 
@@ -176,17 +163,12 @@ def move_data_files(src_dir, dest_dir):
 def listen_for_stop(server, stop_event):
     while not stop_event.is_set():
         try:
-            print("[thread] waiting for receive...")  # debug
             res = server.receive()
-            print(f"[thread] got: {res!r}")  # debug
             if 'Stop' in res:
-                print("[thread] stop command detected")
                 stop_event.set()
                 break
         except socket.timeout:
-            print("[thread] timeout, looping")  # debug
             continue  # just loop again and check stop_event
-    print("[thread] exiting loop")  # debug
 
 
 
