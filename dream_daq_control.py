@@ -43,7 +43,7 @@ def main():
                         print(res)
                         sub_run_name, run_time = res.split()[-2], int(res.split()[-1])
                         print(f'Sub-run name: {sub_run_name}, Run time: {run_time} minutes')
-                        sub_run_out_raw_inner_dir = f'{out_directory}/{sub_run_name}/{raw_daq_inner_dir}'
+                        sub_run_out_raw_inner_dir = f'{out_directory}/{sub_run_name}/{raw_daq_inner_dir}/'
                         create_dir_if_not_exist(sub_run_out_raw_inner_dir)
 
                         if run_directory is not None:
@@ -107,6 +107,8 @@ def main():
                         # server.set_blocking(False)
                         stop_event = threading.Event()
                         server.set_timeout(1.0)  # Set timeout for socket operations
+                        print(f'Server timeout: {server.get_timeout()} seconds')
+                        sleep(5)
                         stop_thread = threading.Thread(target=listen_for_stop, args=(server, stop_event))
                         stop_thread.start()
                         while True:  # DAQ running
@@ -125,6 +127,7 @@ def main():
                         # server.set_blocking(True)
                         print('Waiting for DAQ process to terminate.')
                         stop_event.set()  # Tell the listener thread to stop
+                        print(f'Server timeout: {server.get_timeout()} seconds')
                         stop_thread.join()
                         server.set_timeout(None)
 
@@ -188,6 +191,7 @@ def copy_files_on_the_fly(sub_run_dir, sub_out_dir, daq_finished_event, check_in
             for file_name in os.listdir(sub_run_dir):
                 if file_name.endswith('.fdf') and get_file_num_from_fdf_file_name(file_name, -2) == file_num:
                     shutil.move(f'{sub_run_dir}{file_name}', f'{sub_out_dir}{file_name}')
+            file_num += 1
         sleep(check_interval)  # Check every 5 seconds
 
 

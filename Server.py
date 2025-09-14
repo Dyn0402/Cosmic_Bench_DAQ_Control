@@ -88,3 +88,6 @@ class Server:
 
     def set_timeout(self, timeout):
         self.server.settimeout(timeout)
+
+    def get_timeout(self):
+        return self.server.gettimeout()

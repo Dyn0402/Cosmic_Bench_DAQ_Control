@@ -101,7 +101,7 @@ class Config:
         self.sub_runs = [
             {
                 'sub_run_name': 'resist_430V',
-                'run_time': 30,  # Minutes
+                'run_time': 10,  # Minutes
                 'hvs': {
                     0: {
                         # 0: 800,
