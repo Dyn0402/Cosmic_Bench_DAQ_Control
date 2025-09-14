@@ -14,7 +14,7 @@ import copy
 
 class Config:
     def __init__(self):
-        self.run_name = 'rd542_plein_1_resist_430V_9-12-25'
+        self.run_name = 'rd542_plein_1_drift_scan_9-14-25'
         self.daq_dir = '/home/clas12/dylan/Run/'  # Maybe kill
         self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -27,7 +27,7 @@ class Config:
         self.m3_feu_num = 1
         self.power_off_hv_at_end = False  # True to power off HV at end of run
         self.filtering_by_m3 = False  # True to filter by m3 tracking, False to do no filtering
-        self.process_on_fly = True  # True to process data on fly, False to process after run
+        self.process_on_fly = False  # True to process data on fly, False to process after run
         self.save_fdfs = True  # True to save FDF files, False to delete after decoding
         self.start_time = None
 
@@ -100,15 +100,15 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'resist_430V',
-                'run_time': 10,  # Minutes
+                'sub_run_name': 'drift_300V',
+                'run_time': 60 * 2.5,  # Minutes
                 'hvs': {
                     0: {
                         # 0: 800,
                         # 1: 800,
                         # 2: 800,
                         # 3: 800,
-                        6: 800,
+                        6: 300,
                         # 7: 460,
                         8: 500,
                         9: 500,
@@ -140,15 +140,15 @@ class Config:
         ]
 
         # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
-        # template = self.sub_runs[0]
-        # for drift_v in range(50, 800, 50):
-        #     sub_run = copy.deepcopy(template)
-        #     sub_run['sub_run_name'] = f'drift_{drift_v}'
-        #     card = 0
-        #     for channel in sub_run['hvs'][card]:
-        #         if channel in [6]:
-        #             sub_run['hvs'][card][channel] = drift_v
-        #     self.sub_runs.append(sub_run)
+        template = self.sub_runs[0]
+        for drift_v in range(400, 800, 100):
+            sub_run = copy.deepcopy(template)
+            sub_run['sub_run_name'] = f'drift_{drift_v}'
+            card = 0
+            for channel in sub_run['hvs'][card]:
+                if channel in [6]:
+                    sub_run['hvs'][card][channel] = drift_v
+            self.sub_runs.append(sub_run)
 
         self.bench_geometry = {
             'p1_z': 227,  # mm  To the top of P1 from the top of PB

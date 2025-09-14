@@ -186,10 +186,7 @@ def copy_files_on_the_fly(sub_run_dir, sub_out_dir, daq_finished_event, check_in
     sleep(60 * 1)  # Wait on start for daq to start running
     file_num = 0
     while not daq_finished_event.is_set():  # Running
-        if file_num_still_running(sub_run_dir, file_num, silent=True):
-            sleep(check_interval)
-            continue
-        else:
+        if not file_num_still_running(sub_run_dir, file_num, silent=True):
             for file_name in os.listdir(sub_run_dir):
                 if file_name.endswith('.fdf') and get_file_num_from_fdf_file_name(file_name, -2) == file_num:
                     shutil.move(f'{sub_run_dir}{file_name}', f'{sub_out_dir}{file_name}')
