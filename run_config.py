@@ -28,6 +28,7 @@ class Config:
         self.power_off_hv_at_end = True  # True to power off HV at end of run
         self.filtering_by_m3 = False  # True to filter by m3 tracking, False to do no filtering
         self.process_on_fly = True  # True to process data on fly, False to process after run
+        self.save_fdfs = True  # True to save FDF files, False to delete after decoding
         self.start_time = None
 
         self.dream_daq_info = {
@@ -100,7 +101,7 @@ class Config:
         self.sub_runs = [
             {
                 'sub_run_name': 'resist_430V',
-                'run_time': 60,  # Minutes
+                'run_time': 30,  # Minutes
                 'hvs': {
                     0: {
                         # 0: 800,

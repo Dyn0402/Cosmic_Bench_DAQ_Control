@@ -148,6 +148,7 @@ def main():
         if banco:
             banco_daq.send('Finished')
             trigger_switch.send('Finished')
+        dream_daq.send('Finished')
         dedip196_processor.send('Finished')
         sedip28_processor.send('Finished')
     print('donzo')

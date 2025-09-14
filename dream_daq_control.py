@@ -123,6 +123,7 @@ def main():
                             if output.strip() != '':
                                 print(output.strip())
                         # server.set_blocking(True)
+                        print('Waiting for DAQ process to terminate.')
                         stop_event.set()  # Tell the listener thread to stop
                         stop_thread.join()
                         server.set_timeout(None)
@@ -131,11 +132,11 @@ def main():
                         if copy_on_fly:
                             daq_finished.set()
                             copy_files_on_the_fly_thread.join()
-                        print('Waiting for DAQ process to terminate.')
 
                         os.chdir(original_working_directory)
 
                         if run_successful:
+                            print('Moving data files.')
                             move_data_files(sub_run_dir, sub_run_out_raw_inner_dir)
 
                         server.send('Dream DAQ stopped')
@@ -177,7 +178,7 @@ def copy_files_on_the_fly(sub_run_dir, sub_out_dir, daq_finished_event, check_in
     """
 
     create_dir_if_not_exist(sub_out_dir)
-    sleep(60 * 5)  # Wait on start for daq to start running
+    sleep(60 * 1)  # Wait on start for daq to start running
     file_num = 0
     while not daq_finished_event.is_set():  # Running
         if file_num_still_running(sub_run_dir, file_num, silent=True):
