@@ -65,7 +65,7 @@ def main():
 
                         if copy_on_fly:
                             daq_finished = threading.Event()
-                            copy_files_args = (sub_run_dir, sub_run_out_raw_inner_dir, sub_run_name, daq_finished)
+                            copy_files_args = (sub_run_dir, sub_run_out_raw_inner_dir, daq_finished)
                             copy_files_on_the_fly_thread = threading.Thread(target=copy_files_on_the_fly,
                                                                                args=copy_files_args)
                             copy_files_on_the_fly_thread.start()
