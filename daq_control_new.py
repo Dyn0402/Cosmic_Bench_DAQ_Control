@@ -107,7 +107,8 @@ def main():
                     banco_daq.receive()
 
                 daq_trigger_switch = trigger_switch if banco else None
-                daq_control_args = (sub_run_name, sub_run['run_time'], sub_out_dir, daq_trigger_switch, dream_daq)
+                run_time = sub_run['run_time'] * 60 if daq_trigger_switch is None else sub_run['run_time'] * 60 + 5
+                daq_control_args = (sub_run_name, run_time, sub_out_dir, daq_trigger_switch, dream_daq)
                 # daq_controller_thread = threading.Thread(target=run_daq_controller, args=daq_control_args)
                 # if config.process_on_fly:
                 #     daq_finished = threading.Event()

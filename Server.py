@@ -85,3 +85,6 @@ class Server:
 
     def set_blocking(self, blocking=True):
         self.server.setblocking(blocking)
+
+    def set_timeout(self, timeout):
+        self.server.settimeout(timeout)

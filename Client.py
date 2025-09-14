@@ -82,3 +82,6 @@ class Client:
 
     def set_blocking(self, blocking=True):
         self.client.setblocking(blocking)
+
+    def set_timeout(self, timeout):
+        self.client.settimeout(timeout)

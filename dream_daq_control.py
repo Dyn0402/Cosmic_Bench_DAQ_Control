@@ -13,7 +13,7 @@ from time import time, sleep
 import shutil
 import threading
 from Server import Server
-from socket import error as SocketError
+import socket
 from common_functions import *
 
 
@@ -68,6 +68,7 @@ def main():
                             copy_files_args = (sub_run_dir, sub_run_out_raw_inner_dir, sub_run_name, daq_finished)
                             copy_files_on_the_fly_thread = threading.Thread(target=copy_files_on_the_fly,
                                                                                args=copy_files_args)
+                            copy_files_on_the_fly_thread.start()
 
                         while True:
                             output = process.stdout.readline()
@@ -84,7 +85,7 @@ def main():
                                 process.stdin.write('C')  # Signal to start data taking
                                 process.stdin.flush()
                                 sent_continue, sent_continue_time = True, time()
-                                # print('DAQ started.')
+                                print('DAQ started.')
                                 server.send('Dream DAQ started')
                                 break
 
@@ -103,15 +104,17 @@ def main():
                                 server.send('Dream DAQ timed out')
                                 break
 
-                        server.set_blocking(False)
+                        # server.set_blocking(False)
+                        stop_event = threading.Event()
+                        server.set_timeout(1.0)  # Set timeout for socket operations
+                        stop_thread = threading.Thread(target=listen_for_stop, args=(server, stop_event))
+                        stop_thread.start()
                         while True:  # DAQ running
-                            # try:  # Check for stop command from controller
-                            #     res = server.receive()
-                            #     if 'Stop' in res:
-                            #         print('Stop command received. Stopping DAQ.')
-                            #         process.stdin.write('g')  # Send signal to stop run
-                            # except (BlockingIOError, SocketError):
-                            #     pass  # No command received, continue
+                            if stop_event.is_set():
+                                process.stdin.write('g')
+                                process.stdin.flush()
+                                print('Stop command received. Stopping DAQ.')
+                                break
 
                             output = process.stdout.readline()
                             if output == '' and process.poll() is not None:
@@ -119,7 +122,10 @@ def main():
                                 break
                             if output.strip() != '':
                                 print(output.strip())
-                        server.set_blocking(True)
+                        # server.set_blocking(True)
+                        stop_event.set()  # Tell the listener thread to stop
+                        stop_thread.join()
+                        server.set_timeout(None)
 
                         # DAQ finished
                         if copy_on_fly:
@@ -147,6 +153,17 @@ def move_data_files(src_dir, dest_dir):
             # shutil.move(f'{src_dir}/{file}', f'{dest_dir}/{file}')
             # Copy for now, maybe move and clean up later when more confident
             shutil.copy(f'{src_dir}/{file}', f'{dest_dir}/{file}')
+
+
+def listen_for_stop(server, stop_event):
+    while not stop_event.is_set():
+        try:
+            res = server.receive()
+            if 'Stop' in res:
+                stop_event.set()
+                break
+        except socket.timeout:
+            continue  # just loop again and check stop_event
 
 
 def copy_files_on_the_fly(sub_run_dir, sub_out_dir, daq_finished_event, check_interval=5):
