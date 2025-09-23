@@ -39,8 +39,8 @@ def main():
     hv_client = Client(hv_ip, hv_port)
     trigger_switch_client = Client(trigger_switch_ip, trigger_switch_port) if banco else nullcontext()
     banco_daq_client = Client(banco_daq_ip, banco_daq_port) if banco else nullcontext()
-    dedip196_processor_client = Client(dedip196_ip, dedip196_port)
-    sedip28_processor_client = Client(sedip28_ip, sedip28_port)
+    dedip196_processor_client = Client(dedip196_ip, dedip196_port) if config.process_on_fly else nullcontext()
+    sedip28_processor_client = Client(sedip28_ip, sedip28_port) if m3 and config.process_on_fly else nullcontext()
     dream_daq_client = Client(dream_daq_ip, dream_daq_port)
 
     with (hv_client as hv, trigger_switch_client as trigger_switch, banco_daq_client as banco_daq,
@@ -62,18 +62,20 @@ def main():
             banco_daq.receive()
             banco_daq.send_json(config.banco_info)
 
-        dedip196_processor.send('Connected to daq_control')
-        dedip196_processor.receive()
-        dedip196_processor.send_json(config.dedip196_processor_info)
-        dedip196_processor.receive()
-        dedip196_processor.send_json({'included_detectors': config.included_detectors})
-        dedip196_processor.receive()
-        dedip196_processor.send_json({'detectors': config.detectors})
-        dedip196_processor.receive()
+        if config.process_on_fly:
+            dedip196_processor.send('Connected to daq_control')
+            dedip196_processor.receive()
+            dedip196_processor.send_json(config.dedip196_processor_info)
+            dedip196_processor.receive()
+            dedip196_processor.send_json({'included_detectors': config.included_detectors})
+            dedip196_processor.receive()
+            dedip196_processor.send_json({'detectors': config.detectors})
+            dedip196_processor.receive()
 
-        sedip28_processor.send('Connected to daq_control')
-        sedip28_processor.receive()
-        sedip28_processor.send_json(config.sedip28_processor_info)
+            if m3:
+                sedip28_processor.send('Connected to daq_control')
+                sedip28_processor.receive()
+                sedip28_processor.send_json(config.sedip28_processor_info)
 
         sleep(2)  # Wait for all clients to do what they need to do (specifically, create directories)
 
@@ -144,8 +146,10 @@ def main():
             banco_daq.send('Finished')
             trigger_switch.send('Finished')
         dream_daq.send('Finished')
-        dedip196_processor.send('Finished')
-        sedip28_processor.send('Finished')
+        if config.process_on_fly:
+            dedip196_processor.send('Finished')
+            if m3:
+                sedip28_processor.send('Finished')
     print('donzo')
 
 
