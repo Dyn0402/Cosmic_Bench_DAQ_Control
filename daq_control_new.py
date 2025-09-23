@@ -43,10 +43,6 @@ def main():
     sedip28_processor_client = Client(sedip28_ip, sedip28_port)
     dream_daq_client = Client(dream_daq_ip, dream_daq_port)
 
-    # with (Client(hv_ip, hv_port) as hv_client,
-    #       Client(trigger_switch_ip, trigger_switch_port) if banco else None as trigger_switch_client,
-    #       Client(banco_daq_ip, banco_daq_port) if banco else None as banco_daq_client,
-    #       Client(dedip196_ip, dedip196_port) as dedip196_processor_client):
     with (hv_client as hv, trigger_switch_client as trigger_switch, banco_daq_client as banco_daq,
           dedip196_processor_client as dedip196_processor, sedip28_processor_client as sedip28_processor,
           dream_daq_client as dream_daq):
@@ -81,7 +77,6 @@ def main():
 
         sleep(2)  # Wait for all clients to do what they need to do (specifically, create directories)
 
-        # create_dir_if_not_exist(config.run_dir)
         create_dir_if_not_exist(config.run_out_dir)
         config.write_to_file(f'{config.run_out_dir}run_config.json')
         for sub_run in config.sub_runs:

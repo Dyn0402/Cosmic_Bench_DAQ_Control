@@ -14,7 +14,7 @@ import copy
 
 class Config:
     def __init__(self):
-        self.run_name = 'urw_inter_drift_scan_9-23-25'
+        self.run_name = 'rd542_plein_1_drift_scan_9-14-25'
         self.daq_dir = '/home/clas12/dylan/Run/'  # Maybe kill
         self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -25,10 +25,10 @@ class Config:
         self.m3_tracking_inner_dir = 'm3_tracking_root'
         self.detector_info_dir = f'/mnt/cosmic_data/config/detectors/'
         self.m3_feu_num = 1
-        self.power_off_hv_at_end = True  # True to power off HV at end of run
+        self.power_off_hv_at_end = False  # True to power off HV at end of run
         self.filtering_by_m3 = False  # True to filter by m3 tracking, False to do no filtering
         self.process_on_fly = False  # True to process data on fly, False to process after run
-        self.save_fdfs = False  # True to save FDF files, False to delete after decoding
+        self.save_fdfs = True  # True to save FDF files, False to delete after decoding
         self.start_time = None
 
         self.dream_daq_info = {
@@ -100,15 +100,15 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'drift_800V',
-                'run_time': 80,  # Minutes
+                'sub_run_name': 'drift_300V',
+                'run_time': 60 * 2.5,  # Minutes
                 'hvs': {
                     0: {
                         # 0: 800,
-                        1: 800,
+                        # 1: 800,
                         # 2: 800,
                         # 3: 800,
-                        # 6: 300,
+                        6: 300,
                         # 7: 460,
                         8: 500,
                         9: 500,
@@ -124,9 +124,9 @@ class Config:
                     },
                     3: {
                         # 1: 410,
-                        2: 410,
-                        # 3: 430,
-                        # 4: 430,
+                        # 2: 410,
+                        3: 430,
+                        4: 430,
                         # 5: 450,
                         # 6: 450,
                         # 7: 450,
@@ -141,13 +141,12 @@ class Config:
 
         # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
         template = self.sub_runs[0]
-        for drift_v in range(50, 800, 50):
+        for drift_v in range(400, 800, 100):
             sub_run = copy.deepcopy(template)
             sub_run['sub_run_name'] = f'drift_{drift_v}'
             card = 0
-            channels = [1]
             for channel in sub_run['hvs'][card]:
-                if channel in channels:
+                if channel in [6]:
                     sub_run['hvs'][card][channel] = drift_v
             self.sub_runs.append(sub_run)
 
@@ -166,7 +165,7 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
-        self.included_detectors = ['urw_inter',
+        self.included_detectors = ['rd542_plein_1',
                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
 
         self.detectors = [
