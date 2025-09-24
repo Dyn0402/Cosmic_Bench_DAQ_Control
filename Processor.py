@@ -65,23 +65,35 @@ class DecoderProcessorManager:
             decoded_dir = sub_run / self.decoded_dirname
             filtered_dir = sub_run / self.filtered_dirname
 
+            raw_file_nums = []
             for raw_file in sorted(raw_dir.glob("*.fdf")):
                 feu_num = get_feu_num_from_fdf_file_name(raw_file.name)
-                if feu_num == self._config["m3_feu_num"]:  # Skip M3 files
+                if feu_num != self._config["m3_feu_num"]:  # Skip non-M3 files
+                    print(f'Skipping non-M3 file {raw_file.name}')
                     continue
-
-                base = raw_file.stem
-                already_decoded = any(f.stem.startswith(base) for f in decoded_dir.glob("*"))
-                already_filtered = any(f.stem.startswith(base) for f in filtered_dir.glob("*"))
-
-                if already_decoded or already_filtered:
-                    print(f'Skipping already processed file {raw_file.name}')
+                if '_datrun_' not in raw_file.name:
+                    print(f'Skipp')
                     continue
+                raw_file_nums.append(get_file_num_from_fdf_file_name(raw_file.name, -2))
 
-                self._process_file(raw_file, sub_run.name)
+            already_decoded_file_nums = []
+            for tracked_file in sorted(decoded_dir.glob("*.root")):
+                already_decoded_file_nums.append(get_file_num_from_fdf_file_name(tracked_file.name, -2))
 
-    def _process_file(self, raw_file: Path, sub_run_name: str):
-        file_num = get_file_num_from_fdf_file_name(raw_file.name, -2)
+            already_filtered_file_nums = []
+            for tracked_file in sorted(filtered_dir.glob("*.root")):
+                already_filtered_file_nums.append(get_file_num_from_fdf_file_name(tracked_file.name, -2))
+
+            # Get the raw files that need processing
+            to_process_file_nums = sorted(set(raw_file_nums) - set(already_decoded_file_nums) - set(already_filtered_file_nums))
+            if not to_process_file_nums:
+                print(f'No new files to process for run {sub_run.name}')
+                continue
+
+            for file_num in to_process_file_nums:
+                self._process_file(file_num, sub_run.name)
+
+    def _process_file(self, file_num: int, sub_run_name: str):
         # Decode
         self.client.send(f"Decode FDFs file_num={file_num} {sub_run_name}")
         self.client.receive()
@@ -136,22 +148,31 @@ class TrackerProcessorManager:
             raw_dir = sub_run / self.raw_dirname
             tracking_dir = sub_run / self.tracking_dirname
 
+            raw_file_nums = []
             for raw_file in sorted(raw_dir.glob("*.fdf")):
                 feu_num = get_feu_num_from_fdf_file_name(raw_file.name)
-                if feu_num != self._config["m3_feu_num"]:  # Skip M3 files
+                if feu_num != self._config["m3_feu_num"]:  # Skip non-M3 files
+                    print(f'Skipping non-M3 file {raw_file.name}')
                     continue
-
-                base = raw_file.stem
-                base = re.sub(r'_\d+', '', base)  # Remove _feuX part for matching
-                already_tracked = any(f.stem.startswith(base) for f in tracking_dir.glob("*"))
-                if already_tracked:
-                    print(f'Skipping already tracked file {raw_file.name}')
+                if '_datrun_' not in raw_file.name:
+                    print(f'Skipp')
                     continue
+                raw_file_nums.append(get_file_num_from_fdf_file_name(raw_file.name, -2))
 
-                self._process_file(raw_file, sub_run.name)
+            already_tracked_file_nums = []
+            for tracked_file in sorted(tracking_dir.glob("*.root")):
+                already_tracked_file_nums.append(get_file_num_from_fdf_file_name(tracked_file.name, -1))
 
-    def _process_file(self, fdf_file: Path, sub_run_name: str):
-        file_num = get_file_num_from_fdf_file_name(fdf_file.name, -2)
+            # Get the raw files that need processing
+            to_process_file_nums = sorted(set(raw_file_nums) - set(already_tracked_file_nums))
+            if not to_process_file_nums:
+                print(f'No new M3 files to process for run {sub_run.name}')
+                continue
+
+            for file_num in to_process_file_nums:
+                self._process_file(file_num, sub_run.name)
+
+    def _process_file(self, file_num: int, sub_run_name: str):
         self.client.send(f"Run M3 Tracking file_num={file_num} {sub_run_name}")
         self.client.receive()
         self.client.receive()
