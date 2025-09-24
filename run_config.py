@@ -140,16 +140,16 @@ class Config:
         ]
 
         # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
-        template = self.sub_runs[0]
-        for drift_v in range(50, 800, 50):
-            sub_run = copy.deepcopy(template)
-            sub_run['sub_run_name'] = f'drift_{drift_v}'
-            card = 0
-            channels = [1]
-            for channel in sub_run['hvs'][card]:
-                if channel in channels:
-                    sub_run['hvs'][card][channel] = drift_v
-            self.sub_runs.append(sub_run)
+        # template = self.sub_runs[0]
+        # for drift_v in range(50, 800, 50):
+        #     sub_run = copy.deepcopy(template)
+        #     sub_run['sub_run_name'] = f'drift_{drift_v}'
+        #     card = 0
+        #     channels = [1]
+        #     for channel in sub_run['hvs'][card]:
+        #         if channel in channels:
+        #             sub_run['hvs'][card][channel] = drift_v
+        #     self.sub_runs.append(sub_run)
 
         self.bench_geometry = {
             'p1_z': 227,  # mm  To the top of P1 from the top of PB
