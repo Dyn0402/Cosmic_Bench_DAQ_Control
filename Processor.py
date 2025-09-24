@@ -95,7 +95,8 @@ class DecoderProcessorManager:
 
 class TrackerProcessorManager:
     def __init__(self, config: Dict[str, Any], output_dir: Path):
-        self.client = Client(config["ip"], config["port"])
+        self.self_config_prefix = "sedip28_processor_info"
+        self.client = Client(config["sedip28_processor_info"]["ip"], config["sedip28_processor_info"]["port"])
         self._config = config
         self.output_dir = output_dir
         self.tracking_dirname = config.get("m3_tracking_inner_dir", "m3_tracking_root")
@@ -111,7 +112,7 @@ class TrackerProcessorManager:
     def _setup(self):
         self.client.send("Connected to daq_control")
         self.client.receive()
-        self.client.send_json(self._config)
+        self.client.send_json(self._config["sedip28_processor_info"])
 
     def process_all(self):
         for sub_run in sorted(self.output_dir.iterdir()):
@@ -141,12 +142,13 @@ class Processor:
         self.decoder: Optional[DecoderProcessorManager] = None
         self.tracker: Optional[TrackerProcessorManager] = None
 
-        if "dedip196_processor_info" in self.config:
-            # self.decoder = DecoderProcessorManager(self.config["dedip196_processor_info"], self.output_dir)
-            self.decoder = DecoderProcessorManager(self.config, self.output_dir)
+        # if "dedip196_processor_info" in self.config:
+        #     # self.decoder = DecoderProcessorManager(self.config["dedip196_processor_info"], self.output_dir)
+        #     self.decoder = DecoderProcessorManager(self.config, self.output_dir)
 
         if "sedip28_processor_info" in self.config:
-            self.tracker = TrackerProcessorManager(self.config["sedip28_processor_info"], self.output_dir)
+            # self.tracker = TrackerProcessorManager(self.config["sedip28_processor_info"], self.output_dir)
+            self.tracker = TrackerProcessorManager(self.config, self.output_dir)
 
     def _load_config(self, path: str) -> Dict[str, Any]:
         with open(path, "r") as f:
