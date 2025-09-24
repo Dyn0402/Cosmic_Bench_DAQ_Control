@@ -84,24 +84,24 @@ class DecoderProcessorManager:
 
     def _process_file(self, raw_file: Path, sub_run_name: str):
         # Decode
-        self.client.send(f"Decode FDFs {raw_file.name} {sub_run_name}", silent=True)
-        self.client.receive(silent=True)
+        self.client.send(f"Decode FDFs {raw_file.name} {sub_run_name}")
+        self.client.receive()
 
         # Filtering or copy
         if self.filtering:
-            self.client.send(f"Filter By M3 {raw_file.name} {sub_run_name}", silent=True)
-            self.client.receive(silent=True)
-            self.client.receive(silent=True)
+            self.client.send(f"Filter By M3 {raw_file.name} {sub_run_name}")
+            self.client.receive()
+            self.client.receive()
         else:
-            self.client.send(f"Copy To Filtered {raw_file.name} {sub_run_name}", silent=True)
-            self.client.receive(silent=True)
-            self.client.receive(silent=True)
+            self.client.send(f"Copy To Filtered {raw_file.name} {sub_run_name}")
+            self.client.receive()
+            self.client.receive()
 
         # Cleanup
         if not self.save_fds:
-            self.client.send(f"Clean Up Unfiltered {raw_file.name} {sub_run_name}", silent=True)
-            self.client.receive(silent=True)
-            self.client.receive(silent=True)
+            self.client.send(f"Clean Up Unfiltered {raw_file.name} {sub_run_name}")
+            self.client.receive()
+            self.client.receive()
 
 
 class TrackerProcessorManager:
@@ -124,6 +124,7 @@ class TrackerProcessorManager:
         self.client.send("Connected to daq_control")
         self.client.receive()
         self.client.send_json(self._config["sedip28_processor_info"])
+        self.client.receive()
 
     def process_all(self):
         for sub_run in sorted(self.output_dir.iterdir()):
@@ -140,9 +141,9 @@ class TrackerProcessorManager:
                 self._process_file(fdf_file, sub_run.name)
 
     def _process_file(self, fdf_file: Path, sub_run_name: str):
-        self.client.send(f"Run M3 Tracking {fdf_file.name} {sub_run_name}", silent=True)
-        self.client.receive(silent=True)
-        self.client.receive(silent=True)
+        self.client.send(f"Run M3 Tracking {fdf_file.name} {sub_run_name}")
+        self.client.receive()
+        self.client.receive()
 
 
 class Processor:
