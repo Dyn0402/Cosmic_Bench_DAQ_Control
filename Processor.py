@@ -69,12 +69,11 @@ class DecoderProcessorManager:
             filtered_dir = sub_run / self.filtered_dirname
 
             for raw_file in sorted(raw_dir.glob("*.fdf")):
-                base = raw_file.stem
                 feu_num = get_feu_num_from_fdf_file_name(raw_file.name)
-
                 if feu_num == self._config["m3_feu_num"]:  # Skip M3 files
                     continue
 
+                base = raw_file.stem
                 already_decoded = any(f.stem.startswith(base) for f in decoded_dir.glob("*"))
                 already_filtered = any(f.stem.startswith(base) for f in filtered_dir.glob("*"))
 
@@ -85,23 +84,24 @@ class DecoderProcessorManager:
                 self._process_file(raw_file, sub_run.name)
 
     def _process_file(self, raw_file: Path, sub_run_name: str):
+        file_num = get_file_num_from_fdf_file_name(raw_file.name, -2)
         # Decode
-        self.client.send(f"Decode FDFs {raw_file.name} {sub_run_name}")
+        self.client.send(f"Decode FDFs file_num={file_num}  {sub_run_name}")
         self.client.receive()
 
         # Filtering or copy
         if self.filtering:
-            self.client.send(f"Filter By M3 {raw_file.name} {sub_run_name}")
+            self.client.send(f"Filter By M3 file_num={file_num}  {sub_run_name}")
             self.client.receive()
             self.client.receive()
         else:
-            self.client.send(f"Copy To Filtered {raw_file.name} {sub_run_name}")
+            self.client.send(f"Copy To Filtered file_num={file_num}  {sub_run_name}")
             self.client.receive()
             self.client.receive()
 
         # Cleanup
         if not self.save_fds:
-            self.client.send(f"Clean Up Unfiltered {raw_file.name} {sub_run_name}")
+            self.client.send(f"Clean Up Unfiltered file_num={file_num}  {sub_run_name}")
             self.client.receive()
             self.client.receive()
 
@@ -142,17 +142,22 @@ class TrackerProcessorManager:
             raw_dir = sub_run / self.raw_dirname
             tracking_dir = sub_run / self.tracking_dirname
 
-            for fdf_file in sorted(raw_dir.glob("*.fdf")):
-                base = fdf_file.stem
-                already_tracked = any(f.stem.startswith(base) for f in tracking_dir.glob("*"))
-                if already_tracked:
-                    print(f'Skipping already tracked file {fdf_file.name}')
+            for raw_file in sorted(raw_dir.glob("*.fdf")):
+                feu_num = get_feu_num_from_fdf_file_name(raw_file.name)
+                if feu_num != self._config["m3_feu_num"]:  # Skip M3 files
                     continue
 
-                self._process_file(fdf_file, sub_run.name)
+                base = raw_file.stem
+                already_tracked = any(f.stem.startswith(base) for f in tracking_dir.glob("*"))
+                if already_tracked:
+                    print(f'Skipping already tracked file {raw_file.name}')
+                    continue
+
+                self._process_file(raw_file, sub_run.name)
 
     def _process_file(self, fdf_file: Path, sub_run_name: str):
-        self.client.send(f"Run M3 Tracking {fdf_file.name} {sub_run_name}")
+        file_num = get_file_num_from_fdf_file_name(fdf_file.name, -2)
+        self.client.send(f"Run M3 Tracking file_num={file_num} {sub_run_name}")
         self.client.receive()
         self.client.receive()
 
