@@ -235,7 +235,7 @@ def copy_to_filtered(out_dir, decoded_dir, file_num=None):
             continue
         if get_file_num_from_fdf_file_name(det_file, -2) != file_num:
             continue
-        print(f'Filtering {det_file} to {det_file.replace(".root", "_filtered.root")}')
+        print(f'Coping {det_file} to {det_file.replace(".root", "_filtered.root")}')
         in_file_path = f'{decoded_dir}{det_file}'
         out_file_path = f'{out_dir}{det_file.replace(".root", "_filtered.root")}'
         shutil.copy(in_file_path, out_file_path)  # Just copy in_file_path to out_file_path

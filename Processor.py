@@ -15,12 +15,12 @@ Processor system with separate decoding and tracking managers
 """
 
 import json
+import re
 from pathlib import Path
 from typing import Dict, Any, Optional
 
 from Client import Client
-from common_functions import (get_feu_num_from_fdf_file_name, get_run_name_from_fdf_file_name,
-                              get_file_num_from_fdf_file_name)
+from common_functions import get_feu_num_from_fdf_file_name, get_file_num_from_fdf_file_name
 
 
 class DecoderProcessorManager:
@@ -58,9 +58,6 @@ class DecoderProcessorManager:
 
     def process_all(self):
         for sub_run in sorted(self.output_dir.iterdir()):
-            if 'overnight' in sub_run.name:
-                print(f'Skipping overnight run {sub_run.name}')
-                continue
             if not sub_run.is_dir():
                 continue
 
@@ -86,22 +83,22 @@ class DecoderProcessorManager:
     def _process_file(self, raw_file: Path, sub_run_name: str):
         file_num = get_file_num_from_fdf_file_name(raw_file.name, -2)
         # Decode
-        self.client.send(f"Decode FDFs file_num={file_num}  {sub_run_name}")
+        self.client.send(f"Decode FDFs file_num={file_num} {sub_run_name}")
         self.client.receive()
 
         # Filtering or copy
         if self.filtering:
-            self.client.send(f"Filter By M3 file_num={file_num}  {sub_run_name}")
+            self.client.send(f"Filter By M3 file_num={file_num} {sub_run_name}")
             self.client.receive()
             self.client.receive()
         else:
-            self.client.send(f"Copy To Filtered file_num={file_num}  {sub_run_name}")
+            self.client.send(f"Copy To Filtered file_num={file_num} {sub_run_name}")
             self.client.receive()
             self.client.receive()
 
         # Cleanup
         if not self.save_fds:
-            self.client.send(f"Clean Up Unfiltered file_num={file_num}  {sub_run_name}")
+            self.client.send(f"Clean Up Unfiltered file_num={file_num} {sub_run_name}")
             self.client.receive()
             self.client.receive()
 
@@ -132,9 +129,6 @@ class TrackerProcessorManager:
 
     def process_all(self):
         for sub_run in sorted(self.output_dir.iterdir()):
-            if 'overnight' in sub_run.name:
-                print(f'Skipping overnight run {sub_run.name}')
-                continue
             print(f'Processing run {sub_run.name}')
             if not sub_run.is_dir():
                 continue
@@ -148,6 +142,7 @@ class TrackerProcessorManager:
                     continue
 
                 base = raw_file.stem
+                base = re.sub(r'_\d+', '', base)  # Remove _feuX part for matching
                 already_tracked = any(f.stem.startswith(base) for f in tracking_dir.glob("*"))
                 if already_tracked:
                     print(f'Skipping already tracked file {raw_file.name}')
