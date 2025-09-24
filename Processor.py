@@ -113,6 +113,7 @@ class TrackerProcessorManager:
         self._config = config
         self.output_dir = output_dir
         self.tracking_dirname = config.get("m3_tracking_inner_dir", "m3_tracking_root")
+        self.raw_dirname = config.get("raw_daq_inner_dir", "raw_daq_data")
 
     def __enter__(self):
         self.client.__enter__()
@@ -131,11 +132,17 @@ class TrackerProcessorManager:
 
     def process_all(self):
         for sub_run in sorted(self.output_dir.iterdir()):
+            if 'overnight' in sub_run.name:
+                print(f'Skipping overnight run {sub_run.name}')
+                continue
+            print(f'Processing run {sub_run.name}')
             if not sub_run.is_dir():
                 continue
 
+            raw_dir = sub_run / self.raw_dirname
             tracking_dir = sub_run / self.tracking_dirname
-            for fdf_file in sorted(tracking_dir.glob("*.fdf")):
+
+            for fdf_file in sorted(raw_dir.glob("*.fdf")):
                 base = fdf_file.stem
                 already_tracked = any(f.stem.startswith(base) for f in tracking_dir.glob("*"))
                 if already_tracked:
