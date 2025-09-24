@@ -14,7 +14,7 @@ import copy
 
 class Config:
     def __init__(self):
-        self.run_name = 'rd542_strip_1_9-24-25'
+        self.run_name = 'urw_inter_drift_scan_9-23-25'
         self.daq_dir = '/home/clas12/dylan/Run/'  # Maybe kill
         self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -100,15 +100,15 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'hour_run_resist_500V',
-                'run_time': 60,  # Minutes
+                'sub_run_name': 'drift_800V',
+                'run_time': 80,  # Minutes
                 'hvs': {
                     0: {
                         # 0: 800,
-                        # 1: 800,
+                        1: 800,
                         # 2: 800,
                         # 3: 800,
-                        6: 800,
+                        # 6: 300,
                         # 7: 460,
                         8: 500,
                         9: 500,
@@ -124,47 +124,9 @@ class Config:
                     },
                     3: {
                         # 1: 410,
-                        # 2: 410,
-                        3: 500,
-                        4: 500,
-                        # 5: 450,
-                        # 6: 450,
-                        # 7: 450,
-                        8: 460,
-                        9: 460,
-                        10: 460,
-                        11: 460,
-                    }
-                }
-            },
-            {
-                'sub_run_name': 'overnight_run_resist_500V',
-                'run_time': 60 * 16,  # Minutes
-                'hvs': {
-                    0: {
-                        # 0: 800,
-                        # 1: 800,
-                        # 2: 800,
-                        # 3: 800,
-                        6: 800,
-                        # 7: 460,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500,
-                    },
-                    1: {
-                        # 0: 0,
-                        # 1: 600,
-                    },
-                    2: {
-                        # 0: 450,
-                    },
-                    3: {
-                        # 1: 410,
-                        # 2: 410,
-                        3: 500,
-                        4: 500,
+                        2: 410,
+                        # 3: 430,
+                        # 4: 430,
                         # 5: 450,
                         # 6: 450,
                         # 7: 450,
@@ -204,7 +166,7 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
-        self.included_detectors = ['rd542_strip_1',
+        self.included_detectors = ['urw_inter',
                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
 
         self.detectors = [
@@ -534,31 +496,6 @@ class Config:
             {
                 'name': 'rd542_plein_1',
                 'det_type': 'rd542_plein',
-                'det_center_coords': {  # Center of detector
-                    'x': 24,  # mm
-                    'y': 75.6,  # mm
-                    'z': 720.8,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (0, 6),
-                    'resist_1': (3, 3),
-                    'resist_2': (3, 4)
-                },
-                'dream_feus': {
-                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (6, 2),
-                    'y_1': (6, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (6, 4),
-                },
-            },
-            {
-                'name': 'rd542_strip_1',
-                'det_type': 'rd542_strip',
                 'det_center_coords': {  # Center of detector
                     'x': 24,  # mm
                     'y': 75.6,  # mm
