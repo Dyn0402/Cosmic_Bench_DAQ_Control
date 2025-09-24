@@ -173,10 +173,14 @@ class Processor:
 
     def process_all(self):
         self._init_processors()
-        if self.decoder:
-            with self.decoder as dec:
-                dec.process_all()
-
         if self.tracker:
+            print('Starting tracking processing')
             with self.tracker as trk:
                 trk.process_all()
+            print('Finished tracking processing\n')
+
+        if self.decoder:
+            print('Starting decoding processing')
+            with self.decoder as dec:
+                dec.process_all()
+            print('Finished decoding processing\n')
