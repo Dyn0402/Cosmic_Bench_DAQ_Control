@@ -23,7 +23,8 @@ from Client import Client
 
 class DecoderProcessorManager:
     def __init__(self, config: Dict[str, Any], output_dir: Path):
-        self.client = Client(config["ip"], config["port"])
+        self.process_prefix = "dedip196_processor_info"
+        self.client = Client(config[self.process_prefix]["ip"], config[self.process_prefix]["port"])
         self._config = config
         self.output_dir = output_dir
         self.filtering = config.get("filtering_by_m3", False)
@@ -45,7 +46,7 @@ class DecoderProcessorManager:
     def _setup(self):
         self.client.send("Connected to daq_control")
         self.client.receive()
-        self.client.send_json(self._config)
+        self.client.send_json(self._config[self.process_prefix])
         self.client.receive()
         self.client.send_json({"included_detectors": self._config["included_detectors"]})
         self.client.receive()
@@ -141,7 +142,8 @@ class Processor:
         self.tracker: Optional[TrackerProcessorManager] = None
 
         if "dedip196_processor_info" in self.config:
-            self.decoder = DecoderProcessorManager(self.config["dedip196_processor_info"], self.output_dir)
+            # self.decoder = DecoderProcessorManager(self.config["dedip196_processor_info"], self.output_dir)
+            self.decoder = DecoderProcessorManager(self.config, self.output_dir)
 
         if "sedip28_processor_info" in self.config:
             self.tracker = TrackerProcessorManager(self.config["sedip28_processor_info"], self.output_dir)
