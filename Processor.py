@@ -142,9 +142,9 @@ class Processor:
         self.decoder: Optional[DecoderProcessorManager] = None
         self.tracker: Optional[TrackerProcessorManager] = None
 
-        # if "dedip196_processor_info" in self.config:
-        #     # self.decoder = DecoderProcessorManager(self.config["dedip196_processor_info"], self.output_dir)
-        #     self.decoder = DecoderProcessorManager(self.config, self.output_dir)
+        if "dedip196_processor_info" in self.config:
+            # self.decoder = DecoderProcessorManager(self.config["dedip196_processor_info"], self.output_dir)
+            self.decoder = DecoderProcessorManager(self.config, self.output_dir)
 
         if "sedip28_processor_info" in self.config:
             # self.tracker = TrackerProcessorManager(self.config["sedip28_processor_info"], self.output_dir)
