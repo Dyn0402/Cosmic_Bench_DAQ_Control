@@ -78,6 +78,7 @@ class DecoderProcessorManager:
                 already_filtered = any(f.stem.startswith(base) for f in filtered_dir.glob("*"))
 
                 if already_decoded or already_filtered:
+                    print(f'Skipping already processed file {raw_file.name}')
                     continue
 
                 self._process_file(raw_file, sub_run.name)
@@ -136,6 +137,7 @@ class TrackerProcessorManager:
                 base = fdf_file.stem
                 already_tracked = any(f.stem.startswith(base) for f in tracking_dir.glob("*"))
                 if already_tracked:
+                    print(f'Skipping already tracked file {fdf_file.name}')
                     continue
 
                 self._process_file(fdf_file, sub_run.name)
