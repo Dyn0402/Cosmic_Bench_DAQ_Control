@@ -43,6 +43,7 @@ class DecoderProcessorManager:
         return self
 
     def __exit__(self, *args):
+        self.client.send('Finished')
         return self.client.__exit__(*args)
 
     def _setup(self):
@@ -119,6 +120,7 @@ class TrackerProcessorManager:
         return self
 
     def __exit__(self, *args):
+        self.client.send('Finished')
         return self.client.__exit__(*args)
 
     def _setup(self):
