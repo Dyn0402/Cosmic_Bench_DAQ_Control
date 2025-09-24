@@ -19,6 +19,8 @@ from pathlib import Path
 from typing import Dict, Any, Optional
 
 from Client import Client
+from common_functions import (get_feu_num_from_fdf_file_name, get_run_name_from_fdf_file_name,
+                              get_file_num_from_fdf_file_name)
 
 
 class DecoderProcessorManager:
@@ -55,6 +57,9 @@ class DecoderProcessorManager:
 
     def process_all(self):
         for sub_run in sorted(self.output_dir.iterdir()):
+            if 'overnight' in sub_run.name:
+                print(f'Skipping overnight run {sub_run.name}')
+                continue
             if not sub_run.is_dir():
                 continue
 
@@ -64,8 +69,14 @@ class DecoderProcessorManager:
 
             for raw_file in sorted(raw_dir.glob("*.fdf")):
                 base = raw_file.stem
-                already_decoded = any(base in f.name for f in decoded_dir.glob("*"))
-                already_filtered = any(base in f.name for f in filtered_dir.glob("*"))
+                feu_num = get_feu_num_from_fdf_file_name(raw_file.name)
+
+                if feu_num == self._config["m3_feu_num"]:  # Skip M3 files
+                    continue
+
+                already_decoded = any(f.stem.startswith(base) for f in decoded_dir.glob("*"))
+                already_filtered = any(f.stem.startswith(base) for f in filtered_dir.glob("*"))
+
                 if already_decoded or already_filtered:
                     continue
 
@@ -122,7 +133,7 @@ class TrackerProcessorManager:
             tracking_dir = sub_run / self.tracking_dirname
             for fdf_file in sorted(tracking_dir.glob("*.fdf")):
                 base = fdf_file.stem
-                already_tracked = any(base in f.name for f in tracking_dir.glob("*") if f != fdf_file)
+                already_tracked = any(f.stem.startswith(base) for f in tracking_dir.glob("*"))
                 if already_tracked:
                     continue
 
@@ -142,19 +153,21 @@ class Processor:
         self.decoder: Optional[DecoderProcessorManager] = None
         self.tracker: Optional[TrackerProcessorManager] = None
 
+    def _init_processors(self):
+        if "sedip28_processor_info" in self.config:  # Need to also clean up now
+            # self.tracker = TrackerProcessorManager(self.config["sedip28_processor_info"], self.output_dir)
+            self.tracker = TrackerProcessorManager(self.config, self.output_dir)
+
         if "dedip196_processor_info" in self.config:
             # self.decoder = DecoderProcessorManager(self.config["dedip196_processor_info"], self.output_dir)
             self.decoder = DecoderProcessorManager(self.config, self.output_dir)
-
-        if "sedip28_processor_info" in self.config:
-            # self.tracker = TrackerProcessorManager(self.config["sedip28_processor_info"], self.output_dir)
-            self.tracker = TrackerProcessorManager(self.config, self.output_dir)
 
     def _load_config(self, path: str) -> Dict[str, Any]:
         with open(path, "r") as f:
             return json.load(f)
 
     def process_all(self):
+        self._init_processors()
         if self.decoder:
             with self.decoder as dec:
                 dec.process_all()

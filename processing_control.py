@@ -89,7 +89,8 @@ def main():
                         if 'Clean Up Unfiltered' in run_options:
                             decoded_dir = f"{sub_run_dir}{run_info['decoded_root_inner_dir']}/"
                             # Raw dream data files (leave pedestals in raw, m3 tracking needs pedestal)
-                            remove_files(fdf_dir, 'fdf', file_flag='_datrun_', file_num=file_num)
+                            remove_files(fdf_dir, 'fdf', file_flag='_datrun_', file_num=file_num,
+                                         exclude_feu_nums=[run_info['m3_feu_num']])
                             # Decoded but unfiltered root data files (leave pedestals in decoded)
                             remove_files(decoded_dir, 'root', file_flag='_datrun_', file_num=file_num)
                             server.send(f'Clean Up Complete for {sub_run} {file_num}')
@@ -407,13 +408,14 @@ def filter_dream_file_pyroot(file_path, events, out_file_path, event_branch_name
     in_file.Close()
 
 
-def remove_files(directory, extension=None, file_num=None, file_flag=None, file_num_index=-2):
+def remove_files(directory, extension=None, file_num=None, file_flag=None, exclude_feu_nums=None, file_num_index=-2):
     """
     Remove all files in directory with given file extension
     :param directory: Directory from which to remove files
     :param extension: Only remove files with given extension. Remove all files if extension is None
     :param file_num: Specific fdf file number to remove if not None.
     :param file_flag: Flag to identify fdf files to delete
+    :param exclude_feu_nums: List of feu numbers to exclude from deletion
     :param file_num_index: Index of file number in fdf file name
     :return:
     """
@@ -424,6 +426,9 @@ def remove_files(directory, extension=None, file_num=None, file_flag=None, file_
             continue
         if file_flag is not None and file_flag not in file_name:
             continue
+        if exclude_feu_nums is not None:
+            if get_feu_num_from_fdf_file_name(file_name) in exclude_feu_nums:
+                continue
         print(f'Removing {directory}{file_name}')
         os.remove(f'{directory}{file_name}')
 
