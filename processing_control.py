@@ -69,7 +69,7 @@ def main():
                                         out_type=run_info['out_type'], file_num=file_num,
                                         exclude_feu_nums=[run_info['m3_feu_num']])
                             server.send(f'Decoding Complete for {sub_run} {file_num}')
-                        if 'Filter By M3' in run_options:
+                        elif 'Filter By M3' in run_options:
                             decoded_dir = f"{sub_run_dir}{run_info['decoded_root_inner_dir']}/"
                             m3_tracking_dir = f"{sub_run_dir}{run_info['m3_tracking_inner_dir']}/"
                             out_dir = f"{sub_run_dir}{run_info['filtered_root_inner_dir']}/"
@@ -79,14 +79,14 @@ def main():
                                          run_info['detector_info_dir'], run_info['included_detectors'],
                                          file_num=file_num)
                             server.send(f'Filtering Complete for {sub_run} {file_num}')
-                        if 'Copy To Filtered' in run_options:
+                        elif 'Copy To Filtered' in run_options:
                             decoded_dir = f"{sub_run_dir}{run_info['decoded_root_inner_dir']}/"
                             out_dir = f"{sub_run_dir}{run_info['filtered_root_inner_dir']}/"
                             create_dir_if_not_exist(out_dir)
                             print(f'\n\nCopying non-filtered decoded files in {decoded_dir} to {out_dir}')
                             copy_to_filtered(out_dir, decoded_dir, file_num=file_num)
                             server.send(f'Copy of unfiltered decoded files to filtered directory complete for {sub_run} {file_num}')
-                        if 'Clean Up Unfiltered' in run_options:
+                        elif 'Clean Up Unfiltered' in run_options:
                             decoded_dir = f"{sub_run_dir}{run_info['decoded_root_inner_dir']}/"
                             # Raw dream data files (leave pedestals in raw, m3 tracking needs pedestal)
                             remove_files(fdf_dir, 'fdf', file_flag='_datrun_', file_num=file_num,
@@ -94,6 +94,8 @@ def main():
                             # Decoded but unfiltered root data files (leave pedestals in decoded)
                             remove_files(decoded_dir, 'root', file_flag='_datrun_', file_num=file_num)
                             server.send(f'Clean Up Complete for {sub_run} {file_num}')
+                        else:
+                            server.send('Known Unknown Command?')
                     res = server.receive()
         except Exception as e:
             print(f'Error: {e}\nRestarting processing control server...')

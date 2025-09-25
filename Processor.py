@@ -68,11 +68,11 @@ class DecoderProcessorManager:
             raw_file_nums = []
             for raw_file in sorted(raw_dir.glob("*.fdf")):
                 feu_num = get_feu_num_from_fdf_file_name(raw_file.name)
-                if feu_num != self._config["m3_feu_num"]:  # Skip non-M3 files
-                    print(f'Skipping non-M3 file {raw_file.name}')
+                if feu_num == self._config["m3_feu_num"]:  # Skip M3 files
+                    print(f'Skipping M3 file {raw_file.name}')
                     continue
                 if '_datrun_' not in raw_file.name:
-                    print(f'Skipp')
+                    print(f'Skipping non-datrun file {raw_file.name}')
                     continue
                 raw_file_nums.append(get_file_num_from_fdf_file_name(raw_file.name, -2))
 
@@ -155,7 +155,7 @@ class TrackerProcessorManager:
                     print(f'Skipping non-M3 file {raw_file.name}')
                     continue
                 if '_datrun_' not in raw_file.name:
-                    print(f'Skipp')
+                    print(f'Skipping non-datrun file {raw_file.name}')
                     continue
                 raw_file_nums.append(get_file_num_from_fdf_file_name(raw_file.name, -2))
 
