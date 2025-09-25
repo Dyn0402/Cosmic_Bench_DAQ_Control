@@ -14,7 +14,7 @@ import copy
 
 class Config:
     def __init__(self):
-        self.run_name = 'rd542_strip_1_quick_tests_9-25-25'
+        self.run_name = 'rd542_strip_1_overnight_9-24-25'
         self.daq_dir = '/home/clas12/dylan/Run/'  # Maybe kill
         self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -29,7 +29,6 @@ class Config:
         self.filtering_by_m3 = False  # True to filter by m3 tracking, False to do no filtering
         self.process_on_fly = False  # True to process data on fly, False to process after run
         self.save_fdfs = False  # True to save FDF files, False to delete after decoding
-        self.zero_supress = False  # True let DREAM DAQ pedestal subtract and suppress zeros, False to save all ADC values
         self.start_time = None
 
         self.dream_daq_info = {
@@ -101,7 +100,7 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'quick_test_480V',
+                'sub_run_name': 'overnight_run_resist_485V',
                 'run_time': 60 * 14,  # Minutes
                 'hvs': {
                     0: {
@@ -126,8 +125,8 @@ class Config:
                     3: {
                         # 1: 410,
                         # 2: 410,
-                        3: 480,
-                        4: 480,
+                        3: 485,
+                        4: 485,
                         # 5: 450,
                         # 6: 450,
                         # 7: 450,
