@@ -15,7 +15,7 @@ Processor system with separate decoding and tracking managers
 """
 
 import json
-import re
+import time
 from pathlib import Path
 from typing import Dict, Any, Optional
 
@@ -200,6 +200,11 @@ class Processor:
             return json.load(f)
 
     def process_all(self):
+        """
+        Process all files in the output directory according to the configuration.
+        This includes decoding and tracking as specified in the config.
+        :return:
+        """
         self._init_processors()
         if self.tracker:
             print('Starting tracking processing')
@@ -212,3 +217,25 @@ class Processor:
             with self.decoder as dec:
                 dec.process_all()
             print('Finished decoding processing\n')
+
+    def process_on_the_fly(self):
+        """
+        Process files as they are created in the output directory.
+        Wait for new files and process them accordingly.
+        :return:
+        """
+        self._init_processors()
+        while True:
+            if self.tracker:
+                print('Checking for new tracking files to process')
+                with self.tracker as trk:
+                    trk.process_all()
+                print('Finished tracking processing\n')
+
+            if self.decoder:
+                print('Checking for new files to decode')
+                with self.decoder as dec:
+                    dec.process_all()
+                print('Finished decoding\n')
+            print(f'Waiting to check for new files again, good time to exit...\n')
+            time.sleep(60)  # Wait before checking for new files again
