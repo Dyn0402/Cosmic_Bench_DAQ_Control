@@ -13,7 +13,8 @@ from Processor import *
 
 def main():
     # processor = Processor('/local/home/dn277127/Bureau/beam_test_25/run_config_test.json')
-    processor = Processor('/mnt/cosmic_data/Run/rd542_strip_1_overnight_9-24-25/run_config.json')
+    # processor = Processor('/mnt/cosmic_data/Run/rd542_strip_1_overnight_9-24-25/run_config.json')
+    processor = Processor('/mnt/cosmic_data/Run/zs_test_9-2-25/run_config.json')
     processor.config['save_fds'] = True
 
     processor.process_all()
