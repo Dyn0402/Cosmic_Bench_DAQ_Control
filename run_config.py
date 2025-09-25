@@ -101,7 +101,7 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'high_resist_525V',
+                'sub_run_name': 'high_resist_520V',
                 'run_time': 60,  # Minutes
                 'hvs': {
                     0: {
@@ -126,8 +126,8 @@ class Config:
                     3: {
                         # 1: 410,
                         # 2: 410,
-                        3: 525,
-                        4: 525,
+                        3: 520,
+                        4: 520,
                         # 5: 450,
                         # 6: 450,
                         # 7: 450,
