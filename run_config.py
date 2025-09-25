@@ -29,6 +29,7 @@ class Config:
         self.filtering_by_m3 = False  # True to filter by m3 tracking, False to do no filtering
         self.process_on_fly = False  # True to process data on fly, False to process after run
         self.save_fdfs = False  # True to save FDF files, False to delete after decoding
+        self.zero_supress = False  # True let DREAM DAQ pedestal subtract and suppress zeros, False to save all ADC values
         self.start_time = None
 
         self.dream_daq_info = {

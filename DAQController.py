@@ -17,7 +17,7 @@ import threading
 
 class DAQController:
     def __init__(self, cfg_template_file_path=None, run_time=10, out_name=None, run_dir=None, out_dir=None,
-                 trigger_switch_client=None, dream_daq_client=None):
+                 trigger_switch_client=None, dream_daq_client=None, zero_supress_mode=False):
         self.cfg_template_file_path = cfg_template_file_path
         self.run_directory = run_dir  # Relative to run_directory if not None
         self.out_directory = out_dir
@@ -31,6 +31,7 @@ class DAQController:
         self.go_timeout = 8 * 60  # seconds
         self.run_start_time = None
         self.measured_run_time = None
+        self.zero_supress_mode = zero_supress_mode
 
         # If trigger switch is used, need to run past run time to bracket the trigger switch on/off. Else just run time.
         # DAQ resets timer when first trigger received, so only need short pause to be sure.
@@ -217,6 +218,8 @@ class DAQController:
         for i, line in enumerate(cfg_lines):
             if 'Sys DaqRun Time' in line:
                 cfg_lines[i] = cfg_lines[i].replace('0', f'{self.cfg_file_run_time}')
+            if self.zero_supress_mode and 'Sys DaqRun Mode' in line:
+                cfg_lines[i] = cfg_lines[i].replace('Raw', 'ZS')
         with open(self.cfg_file_path, 'w') as file:
             file.writelines(cfg_lines)
 
