@@ -14,7 +14,7 @@ import copy
 
 class Config:
     def __init__(self):
-        self.run_name = 'rd542_strip_1_quick_tests_9-25-25'
+        self.run_name = 'rd542_strip_1_weekend_run_9-25-25'
         self.daq_dir = '/home/clas12/dylan/Run/'  # Maybe kill
         self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -101,8 +101,46 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'quick_test_480V',
-                'run_time': 60 * 14,  # Minutes
+                'sub_run_name': 'high_resist_525V',
+                'run_time': 60,  # Minutes
+                'hvs': {
+                    0: {
+                        # 0: 800,
+                        # 1: 800,
+                        # 2: 800,
+                        # 3: 800,
+                        6: 800,
+                        # 7: 460,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    1: {
+                        # 0: 0,
+                        # 1: 600,
+                    },
+                    2: {
+                        # 0: 450,
+                    },
+                    3: {
+                        # 1: 410,
+                        # 2: 410,
+                        3: 525,
+                        4: 525,
+                        # 5: 450,
+                        # 6: 450,
+                        # 7: 450,
+                        8: 460,
+                        9: 460,
+                        10: 460,
+                        11: 460,
+                    }
+                }
+            },
+            {
+                'sub_run_name': 'weekend_run_480V',
+                'run_time': 60 * 60,  # Minutes
                 'hvs': {
                     0: {
                         # 0: 800,
