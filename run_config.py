@@ -15,7 +15,8 @@ import copy
 class Config:
     def __init__(self):
         self.run_name = 'rd542_strip_1_beam_test_test_9-26-25'
-        self.daq_dir = '/home/clas12/dylan/Run/'  # Maybe kill
+        # self.daq_dir = '/home/clas12/dylan/Run/'  # Maybe kill
+        self.daq_dir = '/local/home/banco/dylan/Run/'  # Maybe kill
         self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
         self.data_out_dir = '/mnt/cosmic_data/Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
