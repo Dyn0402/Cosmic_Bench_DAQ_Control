@@ -18,7 +18,7 @@ from common_functions import *
 
 
 def main():
-    port = 1000
+    port = 1101
     while True:
         try:
             with Server(port=port) as server:

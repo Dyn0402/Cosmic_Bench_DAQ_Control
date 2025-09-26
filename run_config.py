@@ -36,7 +36,7 @@ class Config:
             # 'ip': '192.168.10.100',
             'ip': '192.168.10.8',
             # 'port': 1100,
-            'port': 1000,
+            'port': 1101,
             # 'daq_config_template_path': '/home/clas12/dylan/Run/config/CosmicTb_beam_dry_run.cfg',
             # 'daq_config_template_path': '/home/clas12/dylan/Run/config/CosmicTb_TPOT.cfg',
             'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_TPOT.cfg',
