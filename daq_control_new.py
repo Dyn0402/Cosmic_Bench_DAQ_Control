@@ -43,9 +43,16 @@ def main():
     sedip28_processor_client = Client(sedip28_ip, sedip28_port) if m3 and config.process_on_fly else nullcontext()
     dream_daq_client = Client(dream_daq_ip, dream_daq_port)
 
-    with (hv_client as hv, trigger_switch_client as trigger_switch, banco_daq_client as banco_daq,
-          dedip196_processor_client as dedip196_processor, sedip28_processor_client as sedip28_processor,
-          dream_daq_client as dream_daq):
+    # with (hv_client as hv, trigger_switch_client as trigger_switch, banco_daq_client as banco_daq,
+    #       dedip196_processor_client as dedip196_processor, sedip28_processor_client as sedip28_processor,
+    #       dream_daq_client as dream_daq):
+    with hv_client as hv, \
+            trigger_switch_client as trigger_switch, \
+            banco_daq_client as banco_daq, \
+            dedip196_processor_client as dedip196_processor, \
+            sedip28_processor_client as sedip28_processor, \
+            dream_daq_client as dream_daq:
+
         hv.send('Connected to daq_control')
         hv.receive()
         hv.send_json(config.hv_info)
