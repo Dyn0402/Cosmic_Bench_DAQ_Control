@@ -48,14 +48,17 @@ def main():
 
                         if run_directory is not None:
                             sub_run_dir = f'{run_directory}/{sub_run_name}/'
+                            print('Changing to sub-run directory:', sub_run_dir)
                             create_dir_if_not_exist(sub_run_dir)
                             os.chdir(sub_run_dir)
                         else:
                             sub_run_dir = os.getcwd()
 
                         cfg_file_path = make_config_from_template(cfg_template_path, sub_run_dir, run_time)
-
+                        print(f'Working directory: {os.getcwd()}')
+                        print(f'Config file path: {cfg_file_path}')
                         run_command = f'RunCtrl -c {cfg_file_path} -f {sub_run_name}'
+                        print(f'Running command: {run_command}')
 
                         process = Popen(run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
                         start, run_start, sent_go_time, sent_continue_time = time(), None, None, None
