@@ -57,7 +57,8 @@ def main():
                         cfg_file_path = make_config_from_template(cfg_template_path, sub_run_dir, run_time)
                         print(f'Working directory: {os.getcwd()}')
                         print(f'Config file path: {cfg_file_path}')
-                        run_command = f'RunCtrl -c {cfg_file_path} -f {sub_run_name}'
+                        # run_command = f'RunCtrl -c {cfg_file_path} -f {sub_run_name}'
+                        run_command = f'bash -c "source ~/.bashrc && RunCtrl -c {cfg_file_path} -f {sub_run_name}"'
                         print(f'Running command: {run_command}')
                         input('Press Enter to continue...')
 
