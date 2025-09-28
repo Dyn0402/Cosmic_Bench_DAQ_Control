@@ -59,6 +59,7 @@ def main():
                         print(f'Config file path: {cfg_file_path}')
                         run_command = f'RunCtrl -c {cfg_file_path} -f {sub_run_name}'
                         print(f'Running command: {run_command}')
+                        input('Press Enter to continue...')
 
                         process = Popen(run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
                         start, run_start, sent_go_time, sent_continue_time = time(), None, None, None
