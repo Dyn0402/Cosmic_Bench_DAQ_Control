@@ -92,11 +92,12 @@ def main():
                             #     server.send('Dream DAQ started')
                             #     break
 
-                            if '_TakePedThr' in output.strip():
+                            if not taking_pedestals and '_TakePedThr' in output.strip():
                                 taking_pedestals = True
                                 server.send('Dream DAQ taking pedestals')
                             elif '_TakeData' in output.strip():
                                 server.send('Dream DAQ started')
+                                break
 
                             if output.strip() != '':
                                 print(output.strip())
