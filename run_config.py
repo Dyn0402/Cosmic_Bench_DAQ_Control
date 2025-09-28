@@ -48,7 +48,8 @@ class Config:
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
             'go_timeout': 5 * 60,  # Seconds to wait for 'Go' response from RunCtrl before assuming failure
             'max_run_time_addition': 60 * 5,  # Seconds to add to requested run time before killing run
-            'copy_on_fly': True  # True to copy raw data to out dir during run, False to copy after run
+            'copy_on_fly': True,  # True to copy raw data to out dir during run, False to copy after run
+            'batch_mode': True  # Run Dream RunCtrl in batch mode. Not implemented for cosmic bench CPU.
         }
 
         self.banco_info = {

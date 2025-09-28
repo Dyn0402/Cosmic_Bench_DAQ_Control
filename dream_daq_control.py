@@ -32,6 +32,7 @@ def main():
                 go_timeout = dream_info['go_timeout']
                 max_run_time_addition = dream_info['max_run_time_addition']
                 copy_on_fly = dream_info['copy_on_fly']
+                batch_mode = dream_info['batch_mode']
                 original_working_directory = os.getcwd()
 
                 create_dir_if_not_exist(run_directory)
@@ -54,8 +55,61 @@ def main():
                         else:
                             sub_run_dir = os.getcwd()
 
+                        # run_command = f'RunCtrl -c {cfg_file_path} -f {sub_run_name}'
+                        # print(f'Running command: {run_command}')
+                        # input('Press Enter to continue...')
+                        #
+                        # process = Popen(run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
+                        # start, run_start, sent_go_time, sent_continue_time = time(), None, None, None
+                        # sent_go, sent_continue, run_successful, triggered, triggered_off = False, False, True, False, False
+                        # server.send('Dream DAQ starting')
+                        # max_run_time = run_time + max_run_time_addition
+                        #
+                        # if copy_on_fly:
+                        #     daq_finished = threading.Event()
+                        #     copy_files_args = (sub_run_dir, sub_run_out_raw_inner_dir, daq_finished)
+                        #     copy_files_on_the_fly_thread = threading.Thread(target=copy_files_on_the_fly,
+                        #                                                     args=copy_files_args)
+                        #     copy_files_on_the_fly_thread.start()
+                        #
+                        # while True:
+                        #     output = process.stdout.readline()
+                        #     # if output == '' and process.poll() is not None:
+                        #     #     print('DAQ process finished.')
+                        #     #     break
+                        #     if not sent_go and output.strip() == '***':  # Start of run, begin taking pedestals
+                        #         process.stdin.write('G')
+                        #         process.stdin.flush()  # Ensure the command is sent immediately
+                        #         sent_go, sent_go_time = True, time()
+                        #         print('Taking pedestals.')
+                        #         server.send('Dream DAQ taking pedestals')
+                        #     elif not sent_continue and 'Press C to Continue' in output.strip():  # End of pedestals, begin taking data
+                        #         process.stdin.write('C')  # Signal to start data taking
+                        #         process.stdin.flush()
+                        #         sent_continue, sent_continue_time = True, time()
+                        #         print('DAQ started.')
+                        #         server.send('Dream DAQ started')
+                        #         break
+                        #
+                        #     if output.strip() != '':
+                        #         print(output.strip())
+                        #
+                        #     go_time_out = time() - sent_go_time > go_timeout if sent_go and not sent_continue else False
+                        #     run_time_out = time() - start > max_run_time * 60
+                        #     # if go_time_out or run_time_out or (output == '' and process.poll() is not None):
+                        #     if go_time_out or run_time_out:
+                        #         print('DAQ process timed out.')
+                        #         process.kill()
+                        #         sleep(5)
+                        #         run_successful = False
+                        #         print('DAQ process timed out.')
+                        #         server.send('Dream DAQ timed out')
+                        #         break
+
                         cfg_file_path = make_config_from_template(cfg_template_path, sub_run_dir, run_time)
-                        run_command = f'RunCtrl -c {cfg_file_path} -f {sub_run_name} -b'
+                        run_command = f'RunCtrl -c {cfg_file_path} -f {sub_run_name}'
+                        if batch_mode:
+                            run_command += ' -b'
 
                         process = Popen(run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
                         start, taking_pedestals, run_successful = time(), False, True
@@ -72,12 +126,26 @@ def main():
                         while True:
                             output = process.stdout.readline()
 
-                            if not taking_pedestals and '_TakePedThr' in output.strip():
-                                taking_pedestals = True
-                                server.send('Dream DAQ taking pedestals')
-                            elif '_TakeData' in output.strip():
-                                server.send('Dream DAQ started')
-                                break
+                            if batch_mode:
+                                if not taking_pedestals and '_TakePedThr' in output.strip():
+                                    taking_pedestals = True
+                                    server.send('Dream DAQ taking pedestals')
+                                elif '_TakeData' in output.strip():
+                                    server.send('Dream DAQ started')
+                                    break
+                            else:
+                                if not taking_pedestals and output.strip() == '***':  # Start of run, begin taking pedestals
+                                    process.stdin.write('G')
+                                    process.stdin.flush()  # Ensure the command is sent immediately
+                                    taking_pedestals = True
+                                    print('Taking pedestals.')
+                                    server.send('Dream DAQ taking pedestals')
+                                elif 'Press C to Continue' in output.strip():  # End of pedestals, begin taking data
+                                    process.stdin.write('C')  # Signal to start data taking
+                                    process.stdin.flush()
+                                    print('DAQ started.')
+                                    server.send('Dream DAQ started')
+                                    break
 
                             if output.strip() != '':
                                 print(output.strip())
