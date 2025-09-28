@@ -47,7 +47,7 @@ def main():
                         create_dir_if_not_exist(sub_run_out_raw_inner_dir)
 
                         if run_directory is not None:
-                            sub_run_dir = f'{run_directory}{sub_run_name}'
+                            sub_run_dir = f'{run_directory}{sub_run_name}/'
                             print('Changing to sub-run directory:', sub_run_dir)
                             create_dir_if_not_exist(sub_run_dir)
                             os.chdir(sub_run_dir)
@@ -200,7 +200,7 @@ def copy_files_on_the_fly(sub_run_dir, sub_out_dir, daq_finished_event, check_in
 
 def make_config_from_template(cfg_template_path, run_directory, run_time):
     cfg_file_name = os.path.basename(cfg_template_path)
-    cfg_file_path = f'{run_directory}/{cfg_file_name}'
+    cfg_file_path = f'{run_directory}/{cfg_file_name}'.replace('//', '/')
     shutil.copy(cfg_template_path, cfg_file_path)
     with open(cfg_file_path, 'r') as file:
         cfg_lines = file.readlines()
