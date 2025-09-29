@@ -15,7 +15,7 @@ import threading
 from flask import Flask, render_template, jsonify
 from flask_socketio import SocketIO
 
-from daq_status import get_dream_daq_status, get_hv_control_status
+from daq_status import get_dream_daq_status, get_hv_control_status, get_daq_control_status
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -39,6 +39,8 @@ def status_all():
             statuses[s] = get_dream_daq_status()
         elif s == "hv_control":
             statuses[s] = get_hv_control_status()
+        elif s == "daq_control":
+            statuses[s] = get_daq_control_status()
         else:
             statuses[s] = {
                 "status": "READY",
