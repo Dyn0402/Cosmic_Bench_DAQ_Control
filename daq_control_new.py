@@ -105,6 +105,7 @@ def main():
             if config.hv_info['hv_monitoring']:  # Monitor hv and write to file
                 hv.send('Begin Monitoring')
                 hv.receive()  # Starting monitoring
+                hv.send_json(sub_run)
                 hv.receive()  # Monitoring started
 
             hv.send('Start')
