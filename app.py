@@ -7,7 +7,7 @@ app = Flask(__name__)
 LOG_FILES = {
     "hv_control": "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/logs/hv_control.log",
     "dream_daq": "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/logs/dream_daq.log",
-    "decoder": "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/logs/decoder_processor.log",
+    "decoder": "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/logs/decoder.log",
     "daq_control": "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/logs/daq_control.log",
     # add more here...
 }
