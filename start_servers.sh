@@ -16,15 +16,11 @@ start_screen() {
         screen -dmS "$name"
         echo "✅ Started empty screen: $name"
     else
-        # Run command inside screen, redirecting output to log
-        screen -dm -S "$name" bash -c "$cmd; exec bash"
+        # Start interactive shell, then inject command
+        screen -dmS "$name"
+        # Send command into the screen, with a newline
+        screen -S "$name" -X stuff $"$cmd\n"
         echo "✅ Started $name running: $cmd"
-        sleep 1  # Give it a moment to start
-
-        # Check log for port error
-        if grep -q "Address already in use" "$logfile"; then
-            echo "⚠️  $name: Port already in use error detected!"
-        fi
     fi
 }
 
