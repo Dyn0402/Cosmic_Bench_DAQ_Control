@@ -100,6 +100,42 @@ def get_hv_control_status():
     return {"status": status, "color": color, "fields": fields}
 
 
+def get_daq_control_status():
+    try:
+        output = subprocess.check_output(
+            ["tmux", "capture-pane", "-pS", "-10", "-t", "daq_control:0.0"],
+            text=True
+        )
+    except subprocess.CalledProcessError:
+        return {
+            "status": "ERROR",
+            "color": "danger",
+            "fields": [{"label": "Details", "value": "daq_control tmux not running"}]
+        }
+
+    fields = []
+    if "Run complete" in output:
+        status = "Run Complete"
+        color = "info"
+    elif "Finished with sub run " in output:
+        status = "Finished Sub Run"
+        color = "warning"
+    elif "Prepping DAQs for " in output:
+        status = "Prepping DAQs"
+        color = "warning"
+    elif "Ramping HVs for " in output:
+        status = "Ramping HV"
+        color = "warning"
+    elif "Starting DAQ Control" in output:
+        status = "STARTING"
+        color = "warning"
+    else:
+        status = "UNKNOWN STATE"
+        color = "danger"
+
+    return {"status": status, "color": color, "fields": fields}
+
+
 # def get_dream_daq_status():
 #     try:
 #         output = subprocess.check_output(

@@ -23,6 +23,7 @@ from common_functions import *
 
 
 def main():
+    print("Starting DAQ Control")
     config = Config()
     config.start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     banco = any(['banco' in detector_name for detector_name in config.included_detectors])
@@ -43,9 +44,6 @@ def main():
     sedip28_processor_client = Client(sedip28_ip, sedip28_port) if m3 and config.process_on_fly else nullcontext()
     dream_daq_client = Client(dream_daq_ip, dream_daq_port)
 
-    # with (hv_client as hv, trigger_switch_client as trigger_switch, banco_daq_client as banco_daq,
-    #       dedip196_processor_client as dedip196_processor, sedip28_processor_client as sedip28_processor,
-    #       dream_daq_client as dream_daq):
     with hv_client as hv, \
             trigger_switch_client as trigger_switch, \
             banco_daq_client as banco_daq, \
@@ -102,6 +100,7 @@ def main():
             # sub_run_name = sub_run['sub_run_name']
             # hv.send(f'Start {sub_run_name}')
 
+            print(f'Ramping HVs for {sub_run_name}')
             if config.hv_info['hv_monitoring']:  # Monitor hv and write to file
                 hv.send('Begin Monitoring')
                 hv.receive()  # Starting monitoring
@@ -113,6 +112,7 @@ def main():
             hv.send_json(sub_run)
             res = hv.receive()
             if 'HV Set' in res:
+                print(f'Prepping DAQs for {sub_run_name}')
                 if banco:
                     banco_daq.send(f'Start {sub_run_name}')
                     banco_daq.receive()
@@ -150,8 +150,9 @@ def main():
                     # if config.process_on_fly:
                     #     process_files_on_the_fly_thread.join()
 
-                    print(f'Finished {sub_run_name}, waiting 10 seconds before next run')
+                    print(f'Finished with sub run {sub_run_name}, waiting 10 seconds before next run')
                     sleep(10)
+        print('Run complete, closing down subsystems')
         if config.power_off_hv_at_end:
             hv.send('Power Off')
             hv.receive()  # Starting power off
