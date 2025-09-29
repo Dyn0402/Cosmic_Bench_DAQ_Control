@@ -1,13 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on September 29 12:46 PM 2025
-Created in PyCharm
-Created as Cosmic_Bench_DAQ_Control/app.py
-
-@author: Dylan Neff, Dylan
-"""
-
 import time
 from flask import Flask, Response, render_template_string, stream_with_context
 
@@ -17,34 +7,66 @@ app = Flask(__name__)
 LOG_FILES = {
     "hv_control": "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/logs/hv_control.log",
     "dream_daq": "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/logs/dream_daq.log",
+    "decoder": "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/logs/decoder_processor.log",
+    "daq_control": "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/logs/daq_control.log",
+    # add more here...
 }
+
+# Number of lines to preload from each log
+PRELOAD_LINES = 200
 
 @app.route("/")
 def index():
-    # Show links to each log
-    links = "".join(f'<li><a href="/view/{name}">{name}</a></li>' for name in LOG_FILES)
-    return f"<h1>Available Logs</h1><ul>{links}</ul>"
-
-@app.route("/view/<name>")
-def view_log(name):
-    if name not in LOG_FILES:
-        return "No such log", 404
-
-    # Basic HTML page that connects to the stream
+    # Build grid with one <pre> per log
     template = """
-    <h1>Log: {{name}}</h1>
-    <pre id="log" style="white-space: pre-wrap; background: #111; color: #eee; padding: 1em; height: 80vh; overflow-y: scroll;"></pre>
-    <script>
-    var logElem = document.getElementById("log");
-    var evtSource = new EventSource("/stream/{{name}}");
-    evtSource.onmessage = function(e) {
-        logElem.textContent += e.data + "\\n";
-        logElem.scrollTop = logElem.scrollHeight; // auto-scroll
-    }
-    </script>
-    <a href="/">Back</a>
+    <html>
+    <head>
+      <style>
+        body { background: #222; color: #eee; font-family: monospace; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1em; }
+        .log-window { background: #111; padding: 0.5em; border: 1px solid #555;
+                      border-radius: 6px; height: 40vh; overflow-y: scroll; }
+        h2 { margin-top: 0; font-size: 1.2em; }
+      </style>
+    </head>
+    <body>
+      <h1>Live Logs</h1>
+      <div class="grid">
+        {% for name, path in logs.items() %}
+        <div>
+          <h2>{{name}}</h2>
+          <pre id="log-{{name}}" class="log-window">{{preloads[name]}}</pre>
+        </div>
+        {% endfor %}
+      </div>
+      <script>
+        {% for name, path in logs.items() %}
+        (function() {
+            var logElem = document.getElementById("log-{{name}}");
+            var evtSource = new EventSource("/stream/{{name}}");
+            evtSource.onmessage = function(e) {
+                logElem.textContent += e.data + "\\n";
+                logElem.scrollTop = logElem.scrollHeight; // auto-scroll
+            }
+        })();
+        {% endfor %}
+      </script>
+    </body>
+    </html>
     """
-    return render_template_string(template, name=name)
+
+    # Preload last N lines of each log
+    preloads = {}
+    for name, path in LOG_FILES.items():
+        try:
+            with open(path, "r") as f:
+                lines = f.readlines()
+                preloads[name] = "".join(lines[-PRELOAD_LINES:])
+        except Exception as e:
+            preloads[name] = f"(Error reading {path}: {e})"
+
+    return render_template_string(template, logs=LOG_FILES, preloads=preloads)
+
 
 @app.route("/stream/<name>")
 def stream_log(name):
@@ -54,7 +76,7 @@ def stream_log(name):
 
     def generate():
         with open(path, "r") as f:
-            # Seek to end of file to show only new content
+            # Start at end for *new* lines only
             f.seek(0, 2)
             while True:
                 line = f.readline()
@@ -64,4 +86,3 @@ def stream_log(name):
                     time.sleep(0.5)
 
     return Response(stream_with_context(generate()), mimetype="text/event-stream")
-
