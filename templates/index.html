@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- DAQ Overview Tab -->
+<div class="tab-pane fade show active" id="overview">
+    <h2>DAQ Overview</h2>
+    <div class="row" id="status-cards">
+        <!-- Cards populated dynamically -->
+    </div>
+</div>
+
+<!-- Live Screens Tab -->
+<div class="tab-pane fade" id="screens">
+    <h2>Live Screen Sessions</h2>
+    <div class="grid">
+    {% for name in screens %}
+        <div class="term-container">
+            <h2>{{name}}</h2>
+            <div id="terminal-{{name}}" class="terminal"></div>
+        </div>
+    {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// --- Live Screens JS ---
+{% for name in screens %}
+(function() {
+    var term = new Terminal();
+    term.open(document.getElementById("terminal-{{name}}"));
+    var socket = io();
+    socket.on("output-{{name}}", function(data) {
+        term.write(data);
+    });
+    term.onData(function(data) {
+        socket.emit("input-{{name}}", data);
+    });
+    socket.emit("start", {name: "{{name}}"});
+})();
+{% endfor %}
+
+// --- DAQ Overview JS ---
+function updateStatus() {
+    fetch("/status")
+        .then(response => response.json())
+        .then(data => {
+            let container = document.getElementById("status-cards");
+            container.innerHTML = "";
+            Object.entries(data).forEach(([name, status]) => {
+                let color = "secondary";
+                if (status === "RUNNING") color = "success";
+                else if (status === "ERROR") color = "danger";
+                else if (status === "READY") color = "warning";
+                else if (status === "STOPPED") color = "dark";
+
+                container.innerHTML += `
+                  <div class="col-md-4 mb-3">
+                    <div class="card text-white bg-${color}">
+                      <div class="card-body">
+                        <h5 class="card-title">${name}</h5>
+                        <p class="card-text">${status}</p>
+                      </div>
+                    </div>
+                  </div>`;
+            });
+        });
+}
+setInterval(updateStatus, 2000);
+updateStatus();
+</script>
+{% endblock %}
