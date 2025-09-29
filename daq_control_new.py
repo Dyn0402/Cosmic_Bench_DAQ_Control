@@ -103,7 +103,7 @@ def main():
             # hv.send(f'Start {sub_run_name}')
 
             if config.hv_info['hv_monitoring']:  # Monitor hv and write to file
-                hv.send('Start Monitoring')
+                hv.send('Begin Monitoring')
                 hv.receive()  # Starting monitoring
                 hv.receive()  # Monitoring started
 
@@ -156,7 +156,7 @@ def main():
             hv.receive()  # Starting power off
             hv.receive()  # Finished power off
         if config.hv_info['hv_monitoring']:
-            hv.send('Stop Monitoring')
+            hv.send('End Monitoring')
             hv.receive()  # Stopping monitoring
             hv.receive()  # Finished monitoring
         hv.send('Finished')

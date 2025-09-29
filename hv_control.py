@@ -41,7 +41,7 @@ def main():
                         server.send('HV ready to power off')
                         power_off_hvs(hv_info)
                         server.send('HV Powered Off')
-                    elif 'Start Monitoring' in res:
+                    elif 'Begin Monitoring' in res:
                         server.send('Starting HV monitor')
                         sub_run = server.receive_json()
                         monitor_stop_event.clear()
@@ -49,7 +49,7 @@ def main():
                         monitor_thread = threading.Thread(target=monitor_hvs, args=monitor_args)
                         monitor_thread.start()
                         server.send(f'HV monitoring started for {sub_run["sub_run_name"]}')
-                    elif 'Stop Monitoring' in res:
+                    elif 'End Monitoring' in res:
                         server.send('Stopping HV monitor')
                         if monitor_thread is not None:
                             monitor_stop_event.set()
