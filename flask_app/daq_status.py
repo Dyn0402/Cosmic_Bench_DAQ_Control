@@ -67,7 +67,7 @@ def get_dream_daq_status():
 def get_hv_control_status():
     try:
         output = subprocess.check_output(
-            ["tmux", "capture-pane", "-pS", "-500", "-t", "hv_control:0.0"],
+            ["tmux", "capture-pane", "-pS", "-50", "-t", "hv_control:0.0"],
             text=True
         )
     except subprocess.CalledProcessError:
