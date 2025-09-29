@@ -228,8 +228,13 @@ class DAQController:
 
     def write_run_time(self):
         with open(f'{self.out_directory}/run_time.txt', 'w') as file:
+            out_str = ''
             if self.measured_run_time is not None:
-                file.write(f'{self.measured_run_time:.2f}')
+                out_str += f'Run Time: {self.measured_run_time:.2f} seconds'
+            if self.run_start_time is not None:
+                out_str += f'\nRun Start Time: {self.run_start_time}'
+            if out_str != '':
+                file.write(out_str)
             else:
                 file.write('None')
 

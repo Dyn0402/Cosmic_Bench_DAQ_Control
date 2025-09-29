@@ -101,6 +101,12 @@ def main():
                 trigger_switch.receive()
             # sub_run_name = sub_run['sub_run_name']
             # hv.send(f'Start {sub_run_name}')
+
+            if config.hv_info['hv_monitoring']:  # Monitor hv and write to file
+                hv.send('Start Monitoring')
+                hv.receive()  # Starting monitoring
+                hv.receive()  # Monitoring started
+
             hv.send('Start')
             hv.receive()
             hv.send_json(sub_run)
@@ -149,6 +155,10 @@ def main():
             hv.send('Power Off')
             hv.receive()  # Starting power off
             hv.receive()  # Finished power off
+        if config.hv_info['hv_monitoring']:
+            hv.send('Stop Monitoring')
+            hv.receive()  # Stopping monitoring
+            hv.receive()  # Finished monitoring
         hv.send('Finished')
         if banco:
             banco_daq.send('Finished')

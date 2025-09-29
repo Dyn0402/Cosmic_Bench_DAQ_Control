@@ -8,7 +8,10 @@ Created as Cosmic_Bench_DAQ_Control/hv_control.py
 @author: Dylan Neff, Dylan
 """
 
+import os
+import threading
 import time
+import csv
 
 from Server import Server
 from caen_hv_py.CAENHVController import CAENHVController
@@ -19,6 +22,7 @@ from caen_hv_py.CAENHVController import CAENHVController
 def main():
     # config = Config()
     port = 1100
+    monitor_stop_event, monitor_thread = threading.Event(), None
     while True:
         try:
             with Server(port=port) as server:
@@ -37,6 +41,21 @@ def main():
                         server.send('HV ready to power off')
                         power_off_hvs(hv_info)
                         server.send('HV Powered Off')
+                    elif 'Start Monitoring' in res:
+                        server.send('Starting HV monitor')
+                        sub_run = server.receive_json()
+                        monitor_stop_event.clear()
+                        monitor_args = (hv_info, sub_run['hvs'], sub_run['sub_run_name'], monitor_stop_event)
+                        monitor_thread = threading.Thread(target=monitor_hvs, args=monitor_args)
+                        monitor_thread.start()
+                        server.send(f'HV monitoring started for {sub_run["sub_run_name"]}')
+                    elif 'Stop Monitoring' in res:
+                        server.send('Stopping HV monitor')
+                        if monitor_thread is not None:
+                            monitor_stop_event.set()
+                            monitor_thread.join()
+                            monitor_thread = None
+                        server.send('HV Monitor Stopped')
                     else:
                         server.send('Unknown Command')
                     res = server.receive()
@@ -86,6 +105,75 @@ def power_off_hvs(hv_info):
                 if power:
                     caen_hv.set_ch_pw(int(slot), int(channel), 0)
     print('HV Powered Off')
+
+
+# def monitor_hvs(hv_info, hvs, sub_run_name, stop_event):
+#     """
+#     Monitor the voltage and current of each HV channel and log the readings.
+#     :param hv_info:
+#     :param hvs:
+#     :return:
+#     """
+#     ip_address, username, password = hv_info['ip'], hv_info['username'], hv_info['password']
+#     run_out_dir = hv_info['run_out_dir']
+#     sub_run_out_dir = f'{run_out_dir}/{sub_run_name}'
+#     os.makedirs(sub_run_out_dir, exist_ok=True)
+#     log_file_path = f'{sub_run_out_dir}/hv_monitor.csv'
+#
+#     with open(log_file_path, 'w') as log_file:
+#         with CAENHVController(ip_address, username, password) as caen_hv:
+#             while not stop_event.is_set():
+#                 for slot, channel_v0s in hvs.items():
+#                     for channel, v0 in channel_v0s.items():
+#                         power = caen_hv.get_ch_power(int(slot), int(channel))
+#                         vmon = caen_hv.get_ch_vmon(int(slot), int(channel))
+#                         imon = caen_hv.get_ch_imon(int(slot), int(channel))
+
+
+def monitor_hvs(hv_info, hvs, sub_run_name, stop_event):
+    """
+    Monitor the voltage and current of each HV channel and log the readings.
+    Logs to CSV and prints human-readable output to the screen.
+    """
+    ip_address, username, password = hv_info['ip'], hv_info['username'], hv_info['password']
+    run_out_dir = hv_info['run_out_dir']
+    monitor_interval = hv_info.get('monitor_interval', 10)  # seconds
+    sub_run_out_dir = f'{run_out_dir}/{sub_run_name}'
+    os.makedirs(sub_run_out_dir, exist_ok=True)
+    log_file_path = f'{sub_run_out_dir}/hv_monitor.csv'
+
+    # Build headers dynamically based on hvs dict
+    headers = ["timestamp"]
+    for slot, channel_v0s in hvs.items():
+        for channel in channel_v0s.keys():
+            prefix = f"{slot}:{channel}"
+            headers.extend([f"{prefix} power", f"{prefix} v0", f"{prefix} vmon", f"{prefix} imon"])
+
+    with open(log_file_path, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(headers)  # write headers once
+
+        with CAENHVController(ip_address, username, password) as caen_hv:
+            while not stop_event.is_set():
+                row = [time.strftime("%Y-%m-%d %H:%M:%S")]
+
+                for slot, channel_v0s in hvs.items():
+                    for channel, v0 in channel_v0s.items():
+                        power = caen_hv.get_ch_power(int(slot), int(channel))
+                        vmon = caen_hv.get_ch_vmon(int(slot), int(channel))
+                        imon = caen_hv.get_ch_imon(int(slot), int(channel))
+
+                        row.extend([power, v0, vmon, imon])  # Append to row
+
+                        print(  # Human-readable output
+                            f"Slot {slot} Channel {channel}: "
+                            f"power={'on' if power else 'off'}, "
+                            f"v set={v0:.2f}, v mon={vmon:.2f}, i mon={imon:.3f}"
+                        )
+
+                writer.writerow(row)
+                csvfile.flush()  # ensure data is written to disk
+                time.sleep(monitor_interval)
 
 
 if __name__ == '__main__':
