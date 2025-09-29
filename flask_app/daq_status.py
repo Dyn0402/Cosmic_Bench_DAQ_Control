@@ -114,7 +114,7 @@ def get_daq_control_status():
         }
 
     fields = []
-    if "Run complete" in output:
+    if "Run complete" in output or "donzo" in output:
         status = "Run Complete"
         color = "info"
     elif "Finished with sub run " in output:
