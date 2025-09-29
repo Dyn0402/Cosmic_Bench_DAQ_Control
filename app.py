@@ -1,88 +1,126 @@
-import time
-from flask import Flask, Response, render_template_string, stream_with_context
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on September 29 3:45 PM 2025
+Created in PyCharm
+Created as Cosmic_Bench_DAQ_Control/app.py
+
+@author: Dylan Neff, Dylan
+"""
+
+import os
+import pty
+import select
+import threading
+
+from flask import Flask, render_template_string
+from flask_socketio import SocketIO
 
 app = Flask(__name__)
+socketio = SocketIO(app)
 
-# Map screen names to their log files
-LOG_FILES = {
-    "hv_control": "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/logs/hv_control.log",
-    "dream_daq": "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/logs/dream_daq.log",
-    "decoder": "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/logs/decoder.log",
-    "daq_control": "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/logs/daq_control.log",
-    # add more here...
-}
+# Define the screen sessions you want to expose
+SCREENS = ["hv_control", "dream_daq", "decoder", "daq_control"]
 
-# Number of lines to preload from each log
-PRELOAD_LINES = 200
+# Keep PTY fds per screen
+sessions = {}
+
 
 @app.route("/")
 def index():
-    # Build grid with one <pre> per log
     template = """
     <html>
     <head>
-      <style>
-        body { background: #222; color: #eee; font-family: monospace; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1em; }
-        .log-window { background: #111; padding: 0.5em; border: 1px solid #555;
-                      border-radius: 6px; height: 40vh; overflow-y: scroll; }
-        h2 { margin-top: 0; font-size: 1.2em; }
-      </style>
+        <link rel="stylesheet" href="/static/xterm.css" />
+        <script src="/static/xterm.js"></script>
+        <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+        <style>
+            body { background: #222; color: #eee; font-family: monospace; }
+            .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1em; }
+            .term-container { background: #111; border: 1px solid #555; border-radius: 6px; }
+            h2 { margin: 0; padding: 0.3em; font-size: 1.1em; background: #333; }
+            .terminal { width: 100%; height: 400px; }
+        </style>
     </head>
     <body>
-      <h1>Live Logs</h1>
-      <div class="grid">
-        {% for name, path in logs.items() %}
-        <div>
-          <h2>{{name}}</h2>
-          <pre id="log-{{name}}" class="log-window">{{preloads[name]}}</pre>
+        <h1>Live Screen Sessions</h1>
+        <div class="grid">
+        {% for name in screens %}
+          <div class="term-container">
+            <h2>{{name}}</h2>
+            <div id="terminal-{{name}}" class="terminal"></div>
+          </div>
+        {% endfor %}
         </div>
+
+        <script>
+        {% for name in screens %}
+          (function() {
+            var term = new Terminal();
+            term.open(document.getElementById("terminal-{{name}}"));
+
+            var socket = io();
+            socket.on("output-{{name}}", function(data) {
+                term.write(data);
+            });
+
+            term.onData(function(data) {
+                socket.emit("input-{{name}}", data);
+            });
+
+            socket.emit("start", {name: "{{name}}"});
+          })();
         {% endfor %}
-      </div>
-      <script>
-        {% for name, path in logs.items() %}
-        (function() {
-            var logElem = document.getElementById("log-{{name}}");
-            var evtSource = new EventSource("/stream/{{name}}");
-            evtSource.onmessage = function(e) {
-                logElem.textContent += e.data + "\\n";
-                logElem.scrollTop = logElem.scrollHeight; // auto-scroll
-            }
-        })();
-        {% endfor %}
-      </script>
+        </script>
     </body>
     </html>
     """
-
-    # Preload last N lines of each log
-    preloads = {}
-    for name, path in LOG_FILES.items():
-        try:
-            with open(path, "r") as f:
-                lines = f.readlines()
-                preloads[name] = "".join(lines[-PRELOAD_LINES:])
-        except Exception as e:
-            preloads[name] = f"(Error reading {path}: {e})"
-
-    return render_template_string(template, logs=LOG_FILES, preloads=preloads)
+    return render_template_string(template, screens=SCREENS)
 
 
-@app.route("/stream/<name>")
-def stream_log(name):
-    path = LOG_FILES.get(name)
-    if not path:
-        return "No such log", 404
+@socketio.on("start")
+def start(data):
+    name = data.get("name")
+    if name in sessions:
+        return
 
-    def generate():
-        with open(path, "r") as f:
-            # Start at end for *new* lines only
-            f.seek(0, 2)
+    pid, fd = pty.fork()
+    if pid == 0:
+        # Child process: attach to screen session
+        os.execvp("screen", ["screen", "-x", name])
+    else:
+        sessions[name] = fd
+
+        def read_from_fd(fd, screen_name):
             while True:
-                line = f.readline()
-                if line:
-                    yield f"data: {line.rstrip()}\n\n"
-                else:
-                    time.sleep(0.5)
+                try:
+                    r, _, _ = select.select([fd], [], [], 0.1)
+                    if fd in r:
+                        output = os.read(fd, 1024).decode(errors="ignore")
+                        socketio.emit(f"output-{screen_name}", output)
+                except OSError:
+                    break
 
-    return Response(stream_with_context(generate()), mimetype="text/event-stream")
+        thread = threading.Thread(target=read_from_fd, args=(fd, name), daemon=True)
+        thread.start()
+
+
+@socketio.on("input-hv_control")
+def input_hv(data):
+    os.write(sessions["hv_control"], data.encode())
+
+
+@socketio.on("input-dream_daq")
+def input_dreamdaq(data):
+    os.write(sessions["dream_daq"], data.encode())
+
+
+@socketio.on("input-decoder")
+def input_decoder(data):
+    os.write(sessions["decoder"], data.encode())
+
+
+@socketio.on("input-daq_control")
+def input_daq(data):
+    os.write(sessions["daq_control"], data.encode())
+
