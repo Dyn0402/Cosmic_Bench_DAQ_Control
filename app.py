@@ -8,11 +8,10 @@ Created as Cosmic_Bench_DAQ_Control/app.py
 @author: Dylan Neff, Dylan
 """
 
-
-import subprocess
+import os
+import pty
+import select
 import threading
-import time
-
 from flask import Flask, render_template
 from flask_socketio import SocketIO
 
@@ -20,38 +19,44 @@ app = Flask(__name__)
 socketio = SocketIO(app)
 
 TMUX_SESSIONS = ["hv_control", "dream_daq", "decoder", "daq_control"]
-
-def read_tmux_output(session_name):
-    """
-    Continuously read the visible output of the tmux session and emit via socketio.
-    """
-    while True:
-        try:
-            # Capture last 50 lines from tmux pane 0
-            output = subprocess.check_output(
-                ["tmux", "capture-pane", "-pt0", "-S", "-50"],
-                stderr=subprocess.DEVNULL,
-            ).decode(errors="ignore")
-            socketio.emit(f"output-{session_name}", output)
-            time.sleep(1)
-        except Exception as e:
-            print(f"Error reading tmux {session_name}: {e}")
-            time.sleep(1)
+sessions = {}
 
 @app.route("/")
 def index():
     return render_template("index.html", screens=TMUX_SESSIONS)
 
-# Start background threads for each tmux session
-for session in TMUX_SESSIONS:
-    threading.Thread(target=read_tmux_output, args=(session,), daemon=True).start()
+@socketio.on("start")
+def start(data):
+    name = data.get("name")
+    if name in sessions:
+        return  # already attached
 
-# Input handlers for interactive panes
-for session in TMUX_SESSIONS:
-    @socketio.on(f"input-{session}")
-    def make_input(s=session):
+    pid, fd = pty.fork()
+    if pid == 0:
+        # Child: attach to tmux session
+        os.execvp("tmux", ["tmux", "attach-session", "-t", name])
+    else:
+        # Parent: keep FD for reading/writing
+        sessions[name] = fd
+
+        def read_fd(fd, session_name):
+            while True:
+                try:
+                    r, _, _ = select.select([fd], [], [], 0.1)
+                    if fd in r:
+                        output = os.read(fd, 1024).decode(errors="ignore")
+                        socketio.emit(f"output-{session_name}", output)
+                except OSError:
+                    break
+
+        threading.Thread(target=read_fd, args=(fd, name), daemon=True).start()
+
+# Generic input handler for all sessions
+for s in TMUX_SESSIONS:
+    @socketio.on(f"input-{s}")
+    def make_input(session_name=s):
         def handle_input(data):
-            subprocess.run(["tmux", "send-keys", "-t", s, data, "Enter"])
+            os.write(sessions[session_name], data.encode())
         return handle_input
 
 if __name__ == "__main__":
