@@ -5,18 +5,19 @@
 <div class="tab-pane fade show active" id="overview">
     <h2>DAQ Overview</h2>
     <div class="row" id="status-cards">
-        <!-- Cards populated dynamically -->
+        <!-- Status cards populated dynamically -->
     </div>
 </div>
 
 <!-- Live Screens Tab -->
 <div class="tab-pane fade" id="screens">
-    <h2>Live Screen Sessions</h2>
+    <h2>Live Screen Sessions (tmux)</h2>
     <div class="grid">
     {% for name in screens %}
         <div class="term-container">
             <h2>{{name}}</h2>
             <div id="terminal-{{name}}" class="terminal"></div>
+            <small class="text-muted">Connected to tmux session: {{name}}</small>
         </div>
     {% endfor %}
     </div>
@@ -41,7 +42,7 @@
 })();
 {% endfor %}
 
-// --- DAQ Overview JS ---
+// --- DAQ Overview JS (example) ---
 function updateStatus() {
     fetch("/status")
         .then(response => response.json())
