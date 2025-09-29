@@ -7,6 +7,16 @@
     <div class="row" id="status-cards">
         <!-- Status cards populated dynamically -->
     </div>
+
+    <div class="card">
+      <div class="card-header">Dream DAQ</div>
+      <div class="card-body">
+        <p>Status: <span id="dream-status">loading...</span></p>
+        <p>Run Time: <span id="dream-runtime">-</span></p>
+        <p>Events: <span id="dream-events">-</span></p>
+        <p>Wait For: <span id="dream-wait">-</span></p>
+      </div>
+    </div>
 </div>
 
 <!-- Live Screens Tab -->
@@ -70,5 +80,18 @@ function updateStatus() {
 }
 setInterval(updateStatus, 2000);
 updateStatus();
+
+function updateDreamDAQ() {
+  fetch("/status/dream_daq")
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById("dream-status").innerText = data.status || "-";
+      document.getElementById("dream-runtime").innerText = data.runtime || "-";
+      document.getElementById("dream-events").innerText = data.events || "-";
+      document.getElementById("dream-wait").innerText = data.wait_for || "-";
+    });
+}
+setInterval(updateDreamDAQ, 2000);
+updateDreamDAQ();
 </script>
 {% endblock %}

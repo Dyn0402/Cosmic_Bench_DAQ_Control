@@ -15,6 +15,8 @@ import threading
 from flask import Flask, render_template
 from flask_socketio import SocketIO
 
+from daq_status import get_dream_daq_status
+
 app = Flask(__name__)
 socketio = SocketIO(app)
 
@@ -24,6 +26,11 @@ sessions = {}
 @app.route("/")
 def index():
     return render_template("index.html", screens=TMUX_SESSIONS)
+
+
+# @app.route("/")
+# def overview():
+#     return render_template("overview.html")
 
 @socketio.on("start")
 def start(data):

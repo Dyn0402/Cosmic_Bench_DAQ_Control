@@ -17,7 +17,8 @@ start_tmux() {
         echo "✅ Started empty tmux session: $name"
     else
         # Start tmux session and run command
-        tmux new-session -d -s "$name" "$cmd"
+        tmux new-session -d -s "$name"
+        tmux send-keys -t "$name" "$cmd" Enter
         echo "✅ Started $name running: $cmd"
     fi
 }
