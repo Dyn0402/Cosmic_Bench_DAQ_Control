@@ -21,6 +21,7 @@ def main():
     port = 1101
     while True:
         try:
+            clear_terminal()  # Dream DAQ output can get messy, try to clear after
             with Server(port=port) as server:
                 server.receive()
                 server.send('Dream DAQ control connected')
@@ -307,6 +308,13 @@ def file_num_still_running(fdf_dir, file_num, wait_time=30, silent=False):
         if new_sizes[i] > old_sizes[i]:
             return True
     return False
+
+
+def clear_terminal():
+    try:
+        os.system('cls' if os.name == 'nt' else 'clear')
+    except:
+        print('Failed to clear terminal')  # Ignore any errors
 
 
 if __name__ == '__main__':
