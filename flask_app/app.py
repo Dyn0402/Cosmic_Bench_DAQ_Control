@@ -15,7 +15,7 @@ import threading
 from flask import Flask, render_template, jsonify
 from flask_socketio import SocketIO
 
-from daq_status import get_dream_daq_status
+from daq_status import get_dream_daq_status, get_hv_control_status
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -37,10 +37,16 @@ def status_all():
     for s in TMUX_SESSIONS:
         if s == "dream_daq":
             statuses[s] = get_dream_daq_status()
+        elif s == "hv_control":
+            statuses[s] = get_hv_control_status()
         else:
-            # simple placeholder for now
-            statuses[s] = {"status": "READY"}
+            statuses[s] = {
+                "status": "READY",
+                "color": "secondary",
+                "fields": []
+            }
     return jsonify(statuses)
+
 
 # @app.route("/")
 # def overview():

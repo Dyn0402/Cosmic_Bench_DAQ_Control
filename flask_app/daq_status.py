@@ -12,6 +12,17 @@ import subprocess
 import re
 
 
+""" Colors:
+- danger (red)
+- warning (yellow)
+- success (green)
+- info (blue)
+- primary (dark blue)
+- secondary (grey)
+- light (light grey)
+- dark (black)
+"""
+
 def get_dream_daq_status():
     try:
         output = subprocess.check_output(
@@ -19,23 +30,74 @@ def get_dream_daq_status():
             text=True
         )
     except subprocess.CalledProcessError:
-        return {"status": "ERROR", "details": "not running"}
+        return {
+            "status": "ERROR",
+            "color": "danger",
+            "fields": [{"label": "Details", "value": "dream_daq tmux not running"}]
+        }
 
-    status = {"status": "WAITING"}
-
+    fields = []
     if "_TakePedThr" in output:
-        status["status"] = "PEDESTALS"
-
-    if "_TakeData:" in output:
-        status["status"] = "RUNNING"
+        status = "Taking Pedestals"
+        color = "warning"
+    elif "_TakeData:" in output:
+        status = "RUNNING"
+        color = "success"
         m_rt = re.search(r"RunTime\s+(\d+h\s+\d+m\s+\d+s)", output)
-        if m_rt: status["runtime"] = m_rt.group(1)
-        m_ev = re.search(r"nb_of_events=(\d+)", output)
-        if m_ev: status["events"] = int(m_ev.group(1))
-        m_wait = re.search(r"wait for\s+(\d+h\s+\d+s)", output)
-        if m_wait: status["wait_for"] = m_wait.group(1)
+        if m_rt: fields.append({"label": "Run Time", "value": m_rt.group(1)})
 
-    return status
+        m_ir = re.search(r"IntRate=\s*([\d.]+\s*[A-Za-z]+)", output)
+        if m_ir: fields.append({"label": "Int Rate", "value": m_ir.group(1)})
+
+        m_ev = re.search(r"nb_of_events=(\d+)", output)
+        if m_ev: fields.append({"label": "Events", "value": m_ev.group(1)})
+
+        m_wait = re.search(r"wait for\s+(\d+h\s+\d+s)", output)
+        if m_wait: fields.append({"label": "Wait For", "value": m_wait.group(1)})
+    elif "Listening on " in output:
+        status = "WAITING"
+        color = "secondary"
+    else:
+        status = "UNKNOWN STATE"
+        color = "danger"
+
+    return {"status": status, "color": color, "fields": fields}
+
+
+def get_hv_control_status():
+    try:
+        output = subprocess.check_output(
+            ["tmux", "capture-pane", "-pS", "-500", "-t", "hv_control:0.0"],
+            text=True
+        )
+    except subprocess.CalledProcessError:
+        return {
+            "status": "ERROR",
+            "color": "danger",
+            "fields": [{"label": "Details", "value": "hv_control tmux not running"}]
+        }
+
+    fields = []
+    if "HV Ramped" in output:
+        status = "HV Ramped"
+        color = "success"
+    elif "Powering off HV" in output or "HV Powered Off" in output:
+        status = "HV Off"
+        color = "secondary"
+    elif "Setting HV" in output or "Checking HV ramp" in output or "Waiting for HV to ramp" in output:
+        status = "Ramping HV"
+        color = "warning"
+    elif "Monitoring HV " in output:
+        status = "Monitoring HV"
+        color = "success"
+    elif "Listening on " in output:
+        status = "WAITING"
+        color = "secondary"
+    else:
+        status = "UNKNOWN STATE"
+        color = "danger"
+
+    return {"status": status, "color": color, "fields": fields}
 
 
 # def get_dream_daq_status():

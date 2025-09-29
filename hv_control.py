@@ -157,6 +157,7 @@ def monitor_hvs(hv_info, hvs, sub_run_name, stop_event):
             while not stop_event.is_set():
                 row = [time.strftime("%Y-%m-%d %H:%M:%S")]
 
+                print(f"Monitoring HV \n{time.strftime('%H:%M:%S', time.strptime(row[0], '%Y-%m-%d %H:%M:%S'))}")
                 for slot, channel_v0s in hvs.items():
                     for channel, v0 in channel_v0s.items():
                         power = caen_hv.get_ch_power(int(slot), int(channel))
@@ -166,7 +167,6 @@ def monitor_hvs(hv_info, hvs, sub_run_name, stop_event):
                         row.extend([power, v0, vmon, imon])  # Append to row
 
                         print(  # Human-readable output
-                            f"\n{time.strftime('%H:%M:%S', time.strptime(row[0], '%Y-%m-%d %H:%M:%S'))}\n"
                             f"Slot {slot} Channel {channel}: "
                             f"power={'on' if power else 'off'}, "
                             f"v set={v0:.2f}, v mon={vmon:.2f}, i mon={imon:.3f}"

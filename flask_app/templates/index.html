@@ -50,26 +50,16 @@ function updateStatus() {
             let container = document.getElementById("status-cards");
             container.innerHTML = "";
             Object.entries(data).forEach(([name, info]) => {
-                let status = typeof info === "string" ? info : info.status;
-                let color = "secondary";
-                if (status === "RUNNING") color = "success";
-                else if (status === "ERROR") color = "danger";
-                else if (status === "READY") color = "warning";
-                else if (status === "WAITING") color = "dark";
-
-                let details = "";
-                if (typeof info === "object") {
-                    if (info.runtime) details += `<p>Run Time: ${info.runtime}</p>`;
-                    if (info.events !== undefined) details += `<p>Events: ${info.events}</p>`;
-                    if (info.wait_for) details += `<p>Wait For: ${info.wait_for}</p>`;
-                }
+                let details = info.fields.map(
+                    f => `<p>${f.label}: ${f.value}</p>`
+                ).join("");
 
                 container.innerHTML += `
                   <div class="col-md-4 mb-3">
-                    <div class="card text-white bg-${color}">
+                    <div class="card text-white bg-${info.color}">
                       <div class="card-body">
                         <h5 class="card-title">${name}</h5>
-                        <p class="card-text">Status: ${status}</p>
+                        <p class="card-text">Status: ${info.status}</p>
                         ${details}
                       </div>
                     </div>
@@ -77,6 +67,7 @@ function updateStatus() {
             });
         });
 }
+
 setInterval(updateStatus, 1000);
 updateStatus();
 </script>
