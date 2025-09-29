@@ -27,9 +27,20 @@ sessions = {}
 def index():
     return render_template("index.html", screens=TMUX_SESSIONS)
 
-@app.route("/status/dream_daq")
-def dream_daq_status():
-    return jsonify(get_dream_daq_status())
+# @app.route("/status/dream_daq")
+# def dream_daq_status():
+#     return jsonify(get_dream_daq_status())
+
+@app.route("/status")
+def status_all():
+    statuses = {}
+    for s in TMUX_SESSIONS:
+        if s == "dream_daq":
+            statuses[s] = get_dream_daq_status()
+        else:
+            # simple placeholder for now
+            statuses[s] = {"status": "READY"}
+    return jsonify(statuses)
 
 # @app.route("/")
 # def overview():

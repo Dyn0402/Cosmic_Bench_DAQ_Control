@@ -55,23 +55,32 @@
 // --- DAQ Overview JS (example) ---
 function updateStatus() {
     fetch("/status")
-        .then(response => response.json())
+        .then(r => r.json())
         .then(data => {
             let container = document.getElementById("status-cards");
             container.innerHTML = "";
-            Object.entries(data).forEach(([name, status]) => {
+            Object.entries(data).forEach(([name, info]) => {
+                let status = typeof info === "string" ? info : info.status;
                 let color = "secondary";
                 if (status === "RUNNING") color = "success";
                 else if (status === "ERROR") color = "danger";
                 else if (status === "READY") color = "warning";
-                else if (status === "STOPPED") color = "dark";
+                else if (status === "WAITING") color = "dark";
+
+                let details = "";
+                if (typeof info === "object") {
+                    if (info.runtime) details += `<p>Run Time: ${info.runtime}</p>`;
+                    if (info.events !== undefined) details += `<p>Events: ${info.events}</p>`;
+                    if (info.wait_for) details += `<p>Wait For: ${info.wait_for}</p>`;
+                }
 
                 container.innerHTML += `
                   <div class="col-md-4 mb-3">
                     <div class="card text-white bg-${color}">
                       <div class="card-body">
                         <h5 class="card-title">${name}</h5>
-                        <p class="card-text">${status}</p>
+                        <p class="card-text">Status: ${status}</p>
+                        ${details}
                       </div>
                     </div>
                   </div>`;
@@ -80,18 +89,5 @@ function updateStatus() {
 }
 setInterval(updateStatus, 2000);
 updateStatus();
-
-function updateDreamDAQ() {
-  fetch("/status/dream_daq")
-    .then(r => r.json())
-    .then(data => {
-      document.getElementById("dream-status").innerText = data.status || "-";
-      document.getElementById("dream-runtime").innerText = data.runtime || "-";
-      document.getElementById("dream-events").innerText = data.events || "-";
-      document.getElementById("dream-wait").innerText = data.wait_for || "-";
-    });
-}
-setInterval(updateDreamDAQ, 2000);
-updateDreamDAQ();
 </script>
 {% endblock %}
