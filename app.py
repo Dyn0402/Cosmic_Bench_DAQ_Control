@@ -12,7 +12,7 @@ import os
 import pty
 import select
 import threading
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 from flask_socketio import SocketIO
 
 from daq_status import get_dream_daq_status
@@ -27,6 +27,9 @@ sessions = {}
 def index():
     return render_template("index.html", screens=TMUX_SESSIONS)
 
+@app.route("/status/dream_daq")
+def dream_daq_status():
+    return jsonify(get_dream_daq_status())
 
 # @app.route("/")
 # def overview():
