@@ -23,10 +23,10 @@ def get_dream_daq_status():
 
     status = {"status": "WAITING"}
 
-    if "TakePedThr= On" in output:
+    if "_TakePedThr" in output:
         status["status"] = "PEDESTALS"
 
-    if "TakeData= On" in output:
+    if "_TakeData:" in output:
         status["status"] = "RUNNING"
         m_rt = re.search(r"RunTime\s+(\d+h\s+\d+m\s+\d+s)", output)
         if m_rt: status["runtime"] = m_rt.group(1)

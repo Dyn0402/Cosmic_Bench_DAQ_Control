@@ -28,7 +28,8 @@ start_tmux hv_control "python hv_control.py"
 start_tmux dream_daq "python dream_daq_control.py"
 start_tmux decoder "python processing_control.py"
 start_tmux daq_control   # empty interactive session
-start_tmux flask_server 'export FLASK_APP=app.py; flask run --host=0.0.0.0 --port=5001'
+#start_tmux flask_server 'export FLASK_APP=app.py; flask run --host=0.0.0.0 --port=5001'
+start_tmux flask_server 'flask_app/start_flask.sh'
 
 
 ##!/bin/bash
