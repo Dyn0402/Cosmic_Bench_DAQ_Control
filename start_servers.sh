@@ -4,7 +4,6 @@
 start_screen() {
     local name=$1
     local cmd=$2
-    local logfile="logs/${name}.log"
 
     # Check if screen session already exists
     if screen -list | grep -q "[.]${name}[[:space:]]"; then
@@ -12,15 +11,13 @@ start_screen() {
         return 1
     fi
 
-    mkdir -p logs
-
     if [ -z "$cmd" ]; then
         # Start an empty interactive screen
         screen -dmS "$name"
         echo "✅ Started empty screen: $name"
     else
         # Run command inside screen, redirecting output to log
-        screen -dmL -Logfile "$logfile" -S "$name" bash -c "$cmd; exec bash"
+        screen -dm -S "$name" bash -c "$cmd; exec bash"
         echo "✅ Started $name running: $cmd"
         sleep 1  # Give it a moment to start
 
