@@ -20,7 +20,7 @@ start_screen() {
         echo "✅ Started empty screen: $name"
     else
         # Run command inside screen, redirecting output to log
-        screen -dmS "$name" bash -c "$cmd 2> $logfile"
+        screen -dmL -Logfile "$logfile" -S "$name" bash -c "$cmd"
         echo "✅ Started $name running: $cmd"
         sleep 1  # Give it a moment to start
 
