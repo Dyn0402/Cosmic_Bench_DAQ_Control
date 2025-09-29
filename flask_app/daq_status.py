@@ -78,21 +78,21 @@ def get_hv_control_status():
         }
 
     fields = []
-    if "HV Ramped" in output:
-        status = "HV Ramped"
-        color = "success"
+    if "Listening on " in output:
+        status = "WAITING"
+        color = "secondary"
     elif "Powering off HV" in output or "HV Powered Off" in output:
         status = "HV Off"
         color = "secondary"
-    elif "Setting HV" in output or "Checking HV ramp" in output or "Waiting for HV to ramp" in output:
-        status = "Ramping HV"
-        color = "warning"
     elif "Monitoring HV " in output:
         status = "Monitoring HV"
         color = "success"
-    elif "Listening on " in output:
-        status = "WAITING"
-        color = "secondary"
+    elif "HV Ramped" in output:
+        status = "HV Ramped"
+        color = "success"
+    elif "Setting HV" in output or "Checking HV ramp" in output or "Waiting for HV to ramp" in output:
+        status = "Ramping HV"
+        color = "warning"
     else:
         status = "UNKNOWN STATE"
         color = "danger"
