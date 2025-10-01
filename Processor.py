@@ -85,6 +85,9 @@ class DecoderProcessorManager:
                 already_filtered_file_nums.append(get_file_num_from_fdf_file_name(tracked_file.name, -2))
 
             # Get the raw files that need processing
+            print(f'Raw file_nums: {raw_file_nums}')
+            print(f'Already decoded file_nums: {already_decoded_file_nums}')
+            print(f'Already filtered file_nums: {already_filtered_file_nums}')
             to_process_file_nums = sorted(set(raw_file_nums) - set(already_decoded_file_nums) - set(already_filtered_file_nums))
             if not to_process_file_nums:
                 print(f'No new files to process for run {sub_run.name}')
