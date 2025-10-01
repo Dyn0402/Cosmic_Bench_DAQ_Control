@@ -68,6 +68,7 @@ class DecoderProcessorManager:
             raw_file_nums = []
             for raw_file in sorted(raw_dir.glob("*.fdf")):
                 feu_num = get_feu_num_from_fdf_file_name(raw_file.name)
+                print(f'Found raw file {raw_file.name} with FEU {feu_num}')
                 if feu_num == self._config["m3_feu_num"]:  # Skip M3 files
                     print(f'Skipping M3 file {raw_file.name}')
                     continue
