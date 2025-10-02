@@ -22,7 +22,7 @@ from caen_hv_py.CAENHVController import CAENHVController
 def main():
     # config = Config()
     port = 1100
-    monitor_stop_event, monitor_thread = threading.Event(), None
+    monitor_stop_event, monitor_print_event, monitor_thread = threading.Event(), threading.Event(), None
     while True:
         try:
             with Server(port=port) as server:
@@ -33,10 +33,12 @@ def main():
                 res = server.receive()
                 while 'Finished' not in res:
                     if 'Start' in res:
+                        monitor_print_event.clear()
                         server.send('HV ready to start')
                         sub_run = server.receive_json()
                         set_hvs(hv_info, sub_run['hvs'])
                         server.send(f'HV Set {sub_run["sub_run_name"]}')
+                        monitor_print_event.set()
                     elif 'Power Off' in res:
                         server.send('HV ready to power off')
                         power_off_hvs(hv_info)
@@ -45,7 +47,8 @@ def main():
                         server.send('Starting HV monitor')
                         sub_run = server.receive_json()
                         monitor_stop_event.clear()
-                        monitor_args = (hv_info, sub_run['hvs'], sub_run['sub_run_name'], monitor_stop_event)
+                        monitor_print_event.set()
+                        monitor_args = (hv_info, sub_run['hvs'], sub_run['sub_run_name'], monitor_stop_event, monitor_print_event)
                         monitor_thread = threading.Thread(target=monitor_hvs, args=monitor_args)
                         monitor_thread.start()
                         server.send(f'HV monitoring started for {sub_run["sub_run_name"]}')
@@ -130,7 +133,7 @@ def power_off_hvs(hv_info):
 #                         imon = caen_hv.get_ch_imon(int(slot), int(channel))
 
 
-def monitor_hvs(hv_info, hvs, sub_run_name, stop_event):
+def monitor_hvs(hv_info, hvs, sub_run_name, stop_event, print_event):
     """
     Monitor the voltage and current of each HV channel and log the readings.
     Logs to CSV and prints human-readable output to the screen.
@@ -157,7 +160,8 @@ def monitor_hvs(hv_info, hvs, sub_run_name, stop_event):
             while not stop_event.is_set():
                 row = [time.strftime("%Y-%m-%d %H:%M:%S")]
 
-                print(f"Monitoring HV \n{time.strftime('%H:%M:%S', time.strptime(row[0], '%Y-%m-%d %H:%M:%S'))}")
+                if print_event.is_set():
+                    print(f"Monitoring HV \n{time.strftime('%H:%M:%S', time.strptime(row[0], '%Y-%m-%d %H:%M:%S'))}")
                 for slot, channel_v0s in hvs.items():
                     for channel, v0 in channel_v0s.items():
                         power = caen_hv.get_ch_power(int(slot), int(channel))
@@ -166,11 +170,12 @@ def monitor_hvs(hv_info, hvs, sub_run_name, stop_event):
 
                         row.extend([power, v0, vmon, imon])  # Append to row
 
-                        print(  # Human-readable output
-                            f"Slot {slot} Channel {channel}: "
-                            f"power={'on' if power else 'off'}, "
-                            f"v set={v0:.2f}, v mon={vmon:.2f}, i mon={imon:.3f}"
-                        )
+                        if print_event.is_set():
+                            print(  # Human-readable output
+                                f"Slot {slot} Channel {channel}: "
+                                f"power={'on' if power else 'off'}, "
+                                f"v set={v0:.2f}, v mon={vmon:.2f}, i mon={imon:.3f}"
+                            )
 
                 writer.writerow(row)
                 csvfile.flush()  # ensure data is written to disk
