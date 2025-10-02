@@ -101,7 +101,7 @@ class Config:
             'username': 'admin',
             'password': 'admin',
             # 'n_cards': 4,
-            'n_cards': 5,
+            'n_cards': 6,
             'n_channels_per_card': 12,
             'run_out_dir': self.run_out_dir,
             'hv_monitoring': True,  # True to monitor HV during run, False to not monitor
