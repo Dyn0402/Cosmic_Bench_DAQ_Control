@@ -107,7 +107,7 @@ class Config:
         self.sub_runs = [
             {
                 'sub_run_name': 'quick_test_450V',
-                'run_time': 60,  # Minutes
+                'run_time': 60 * 5,  # Minutes
                 'hvs': {
                     0: {
                         # 0: 800,
