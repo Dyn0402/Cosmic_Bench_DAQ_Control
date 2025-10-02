@@ -19,17 +19,27 @@ def main():
         print('No command given')
         return
     state = argv[1]
-    if len(argv) > 2:
+    if len(argv) == 3:
         sleep_time = int(argv[2])
     else:
         sleep_time = 5
+    if len(argv) > 3:
+        num_triggers = int(argv[2])
+        freq_hz = float(argv[3])
+        pulse_freq_ratio = float(argv[4])
+
     trigger_switch_ip, trigger_switch_port = '192.168.10.101', 1100
     with Client(trigger_switch_ip, trigger_switch_port) as trigger_switch_client:
         trigger_switch_client.send('Connected to trigger manual control')
         trigger_switch_client.receive()
-        trigger_switch_client.send(state)
-        trigger_switch_client.receive()
-        sleep(sleep_time)
+
+        if len(argv) <= 3:
+            trigger_switch_client.send(state)
+            trigger_switch_client.receive()
+            sleep(sleep_time)
+        else:
+            trigger_switch_client.send(f'send triggers {num_triggers} {freq_hz} {pulse_freq_ratio}')
+            trigger_switch_client.receive()
         trigger_switch_client.send('Finished')
         trigger_switch_client.receive()
     print('donzo')

@@ -35,10 +35,9 @@ def main():
                             num_triggers = int(parts[2])
                             freq_hz = float(parts[3])
                             pulse_freq_ratio = float(parts[4])
-                            pulse_level = parts[5]
                             send_triggers(num_triggers=num_triggers, freq_hz=freq_hz,
-                                          pulse_freq_ratio=pulse_freq_ratio, pulse_level=pulse_level, pin=gpio_pin)
-                            server.send(f'Sent {num_triggers} triggers at {freq_hz} Hz with pulse ratio {pulse_freq_ratio} and level {pulse_level}')
+                                          pulse_freq_ratio=pulse_freq_ratio, pin=gpio_pin)
+                            server.send(f'Sent {num_triggers} triggers at {freq_hz} Hz with pulse ratio {pulse_freq_ratio}')
                         except (IndexError, ValueError) as e:
                             server.send(f'Error parsing send triggers command: {e}')
                     else:
