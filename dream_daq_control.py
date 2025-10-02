@@ -8,6 +8,8 @@ Created as Cosmic_Bench_DAQ_Control/dream_daq_control
 @author: Dylan Neff, dn277127
 """
 
+import os
+import sys
 from subprocess import Popen, PIPE
 from time import time, sleep
 import shutil
@@ -167,6 +169,8 @@ def main():
 
                         stop_thread = threading.Thread(target=listen_for_stop, args=(server, stop_event))
                         stop_thread.start()
+                        screen_clear_period = 30
+                        screen_clear_timer = time()
                         # sleep(2)
                         while True:  # DAQ running
                             if stop_event.is_set():
@@ -174,6 +178,10 @@ def main():
                                 process.stdin.flush()
                                 print('Stop command received. Stopping DAQ.')
                                 break
+
+                            if time() - screen_clear_timer > screen_clear_period:  # Clear terminal every 5 minutes
+                                clear_terminal()
+                                screen_clear_timer = time()
 
                             output = process.stdout.readline()
                             if output == '' and process.poll() is not None:
