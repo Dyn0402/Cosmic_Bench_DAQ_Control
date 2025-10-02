@@ -20,7 +20,7 @@ from daq_status import get_dream_daq_status, get_hv_control_status, get_daq_cont
 app = Flask(__name__)
 socketio = SocketIO(app)
 
-TMUX_SESSIONS = ["hv_control", "dream_daq", "decoder", "daq_control"]
+TMUX_SESSIONS = ["hv_control", "dream_daq", "decoder", "daq_control", "trigger_control"]
 sessions = {}
 
 @app.route("/")
