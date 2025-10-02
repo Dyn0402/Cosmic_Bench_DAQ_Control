@@ -77,27 +77,26 @@ def get_hv_control_status():
             "fields": [{"label": "Details", "value": "hv_control tmux not running"}]
         }
 
-    fields = []
-    if "Listening on " in output:
-        status = "WAITING"
-        color = "secondary"
-    elif "Powering off HV" in output or "HV Powered Off" in output:
-        status = "HV Off"
-        color = "secondary"
-    elif "Monitoring HV " in output:
-        status = "Monitoring HV"
-        color = "success"
-    elif "HV Ramped" in output:
-        status = "HV Ramped"
-        color = "success"
-    elif "Setting HV" in output or "Checking HV ramp" in output or "Waiting for HV to ramp" in output:
-        status = "Ramping HV"
-        color = "warning"
-    else:
-        status = "UNKNOWN STATE"
-        color = "danger"
+    # define your rules once, ordered by priority
+    rules = [
+        ("Listening on ", "WAITING", "secondary"),
+        ("Powering off HV", "HV Off", "secondary"),
+        ("HV Powered Off", "HV Off", "secondary"),
+        ("Monitoring HV", "Monitoring HV", "success"),
+        ("HV Ramped", "HV Ramped", "success"),
+        ("Setting HV", "Ramping HV", "warning"),
+        ("Checking HV ramp", "Ramping HV", "warning"),
+        ("Waiting for HV to ramp", "Ramping HV", "warning"),
+    ]
 
-    return {"status": status, "color": color, "fields": fields}
+    # scan bottom-to-top for the most recent matching line
+    for line in reversed(output.splitlines()):
+        for flag, status, color in rules:
+            if flag in line:
+                return {"status": status, "color": color, "fields": []}
+
+    # fallback if nothing matched
+    return {"status": "UNKNOWN STATE", "color": "danger", "fields": []}
 
 
 def get_daq_control_status():
@@ -113,62 +112,152 @@ def get_daq_control_status():
             "fields": [{"label": "Details", "value": "daq_control tmux not running"}]
         }
 
-    fields = []
-    if "Run complete" in output or "donzo" in output:
-        status = "Run Complete"
-        color = "info"
-    elif "Finished with sub run " in output:
-        status = "Finished Sub Run"
-        color = "warning"
-    elif "Prepping DAQs for " in output:
-        status = "Prepping DAQs"
-        color = "warning"
-    elif "Ramping HVs for " in output:
-        status = "Ramping HV"
-        color = "warning"
-    elif "Starting DAQ Control" in output:
-        status = "STARTING"
-        color = "warning"
-    else:
-        status = "UNKNOWN STATE"
-        color = "danger"
+    rules = [
+        ("Run complete", "Run Complete", "info"),
+        ("donzo", "Run Complete", "info"),
+        ("Finished with sub run ", "Finished Sub Run", "warning"),
+        ("Prepping DAQs for ", "Prepping DAQs", "warning"),
+        ("Ramping HVs for ", "Ramping HV", "warning"),
+        ("Starting DAQ Control", "STARTING", "warning"),
+    ]
 
-    return {"status": status, "color": color, "fields": fields}
+    for line in reversed(output.splitlines()):
+        for flag, status, color in rules:
+            if flag in line:
+                return {"status": status, "color": color, "fields": []}
+
+    return {"status": "UNKNOWN STATE", "color": "danger", "fields": []}
 
 
-# def get_dream_daq_status():
+def get_trigger_control_status():
+    try:
+        output = subprocess.check_output(
+            ["tmux", "capture-pane", "-pS", "-10", "-t", "trigger_control:0.0"],
+            text=True
+        )
+    except subprocess.CalledProcessError:
+        return {
+            "status": "ERROR",
+            "color": "danger",
+            "fields": [{"label": "Details", "value": "trigger_control tmux not running"}]
+        }
+
+    rules = [
+        ("Trigger switch turned on'", "Configured", "success"),
+        ("Trigger switch turned off", "Configuring", "warning"),
+        ("Trigger switch control connected", "STARTING", "warning"),
+        ("Listening on ", "WAITING", "secondary"),
+    ]
+
+    for line in reversed(output.splitlines()):
+        for flag, status, color in rules:
+            if flag in line:
+                return {"status": status, "color": color, "fields": []}
+
+    return {"status": "UNKNOWN STATE", "color": "danger", "fields": []}
+
+
+# def get_hv_control_status():
 #     try:
 #         output = subprocess.check_output(
-#             ["tmux", "capture-pane", "-pS", "-500", "-t", "dream_daq:0.0"],
+#             ["tmux", "capture-pane", "-pS", "-50", "-t", "hv_control:0.0"],
 #             text=True
 #         )
 #     except subprocess.CalledProcessError:
-#         return {"status": "error", "details": "dream_daq not running"}
+#         return {
+#             "status": "ERROR",
+#             "color": "danger",
+#             "fields": [{"label": "Details", "value": "hv_control tmux not running"}]
+#         }
 #
-#     status = {"status": "waiting"}  # default
+#     fields = []
+#     if "Listening on " in output:
+#         status = "WAITING"
+#         color = "secondary"
+#     elif "Powering off HV" in output or "HV Powered Off" in output:
+#         status = "HV Off"
+#         color = "secondary"
+#     elif "Monitoring HV " in output:
+#         status = "Monitoring HV"
+#         color = "success"
+#     elif "HV Ramped" in output:
+#         status = "HV Ramped"
+#         color = "success"
+#     elif "Setting HV" in output or "Checking HV ramp" in output or "Waiting for HV to ramp" in output:
+#         status = "Ramping HV"
+#         color = "warning"
+#     else:
+#         status = "UNKNOWN STATE"
+#         color = "danger"
 #
-#     # Detect pedestal taking
-#     if "TakePedThr= On" in output:
-#         status["status"] = "taking pedestals"
+#     return {"status": status, "color": color, "fields": fields}
+
+
+# def get_daq_control_status():
+#     try:
+#         output = subprocess.check_output(
+#             ["tmux", "capture-pane", "-pS", "-10", "-t", "daq_control:0.0"],
+#             text=True
+#         )
+#     except subprocess.CalledProcessError:
+#         return {
+#             "status": "ERROR",
+#             "color": "danger",
+#             "fields": [{"label": "Details", "value": "daq_control tmux not running"}]
+#         }
 #
-#     # Detect data taking
-#     if "TakeData= On" in output:
-#         status["status"] = "taking data"
+#     fields = []
+#     if "Run complete" in output or "donzo" in output:
+#         status = "Run Complete"
+#         color = "info"
+#     elif "Finished with sub run " in output:
+#         status = "Finished Sub Run"
+#         color = "warning"
+#     elif "Prepping DAQs for " in output:
+#         status = "Prepping DAQs"
+#         color = "warning"
+#     elif "Ramping HVs for " in output:
+#         status = "Ramping HV"
+#         color = "warning"
+#     elif "Starting DAQ Control" in output:
+#         status = "STARTING"
+#         color = "warning"
+#     else:
+#         status = "UNKNOWN STATE"
+#         color = "danger"
 #
-#         # Extract RunTime
-#         match_runtime = re.search(r"RunTime\s+(\d+h\s+\d+m\s+\d+s)", output)
-#         if match_runtime:
-#             status["runtime"] = match_runtime.group(1)
+#     return {"status": status, "color": color, "fields": fields}
 #
-#         # Extract nb_of_events
-#         match_events = re.search(r"nb_of_events=(\d+)", output)
-#         if match_events:
-#             status["events"] = int(match_events.group(1))
 #
-#         # Extract wait for time
-#         match_wait = re.search(r"wait for\s+(\d+h\s+\d+s)", output)
-#         if match_wait:
-#             status["wait_for"] = match_wait.group(1)
+# def get_trigger_control_status():
+#     try:
+#         output = subprocess.check_output(
+#             ["tmux", "capture-pane", "-pS", "-10", "-t", "trigger_control:0.0"],
+#             text=True
+#         )
+#     except subprocess.CalledProcessError:
+#         return {
+#             "status": "ERROR",
+#             "color": "danger",
+#             "fields": [{"label": "Details", "value": "trigger_control tmux not running"}]
+#         }
 #
-#     return status
+#     fields = []
+#     if "Trigger switch turned on'" in output:
+#         status = "Configured"
+#         color = "success"
+#     elif "Trigger switch turned off" in output:
+#         status = "Configuring"
+#         color = "warning"
+#     elif "Trigger switch control connected" in output:
+#         status = "STARTING"
+#         color = "warning"
+#     elif "Listening on " in output:
+#         status = "WAITING"
+#         color = "secondary"
+#     else:
+#         status = "UNKNOWN STATE"
+#         color = "danger"
+#
+#     return {"status": status, "color": color, "fields": fields}
 
