@@ -23,10 +23,10 @@ def main():
         sleep_time = int(argv[2])
     else:
         sleep_time = 5
-    if len(argv) > 3:
-        num_triggers = int(argv[2])
-        freq_hz = float(argv[3])
-        pulse_freq_ratio = float(argv[4])
+    if len(argv) == 4:
+        num_triggers = int(argv[1])
+        freq_hz = float(argv[2])
+        pulse_freq_ratio = float(argv[3])
 
     trigger_switch_ip, trigger_switch_port = '192.168.10.101', 1100
     with Client(trigger_switch_ip, trigger_switch_port) as trigger_switch_client:
