@@ -68,6 +68,7 @@ class DecoderProcessorManager:
             raw_file_nums = []
             for raw_file in sorted(raw_dir.glob("*.fdf")):
                 feu_num = get_feu_num_from_fdf_file_name(raw_file.name)
+                print(f'Found raw file {raw_file.name} with FEU {feu_num}')
                 if feu_num == self._config["m3_feu_num"]:  # Skip M3 files
                     print(f'Skipping M3 file {raw_file.name}')
                     continue
@@ -85,6 +86,9 @@ class DecoderProcessorManager:
                 already_filtered_file_nums.append(get_file_num_from_fdf_file_name(tracked_file.name, -2))
 
             # Get the raw files that need processing
+            print(f'Raw file_nums: {raw_file_nums}')
+            print(f'Already decoded file_nums: {already_decoded_file_nums}')
+            print(f'Already filtered file_nums: {already_filtered_file_nums}')
             to_process_file_nums = sorted(set(raw_file_nums) - set(already_decoded_file_nums) - set(already_filtered_file_nums))
             if not to_process_file_nums:
                 print(f'No new files to process for run {sub_run.name}')
