@@ -17,7 +17,8 @@ def main():
     # processor = Processor('/mnt/cosmic_data/Run/rd542_strip_1_quick_tests_9-25-25/run_config.json')
     # processor = Processor('/mnt/cosmic_data/Run/rd542_strip_1_weekend_run_9-25-25/run_config.json')
     # processor = Processor('/mnt/cosmic_data/Run/rd542_plein_2_first_test_9-30-25/run_config.json')
-    processor = Processor('/mnt/cosmic_data/Run/rd542_plein_2_first_test_9-30-25/run_config.json')
+    # processor = Processor('/mnt/cosmic_data/Run/rd542_plein_2_first_test_9-30-25/run_config.json')
+    processor = Processor('/mnt/cosmic_data/Run/rd542_strip_1_beam_test_test_9-30-25/run_config.json')
     # processor = Processor('/mnt/cosmic_data/Run/zs_test_9-2-25/run_config.json')
     # processor.config['save_fds'] = True
 

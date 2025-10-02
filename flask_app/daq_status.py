@@ -119,6 +119,8 @@ def get_daq_control_status():
         ("Prepping DAQs for ", "Prepping DAQs", "warning"),
         ("Ramping HVs for ", "Ramping HV", "warning"),
         ("Starting DAQ Control", "STARTING", "warning"),
+        ("DAQ started", "RUNNING", "success"),
+        ("Stopping DAQ process", "Stopping DAQ", "warning"),
     ]
 
     for line in reversed(output.splitlines()):
