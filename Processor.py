@@ -193,9 +193,9 @@ class Processor:
         self.tracker: Optional[TrackerProcessorManager] = None
 
     def _init_processors(self):
-        if "sedip28_processor_info" in self.config:  # Need to also clean up now
+        # if "sedip28_processor_info" in self.config:  # Need to also clean up now
             # self.tracker = TrackerProcessorManager(self.config["sedip28_processor_info"], self.output_dir)
-            self.tracker = TrackerProcessorManager(self.config, self.output_dir)
+            # self.tracker = TrackerProcessorManager(self.config, self.output_dir)
 
         if "dedip196_processor_info" in self.config:
             # self.decoder = DecoderProcessorManager(self.config["dedip196_processor_info"], self.output_dir)
