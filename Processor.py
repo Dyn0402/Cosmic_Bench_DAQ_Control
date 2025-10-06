@@ -98,7 +98,7 @@ class DecoderProcessorManager:
 
             for file_num in to_process_file_nums:
                 print(f'Processing file_num {file_num} for run {sub_run.name}')
-                # self._process_file(file_num, sub_run.name)
+                self._process_file(file_num, sub_run.name)
 
     def _process_file(self, file_num: int, sub_run_name: str):
         # Decode
