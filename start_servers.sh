@@ -29,5 +29,5 @@ start_tmux dream_daq "python dream_daq_control.py"
 start_tmux decoder "python processing_control.py"
 start_tmux daq_control   # empty interactive session
 start_tmux trigger_control "./start_trigger_control.sh"
+start_tmux banco_tracker "./start_banco_alpide_control.sh"
 start_tmux flask_server "flask_app/start_flask.sh"
-#start_tmux banco_tracker "python "
