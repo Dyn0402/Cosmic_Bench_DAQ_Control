@@ -58,10 +58,12 @@ class DecoderProcessorManager:
 
     def process_all(self):
         for sub_run in sorted(self.output_dir.iterdir()):
+            print(f'Processing run {sub_run.name}')
             if not sub_run.is_dir():
                 continue
 
             raw_dir = sub_run / self.raw_dirname
+            print(f'Raw dir: {raw_dir}')
             decoded_dir = sub_run / self.decoded_dirname
             filtered_dir = sub_run / self.filtered_dirname
 
