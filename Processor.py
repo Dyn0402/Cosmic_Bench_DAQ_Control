@@ -30,7 +30,7 @@ class DecoderProcessorManager:
         self._config = config
         self.output_dir = output_dir
         self.filtering = config.get("filtering_by_m3", False)
-        self.save_fds = config.get("save_fds", False)
+        self.save_fds = config.get("save_fdfs", False)
 
         # inner dirs
         self.raw_dirname = config.get("raw_daq_inner_dir", "raw_daq_data")
@@ -103,23 +103,24 @@ class DecoderProcessorManager:
     def _process_file(self, file_num: int, sub_run_name: str):
         # Decode
         self.client.send(f"Decode FDFs file_num={file_num} {sub_run_name}")
-        self.client.receive()
+        self.client.receive()  # Decoding started
+        self.client.receive()  # Wait for decoding to finish
 
         # Filtering or copy
         if self.filtering:
             self.client.send(f"Filter By M3 file_num={file_num} {sub_run_name}")
-            self.client.receive()
-            self.client.receive()
+            self.client.receive()  # Filtering started
+            self.client.receive()  # Wait for filtering to finish
         else:
             self.client.send(f"Copy To Filtered file_num={file_num} {sub_run_name}")
-            self.client.receive()
-            self.client.receive()
+            self.client.receive()  # Copying started
+            self.client.receive()  # Wait for copying to finish
 
         # Cleanup
         if not self.save_fds:
             self.client.send(f"Clean Up Unfiltered file_num={file_num} {sub_run_name}")
-            self.client.receive()
-            self.client.receive()
+            self.client.receive()  # Cleanup started
+            self.client.receive()  # Wait for cleanup to finish
 
 
 class TrackerProcessorManager:
