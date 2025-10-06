@@ -197,11 +197,9 @@ class Processor:
 
     def _init_processors(self):
         # if "sedip28_processor_info" in self.config:  # Need to also clean up now
-            # self.tracker = TrackerProcessorManager(self.config["sedip28_processor_info"], self.output_dir)
             # self.tracker = TrackerProcessorManager(self.config, self.output_dir)
 
         if "dedip196_processor_info" in self.config:
-            # self.decoder = DecoderProcessorManager(self.config["dedip196_processor_info"], self.output_dir)
             self.decoder = DecoderProcessorManager(self.config, self.output_dir)
 
     def _load_config(self, path: str) -> Dict[str, Any]:
