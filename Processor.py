@@ -95,7 +95,8 @@ class DecoderProcessorManager:
                 continue
 
             for file_num in to_process_file_nums:
-                self._process_file(file_num, sub_run.name)
+                print(f'Processing file_num {file_num} for run {sub_run.name}')
+                # self._process_file(file_num, sub_run.name)
 
     def _process_file(self, file_num: int, sub_run_name: str):
         # Decode
@@ -174,7 +175,8 @@ class TrackerProcessorManager:
                 continue
 
             for file_num in to_process_file_nums:
-                self._process_file(file_num, sub_run.name)
+                print(f'Processing M3 file_num {file_num} for run {sub_run.name}')
+                # self._process_file(file_num, sub_run.name)
 
     def _process_file(self, file_num: int, sub_run_name: str):
         self.client.send(f"Run M3 Tracking file_num={file_num} {sub_run_name}")
