@@ -219,9 +219,13 @@ class DAQController:
 
         # Copy all Grace* files from template directory to run directory
         template_dir = os.path.dirname(self.cfg_template_file_path)
+        print(f'Copying Grace files from {template_dir} to {dest}')
         for file in os.listdir(template_dir):
+            print(f'Found file: {file}')
             if file.startswith('Grace_'):
+                print(f'Copying {file} to {dest}')
                 shutil.copy(f'{template_dir}/{file}', f'{dest}/{file}')
+        input('Enter to continue...')
 
         with open(self.cfg_file_path, 'r') as file:
             cfg_lines = file.readlines()
