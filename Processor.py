@@ -236,8 +236,8 @@ class Processor:
         Wait for new files and process them accordingly.
         :return:
         """
-        self._init_processors()
         while True:
+            self._init_processors()
             if self.tracker:
                 print('Checking for new tracking files to process')
                 with self.tracker as trk:
