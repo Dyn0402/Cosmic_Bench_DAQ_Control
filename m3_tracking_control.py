@@ -52,6 +52,10 @@ def main():
                             m3_tracking(fdf_dir, run_info['tracking_sh_path'], run_info['tracking_run_dir'], out_dir,
                                         m3_feu_num=run_info['m3_feu_num'], file_num=file_num)
                             server.send(f'M3 Tracking Complete for {sub_run} file_num={file_num}')
+                        elif 'Clean Up M3 FDFs' in run_options:
+                            print(f'Cleaning up M3 FDFs in {fdf_dir}')
+                            clean_up_fdfs(fdf_dir, file_num=file_num)
+                            server.send(f'Clean Up FDFs Complete for {sub_run}')
                     res = server.receive()
         except Exception as e:
             print(f'Error: {e}\nRestarting processing control server...')
@@ -159,6 +163,22 @@ def make_temp_sh_file(fdf_run, ref_sh_file, file_num, sh_file_type='tracking', f
     # Make file executable
     os.system(f'chmod +x {temp_file_name}')
     return temp_file_name
+
+
+def clean_up_fdfs(fdf_dir, file_num=None):
+    """
+    Clean up fdf files in the given directory.
+    :param fdf_dir: Directory containing fdf files.
+    :param file_num: If given, only clean up files with this file number.
+    :return:
+    """
+    for file in os.listdir(fdf_dir):
+        if file.endswith('.fdf') and '_datrun_' in file:
+            if file_num is not None:
+                file_num_i = get_file_num_from_fdf_file_name(file, -2)
+                if file_num_i != file_num:
+                    continue
+            os.remove(f'{fdf_dir}/{file}')
 
 
 if __name__ == '__main__':

@@ -131,6 +131,7 @@ class TrackerProcessorManager:
         self.output_dir = output_dir
         self.tracking_dirname = config.get("m3_tracking_inner_dir", "m3_tracking_root")
         self.raw_dirname = config.get("raw_daq_inner_dir", "raw_daq_data")
+        self.save_fds = config.get("save_fdfs", False)
 
     def __enter__(self):
         self.client.__enter__()
@@ -179,12 +180,16 @@ class TrackerProcessorManager:
 
             for file_num in to_process_file_nums:
                 print(f'Processing M3 file_num {file_num} for run {sub_run.name}')
-                # self._process_file(file_num, sub_run.name)
+                self._process_file(file_num, sub_run.name)
 
     def _process_file(self, file_num: int, sub_run_name: str):
         self.client.send(f"Run M3 Tracking file_num={file_num} {sub_run_name}")
-        self.client.receive()
-        self.client.receive()
+        self.client.receive()  # Tracking started
+        self.client.receive()  # Wait for tracking to finish
+        if not self.save_fds:
+            self.client.send(f"Clean Up M3 FDFs file_num={file_num} {sub_run_name}")
+            self.client.receive()  # Cleanup started
+            self.client.receive()  # Wait for cleanup to finish
 
 
 class Processor:
@@ -196,8 +201,8 @@ class Processor:
         self.tracker: Optional[TrackerProcessorManager] = None
 
     def _init_processors(self):
-        # if "sedip28_processor_info" in self.config:  # Need to also clean up now
-            # self.tracker = TrackerProcessorManager(self.config, self.output_dir)
+        if "sedip28_processor_info" in self.config:  # Need to also clean up now
+            self.tracker = TrackerProcessorManager(self.config, self.output_dir)
 
         if "dedip196_processor_info" in self.config:
             self.decoder = DecoderProcessorManager(self.config, self.output_dir)
