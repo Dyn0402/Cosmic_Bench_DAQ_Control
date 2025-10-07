@@ -84,6 +84,10 @@ def m3_tracking(fdf_dir, tracking_sh_ref_path, tracking_run_dir, out_dir=None, m
         if file_num is not None and file_num_i != file_num:
             continue
         out_dir = fdf_dir if out_dir is None else out_dir
+
+        print(f'Waiting to make sure copy of {fdf_dir}/{file} complete...')
+        wait_for_copy_complete(f'{fdf_dir}/{file}', check_interval=0.2, stable_time=1.0)
+
         get_rays_from_fdf(run_name, tracking_sh_ref_path, [file_num_i], out_dir, tracking_run_dir, verbose=True,
                           fdf_dir=fdf_dir)
 
@@ -117,7 +121,6 @@ def get_rays_from_fdf(fdf_run, tracking_sh_file, file_nums, output_root_dir, run
 
         print(f'Running command: {cmd}')
 
-        # os.system(cmd)
         subprocess.run(cmd, shell=True)
 
         out_root_path = f'{output_root_dir}{fdf_run}_{i:03d}_rays.root'

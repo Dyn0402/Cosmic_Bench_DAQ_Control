@@ -10,6 +10,7 @@ Created as Cosmic_Bench_DAQ_Control/common_functions.py
 
 import os
 from datetime import datetime
+import time
 
 
 def create_dir_if_not_exist(dir_path):
@@ -86,3 +87,46 @@ def is_convertible_to_int(s):
         return True
     except ValueError:
         return False
+
+
+import os
+import time
+
+def wait_for_copy_complete(filepath, check_interval=1.0, stable_time=3.0, wait_for_creation=False):
+    """
+    Wait until file size stops changing for 'stable_time' seconds.
+
+    Args:
+        filepath (str): Path to file to check.
+        check_interval (float): Seconds between size checks.
+        stable_time (float): Time file size must remain constant to be considered complete.
+        wait_for_creation (bool):
+            - If True, keep waiting until the file appears.
+            - If False, return False immediately if file does not exist.
+
+    Returns:
+        bool: True if file appears and stabilizes, False otherwise.
+    """
+    last_size = -1
+    stable_start = None
+
+    while True:
+        if not os.path.exists(filepath):
+            if not wait_for_creation:
+                return False
+            stable_start = None
+            time.sleep(check_interval)
+            continue
+
+        current_size = os.path.getsize(filepath)
+
+        if current_size == last_size:
+            if stable_start is None:
+                stable_start = time.time()
+            elif time.time() - stable_start >= stable_time:
+                return True  # File size stable long enough
+        else:
+            stable_start = None
+            last_size = current_size
+
+        time.sleep(check_interval)

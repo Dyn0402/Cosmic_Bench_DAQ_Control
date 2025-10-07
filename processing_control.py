@@ -163,6 +163,8 @@ def decode_fdf(fdf_file_name, fdf_dir, decode_path, convert_path=None, out_type=
     """
     out_name = fdf_file_name.replace('.fdf', '_decoded.root')
     command = f"{decode_path} {fdf_dir}{fdf_file_name} {out_name}"
+    print(f'\n\nEnsuring copy of {fdf_file_name} is complete before decoding...')
+    wait_for_copy_complete(f'{fdf_dir}{fdf_file_name}', check_interval=0.2, stable_time=1.0)
     print(f'\nDecoding {fdf_file_name} to {out_name}')
     print(command)
     os.system(command)
