@@ -117,8 +117,8 @@ def main():
 
                 daq_trigger_switch = trigger_switch if banco else None
                 run_time = sub_run['run_time'] * 60 if daq_trigger_switch is None else sub_run['run_time'] * 60 + 5
-                daq_control_args = (sub_run_name, run_time, sub_out_dir, daq_trigger_switch, dream_daq,
-                                    config.zero_supress)
+                daq_control_args = (config.dream_daq_info['daq_config_template_path'], sub_run_name, run_time,
+                                    sub_out_dir, daq_trigger_switch, dream_daq, config.zero_supress)
 
                 try:
                     run_daq_controller(*daq_control_args)
@@ -156,10 +156,11 @@ def main():
     print('donzo')
 
 
-def run_daq_controller(sub_run_name, run_time, sub_out_dir, daq_trigger_switch, dream_daq_client, zs=False):
-    daq_controller = DAQController(run_time=run_time, out_dir=sub_out_dir, out_name=sub_run_name,
-                                   trigger_switch_client=daq_trigger_switch, dream_daq_client=dream_daq_client,
-                                   zero_supress_mode=zs)
+def run_daq_controller(config_template_path, sub_run_name, run_time, sub_out_dir, daq_trigger_switch, dream_daq_client,
+                       zs=False):
+    daq_controller = DAQController(cfg_template_file_path=config_template_path, run_time=run_time, out_dir=sub_out_dir,
+                                   out_name=sub_run_name, trigger_switch_client=daq_trigger_switch,
+                                   dream_daq_client=dream_daq_client, zero_supress_mode=zs)
 
     daq_success = False
     while not daq_success:  # Rerun if failure
