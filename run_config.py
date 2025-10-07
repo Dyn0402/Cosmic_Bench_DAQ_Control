@@ -14,9 +14,8 @@ import copy
 
 class Config:
     def __init__(self):
-        self.run_name = 'beam_test_daq_test_10-6-25'
-        # self.daq_dir = '/home/clas12/dylan/Run/'  # Maybe kill
-        self.daq_dir = '/local/home/banco/dylan/Run/'  # Maybe kill
+        self.run_name = 'rd542_strip_2_first_test_10-27-25'
+        self.daq_dir = '/home/clas12/dylan/Run/'  # Maybe kill
         self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
         self.data_out_dir = '/mnt/cosmic_data/Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -25,8 +24,8 @@ class Config:
         self.filtered_root_inner_dir = 'filtered_root'
         self.m3_tracking_inner_dir = 'm3_tracking_root'
         self.detector_info_dir = f'/mnt/cosmic_data/config/detectors/'
-        self.m3_feu_num = None
-        self.power_off_hv_at_end = True  # True to power off HV at end of run
+        self.m3_feu_num = 1
+        self.power_off_hv_at_end = False  # True to power off HV at end of run
         self.filtering_by_m3 = False  # True to filter by m3 tracking, False to do no filtering
         self.process_on_fly = False  # True to process data on fly, False to process after run
         self.save_fdfs = False  # True to save FDF files, False to delete after decoding
@@ -34,23 +33,19 @@ class Config:
         self.start_time = None
 
         self.dream_daq_info = {
-            # 'ip': '192.168.10.100',
-            'ip': '192.168.10.8',
-            # 'port': 1100,
+            'ip': '192.168.10.100',
             'port': 1101,
             # 'daq_config_template_path': '/home/clas12/dylan/Run/config/CosmicTb_beam_dry_run.cfg',
-            # 'daq_config_template_path': '/home/clas12/dylan/Run/config/CosmicTb_TPOT.cfg',
-            'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_TPOT.cfg',
-            # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_SelfTrigger.cfg',
+            'daq_config_template_path': '/home/clas12/dylan/Run/config/CosmicTb_TPOT.cfg',
+            # 'daq_config_template_path': '/home/clas12/dylan/Run/config/banco_test.cfg',
             # 'daq_config_template_path': '/home/clas12/dylan/Run/config/CosmicTb_SelfTrigger.cfg',
-            # 'run_directory': f'/home/clas12/dylan/Run/{self.run_name}/',
-            'run_directory': f'/local/home/banco/dylan/Run/{self.run_name}/',
+            'run_directory': f'/home/clas12/dylan/Run/{self.run_name}/',
             'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
             'go_timeout': 5 * 60,  # Seconds to wait for 'Go' response from RunCtrl before assuming failure
             'max_run_time_addition': 60 * 5,  # Seconds to add to requested run time before killing run
             'copy_on_fly': True,  # True to copy raw data to out dir during run, False to copy after run
-            'batch_mode': True  # Run Dream RunCtrl in batch mode. Not implemented for cosmic bench CPU.
+            'batch_mode': False  # Run Dream RunCtrl in batch mode. Not implemented for cosmic bench C
         }
 
         self.banco_info = {
@@ -73,13 +68,12 @@ class Config:
             'convert_path': '/local/home/banco/dylan/decode/convert_vec_tree_to_array',
             'detector_info_dir': self.detector_info_dir,
             'filtered_root_inner_dir': self.filtered_root_inner_dir,
-            'out_type': 'both',  # 'vec', 'array', or 'both'
+            'out_type': 'array',  # 'vec', 'array', or 'both'
             'm3_feu_num': self.m3_feu_num,
         }
 
         self.sedip28_processor_info = {
-            # 'ip': '192.168.10.1',
-            'ip': '192.168.10.8',
+            'ip': '192.168.10.1',
             'port': 1200,
             'run_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
@@ -90,22 +84,19 @@ class Config:
         }
 
         self.hv_control_info = {
-            # 'ip': '192.168.10.1',
-            'ip': '192.168.10.8',
+            'ip': '192.168.10.1',
             'port': 1100,
         }
 
         self.hv_info = {
-            # 'ip': '192.168.10.81',
-            'ip': '192.168.10.199',
+            'ip': '192.168.10.81',
             'username': 'admin',
             'password': 'admin',
-            # 'n_cards': 4,
-            'n_cards': 6,
+            'n_cards': 4,
             'n_channels_per_card': 12,
             'run_out_dir': self.run_out_dir,
             'hv_monitoring': True,  # True to monitor HV during run, False to not monitor
-            'monitor_interval': 5,  # Seconds between HV monitoring
+            'monitor_interval': 2,  # Seconds between HV monitoring
         }
 
         self.trigger_switch_info = {
@@ -114,57 +105,79 @@ class Config:
         }
 
         self.sub_runs = [
-            # {
-            #     'sub_run_name': 'quick_test_480V',
-            #     'run_time': 60 * 14,  # Minutes
-            #     'hvs': {
-            #         0: {
-            #             # 0: 800,
-            #             # 1: 800,
-            #             # 2: 800,
-            #             # 3: 800,
-            #             6: 800,
-            #             # 7: 460,
-            #             8: 500,
-            #             9: 500,
-            #             10: 500,
-            #             11: 500,
-            #         },
-            #         1: {
-            #             # 0: 0,
-            #             # 1: 600,
-            #         },
-            #         2: {
-            #             # 0: 450,
-            #         },
-            #         3: {
-            #             # 1: 410,
-            #             # 2: 410,
-            #             3: 480,
-            #             4: 480,
-            #             # 5: 450,
-            #             # 6: 450,
-            #             # 7: 450,
-            #             8: 460,
-            #             9: 460,
-            #             10: 460,
-            #             11: 460,
-            #         }
-            #     }
-            # },
             {
-                'sub_run_name': 'quick_test_480V',
-                'run_time': 60,  # Minutes
+                'sub_run_name': 'quick_test_450V',
+                'run_time': 60 * 5,  # Minutes
                 'hvs': {
+                    0: {
+                        # 0: 800,
+                        # 1: 800,
+                        # 2: 800,
+                        # 3: 800,
+                        6: 800,
+                        # 7: 460,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    1: {
+                        # 0: 0,
+                        # 1: 600,
+                    },
                     2: {
                         # 0: 450,
-                        # 1: 450,
-                        0: 10,
-                        1: 10,
                     },
-                    5: {
+                    3: {
+                        # 1: 410,
+                        # 2: 410,
+                        3: 450,
+                        4: 450,
+                        # 5: 450,
+                        # 6: 450,
+                        # 7: 450,
+                        8: 460,
+                        9: 460,
+                        10: 460,
+                        11: 460,
+                    }
+                }
+            },
+            {
+                'sub_run_name': 'long_test_450V',
+                'run_time': 60 * 24 * 5,  # Minutes
+                'hvs': {
+                    0: {
                         # 0: 800,
-                        0: 20,
+                        # 1: 800,
+                        # 2: 800,
+                        # 3: 800,
+                        6: 800,
+                        # 7: 460,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    1: {
+                        # 0: 0,
+                        # 1: 600,
+                    },
+                    2: {
+                        # 0: 450,
+                    },
+                    3: {
+                        # 1: 410,
+                        # 2: 410,
+                        3: 450,
+                        4: 450,
+                        # 5: 450,
+                        # 6: 450,
+                        # 7: 450,
+                        8: 460,
+                        9: 460,
+                        10: 460,
+                        11: 460,
                     }
                 }
             },
@@ -197,7 +210,8 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
-        self.included_detectors = ['rd542_strip_1']
+        self.included_detectors = ['rd542_strip_2',
+                                   'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
 
         self.detectors = [
             {
@@ -562,15 +576,90 @@ class Config:
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
-                    'drift': (5, 0),
-                    'resist_1': (2, 0),
-                    'resist_2': (2, 1)
+                    'drift': (0, 6),
+                    'resist_1': (3, 3),
+                    'resist_2': (3, 4)
                 },
                 'dream_feus': {
-                    'x_1': (1, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (1, 2),
-                    'y_1': (1, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (1, 4),
+                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
+                    'x_2': (6, 2),
+                    'y_1': (6, 3),  # Runs along y direction, indicates x hit location
+                    'y_2': (6, 4),
+                },
+            },
+            {
+                'name': 'rd542_plein_2',
+                'det_type': 'rd542_plein',
+                'det_center_coords': {  # Center of detector
+                    'x': 24,  # mm
+                    'y': 75.6,  # mm
+                    'z': 720.8,  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': {
+                    'drift': (0, 6),
+                    'resist_1': (3, 3),
+                    'resist_2': (3, 4)
+                },
+                'dream_feus': {
+                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
+                    'x_2': (6, 2),
+                    'y_1': (6, 3),  # Runs along y direction, indicates x hit location
+                    'y_2': (6, 4),
+                },
+            },
+            {
+                'name': 'rd542_plein_3',
+                'det_type': 'rd542_plein',
+                'det_center_coords': {  # Center of detector
+                    'x': 24,  # mm
+                    'y': 75.6,  # mm
+                    'z': 720.8,  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': {
+                    'drift': (0, 6),
+                    'resist_1': (3, 3),
+                    'resist_2': (3, 4)
+                },
+                'dream_feus': {
+                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
+                    'x_2': (6, 2),
+                    'y_1': (6, 3),  # Runs along y direction, indicates x hit location
+                    'y_2': (6, 4),
+                },
+            },
+            {
+                'name': 'rd542_strip_2',
+                'det_type': 'rd542_strip',
+                'det_center_coords': {  # Center of detector
+                    'x': 24,  # mm
+                    'y': 75.6,  # mm
+                    'z': 720.8,  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': {
+                    'drift': (0, 6),
+                    'resist_1': (3, 3),
+                    'resist_2': (3, 4)
+                },
+                'dream_feus': {
+                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
+                    'x_2': (6, 2),
+                    'y_1': (6, 3),  # Runs along y direction, indicates x hit location
+                    'y_2': (6, 4),
                 },
             },
             {
