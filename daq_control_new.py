@@ -97,8 +97,6 @@ def main():
             if banco:
                 trigger_switch.send('off')  # Turn off trigger to make sure daqs are synced
                 trigger_switch.receive()
-            # sub_run_name = sub_run['sub_run_name']
-            # hv.send(f'Start {sub_run_name}')
 
             print(f'Ramping HVs for {sub_run_name}')
             if config.hv_info['hv_monitoring']:  # Monitor hv and write to file
@@ -121,34 +119,19 @@ def main():
                 run_time = sub_run['run_time'] * 60 if daq_trigger_switch is None else sub_run['run_time'] * 60 + 5
                 daq_control_args = (sub_run_name, run_time, sub_out_dir, daq_trigger_switch, dream_daq,
                                     config.zero_supress)
-                # daq_controller_thread = threading.Thread(target=run_daq_controller, args=daq_control_args)
-                # if config.process_on_fly:
-                #     daq_finished = threading.Event()
-                #     process_files_args = (sub_run_dir, sub_out_dir, sub_run_name, dedip196_processor, sedip28_processor,
-                #                           daq_finished, m3, config.filtering_by_m3)
-                #     process_files_on_the_fly_thread = threading.Thread(target=process_files_on_the_fly,
-                #                                                    args=process_files_args)
 
                 try:
-                    # daq_controller_thread.start()
-                    # if config.process_on_fly:
-                    #     process_files_on_the_fly_thread.start()
                     run_daq_controller(*daq_control_args)
 
-                    # daq_controller_thread.join()
                 except KeyboardInterrupt:
                     print('Keyboard Interrupt, stopping run')
                 finally:
-                    # if config.process_on_fly:
-                    #     daq_finished.set()
                     if banco:
                         banco_daq.send('Stop')
                         banco_daq.receive()
 
                     if banco:
                         pass  # Process banco data
-                    # if config.process_on_fly:
-                    #     process_files_on_the_fly_thread.join()
 
                     print(f'Finished with sub run {sub_run_name}, waiting 10 seconds before next run')
                     sleep(10)
