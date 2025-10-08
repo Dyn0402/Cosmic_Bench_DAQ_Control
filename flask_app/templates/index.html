@@ -56,7 +56,14 @@
 
         <div class="mb-3">
             <button id="refreshSection" class="btn btn-secondary me-2">Update Section View</button>
-            <button id="saveSection" class="btn btn-success">Save Changes Locally</button>
+            <button id="saveSection" class="btn btn-success me-2">Save Changes Locally</button>
+            <button id="saveAsTemplate" class="btn btn-primary me-2">Save As Template</button>
+            <button id="saveRunConfig" class="btn btn-warning">Save Run Config</button>
+        </div>
+
+        <div class="mb-3" id="saveAsTemplateInput" style="display:none;">
+            <input type="text" id="newTemplateName" class="form-control" placeholder="Enter new template name (e.g., new_config.json)" style="max-width: 400px;">
+            <button id="confirmSaveAsTemplate" class="btn btn-success mt-2">Confirm Save</button>
         </div>
     </div>
 
@@ -226,6 +233,47 @@ document.getElementById("saveSection").addEventListener("click", () => {
     } catch (e) {
         alert("Invalid JSON: " + e.message);
     }
+});
+
+// --- Save As Template ---
+document.getElementById("saveAsTemplate").addEventListener("click", () => {
+    document.getElementById("saveAsTemplateInput").style.display = "block";
+});
+
+document.getElementById("confirmSaveAsTemplate").addEventListener("click", () => {
+    let filename = document.getElementById("newTemplateName").value.trim();
+    if (!filename) return alert("Please enter a filename");
+    if (!filename.endsWith(".json")) filename += ".json";
+
+    fetch("/save_json_template", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({filename: filename, content: currentJson})
+    })
+    .then(r => r.json())
+    .then(data => {
+        alert(data.message);
+        if (data.success) {
+            loadTemplateList();
+            document.getElementById("saveAsTemplateInput").style.display = "none";
+        }
+    })
+    .catch(err => alert("Failed to save: " + err));
+});
+
+// --- Save Run Config ---
+document.getElementById("saveRunConfig").addEventListener("click", () => {
+    if (!currentJson) return alert("No JSON loaded");
+    if (!currentJson.run_name) return alert("This JSON has no 'run_name' field");
+
+    fetch("/save_run_config", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({content: currentJson})
+    })
+    .then(r => r.json())
+    .then(data => alert(data.message))
+    .catch(err => alert("Failed to save run config: " + err));
 });
 
 

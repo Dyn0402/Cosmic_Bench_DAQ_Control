@@ -1,0 +1,147 @@
+{
+    "run_name": "beam_test_daq_test_10-6-25",
+    "daq_dir": "/local/home/banco/dylan/Run/",
+    "run_dir": "/local/home/banco/dylan/Run/beam_test_daq_test_10-6-25/",
+    "data_out_dir": "/mnt/cosmic_data/Run/",
+    "run_out_dir": "/mnt/cosmic_data/Run/beam_test_daq_test_10-6-25/",
+    "raw_daq_inner_dir": "raw_daq_data",
+    "decoded_root_inner_dir": "decoded_root",
+    "filtered_root_inner_dir": "filtered_root",
+    "m3_tracking_inner_dir": "m3_tracking_root",
+    "detector_info_dir": "/mnt/cosmic_data/config/detectors/",
+    "m3_feu_num": null,
+    "power_off_hv_at_end": true,
+    "filtering_by_m3": false,
+    "process_on_fly": false,
+    "save_fdfs": false,
+    "zero_supress": false,
+    "start_time": null,
+    "dream_daq_info": {
+        "ip": "192.168.10.8",
+        "port": 1101,
+        "daq_config_template_path": "/local/home/banco/dylan/Run/config/CosmicTb_TPOT.cfg",
+        "run_directory": "/local/home/banco/dylan/Run/beam_test_daq_test_10-6-25/",
+        "data_out_dir": "/mnt/cosmic_data/Run/beam_test_daq_test_10-6-25",
+        "raw_daq_inner_dir": "raw_daq_data",
+        "go_timeout": 300,
+        "max_run_time_addition": 300,
+        "copy_on_fly": true,
+        "batch_mode": true
+    },
+    "banco_info": {
+        "ip": "132.166.30.82",
+        "port": 1100,
+        "daq_run_command": "cd /home/banco/dylan/Run/framework/bin && ./test_multi_noiseocc_int",
+        "data_temp_dir": "/home/banco/dylan/Run/data",
+        "data_out_dir": "/mnt/cosmic_data/Run/beam_test_daq_test_10-6-25",
+        "data_inner_dir": "banco_data"
+    },
+    "dedip196_processor_info": {
+        "ip": "132.166.10.196",
+        "port": 1200,
+        "run_dir": "/mnt/cosmic_data/Run/beam_test_daq_test_10-6-25",
+        "raw_daq_inner_dir": "raw_daq_data",
+        "decoded_root_inner_dir": "decoded_root",
+        "m3_tracking_inner_dir": "m3_tracking_root",
+        "decode_path": "/local/home/banco/dylan/decode/decode",
+        "convert_path": "/local/home/banco/dylan/decode/convert_vec_tree_to_array",
+        "detector_info_dir": "/mnt/cosmic_data/config/detectors/",
+        "filtered_root_inner_dir": "filtered_root",
+        "out_type": "both",
+        "m3_feu_num": null
+    },
+    "hv_control_info": {
+        "ip": "192.168.10.8",
+        "port": 1100
+    },
+    "hv_info": {
+        "ip": "192.168.10.199",
+        "username": "admin",
+        "password": "admin",
+        "n_cards": 6,
+        "n_channels_per_card": 12,
+        "run_out_dir": "/mnt/cosmic_data/Run/beam_test_daq_test_10-6-25/",
+        "hv_monitoring": true,
+        "monitor_interval": 5
+    },
+    "trigger_switch_info": {
+        "ip": "192.168.10.101",
+        "port": 1100
+    },
+    "sub_runs": [
+        {
+            "sub_run_name": "quick_test_480V",
+            "run_time": 60,
+            "hvs": {
+                "2": {
+                    "0": 10,
+                    "1": 10
+                },
+                "5": {
+                    "0": 20
+                }
+            }
+        }
+    ],
+    "bench_geometry": {
+        "p1_z": 227,
+        "bottom_level_z": 82,
+        "level_z_spacing": 97,
+        "board_thickness": 5,
+        "banco_arm_bottom_to_center": 10.5,
+        "banco_arm_separation_z": 131,
+        "banco_arm_right_y": 134,
+        "banco_arm_length_y": 230
+    },
+    "included_detectors": [
+        "rd542_strip_1"
+    ],
+    "detectors": [
+        {
+            "name": "rd542_strip_1",
+            "det_type": "rd542_strip",
+            "det_center_coords": {
+                "x": 24,
+                "y": 75.6,
+                "z": 720.8
+            },
+            "det_orientation": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "hv_channels": {
+                "drift": [
+                    5,
+                    0
+                ],
+                "resist_1": [
+                    2,
+                    0
+                ],
+                "resist_2": [
+                    2,
+                    1
+                ]
+            },
+            "dream_feus": {
+                "x_1": [
+                    1,
+                    1
+                ],
+                "x_2": [
+                    1,
+                    2
+                ],
+                "y_1": [
+                    1,
+                    3
+                ],
+                "y_2": [
+                    1,
+                    4
+                ]
+            }
+        }
+    ]
+}

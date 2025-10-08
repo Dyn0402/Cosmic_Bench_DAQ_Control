@@ -19,7 +19,9 @@ from flask_socketio import SocketIO
 
 from daq_status import get_dream_daq_status, get_hv_control_status, get_daq_control_status
 
-TEMPLATE_DIR = "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/config/json_templates"
+CONFIG_TEMPLATE_DIR = "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/config/json_templates"
+CONFIG_RUN_DIR = "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/config/json_run_configs"
+
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -76,7 +78,7 @@ def stop_run():
 @app.route("/json_templates")
 def list_json_templates():
     try:
-        files = [f for f in os.listdir(TEMPLATE_DIR) if f.endswith(".json")]
+        files = [f for f in os.listdir(CONFIG_TEMPLATE_DIR) if f.endswith(".json")]
         return jsonify({"success": True, "templates": files})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
@@ -85,12 +87,55 @@ def list_json_templates():
 @app.route("/json_templates/<template_name>")
 def load_json_template(template_name):
     try:
-        path = os.path.join(TEMPLATE_DIR, template_name)
+        path = os.path.join(CONFIG_TEMPLATE_DIR, template_name)
         if not os.path.isfile(path):
             return jsonify({"success": False, "message": "File not found"}), 404
         with open(path, "r") as f:
             data = json.load(f)
         return jsonify({"success": True, "content": data})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+@app.route("/save_json_template", methods=["POST"])
+def save_json_template():
+    try:
+        data = request.get_json()
+        filename = data.get("filename")
+        content = data.get("content")
+
+        if not filename or not filename.endswith(".json"):
+            return jsonify({"success": False, "message": "Invalid filename"}), 400
+
+        path = os.path.join(CONFIG_TEMPLATE_DIR, filename)
+        with open(path, "w") as f:
+            json.dump(content, f, indent=4)
+
+        return jsonify({"success": True, "message": f"Template saved as {filename}"})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@app.route("/save_run_config", methods=["POST"])
+def save_run_config():
+    try:
+        data = request.get_json()
+        content = data.get("content")
+
+        if not isinstance(content, dict):
+            return jsonify({"success": False, "message": "Invalid JSON content"}), 400
+
+        run_name = content.get("run_name")
+        if not run_name:
+            return jsonify({"success": False, "message": "Missing 'run_name' field in config"}), 400
+
+        os.makedirs(CONFIG_RUN_DIR, exist_ok=True)
+
+        filename = f"{run_name}.json"
+        path = os.path.join(CONFIG_RUN_DIR, filename)
+        with open(path, "w") as f:
+            json.dump(content, f, indent=4)
+
+        return jsonify({"success": True, "message": f"Run config saved as {filename}"})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
 
