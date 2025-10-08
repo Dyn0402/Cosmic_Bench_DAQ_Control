@@ -15,10 +15,10 @@ from Server import Server
 
 def main():
     port, gpio_pin = 1100, 17
-    while True:
-        try:
-            with Server(port=port) as server:
-                server.receive()
+    while True:  # Keep the server listening forever
+        try:  # If there is some error, just restart the server
+            with Server(port=port) as server:  # Initialize server on specified port
+                server.receive()  # Wait for client to connect
                 server.send('Trigger switch control connected')
 
                 res = server.receive()
