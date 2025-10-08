@@ -13,10 +13,13 @@ import subprocess
 import pty
 import select
 import threading
+import json
 from flask import Flask, render_template, jsonify, request
 from flask_socketio import SocketIO
 
 from daq_status import get_dream_daq_status, get_hv_control_status, get_daq_control_status
+
+TEMPLATE_DIR = "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/config/json_templates"
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -66,6 +69,28 @@ def stop_run():
     try:
         subprocess.Popen(["/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/bash_scripts/stop_run.sh"])
         return jsonify({"success": True, "message": "Run stopped"})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@app.route("/json_templates")
+def list_json_templates():
+    try:
+        files = [f for f in os.listdir(TEMPLATE_DIR) if f.endswith(".json")]
+        return jsonify({"success": True, "templates": files})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@app.route("/json_templates/<template_name>")
+def load_json_template(template_name):
+    try:
+        path = os.path.join(TEMPLATE_DIR, template_name)
+        if not os.path.isfile(path):
+            return jsonify({"success": False, "message": "File not found"}), 404
+        with open(path, "r") as f:
+            data = json.load(f)
+        return jsonify({"success": True, "content": data})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
 

@@ -23,6 +23,7 @@ from common_functions import *
 
 
 def main():
+    print("Starting DAQ Control")
     config = Config()
     config.start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     banco = any(['banco' in detector_name for detector_name in config.included_detectors])
@@ -34,22 +35,29 @@ def main():
     banco_daq_ip, banco_daq_port = config.banco_info['ip'], config.banco_info['port']
     dedip196_ip, dedip196_port = config.dedip196_processor_info['ip'], config.dedip196_processor_info['port']
     sedip28_ip, sedip28_port = config.sedip28_processor_info['ip'], config.sedip28_processor_info['port']
+    dream_daq_ip, dream_daq_port = config.dream_daq_info['ip'], config.dream_daq_info['port']
 
     hv_client = Client(hv_ip, hv_port)
     trigger_switch_client = Client(trigger_switch_ip, trigger_switch_port) if banco else nullcontext()
     banco_daq_client = Client(banco_daq_ip, banco_daq_port) if banco else nullcontext()
-    dedip196_processor_client = Client(dedip196_ip, dedip196_port)
-    sedip28_processor_client = Client(sedip28_ip, sedip28_port)
+    dedip196_processor_client = Client(dedip196_ip, dedip196_port) if config.process_on_fly else nullcontext()
+    sedip28_processor_client = Client(sedip28_ip, sedip28_port) if m3 and config.process_on_fly else nullcontext()
+    dream_daq_client = Client(dream_daq_ip, dream_daq_port)
 
-    # with (Client(hv_ip, hv_port) as hv_client,
-    #       Client(trigger_switch_ip, trigger_switch_port) if banco else None as trigger_switch_client,
-    #       Client(banco_daq_ip, banco_daq_port) if banco else None as banco_daq_client,
-    #       Client(dedip196_ip, dedip196_port) as dedip196_processor_client):
-    with (hv_client as hv, trigger_switch_client as trigger_switch, banco_daq_client as banco_daq,
-          dedip196_processor_client as dedip196_processor, sedip28_processor_client as sedip28_processor):
+    with hv_client as hv, \
+            trigger_switch_client as trigger_switch, \
+            banco_daq_client as banco_daq, \
+            dedip196_processor_client as dedip196_processor, \
+            sedip28_processor_client as sedip28_processor, \
+            dream_daq_client as dream_daq:
+
         hv.send('Connected to daq_control')
         hv.receive()
         hv.send_json(config.hv_info)
+
+        dream_daq.send('Connected to daq_control')
+        dream_daq.receive()
+        dream_daq.send_json(config.dream_daq_info)
 
         if banco:
             trigger_switch.send('Connected to daq_control')
@@ -59,22 +67,23 @@ def main():
             banco_daq.receive()
             banco_daq.send_json(config.banco_info)
 
-        dedip196_processor.send('Connected to daq_control')
-        dedip196_processor.receive()
-        dedip196_processor.send_json(config.dedip196_processor_info)
-        dedip196_processor.receive()
-        dedip196_processor.send_json({'included_detectors': config.included_detectors})
-        dedip196_processor.receive()
-        dedip196_processor.send_json({'detectors': config.detectors})
-        dedip196_processor.receive()
+        if config.process_on_fly:
+            dedip196_processor.send('Connected to daq_control')
+            dedip196_processor.receive()
+            dedip196_processor.send_json(config.dedip196_processor_info)
+            dedip196_processor.receive()
+            dedip196_processor.send_json({'included_detectors': config.included_detectors})
+            dedip196_processor.receive()
+            dedip196_processor.send_json({'detectors': config.detectors})
+            dedip196_processor.receive()
 
-        sedip28_processor.send('Connected to daq_control')
-        sedip28_processor.receive()
-        sedip28_processor.send_json(config.sedip28_processor_info)
+            if m3:
+                sedip28_processor.send('Connected to daq_control')
+                sedip28_processor.receive()
+                sedip28_processor.send_json(config.sedip28_processor_info)
 
         sleep(2)  # Wait for all clients to do what they need to do (specifically, create directories)
 
-        create_dir_if_not_exist(config.run_dir)
         create_dir_if_not_exist(config.run_out_dir)
         config.write_to_file(f'{config.run_out_dir}run_config.json')
         for sub_run in config.sub_runs:
@@ -88,71 +97,74 @@ def main():
             if banco:
                 trigger_switch.send('off')  # Turn off trigger to make sure daqs are synced
                 trigger_switch.receive()
-            # sub_run_name = sub_run['sub_run_name']
-            # hv.send(f'Start {sub_run_name}')
+
+            print(f'Ramping HVs for {sub_run_name}')
+            if config.hv_info['hv_monitoring']:  # Monitor hv and write to file
+                hv.send('Begin Monitoring')
+                hv.receive()  # Starting monitoring
+                hv.send_json(sub_run)
+                hv.receive()  # Monitoring started
+
             hv.send('Start')
             hv.receive()
             hv.send_json(sub_run)
             res = hv.receive()
             if 'HV Set' in res:
+                print(f'Prepping DAQs for {sub_run_name}')
                 if banco:
                     banco_daq.send(f'Start {sub_run_name}')
                     banco_daq.receive()
 
                 daq_trigger_switch = trigger_switch if banco else None
-                daq_control_args = (config.dream_daq_info['daq_config_template_path'], sub_run['run_time'],
-                                    sub_run_name, sub_run_dir, sub_out_dir, daq_trigger_switch)
-                # daq_controller_thread = threading.Thread(target=run_daq_controller, args=daq_control_args)
-                if config.process_on_fly:
-                    daq_finished = threading.Event()
-                    process_files_args = (sub_run_dir, sub_out_dir, sub_run_name, dedip196_processor, sedip28_processor,
-                                          daq_finished, m3, config.filtering_by_m3)
-                    process_files_on_the_fly_thread = threading.Thread(target=process_files_on_the_fly,
-                                                                   args=process_files_args)
+                run_time = sub_run['run_time'] * 60 if daq_trigger_switch is None else sub_run['run_time'] * 60 + 5
+                daq_control_args = (config.dream_daq_info['daq_config_template_path'], sub_run_name, run_time,
+                                    sub_out_dir, sub_run_dir, daq_trigger_switch, dream_daq, config.zero_supress)
 
                 try:
-                    # daq_controller_thread.start()
-                    if config.process_on_fly:
-                        process_files_on_the_fly_thread.start()
                     run_daq_controller(*daq_control_args)
 
-                    # daq_controller_thread.join()
                 except KeyboardInterrupt:
                     print('Keyboard Interrupt, stopping run')
                 finally:
-                    if config.process_on_fly:
-                        daq_finished.set()
                     if banco:
                         banco_daq.send('Stop')
                         banco_daq.receive()
 
                     if banco:
                         pass  # Process banco data
-                    if config.process_on_fly:
-                        process_files_on_the_fly_thread.join()
 
-                    print(f'Finished {sub_run_name}, waiting 10 seconds before next run')
+                    print(f'Finished with sub run {sub_run_name}, waiting 10 seconds before next run')
                     sleep(10)
+        print('Run complete, closing down subsystems')
         if config.power_off_hv_at_end:
             hv.send('Power Off')
             hv.receive()  # Starting power off
             hv.receive()  # Finished power off
+        if config.hv_info['hv_monitoring']:
+            hv.send('End Monitoring')
+            hv.receive()  # Stopping monitoring
+            hv.receive()  # Finished monitoring
         hv.send('Finished')
         if banco:
             banco_daq.send('Finished')
             trigger_switch.send('Finished')
-        dedip196_processor.send('Finished')
-        sedip28_processor.send('Finished')
+        dream_daq.send('Finished')
+        if config.process_on_fly:
+            dedip196_processor.send('Finished')
+            if m3:
+                sedip28_processor.send('Finished')
     print('donzo')
 
 
-def run_daq_controller(config_template_path, run_time, sub_run_name, sub_run_dir, sub_out_dir, daq_trigger_switch):
-    daq_controller = DAQController(config_template_path, run_time, sub_run_name, sub_run_dir, sub_out_dir,
-                                   daq_trigger_switch)
+def run_daq_controller(config_template_path, sub_run_name, run_time, sub_out_dir, sub_run_dir, daq_trigger_switch,
+                       dream_daq_client, zs=False):
+    daq_controller = DAQController(cfg_template_file_path=config_template_path, run_time=run_time, out_dir=sub_out_dir,
+                                   out_name=sub_run_name, trigger_switch_client=daq_trigger_switch, run_dir=sub_run_dir,
+                                   dream_daq_client=dream_daq_client, zero_supress_mode=zs)
 
     daq_success = False
     while not daq_success:  # Rerun if failure
-        daq_success = daq_controller.run()
+        daq_success = daq_controller.run_new()
 
 
 def process_files_on_the_fly(sub_run_dir, sub_out_dir, sub_run_name, dedip196_processor, sedip28_processor,
