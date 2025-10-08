@@ -34,7 +34,10 @@ def main():
     trigger_switch_ip, trigger_switch_port = config.trigger_switch_info['ip'], config.trigger_switch_info['port']
     banco_daq_ip, banco_daq_port = config.banco_info['ip'], config.banco_info['port']
     dedip196_ip, dedip196_port = config.dedip196_processor_info['ip'], config.dedip196_processor_info['port']
-    sedip28_ip, sedip28_port = config.sedip28_processor_info['ip'], config.sedip28_processor_info['port']
+    if m3:
+        sedip28_ip, sedip28_port = config.sedip28_processor_info['ip'], config.sedip28_processor_info['port']
+    else:
+        sedip28_ip, sedip28_port = None, None
     dream_daq_ip, dream_daq_port = config.dream_daq_info['ip'], config.dream_daq_info['port']
 
     hv_client = Client(hv_ip, hv_port)
