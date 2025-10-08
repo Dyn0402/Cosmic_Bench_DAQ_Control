@@ -39,7 +39,29 @@
         </select>
     </div>
 
-    <pre id="jsonDisplay" style="background:#111; color:#0f0; padding:1em; border-radius:6px; overflow-x:auto; max-height:500px;"></pre>
+    <div id="jsonControls" style="display:none;">
+        <div class="mb-3">
+            <label for="sectionSelect" class="form-label">Select a top-level section:</label>
+            <select id="sectionSelect" class="form-select" style="max-width: 400px;">
+                <option value="">-- Choose a section --</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="jsonEditor" class="form-label">Edit section JSON:</label>
+            <textarea id="jsonEditor"
+                      class="form-control"
+                      style="background:#111; color:#0f0; font-family: monospace; height:300px;"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <button id="refreshSection" class="btn btn-secondary me-2">Update Section View</button>
+            <button id="saveSection" class="btn btn-success">Save Changes Locally</button>
+        </div>
+    </div>
+
+    <h5>Full JSON Preview:</h5>
+    <pre id="jsonDisplay" style="background:#111; color:#0f0; padding:1em; border-radius:6px; overflow-x:auto; max-height:400px;"></pre>
 </div>
 
 {% endblock %}
@@ -62,7 +84,7 @@
 })();
 {% endfor %}
 
-// --- DAQ Overview JS (example) ---
+// --- DAQ Overview JS ---
 function updateStatus() {
     fetch("/status")
         .then(r => r.json())
@@ -102,7 +124,7 @@ document.getElementById("stop-run").addEventListener("click", () => {
     .catch(err => alert("Error: " + err));
 });
 
-// --- JSON Templates Tab ---
+// --- Run Config JSON Templates Tab ---
 function loadTemplateList() {
     fetch("/json_templates")
         .then(r => r.json())
@@ -131,6 +153,79 @@ document.getElementById("templateSelect").addEventListener("change", e => {
                 JSON.stringify(data.content, null, 4);
         })
         .catch(err => alert("Failed to load JSON: " + err));
+});
+
+let currentJson = null;
+let currentFilename = null;
+
+function loadTemplateList() {
+    fetch("/json_templates")
+        .then(r => r.json())
+        .then(data => {
+            if (!data.success) throw data.message;
+            let select = document.getElementById("templateSelect");
+            select.innerHTML = '<option value="">-- Choose a template --</option>';
+            data.templates.forEach(f => {
+                let opt = document.createElement("option");
+                opt.value = f;
+                opt.textContent = f;
+                select.appendChild(opt);
+            });
+        })
+        .catch(err => alert("Failed to load templates: " + err));
+}
+
+document.getElementById("templateSelect").addEventListener("change", e => {
+    let filename = e.target.value;
+    if (!filename) return;
+    fetch("/json_templates/" + filename)
+        .then(r => r.json())
+        .then(data => {
+            if (!data.success) throw data.message;
+            currentJson = data.content;
+            currentFilename = filename;
+            document.getElementById("jsonControls").style.display = "block";
+            document.getElementById("jsonDisplay").textContent = JSON.stringify(currentJson, null, 4);
+
+            // populate top-level keys
+            let sectionSelect = document.getElementById("sectionSelect");
+            sectionSelect.innerHTML = '<option value="">-- Choose a section --</option>';
+            Object.keys(currentJson).forEach(k => {
+                let opt = document.createElement("option");
+                opt.value = k;
+                opt.textContent = k;
+                sectionSelect.appendChild(opt);
+            });
+        })
+        .catch(err => alert("Failed to load JSON: " + err));
+});
+
+document.getElementById("sectionSelect").addEventListener("change", e => {
+    let section = e.target.value;
+    let editor = document.getElementById("jsonEditor");
+    if (!section || !currentJson) {
+        editor.value = "";
+        return;
+    }
+    editor.value = JSON.stringify(currentJson[section], null, 4);
+});
+
+document.getElementById("refreshSection").addEventListener("click", () => {
+    if (!currentJson) return;
+    document.getElementById("jsonDisplay").textContent = JSON.stringify(currentJson, null, 4);
+});
+
+document.getElementById("saveSection").addEventListener("click", () => {
+    let section = document.getElementById("sectionSelect").value;
+    if (!section) return alert("No section selected");
+    try {
+        let newValue = JSON.parse(document.getElementById("jsonEditor").value);
+        currentJson[section] = newValue;
+        document.getElementById("jsonDisplay").textContent = JSON.stringify(currentJson, null, 4);
+        alert("Section updated locally!");
+    } catch (e) {
+        alert("Invalid JSON: " + e.message);
+    }
 });
 
 
