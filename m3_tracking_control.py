@@ -23,7 +23,7 @@ def main():
             port = int(sys.argv[1])
         except ValueError:
             print(f'Invalid port number {sys.argv[1]}. Using default port {port}')
-    options = ['Run M3 Tracking']
+    options = ['Run M3 Tracking', 'Clean Up M3 FDFs']
     while True:
         try:
             with Server(port=port) as server:
