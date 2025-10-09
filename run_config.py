@@ -14,7 +14,7 @@ import copy
 
 class Config:
     def __init__(self):
-        self.run_name = 'rd542_strip_2_co2_10-8-25'
+        self.run_name = 'rd542_strip_2_co2_10-9-25'
         self.daq_dir = '/home/clas12/dylan/Run/'  # Maybe kill
         self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -28,7 +28,7 @@ class Config:
         self.power_off_hv_at_end = False  # True to power off HV at end of run
         self.filtering_by_m3 = False  # True to filter by m3 tracking, False to do no filtering
         self.process_on_fly = False  # True to process data on fly, False to process after run
-        self.save_fdfs = True  # True to save FDF files, False to delete after decoding
+        self.save_fdfs = False  # True to save FDF files, False to delete after decoding
         self.zero_supress = False  # True let DREAM DAQ pedestal subtract and suppress zeros, False to save all ADC values
         self.start_time = None  # '2024-06-03 15:30:00'  # 'YYYY-MM-DD HH:MM:SS' or None to start immediately
         self.gas = 'Ar/CO2/Iso 93/5/2'  # Gas type for run
@@ -107,15 +107,15 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'quick_test_460V',
-                'run_time': 60 * 5,  # Minutes
+                'sub_run_name': 'quick_test_540V',
+                'run_time': 60 * 1,  # Minutes
                 'hvs': {
                     0: {
                         # 0: 800,
                         # 1: 800,
                         # 2: 800,
                         # 3: 800,
-                        6: 800,
+                        6: 850,
                         # 7: 460,
                         8: 500,
                         9: 500,
@@ -132,8 +132,8 @@ class Config:
                     3: {
                         # 1: 410,
                         # 2: 410,
-                        3: 460,
-                        4: 460,
+                        3: 540,
+                        4: 540,
                         # 5: 450,
                         # 6: 450,
                         # 7: 450,
@@ -145,7 +145,7 @@ class Config:
                 }
             },
             {
-                'sub_run_name': 'long_test_460V',
+                'sub_run_name': 'long_test_540V',
                 'run_time': 60 * 24 * 5,  # Minutes
                 'hvs': {
                     0: {
@@ -153,7 +153,7 @@ class Config:
                         # 1: 800,
                         # 2: 800,
                         # 3: 800,
-                        6: 800,
+                        6: 850,
                         # 7: 460,
                         8: 500,
                         9: 500,
@@ -170,8 +170,8 @@ class Config:
                     3: {
                         # 1: 410,
                         # 2: 410,
-                        3: 460,
-                        4: 460,
+                        3: 540,
+                        4: 540,
                         # 5: 450,
                         # 6: 450,
                         # 7: 450,
