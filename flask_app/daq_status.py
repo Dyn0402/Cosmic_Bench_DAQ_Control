@@ -185,10 +185,11 @@ def get_daq_control_status():
         ("Run complete", "Run Complete", "info"),
         ("donzo", "Run Complete", "info"),
         ("Finished with sub run ", "Finished Sub Run", "warning"),
+        ("Dream DAQ taking pedestals", "Prepping DAQs", "warning"),
         ("Prepping DAQs for ", "Prepping DAQs", "warning"),
         ("Ramping HVs for ", "Ramping HV", "warning"),
         ("Starting DAQ Control", "STARTING", "warning"),
-        ("DAQ started", "RUNNING", "success"),
+        ("Dream DAQ started", "RUNNING", "success"),
         ("Stopping DAQ process", "Stopping DAQ", "warning"),
     ]
 
