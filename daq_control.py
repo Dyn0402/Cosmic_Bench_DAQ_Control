@@ -119,8 +119,7 @@ def main():
                     banco_daq.receive()
 
                 daq_trigger_switch = trigger_switch if banco else None
-                run_time = sub_run['run_time'] * 60 if daq_trigger_switch is None else sub_run['run_time'] * 60 + 5
-                daq_control_args = (config.dream_daq_info['daq_config_template_path'], sub_run_name, run_time,
+                daq_control_args = (config.dream_daq_info['daq_config_template_path'], sub_run_name, sub_run['run_time'],
                                     sub_out_dir, sub_run_dir, daq_trigger_switch, dream_daq, config.zero_supress)
 
                 try:

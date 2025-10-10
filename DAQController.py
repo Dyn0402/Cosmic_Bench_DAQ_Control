@@ -28,14 +28,14 @@ class DAQController:
 
         self.run_time = run_time  # minutes
         self.max_run_time = self.run_time + 5  # minutes After this time assume stuck and kill
-        self.go_timeout = 8 * 60  # seconds
+        self.go_timeout = 8  # minutes
         self.run_start_time = None
         self.measured_run_time = None
         self.zero_suppress_mode = zero_suppress_mode
 
         # If trigger switch is used, need to run past run time to bracket the trigger switch on/off. Else just run time.
         # DAQ resets timer when first trigger received, so only need short pause to be sure.
-        self.cfg_file_run_time = self.run_time * 60 if self.trigger_switch_client is None else self.run_time * 60 + 5
+        self.cfg_file_run_time = self.run_time if self.trigger_switch_client is None else self.run_time + 5  # minutes
         self.cfg_file_path = None
         if self.cfg_template_file_path is not None:
             self.make_config_from_template()
@@ -227,15 +227,17 @@ class DAQController:
             cfg_lines = file.readlines()
         for i, line in enumerate(cfg_lines):
             if 'Sys DaqRun Time' in line:
-                print(f'Setting run time to {self.cfg_file_run_time} seconds')
-                cfg_lines[i] = cfg_lines[i].replace('0', f'{self.cfg_file_run_time}')
+                cfg_lines[i] = cfg_lines[i].replace('0', f'{self.cfg_file_run_time * 60}')  # Seconds
             if 'Sys DaqRun Mode' in line:
+                pre_comment_line = cfg_lines[i].split('#')[0]
                 if self.zero_suppress_mode:
-                    pass
+                    pre_comment_line_updated = pre_comment_line.replace('Raw', 'ZS')
+                    cfg_lines[i] = cfg_lines[i].replace(pre_comment_line, pre_comment_line_updated)
                 else:
-                    pass
-            if self.zero_suppress_mode and 'Sys DaqRun Mode' in line:
-                cfg_lines[i] = cfg_lines[i].replace('Raw', 'ZS')
+                    pre_comment_line_updated = pre_comment_line.replace('ZS', 'Raw')
+                    cfg_lines[i] = cfg_lines[i].replace(pre_comment_line, pre_comment_line_updated)
+            # if self.zero_suppress_mode and 'Sys DaqRun Mode' in line:
+            #     cfg_lines[i] = cfg_lines[i].replace('Raw', 'ZS')
         with open(self.cfg_file_path, 'w') as file:
             file.writelines(cfg_lines)
 
