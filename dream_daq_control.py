@@ -216,6 +216,7 @@ def main():
                     res = server.receive()
         except Exception as e:
             print(f'Error: {e}')
+            sleep(30)
     print('donzo')
 
 
