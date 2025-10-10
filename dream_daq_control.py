@@ -68,7 +68,7 @@ def main():
                         master_fd, slave_fd = pty.openpty()
 
                         # Launch DAQ program
-                        process = subprocess.Popen(
+                        process = Popen(
                             run_command,
                             shell=True,
                             stdin=slave_fd,
