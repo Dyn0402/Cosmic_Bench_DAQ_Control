@@ -38,6 +38,9 @@ class DAQController:
         self.cfg_file_run_time = self.run_time * 60 if self.trigger_switch_client is None else self.run_time * 60 + 5
         self.cfg_file_path = None
         if self.cfg_template_file_path is not None:
+            print(f'Using config template: {self.cfg_template_file_path}')
+            print(f'Zero Supress Mode: {self.zero_supress_mode}')
+            input('Getting ready to make config from template. Press Enter to continue...')
             self.make_config_from_template()
 
         if out_name is None:
@@ -227,8 +230,10 @@ class DAQController:
             cfg_lines = file.readlines()
         for i, line in enumerate(cfg_lines):
             if 'Sys DaqRun Time' in line:
+                print(f'Setting run time to {self.cfg_file_run_time} seconds')
                 cfg_lines[i] = cfg_lines[i].replace('0', f'{self.cfg_file_run_time}')
             if self.zero_supress_mode and 'Sys DaqRun Mode' in line:
+                print('Setting DAQ mode to Zero Suppress')
                 cfg_lines[i] = cfg_lines[i].replace('Raw', 'ZS')
         with open(self.cfg_file_path, 'w') as file:
             file.writelines(cfg_lines)
