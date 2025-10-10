@@ -26,7 +26,7 @@ CONFIG_RUN_DIR = "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/config/json_r
 app = Flask(__name__)
 socketio = SocketIO(app)
 
-TMUX_SESSIONS = ["hv_control", "dream_daq", "decoder", "daq_control", "trigger_control", "banco_alpide_control"]
+TMUX_SESSIONS = ["hv_control", "dream_daq", "decoder", "daq_control", "trigger_control", "banco_tracker"]
 sessions = {}
 
 @app.route("/")
