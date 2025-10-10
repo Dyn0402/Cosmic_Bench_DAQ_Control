@@ -52,16 +52,16 @@ def get_dream_daq_status():
         m_ev = re.search(r"nb_of_events=(\d+)", output)
         if m_ev: fields.append({"label": "Events", "value": m_ev.group(1)})
 
-        m_wait = re.search(
-            r"wait for\s*((?:(\d+)h\s*)?(?:(\d+)m\s*)?(?:(\d+)s)?)", output
-        )
-        if m_wait:
-            h, m, s = m_wait.groups()
-            # Fill in missing values as 0
-            h = h or "0"
-            m = m or "0"
-            s = s or "0"
-            fields.append({"label": "Wait For", "value": f"{h}h {m}m {s}s"})
+        # m_wait = re.search(
+        #     r"wait for\s*((?:(\d+)h\s*)?(?:(\d+)m\s*)?(?:(\d+)s)?)", output
+        # )
+        # if m_wait:
+        #     h, m, s = m_wait.groups()
+        #     # Fill in missing values as 0
+        #     h = h or "0"
+        #     m = m or "0"
+        #     s = s or "0"
+        #     fields.append({"label": "Wait For", "value": f"{h}h {m}m {s}s"})
     elif "Listening on " in output:
         status = "WAITING"
         color = "secondary"
@@ -241,8 +241,9 @@ def get_banco_tracker_status():
         }
 
     rules = [
-        ("Tracker started", "RUNNING", "success"),
-        ("Starting Tracker", "STARTING", "warning"),
+        ("Waiting for trigger...", "RUNNING", "success"),
+        ("Triggers to the MOSAIC (trgCount)", "RUNNING", "success"),
+        ("ROOT files ready to be closed", "RUNNING", "success"),
         ("Banco DAQ stopped", "STOPPED", "warning"),
         ("Listening on ", "WAITING", "secondary"),
     ]
