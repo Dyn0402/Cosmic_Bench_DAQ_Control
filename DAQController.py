@@ -235,10 +235,7 @@ class DAQController:
                 else:
                     pass
             if self.zero_suppress_mode and 'Sys DaqRun Mode' in line:
-                print('Setting DAQ mode to Zero Suppress')
-                print(f'Old line: {cfg_lines[i]}')
                 cfg_lines[i] = cfg_lines[i].replace('Raw', 'ZS')
-                print(f'New line: {cfg_lines[i]}')
         with open(self.cfg_file_path, 'w') as file:
             file.writelines(cfg_lines)
 

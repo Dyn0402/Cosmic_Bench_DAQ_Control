@@ -59,6 +59,9 @@ def main():
                         else:
                             sub_run_dir = os.getcwd()
 
+                        print(f'Changed to new working directory: {os.getcwd()}')
+                        sleep(5)
+
                         # run_command = f'RunCtrl -c {cfg_file_path} -f {sub_run_name}'
                         # print(f'Running command: {run_command}')
                         # input('Press Enter to continue...')
@@ -115,6 +118,9 @@ def main():
                         run_command = f'RunCtrl -c {cfg_run_path} -f {sub_run_name}'
                         if batch_mode:
                             run_command += ' -b'
+
+                        print(f'Running command: {run_command}')
+                        sleep(5)
 
                         process = Popen(run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
                         start, taking_pedestals, run_successful = time(), False, True
