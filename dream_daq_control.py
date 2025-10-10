@@ -12,6 +12,7 @@ import os
 import sys
 from subprocess import Popen, PIPE
 from time import time, sleep
+import traceback
 import shutil
 import threading
 from Server import Server
@@ -221,6 +222,7 @@ def main():
                         server.send('Unknown Command')
                     res = server.receive()
         except Exception as e:
+            traceback.print_exc()
             print(f'Error: {e}')
             sleep(30)
     print('donzo')
