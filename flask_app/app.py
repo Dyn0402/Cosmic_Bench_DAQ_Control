@@ -14,7 +14,7 @@ import pty
 import select
 import threading
 import json
-import pd
+import pandas as pd
 from flask import Flask, render_template, jsonify, request
 from flask_socketio import SocketIO
 
