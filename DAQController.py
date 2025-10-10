@@ -9,15 +9,14 @@ Created as Cosmic_Bench_DAQ_Control/DAQController.py
 """
 
 import os
-from subprocess import Popen, PIPE
+import re
 import shutil
 from time import time, sleep
-import threading
 
 
 class DAQController:
     def __init__(self, cfg_template_file_path=None, run_time=10, out_name=None, run_dir=None, out_dir=None,
-                 trigger_switch_client=None, dream_daq_client=None, zero_suppress_mode=False):
+                 trigger_switch_client=None, dream_daq_client=None, zero_suppress_mode=False, samples_per_waveform=None):
         self.cfg_template_file_path = cfg_template_file_path
         self.run_directory = run_dir  # Relative to run_directory if not None
         self.out_directory = out_dir
@@ -32,6 +31,7 @@ class DAQController:
         self.run_start_time = None
         self.measured_run_time = None
         self.zero_suppress_mode = zero_suppress_mode
+        self.samples_per_waveform = samples_per_waveform  # If None use whatever is in cfg file
 
         # If trigger switch is used, need to run past run time to bracket the trigger switch on/off. Else just run time.
         # DAQ resets timer when first trigger received, so only need short pause to be sure.
@@ -39,6 +39,8 @@ class DAQController:
         self.cfg_file_path = None
         if self.cfg_template_file_path is not None:
             self.make_config_from_template()
+            if self.out_directory is not None:  # Copy config file to out directory for future reference
+                shutil.copy(self.cfg_file_path, f'{self.out_directory}/{os.path.basename(self.cfg_file_path)}')
 
         if out_name is None:
             self.run_command = f'RunCtrl -c {self.cfg_file_path} -f test'  # Think I need an out name
@@ -223,23 +225,32 @@ class DAQController:
             if file.startswith('Grace_'):
                 shutil.copy(f'{template_dir}/{file}', f'{dest}/{file}')
 
-        with open(self.cfg_file_path, 'r') as file:
-            cfg_lines = file.readlines()
-        for i, line in enumerate(cfg_lines):
-            if 'Sys DaqRun Time' in line:
-                cfg_lines[i] = cfg_lines[i].replace('0', f'{self.cfg_file_run_time * 60}')  # Seconds
-            if 'Sys DaqRun Mode' in line:
-                pre_comment_line = cfg_lines[i].split('#')[0]
-                if self.zero_suppress_mode:
-                    pre_comment_line_updated = pre_comment_line.replace('Raw', 'ZS')
-                    cfg_lines[i] = cfg_lines[i].replace(pre_comment_line, pre_comment_line_updated)
-                else:
-                    pre_comment_line_updated = pre_comment_line.replace('ZS', 'Raw')
-                    cfg_lines[i] = cfg_lines[i].replace(pre_comment_line, pre_comment_line_updated)
-            # if self.zero_suppress_mode and 'Sys DaqRun Mode' in line:
-            #     cfg_lines[i] = cfg_lines[i].replace('Raw', 'ZS')
-        with open(self.cfg_file_path, 'w') as file:
-            file.writelines(cfg_lines)
+        updates = {  # Update config file with desired parameters
+            "Sys DaqRun Time": self.cfg_file_run_time * 60,  # Seconds
+            "Sys DaqRun Mode": 'ZS' if self.zero_suppress_mode else 'Raw',
+            "Sys NbOfSamples": self.samples_per_waveform,
+        }
+        update_config_value(self.cfg_file_path, updates)
+
+        # with open(self.cfg_file_path, 'r') as file:
+        #     cfg_lines = file.readlines()
+        # for i, line in enumerate(cfg_lines):
+        #     if 'Sys DaqRun Time' in line:
+        #         cfg_lines[i] = cfg_lines[i].replace('0', f'{self.cfg_file_run_time * 60}')  # Seconds
+        #     if 'Sys DaqRun Mode' in line:
+        #         pre_comment_line = cfg_lines[i].split('#')[0]
+        #         if self.zero_suppress_mode:
+        #             pre_comment_line_updated = pre_comment_line.replace('Raw', 'ZS')
+        #             cfg_lines[i] = cfg_lines[i].replace(pre_comment_line, pre_comment_line_updated)
+        #         else:
+        #             pre_comment_line_updated = pre_comment_line.replace('ZS', 'Raw')
+        #             cfg_lines[i] = cfg_lines[i].replace(pre_comment_line, pre_comment_line_updated)
+        #     if 'Sys NbOfSamples' in line:
+        #         cfg_lines[i] = cfg_lines[i].replace('16', '32')  # Use 32 samples for now
+        #     # if self.zero_suppress_mode and 'Sys DaqRun Mode' in line:
+        #     #     cfg_lines[i] = cfg_lines[i].replace('Raw', 'ZS')
+        # with open(self.cfg_file_path, 'w') as file:
+        #     file.writelines(cfg_lines)
 
     def write_run_time(self):
         with open(f'{self.out_directory}/run_time.txt', 'w') as file:
@@ -257,6 +268,45 @@ class DAQController:
 def move_data_files(src_dir, dest_dir):
     for file in os.listdir(src_dir):
         if file.endswith('.fdf'):
-            # shutil.move(f'{src_dir}/{file}', f'{dest_dir}/{file}')
+            shutil.move(f'{src_dir}/{file}', f'{dest_dir}/{file}')
             # Copy for now, maybe move and clean up later when more confident
-            shutil.copy(f'{src_dir}/{file}', f'{dest_dir}/{file}')
+            # shutil.copy(f'{src_dir}/{file}', f'{dest_dir}/{file}')
+
+
+def update_config_value(filepath, updates, output_path=None):
+    """
+    Updates parameters in a free-form config file without changing spacing/comments.
+
+    Parameters
+    ----------
+    filepath : str or Path
+        Path to the input config file.
+    updates : dict
+        Keys are full parameter flags (e.g., "Sys DaqRun Trig"),
+        values are the new values to insert.
+    output_path : str or Path, optional
+        Where to save the updated file. Defaults to overwriting the original.
+    """
+    output_path = output_path or filepath
+    with open(filepath, 'r') as f:
+        lines = f.readlines()
+
+    updates = {re.escape(k.strip()): str(v) for k, v in updates.items()}
+    new_lines = []
+
+    for line in lines:
+        if re.match(r'^\s*#', line) or not line.strip():
+            new_lines.append(line)
+            continue
+
+        for flag_pattern, new_value in updates.items():
+            pattern = rf"^(\s*{flag_pattern}\s+)([^\s#]+)(?=(\s*#|$))"
+            if re.search(pattern, line):
+                # Use a lambda to avoid backreference confusion
+                line = re.sub(pattern, lambda m: f"{m.group(1)}{new_value}", line)
+                break
+
+        new_lines.append(line)
+
+    with open(output_path, 'w') as f:
+        f.writelines(new_lines)

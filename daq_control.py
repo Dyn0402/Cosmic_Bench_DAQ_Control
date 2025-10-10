@@ -120,7 +120,8 @@ def main():
 
                 daq_trigger_switch = trigger_switch if banco else None
                 daq_control_args = (config.dream_daq_info['daq_config_template_path'], sub_run_name, sub_run['run_time'],
-                                    sub_out_dir, sub_run_dir, daq_trigger_switch, dream_daq, config.zero_supress)
+                                    sub_out_dir, sub_run_dir, daq_trigger_switch, dream_daq, config.zero_supress,
+                                    config.dream_daq_info.get('samples_per_waveform', None))
 
                 try:
                     run_daq_controller(*daq_control_args)
@@ -159,10 +160,11 @@ def main():
 
 
 def run_daq_controller(config_template_path, sub_run_name, run_time, sub_out_dir, sub_run_dir, daq_trigger_switch,
-                       dream_daq_client, zs=False):
+                       dream_daq_client, zs=False, samples_per_waveform=32):
     daq_controller = DAQController(cfg_template_file_path=config_template_path, run_time=run_time, out_dir=sub_out_dir,
                                    out_name=sub_run_name, trigger_switch_client=daq_trigger_switch, run_dir=sub_run_dir,
-                                   dream_daq_client=dream_daq_client, zero_suppress_mode=zs)
+                                   dream_daq_client=dream_daq_client, zero_suppress_mode=zs,
+                                   samples_per_waveform=samples_per_waveform)
 
     daq_success = False
     while not daq_success:  # Rerun if failure
