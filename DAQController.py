@@ -17,7 +17,7 @@ import threading
 
 class DAQController:
     def __init__(self, cfg_template_file_path=None, run_time=10, out_name=None, run_dir=None, out_dir=None,
-                 trigger_switch_client=None, dream_daq_client=None, zero_supress_mode=False):
+                 trigger_switch_client=None, dream_daq_client=None, zero_suppress_mode=False):
         self.cfg_template_file_path = cfg_template_file_path
         self.run_directory = run_dir  # Relative to run_directory if not None
         self.out_directory = out_dir
@@ -31,7 +31,7 @@ class DAQController:
         self.go_timeout = 8 * 60  # seconds
         self.run_start_time = None
         self.measured_run_time = None
-        self.zero_supress_mode = zero_supress_mode
+        self.zero_suppress_mode = zero_suppress_mode
 
         # If trigger switch is used, need to run past run time to bracket the trigger switch on/off. Else just run time.
         # DAQ resets timer when first trigger received, so only need short pause to be sure.
@@ -39,9 +39,10 @@ class DAQController:
         self.cfg_file_path = None
         if self.cfg_template_file_path is not None:
             print(f'Using config template: {self.cfg_template_file_path}')
-            print(f'Zero Supress Mode: {self.zero_supress_mode}')
+            print(f'Zero Suppress Mode: {self.zero_suppress_mode}')
             input('Getting ready to make config from template. Press Enter to continue...')
             self.make_config_from_template()
+            input('Config made. Press Enter to continue...')
 
         if out_name is None:
             self.run_command = f'RunCtrl -c {self.cfg_file_path} -f test'  # Think I need an out name
@@ -232,9 +233,11 @@ class DAQController:
             if 'Sys DaqRun Time' in line:
                 print(f'Setting run time to {self.cfg_file_run_time} seconds')
                 cfg_lines[i] = cfg_lines[i].replace('0', f'{self.cfg_file_run_time}')
-            if self.zero_supress_mode and 'Sys DaqRun Mode' in line:
+            if self.zero_suppress_mode and 'Sys DaqRun Mode' in line:
                 print('Setting DAQ mode to Zero Suppress')
+                print(f'Old line: {cfg_lines[i]}')
                 cfg_lines[i] = cfg_lines[i].replace('Raw', 'ZS')
+                print(f'New line: {cfg_lines[i]}')
         with open(self.cfg_file_path, 'w') as file:
             file.writelines(cfg_lines)
 

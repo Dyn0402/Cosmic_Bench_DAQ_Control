@@ -163,7 +163,7 @@ def run_daq_controller(config_template_path, sub_run_name, run_time, sub_out_dir
                        dream_daq_client, zs=False):
     daq_controller = DAQController(cfg_template_file_path=config_template_path, run_time=run_time, out_dir=sub_out_dir,
                                    out_name=sub_run_name, trigger_switch_client=daq_trigger_switch, run_dir=sub_run_dir,
-                                   dream_daq_client=dream_daq_client, zero_supress_mode=zs)
+                                   dream_daq_client=dream_daq_client, zero_suppress_mode=zs)
 
     daq_success = False
     while not daq_success:  # Rerun if failure
