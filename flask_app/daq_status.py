@@ -181,6 +181,7 @@ def get_daq_control_status():
         }
 
     rules = [
+        ("Daq control session started", "WAITING", "secondary"),
         ("Run complete", "Run Complete", "info"),
         ("donzo", "Run Complete", "info"),
         ("Finished with sub run ", "Finished Sub Run", "warning"),

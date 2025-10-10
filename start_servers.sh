@@ -27,7 +27,7 @@ start_tmux() {
 start_tmux hv_control "python hv_control.py"
 start_tmux dream_daq "python dream_daq_control.py"
 start_tmux decoder "python processing_control.py"
-start_tmux daq_control   # empty interactive session
+start_tmux daq_control "echo 'Daq control session started'"
 start_tmux trigger_control "bash_scripts/start_trigger_control.sh"
 start_tmux banco_tracker "bash_scripts/start_banco_alpide_control.sh"
 start_tmux flask_server "flask_app/start_flask.sh"
