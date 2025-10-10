@@ -120,7 +120,7 @@ def get_hv_control_status():
             "fields": [{"label": "Details", "value": "hv_control tmux not running"}]
         }
 
-    # Default status/color rules (most recent match takes priority)
+    # Default status/color rules
     rules = [
         ("Listening on ", "WAITING", "secondary"),
         ("Powering off HV", "HV Off", "secondary"),
@@ -132,6 +132,7 @@ def get_hv_control_status():
         ("Waiting for HV to ramp", "Ramping HV", "warning"),
     ]
 
+    # Determine overall status/color from most recent matching line
     status, color = "UNKNOWN STATE", "danger"
     for line in reversed(output.splitlines()):
         for flag, s, c in rules:
@@ -141,12 +142,19 @@ def get_hv_control_status():
         if status != "UNKNOWN STATE":
             break
 
-    # Parse individual channel lines
+    # Split by "Monitoring HV" and only take the last block
+    blocks = output.split("Monitoring HV")
+    if blocks:
+        last_block = blocks[-1]
+    else:
+        last_block = output
+
+    # Parse individual channel lines in the last block
     fields = []
     channel_pattern = re.compile(
         r"Slot\s+(\d+)\s+Channel\s+(\d+):\s+power=(on|off),\s+v set=([\d.]+),\s+v mon=([\d.]+),\s+i mon=([\d.]+)"
     )
-    for line in output.splitlines():
+    for line in last_block.splitlines():
         m = channel_pattern.search(line)
         if m:
             slot, ch, power, v_set, v_mon, i_mon = m.groups()
