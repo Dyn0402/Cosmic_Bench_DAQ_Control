@@ -30,6 +30,7 @@ def main():
                 dream_info = server.receive_json()
                 cfg_template_path = dream_info['daq_config_template_path']
                 run_directory = dream_info['run_directory']
+                cfg_run_path = os.path.join(run_directory, os.path.basename(cfg_template_path))
                 out_directory = dream_info['data_out_dir']
                 raw_daq_inner_dir = dream_info['raw_daq_inner_dir']
                 go_timeout = dream_info['go_timeout']
@@ -109,8 +110,9 @@ def main():
                         #         server.send('Dream DAQ timed out')
                         #         break
 
-                        cfg_file_path = make_config_from_template(cfg_template_path, sub_run_dir, run_time)
-                        run_command = f'RunCtrl -c {cfg_file_path} -f {sub_run_name}'
+                        # make_config_from_template done in DAQController
+                        # cfg_file_path = make_config_from_template(cfg_template_path, sub_run_dir, run_time)
+                        run_command = f'RunCtrl -c {cfg_run_path} -f {sub_run_name}'
                         if batch_mode:
                             run_command += ' -b'
 
@@ -259,18 +261,19 @@ def copy_files_on_the_fly(sub_run_dir, sub_out_dir, daq_finished_event, check_in
         sleep(check_interval)  # Check every 5 seconds
 
 
-def make_config_from_template(cfg_template_path, run_directory, run_time):
-    cfg_file_name = os.path.basename(cfg_template_path)
-    cfg_file_path = f'{run_directory}/{cfg_file_name}'.replace('//', '/')
-    shutil.copy(cfg_template_path, cfg_file_path)
-    with open(cfg_file_path, 'r') as file:
-        cfg_lines = file.readlines()
-    for i, line in enumerate(cfg_lines):
-        if 'Sys DaqRun Time' in line:
-            cfg_lines[i] = cfg_lines[i].replace('0', f'{run_time}')
-    with open(cfg_file_path, 'w') as file:
-        file.writelines(cfg_lines)
-    return cfg_file_path
+# Done in DAQController
+# def make_config_from_template(cfg_template_path, run_directory, run_time):
+#     cfg_file_name = os.path.basename(cfg_template_path)
+#     cfg_file_path = f'{run_directory}/{cfg_file_name}'.replace('//', '/')
+#     shutil.copy(cfg_template_path, cfg_file_path)
+#     with open(cfg_file_path, 'r') as file:
+#         cfg_lines = file.readlines()
+#     for i, line in enumerate(cfg_lines):
+#         if 'Sys DaqRun Time' in line:
+#             cfg_lines[i] = cfg_lines[i].replace('0', f'{run_time}')
+#     with open(cfg_file_path, 'w') as file:
+#         file.writelines(cfg_lines)
+#     return cfg_file_path
 
 
 def file_num_still_running(fdf_dir, file_num, wait_time=30, silent=False):

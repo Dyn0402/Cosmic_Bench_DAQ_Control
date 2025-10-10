@@ -38,11 +38,7 @@ class DAQController:
         self.cfg_file_run_time = self.run_time * 60 if self.trigger_switch_client is None else self.run_time * 60 + 5
         self.cfg_file_path = None
         if self.cfg_template_file_path is not None:
-            print(f'Using config template: {self.cfg_template_file_path}')
-            print(f'Zero Suppress Mode: {self.zero_suppress_mode}')
-            input('Getting ready to make config from template. Press Enter to continue...')
             self.make_config_from_template()
-            input('Config made. Press Enter to continue...')
 
         if out_name is None:
             self.run_command = f'RunCtrl -c {self.cfg_file_path} -f test'  # Think I need an out name
@@ -55,93 +51,93 @@ class DAQController:
     def __exit__(self, exc_type, exc_val, exc_tb):
         os.chdir(self.original_working_directory)
 
+    # def run(self):
+    #     if self.run_directory is not None:
+    #         os.chdir(self.run_directory)
+    #     process = Popen(self.run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
+    #     start, run_start, sent_go_time, sent_continue_time = time(), None, None, None
+    #     sent_go, sent_continue, run_successful, triggered, triggered_off = False, False, True, False, False
+    #     if self.trigger_switch_client is not None:
+    #         self.trigger_switch_client.silent = True
+    #
+    #     try:
+    #         while True:
+    #             output = process.stdout.readline()
+    #             if output == '' and process.poll() is not None:
+    #                 print('DAQ process finished.')
+    #                 break
+    #             if not sent_go and output.strip() == '***':  # Start of run, begin taking pedestals
+    #                 process.stdin.write('G')
+    #                 process.stdin.flush()  # Ensure the command is sent immediately
+    #                 sent_go, sent_go_time = True, time()
+    #             elif not sent_continue and 'Press C to Continue' in output.strip():  # End of pedestals, begin taking data
+    #                 process.stdin.write('C')  # Signal to start data taking
+    #                 process.stdin.flush()
+    #                 sent_continue, sent_continue_time = True, time()
+    #                 print('DAQ process started.')
+    #                 run_start = time()
+    #                 self.run_start_time = run_start
+    #
+    #             # Need to wait a bit for DAQ to start
+    #             if (not triggered and self.trigger_switch_client is not None and sent_continue
+    #                     and time() - sent_continue_time > 5):  # Takes 0 seconds to start, 5 to be safe
+    #                 self.trigger_switch_client.send('on')
+    #                 self.run_start_time = time()
+    #                 self.trigger_switch_client.receive()
+    #                 triggered = True
+    #                 run_start = time()  # Reset run time if trigger used
+    #
+    #             if self.trigger_switch_client is not None and sent_continue and triggered and not triggered_off:
+    #                 if run_start is not None and time() - run_start >= self.run_time * 60:
+    #                     self.trigger_switch_client.send('off')
+    #                     self.measured_run_time = time() - self.run_start_time
+    #                     self.trigger_switch_client.receive()
+    #                     triggered_off = True
+    #
+    #             if output.strip() != '':
+    #                 print(output.strip())
+    #
+    #             go_time_out = time() - sent_go_time > self.go_timeout if sent_go and not sent_continue else False
+    #             run_time_out = time() - start > self.max_run_time * 60
+    #             if go_time_out or run_time_out:
+    #                 print('DAQ process timed out.')
+    #                 process.kill()
+    #                 sleep(5)
+    #                 run_successful = False
+    #                 print('DAQ process timed out.')
+    #                 break
+    #     except KeyboardInterrupt:
+    #         print('Keyboard interrupt. Stopping DAQ process.')
+    #         if self.trigger_switch_client is not None:
+    #             self.trigger_switch_client.send('off')
+    #         self.measured_run_time = time() - self.run_start_time
+    #         if self.trigger_switch_client is not None:
+    #             self.trigger_switch_client.receive()
+    #         sleep(1)
+    #         process.stdin.write('g')  # Send signal to stop run
+    #         print('DAQ process stopped.')
+    #         while True:
+    #             output = process.stdout.readline()
+    #             if output == '' and process.poll() is not None:
+    #                 print('DAQ process finished.')
+    #                 break
+    #             if output.strip() != '':
+    #                 print(output.strip())
+    #     finally:
+    #         os.chdir(self.original_working_directory)
+    #         if self.trigger_switch_client is not None:
+    #             self.trigger_switch_client.silent = False
+    #
+    #         if self.measured_run_time is None:
+    #             self.measured_run_time = time() - self.run_start_time
+    #
+    #         if run_successful:
+    #             move_data_files(self.run_directory, self.out_directory)
+    #             self.write_run_time()
+    #
+    #     return run_successful
+
     def run(self):
-        if self.run_directory is not None:
-            os.chdir(self.run_directory)
-        process = Popen(self.run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
-        start, run_start, sent_go_time, sent_continue_time = time(), None, None, None
-        sent_go, sent_continue, run_successful, triggered, triggered_off = False, False, True, False, False
-        if self.trigger_switch_client is not None:
-            self.trigger_switch_client.silent = True
-
-        try:
-            while True:
-                output = process.stdout.readline()
-                if output == '' and process.poll() is not None:
-                    print('DAQ process finished.')
-                    break
-                if not sent_go and output.strip() == '***':  # Start of run, begin taking pedestals
-                    process.stdin.write('G')
-                    process.stdin.flush()  # Ensure the command is sent immediately
-                    sent_go, sent_go_time = True, time()
-                elif not sent_continue and 'Press C to Continue' in output.strip():  # End of pedestals, begin taking data
-                    process.stdin.write('C')  # Signal to start data taking
-                    process.stdin.flush()
-                    sent_continue, sent_continue_time = True, time()
-                    print('DAQ process started.')
-                    run_start = time()
-                    self.run_start_time = run_start
-
-                # Need to wait a bit for DAQ to start
-                if (not triggered and self.trigger_switch_client is not None and sent_continue
-                        and time() - sent_continue_time > 5):  # Takes 0 seconds to start, 5 to be safe
-                    self.trigger_switch_client.send('on')
-                    self.run_start_time = time()
-                    self.trigger_switch_client.receive()
-                    triggered = True
-                    run_start = time()  # Reset run time if trigger used
-
-                if self.trigger_switch_client is not None and sent_continue and triggered and not triggered_off:
-                    if run_start is not None and time() - run_start >= self.run_time * 60:
-                        self.trigger_switch_client.send('off')
-                        self.measured_run_time = time() - self.run_start_time
-                        self.trigger_switch_client.receive()
-                        triggered_off = True
-
-                if output.strip() != '':
-                    print(output.strip())
-
-                go_time_out = time() - sent_go_time > self.go_timeout if sent_go and not sent_continue else False
-                run_time_out = time() - start > self.max_run_time * 60
-                if go_time_out or run_time_out:
-                    print('DAQ process timed out.')
-                    process.kill()
-                    sleep(5)
-                    run_successful = False
-                    print('DAQ process timed out.')
-                    break
-        except KeyboardInterrupt:
-            print('Keyboard interrupt. Stopping DAQ process.')
-            if self.trigger_switch_client is not None:
-                self.trigger_switch_client.send('off')
-            self.measured_run_time = time() - self.run_start_time
-            if self.trigger_switch_client is not None:
-                self.trigger_switch_client.receive()
-            sleep(1)
-            process.stdin.write('g')  # Send signal to stop run
-            print('DAQ process stopped.')
-            while True:
-                output = process.stdout.readline()
-                if output == '' and process.poll() is not None:
-                    print('DAQ process finished.')
-                    break
-                if output.strip() != '':
-                    print(output.strip())
-        finally:
-            os.chdir(self.original_working_directory)
-            if self.trigger_switch_client is not None:
-                self.trigger_switch_client.silent = False
-
-            if self.measured_run_time is None:
-                self.measured_run_time = time() - self.run_start_time
-
-            if run_successful:
-                move_data_files(self.run_directory, self.out_directory)
-                self.write_run_time()
-
-        return run_successful
-
-    def run_new(self):
         run_successful = True
         if self.trigger_switch_client is not None:
             self.trigger_switch_client.silent = True
@@ -233,6 +229,11 @@ class DAQController:
             if 'Sys DaqRun Time' in line:
                 print(f'Setting run time to {self.cfg_file_run_time} seconds')
                 cfg_lines[i] = cfg_lines[i].replace('0', f'{self.cfg_file_run_time}')
+            if 'Sys DaqRun Mode' in line:
+                if self.zero_suppress_mode:
+                    pass
+                else:
+                    pass
             if self.zero_suppress_mode and 'Sys DaqRun Mode' in line:
                 print('Setting DAQ mode to Zero Suppress')
                 print(f'Old line: {cfg_lines[i]}')

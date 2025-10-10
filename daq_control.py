@@ -167,7 +167,7 @@ def run_daq_controller(config_template_path, sub_run_name, run_time, sub_out_dir
 
     daq_success = False
     while not daq_success:  # Rerun if failure
-        daq_success = daq_controller.run_new()
+        daq_success = daq_controller.run()
 
 
 def process_files_on_the_fly(sub_run_dir, sub_out_dir, sub_run_name, dedip196_processor, sedip28_processor,
