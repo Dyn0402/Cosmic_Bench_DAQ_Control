@@ -14,6 +14,7 @@ import pty
 import select
 import threading
 import json
+import pd
 from flask import Flask, render_template, jsonify, request
 from flask_socketio import SocketIO
 
@@ -87,18 +88,20 @@ def hv_data():
         df = pd.read_csv(HV_CSV_PATH)
         df = df.tail(HV_TAIL)
 
-        # Expected columns: time, slot, channel, voltage, current
-        # If your structure differs, adjust here:
-        time = df["time"].tolist()
-        grouped = df.groupby(["slot", "channel"])
+        # Extract timestamps
+        time = df["timestamp"].astype(str).tolist()
 
         voltage_data = {}
         current_data = {}
 
-        for (slot, ch), group in grouped:
-            label = f"{slot}:{ch}"
-            voltage_data[label] = group["voltage"].tolist()
-            current_data[label] = group["current"].tolist()
+        # Loop through columns to find slot:channel prefixes
+        for col in df.columns:
+            if "vmon" in col:
+                key = col.replace(" vmon", "")
+                voltage_data[key] = df[col].tolist()
+            elif "imon" in col:
+                key = col.replace(" imon", "")
+                current_data[key] = df[col].tolist()
 
         return jsonify({
             "success": True,

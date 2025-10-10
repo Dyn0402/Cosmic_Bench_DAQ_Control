@@ -299,35 +299,36 @@ async function updateHVPlots() {
         const data = await fetchHVData();
         const time = data.time;
 
-        const voltageTraces = Object.entries(data.voltage).map(([label, values]) => ({
-            x: time.slice(-values.length),
+        const voltageTraces = Object.entries(data.voltage).map(([key, values]) => ({
+            x: time,
             y: values,
-            name: label,
-            mode: 'lines'
+            mode: 'lines',
+            name: key
         }));
 
-        const currentTraces = Object.entries(data.current).map(([label, values]) => ({
-            x: time.slice(-values.length),
+        const currentTraces = Object.entries(data.current).map(([key, values]) => ({
+            x: time,
             y: values,
-            name: label,
-            mode: 'lines'
+            mode: 'lines',
+            name: key
         }));
 
         Plotly.newPlot('hv-voltage-plot', voltageTraces, {
-            title: 'Voltage vs Time',
+            title: 'Voltage (V) vs Time',
             xaxis: { title: 'Time' },
             yaxis: { title: 'Voltage (V)' },
             legend: { orientation: 'h' }
         });
 
         Plotly.newPlot('hv-current-plot', currentTraces, {
-            title: 'Current vs Time',
+            title: 'Current (µA) vs Time',
             xaxis: { title: 'Time' },
             yaxis: { title: 'Current (µA)' },
             legend: { orientation: 'h' }
         });
+
     } catch (err) {
-        console.error("HV plot update failed:", err);
+        console.error("HV update failed:", err);
     }
 }
 
