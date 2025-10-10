@@ -10,8 +10,13 @@ ssh -t "$USER@$HOST" "
 cd '$REMOTE_DIR'
 # Start screen session (detached) and run Python
 screen -S "$SCREEN_NAME" -X quit 2>/dev/null  # optional: kill existing session
-#screen -dmS '$SCREEN_NAME' bash -c 'source ~/.bashrc && setup-o2-root && python3 $SCRIPT; exec bash'
-screen -dmS '$SCREEN_NAME' bash -c 'source ~/.bashrc && setup-o2-root && python3 $SCRIPT'
+
+# Start new detached screen session
+screen -dmS '$SCREEN_NAME' bash -c '
+    source ~/.bashrc
+    echo \"python3 $SCRIPT\" | setup-o2-root
+'
+
 # Attach to the screen to see output
 screen -r '$SCREEN_NAME'
 "
