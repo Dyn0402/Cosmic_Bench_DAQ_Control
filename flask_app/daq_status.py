@@ -214,8 +214,8 @@ def get_trigger_control_status():
         }
 
     rules = [
-        ("Trigger switch turned on'", "Configured", "success"),
-        ("Trigger switch turned off", "Configuring", "warning"),
+        ("Trigger switch turned on", "Triggering", "success"),
+        ("Trigger switch turned off", "Triggers Held", "warning"),
         ("Trigger switch control connected", "STARTING", "warning"),
         ("Listening on ", "WAITING", "secondary"),
     ]
@@ -249,12 +249,46 @@ def get_banco_tracker_status():
         ("Listening on ", "WAITING", "secondary"),
     ]
 
+    fields = []
+    trg_count_match = re.search(r"Triggers to the MOSAIC \(trgCount\)\s*:\s*(\d+)", output)
+    if trg_count_match:
+        fields.append({"label": "Trigger Count", "value": trg_count_match.group(1)})
+
     for line in reversed(output.splitlines()):
         for flag, status, color in rules:
             if flag in line:
-                return {"status": status, "color": color, "fields": []}
+                return {"status": status, "color": color, "fields": fields}
 
-    return {"status": "UNKNOWN STATE", "color": "danger", "fields": []}
+    return {"status": "UNKNOWN STATE", "color": "danger", "fields": fields}
+
+
+# def get_banco_tracker_status():
+#     try:
+#         output = subprocess.check_output(
+#             ["tmux", "capture-pane", "-pS", "-10", "-t", "banco_tracker:0.0"],
+#             text=True
+#         )
+#     except subprocess.CalledProcessError:
+#         return {
+#             "status": "ERROR",
+#             "color": "danger",
+#             "fields": [{"label": "Details", "value": "banco_tracker tmux not running"}]
+#         }
+#
+#     rules = [
+#         ("Waiting for trigger...", "RUNNING", "success"),
+#         ("Triggers to the MOSAIC (trgCount)", "RUNNING", "success"),
+#         ("ROOT files ready to be closed", "RUNNING", "success"),
+#         ("Banco DAQ stopped", "STOPPED", "warning"),
+#         ("Listening on ", "WAITING", "secondary"),
+#     ]
+#
+#     for line in reversed(output.splitlines()):
+#         for flag, status, color in rules:
+#             if flag in line:
+#                 return {"status": status, "color": color, "fields": []}
+#
+#     return {"status": "UNKNOWN STATE", "color": "danger", "fields": []}
 
 
 def get_decoder_status():
