@@ -117,6 +117,8 @@ def main():
                         if batch_mode:
                             run_command += ' -b'
 
+                        print(f'Running command: {run_command}')
+                        sleep(20)
                         process = Popen(run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
                         start, taking_pedestals, run_successful = time.time(), False, True
                         server.send('Dream DAQ starting')
