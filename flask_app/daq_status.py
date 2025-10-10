@@ -159,8 +159,8 @@ def get_hv_control_status():
         if m:
             slot, ch, power, v_set, v_mon, i_mon = m.groups()
             fields.append({
-                "label": f"Slot {slot} Channel {ch}",
-                "value": f"Power={power}, Vset={v_set}, Vmon={v_mon}, Imon={i_mon}"
+                "label": f"{slot}:{ch}",
+                "value": f"Vset={v_set}, V={v_mon}, I={i_mon}"
             })
 
     return {"status": status, "color": color, "fields": fields}
