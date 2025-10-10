@@ -60,9 +60,6 @@ def main():
                         else:
                             sub_run_dir = os.getcwd()
 
-                        print(f'Changed to new working directory: {os.getcwd()}')
-                        sleep(5)
-
                         # run_command = f'RunCtrl -c {cfg_file_path} -f {sub_run_name}'
                         # print(f'Running command: {run_command}')
                         # input('Press Enter to continue...')
@@ -120,13 +117,7 @@ def main():
                         if batch_mode:
                             run_command += ' -b'
 
-                        print(f'Running command: {run_command}')
-                        sleep(5)
-                        print(f'Time type before Popen: {type(time)}')
-                        sleep(5)
-
                         process = Popen(run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
-                        print(f'Time type after Popen: {type(time)}')
                         start, taking_pedestals, run_successful = time.time(), False, True
                         server.send('Dream DAQ starting')
                         max_run_time = run_time + max_run_time_addition
