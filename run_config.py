@@ -35,8 +35,8 @@ class Config:
         self.dream_daq_info = {
             'ip': '192.168.10.8',
             'port': 1101,
-            # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_TPOT.cfg',
-            'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_SelfTrigger.cfg',
+            'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_TPOT.cfg',
+            # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_SelfTrigger.cfg',
             'run_directory': f'/local/home/banco/dylan/Run/{self.run_name}/',
             'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
             'raw_daq_inner_dir': self.raw_daq_inner_dir,

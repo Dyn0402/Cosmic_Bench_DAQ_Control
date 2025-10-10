@@ -53,7 +53,6 @@ def main():
 
                         if run_directory is not None:
                             sub_run_dir = f'{run_directory}{sub_run_name}/'
-                            print('Changing to sub-run directory:', sub_run_dir)
                             create_dir_if_not_exist(sub_run_dir)
                             os.chdir(sub_run_dir)
                         else:

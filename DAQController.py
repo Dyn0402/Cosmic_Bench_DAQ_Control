@@ -228,8 +228,9 @@ class DAQController:
         updates = {  # Update config file with desired parameters
             "Sys DaqRun Time": self.cfg_file_run_time * 60,  # Seconds
             "Sys DaqRun Mode": 'ZS' if self.zero_suppress_mode else 'Raw',
-            "Sys NbOfSamples": self.samples_per_waveform,
         }
+        if self.samples_per_waveform is not None:
+            updates["Sys NbOfSamples"] = self.samples_per_waveform  # Use specified number of samples
         update_config_value(self.cfg_file_path, updates)
 
         # with open(self.cfg_file_path, 'r') as file:
