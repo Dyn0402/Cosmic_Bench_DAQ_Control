@@ -31,7 +31,6 @@ def main():
                 dream_info = server.receive_json()
                 cfg_template_path = dream_info['daq_config_template_path']
                 run_directory = dream_info['run_directory']
-                cfg_run_path = os.path.join(run_directory, os.path.basename(cfg_template_path))
                 out_directory = dream_info['data_out_dir']
                 raw_daq_inner_dir = dream_info['raw_daq_inner_dir']
                 go_timeout = dream_info['go_timeout']
@@ -113,12 +112,11 @@ def main():
 
                         # make_config_from_template done in DAQController
                         # cfg_file_path = make_config_from_template(cfg_template_path, sub_run_dir, run_time)
+                        cfg_run_path = os.path.join(os.getcwd(), os.path.basename(cfg_template_path))
                         run_command = f'RunCtrl -c {cfg_run_path} -f {sub_run_name}'
                         if batch_mode:
                             run_command += ' -b'
 
-                        print(f'Running command: {run_command}')
-                        sleep(20)
                         process = Popen(run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
                         start, taking_pedestals, run_successful = time.time(), False, True
                         server.send('Dream DAQ starting')
