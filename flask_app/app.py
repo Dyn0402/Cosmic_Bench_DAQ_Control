@@ -22,6 +22,8 @@ from daq_status import (get_dream_daq_status, get_hv_control_status, get_daq_con
 
 CONFIG_TEMPLATE_DIR = "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/config/json_templates"
 CONFIG_RUN_DIR = "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/config/json_run_configs"
+HV_CSV_PATH = "/mnt/cosmic_data/Run/beam_test_daq_test_10-10-25/quick_test_440V/hv_monitor.csv"  # PLACEHOLDER
+HV_TAIL = 200  # number of most recent rows to show
 
 
 app = Flask(__name__)
@@ -34,9 +36,6 @@ sessions = {}
 def index():
     return render_template("index.html", screens=TMUX_SESSIONS)
 
-# @app.route("/status/dream_daq")
-# def dream_daq_status():
-#     return jsonify(get_dream_daq_status())
 
 @app.route("/status")
 def status_all():
@@ -80,6 +79,36 @@ def stop_run():
         return jsonify({"success": True, "message": "Run stopped"})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
+
+
+@app.route("/hv_data")
+def hv_data():
+    try:
+        df = pd.read_csv(HV_CSV_PATH)
+        df = df.tail(HV_TAIL)
+
+        # Expected columns: time, slot, channel, voltage, current
+        # If your structure differs, adjust here:
+        time = df["time"].tolist()
+        grouped = df.groupby(["slot", "channel"])
+
+        voltage_data = {}
+        current_data = {}
+
+        for (slot, ch), group in grouped:
+            label = f"{slot}:{ch}"
+            voltage_data[label] = group["voltage"].tolist()
+            current_data[label] = group["current"].tolist()
+
+        return jsonify({
+            "success": True,
+            "time": time,
+            "voltage": voltage_data,
+            "current": current_data
+        })
+
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)})
 
 
 @app.route("/json_templates")

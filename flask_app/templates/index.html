@@ -12,6 +12,16 @@
     <div class="row" id="status-cards">
         <!-- Status cards populated dynamically -->
     </div>
+    <hr class="my-4">
+
+    <h3>HV Monitor</h3>
+    <p class="text-muted">Latest voltage and current readings from HV control system</p>
+
+    <div id="hv-voltage-plot" style="width:100%;height:400px;"></div>
+    <div id="hv-current-plot" style="width:100%;height:400px;"></div>
+
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
 </div>
 
 <!-- Live Screens Tab -->
@@ -276,9 +286,56 @@ document.getElementById("saveRunConfig").addEventListener("click", () => {
     .catch(err => alert("Failed to save run config: " + err));
 });
 
+// --- HV Plots ---
+async function fetchHVData() {
+    const resp = await fetch("/hv_data");
+    const data = await resp.json();
+    if (!data.success) throw data.message;
+    return data;
+}
 
-setInterval(updateStatus, 1000);
+async function updateHVPlots() {
+    try {
+        const data = await fetchHVData();
+        const time = data.time;
+
+        const voltageTraces = Object.entries(data.voltage).map(([label, values]) => ({
+            x: time.slice(-values.length),
+            y: values,
+            name: label,
+            mode: 'lines'
+        }));
+
+        const currentTraces = Object.entries(data.current).map(([label, values]) => ({
+            x: time.slice(-values.length),
+            y: values,
+            name: label,
+            mode: 'lines'
+        }));
+
+        Plotly.newPlot('hv-voltage-plot', voltageTraces, {
+            title: 'Voltage vs Time',
+            xaxis: { title: 'Time' },
+            yaxis: { title: 'Voltage (V)' },
+            legend: { orientation: 'h' }
+        });
+
+        Plotly.newPlot('hv-current-plot', currentTraces, {
+            title: 'Current vs Time',
+            xaxis: { title: 'Time' },
+            yaxis: { title: 'Current (µA)' },
+            legend: { orientation: 'h' }
+        });
+    } catch (err) {
+        console.error("HV plot update failed:", err);
+    }
+}
+
+setInterval(updateStatus, 1000);  // update every 1s
 updateStatus();
 loadTemplateList();
+
+updateHVPlots();
+setInterval(updateHVPlots, 5000);  // update every 5s
 </script>
 {% endblock %}
