@@ -143,14 +143,14 @@ def get_hv_control_status():
             break
 
     # Split by "Monitoring HV" and only take the last block
-    blocks = output.split("Monitoring HV")
-    if blocks:
-        last_block = blocks[-1]
-    else:
-        last_block = output
+    # blocks = output.split("Monitoring HV")
+    # if blocks:
+    #     last_block = blocks[-1]
+    # else:
+    #     last_block = output
 
     # Parse individual channel lines in the last block
-    # fields = []
+    fields = []
     # channel_pattern = re.compile(
     #     r"Slot\s+(\d+)\s+Channel\s+(\d+):\s+power=(on|off),\s+v set=([\d.]+),\s+v mon=([\d.]+),\s+i mon=([\d.]+)"
     # )
@@ -227,3 +227,57 @@ def get_trigger_control_status():
     return {"status": "UNKNOWN STATE", "color": "danger", "fields": []}
 
 
+def get_banco_tracker_status():
+    try:
+        output = subprocess.check_output(
+            ["tmux", "capture-pane", "-pS", "-10", "-t", "banco_tracker:0.0"],
+            text=True
+        )
+    except subprocess.CalledProcessError:
+        return {
+            "status": "ERROR",
+            "color": "danger",
+            "fields": [{"label": "Details", "value": "banco_tracker tmux not running"}]
+        }
+
+    rules = [
+        ("Tracker started", "RUNNING", "success"),
+        ("Starting Tracker", "STARTING", "warning"),
+        ("Banco DAQ stopped", "STOPPED", "warning"),
+        ("Listening on ", "WAITING", "secondary"),
+    ]
+
+    for line in reversed(output.splitlines()):
+        for flag, status, color in rules:
+            if flag in line:
+                return {"status": status, "color": color, "fields": []}
+
+    return {"status": "UNKNOWN STATE", "color": "danger", "fields": []}
+
+
+def get_decoder_status():
+    try:
+        output = subprocess.check_output(
+            ["tmux", "capture-pane", "-pS", "-10", "-t", "decoder:0.0"],
+            text=True
+        )
+    except subprocess.CalledProcessError:
+        return {
+            "status": "ERROR",
+            "color": "danger",
+            "fields": [{"label": "Details", "value": "decoder tmux not running"}]
+        }
+
+    rules = [
+        ("Decoder started", "RUNNING", "success"),
+        ("Starting Decoder", "STARTING", "warning"),
+        ("Decoder stopped", "STOPPED", "warning"),
+        ("Listening on ", "WAITING", "secondary"),
+    ]
+
+    for line in reversed(output.splitlines()):
+        for flag, status, color in rules:
+            if flag in line:
+                return {"status": status, "color": color, "fields": []}
+
+    return {"status": "UNKNOWN STATE", "color": "danger", "fields": []}
