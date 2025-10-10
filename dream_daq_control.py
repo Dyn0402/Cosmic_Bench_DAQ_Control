@@ -12,12 +12,14 @@ import os
 import sys
 from subprocess import Popen, PIPE
 from time import time, sleep
+print(f'Type of time 1: {type(time)}')
 import traceback
 import shutil
 import threading
 from Server import Server
 import socket
 from common_functions import *
+print(f'Type of time 2: {type(time)}')
 
 
 def main():
@@ -122,8 +124,11 @@ def main():
 
                         print(f'Running command: {run_command}')
                         sleep(5)
+                        print(f'Time type before Popen: {type(time)}')
+                        sleep(5)
 
                         process = Popen(run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
+                        print(f'Time type after Popen: {type(time)}')
                         start, taking_pedestals, run_successful = time(), False, True
                         server.send('Dream DAQ starting')
                         max_run_time = run_time + max_run_time_addition
