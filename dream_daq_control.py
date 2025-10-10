@@ -11,15 +11,13 @@ Created as Cosmic_Bench_DAQ_Control/dream_daq_control
 import os
 import sys
 from subprocess import Popen, PIPE
-from time import time, sleep
-print(f'Type of time 1: {type(time)}')
+from time import sleep
 import traceback
 import shutil
 import threading
 from Server import Server
 import socket
 from common_functions import *
-print(f'Type of time 2: {type(time)}')
 
 
 def main():
@@ -70,7 +68,7 @@ def main():
                         # input('Press Enter to continue...')
                         #
                         # process = Popen(run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
-                        # start, run_start, sent_go_time, sent_continue_time = time(), None, None, None
+                        # start, run_start, sent_go_time, sent_continue_time = time.time(), None, None, None
                         # sent_go, sent_continue, run_successful, triggered, triggered_off = False, False, True, False, False
                         # server.send('Dream DAQ starting')
                         # max_run_time = run_time + max_run_time_addition
@@ -90,13 +88,13 @@ def main():
                         #     if not sent_go and output.strip() == '***':  # Start of run, begin taking pedestals
                         #         process.stdin.write('G')
                         #         process.stdin.flush()  # Ensure the command is sent immediately
-                        #         sent_go, sent_go_time = True, time()
+                        #         sent_go, sent_go_time = True, time.time()
                         #         print('Taking pedestals.')
                         #         server.send('Dream DAQ taking pedestals')
                         #     elif not sent_continue and 'Press C to Continue' in output.strip():  # End of pedestals, begin taking data
                         #         process.stdin.write('C')  # Signal to start data taking
                         #         process.stdin.flush()
-                        #         sent_continue, sent_continue_time = True, time()
+                        #         sent_continue, sent_continue_time = True, time.time()
                         #         print('DAQ started.')
                         #         server.send('Dream DAQ started')
                         #         break
@@ -104,8 +102,8 @@ def main():
                         #     if output.strip() != '':
                         #         print(output.strip())
                         #
-                        #     go_time_out = time() - sent_go_time > go_timeout if sent_go and not sent_continue else False
-                        #     run_time_out = time() - start > max_run_time * 60
+                        #     go_time_out = time.time() - sent_go_time > go_timeout if sent_go and not sent_continue else False
+                        #     run_time_out = time.time() - start > max_run_time * 60
                         #     # if go_time_out or run_time_out or (output == '' and process.poll() is not None):
                         #     if go_time_out or run_time_out:
                         #         print('DAQ process timed out.')
@@ -129,7 +127,7 @@ def main():
 
                         process = Popen(run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
                         print(f'Time type after Popen: {type(time)}')
-                        start, taking_pedestals, run_successful = time(), False, True
+                        start, taking_pedestals, run_successful = time.time(), False, True
                         server.send('Dream DAQ starting')
                         max_run_time = run_time + max_run_time_addition
 
@@ -167,8 +165,8 @@ def main():
                             if output.strip() != '':
                                 print(output.strip())
 
-                            pedestals_time_out = time() - start > go_timeout and taking_pedestals
-                            run_time_out = time() - start > max_run_time * 60
+                            pedestals_time_out = time.time() - start > go_timeout and taking_pedestals
+                            run_time_out = time.time() - start > max_run_time * 60
                             if pedestals_time_out or run_time_out:
                                 print('DAQ process timed out.')
                                 process.kill()
@@ -184,7 +182,7 @@ def main():
                         stop_thread = threading.Thread(target=listen_for_stop, args=(server, stop_event))
                         stop_thread.start()
                         screen_clear_period = 30
-                        screen_clear_timer = time()
+                        screen_clear_timer = time.time()
                         # sleep(2)
                         while True:  # DAQ running
                             if stop_event.is_set():
@@ -193,9 +191,9 @@ def main():
                                 print('Stop command received. Stopping DAQ.')
                                 break
 
-                            if time() - screen_clear_timer > screen_clear_period:  # Clear terminal every 5 minutes
+                            if time.time() - screen_clear_timer > screen_clear_period:  # Clear terminal every 5 minutes
                                 clear_terminal()
-                                screen_clear_timer = time()
+                                screen_clear_timer = time.time()
 
                             output = process.stdout.readline()
                             if output == '' and process.poll() is not None:
