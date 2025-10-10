@@ -150,18 +150,18 @@ def get_hv_control_status():
         last_block = output
 
     # Parse individual channel lines in the last block
-    fields = []
-    channel_pattern = re.compile(
-        r"Slot\s+(\d+)\s+Channel\s+(\d+):\s+power=(on|off),\s+v set=([\d.]+),\s+v mon=([\d.]+),\s+i mon=([\d.]+)"
-    )
-    for line in last_block.splitlines():
-        m = channel_pattern.search(line)
-        if m:
-            slot, ch, power, v_set, v_mon, i_mon = m.groups()
-            fields.append({
-                "label": f"{slot}:{ch}",
-                "value": f"Vset={v_set}, V={v_mon}, I={i_mon}"
-            })
+    # fields = []
+    # channel_pattern = re.compile(
+    #     r"Slot\s+(\d+)\s+Channel\s+(\d+):\s+power=(on|off),\s+v set=([\d.]+),\s+v mon=([\d.]+),\s+i mon=([\d.]+)"
+    # )
+    # for line in last_block.splitlines():
+    #     m = channel_pattern.search(line)
+    #     if m:
+    #         slot, ch, power, v_set, v_mon, i_mon = m.groups()
+    #         fields.append({
+    #             "label": f"{slot}:{ch}",
+    #             "value": f"Vset={v_set}, V={v_mon}, I={i_mon}"
+    #         })
 
     return {"status": status, "color": color, "fields": fields}
 

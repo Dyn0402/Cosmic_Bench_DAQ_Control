@@ -142,7 +142,7 @@ def main():
                         stop_thread = threading.Thread(target=listen_for_stop, args=(server, stop_event))
                         stop_thread.start()
 
-                        screen_clear_period = 30
+                        # screen_clear_period = 30
                         screen_clear_timer = time.time()
 
                         while True:
@@ -151,9 +151,9 @@ def main():
                                 print('Stop command received. Stopping DAQ.')
                                 break
 
-                            if time.time() - screen_clear_timer > screen_clear_period:
-                                clear_terminal()
-                                screen_clear_timer = time.time()
+                            # if time.time() - screen_clear_timer > screen_clear_period:
+                            #     clear_terminal()
+                            #     screen_clear_timer = time.time()
 
                             if process.poll() is not None:
                                 print('DAQ process finished.')
