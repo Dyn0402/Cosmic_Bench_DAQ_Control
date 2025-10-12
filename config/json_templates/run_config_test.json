@@ -1,9 +1,9 @@
 {
-    "run_name": "beam_test_daq_test_10-6-25",
+    "run_name": "beam_test_daq_test_10-10-25",
     "daq_dir": "/local/home/banco/dylan/Run/",
-    "run_dir": "/local/home/banco/dylan/Run/beam_test_daq_test_10-6-25/",
+    "run_dir": "/local/home/banco/dylan/Run/beam_test_daq_test_10-10-25/",
     "data_out_dir": "/mnt/cosmic_data/Run/",
-    "run_out_dir": "/mnt/cosmic_data/Run/beam_test_daq_test_10-6-25/",
+    "run_out_dir": "/mnt/cosmic_data/Run/beam_test_daq_test_10-10-25/",
     "raw_daq_inner_dir": "raw_daq_data",
     "decoded_root_inner_dir": "decoded_root",
     "filtered_root_inner_dir": "filtered_root",
@@ -13,16 +13,18 @@
     "power_off_hv_at_end": true,
     "filtering_by_m3": false,
     "process_on_fly": false,
-    "save_fdfs": false,
-    "zero_supress": false,
+    "save_fdfs": true,
+    "zero_supress": true,
     "start_time": null,
+    "write_all_dectors_to_json": true,
     "dream_daq_info": {
         "ip": "192.168.10.8",
         "port": 1101,
         "daq_config_template_path": "/local/home/banco/dylan/Run/config/CosmicTb_TPOT.cfg",
-        "run_directory": "/local/home/banco/dylan/Run/beam_test_daq_test_10-6-25/",
-        "data_out_dir": "/mnt/cosmic_data/Run/beam_test_daq_test_10-6-25",
+        "run_directory": "/local/home/banco/dylan/Run/beam_test_daq_test_10-10-25/",
+        "data_out_dir": "/mnt/cosmic_data/Run/beam_test_daq_test_10-10-25",
         "raw_daq_inner_dir": "raw_daq_data",
+        "n_samples_per_waveform": 32,
         "go_timeout": 300,
         "max_run_time_addition": 300,
         "copy_on_fly": true,
@@ -31,15 +33,15 @@
     "banco_info": {
         "ip": "132.166.30.82",
         "port": 1100,
-        "daq_run_command": "cd /home/banco/dylan/Run/framework/bin && ./test_multi_noiseocc_int",
-        "data_temp_dir": "/home/banco/dylan/Run/data",
-        "data_out_dir": "/mnt/cosmic_data/Run/beam_test_daq_test_10-6-25",
+        "daq_run_command": "cd /home/banco/CERNTestBeam/framework/bin && ./test_multi_noiseocc_int",
+        "data_temp_dir": "/home/banco/CERNTestBeam/data",
+        "data_out_dir": "/mnt/cosmic_data/Run/beam_test_daq_test_10-10-25",
         "data_inner_dir": "banco_data"
     },
     "dedip196_processor_info": {
         "ip": "132.166.10.196",
         "port": 1200,
-        "run_dir": "/mnt/cosmic_data/Run/beam_test_daq_test_10-6-25",
+        "run_dir": "/mnt/cosmic_data/Run/beam_test_daq_test_10-10-25",
         "raw_daq_inner_dir": "raw_daq_data",
         "decoded_root_inner_dir": "decoded_root",
         "m3_tracking_inner_dir": "m3_tracking_root",
@@ -60,7 +62,7 @@
         "password": "admin",
         "n_cards": 6,
         "n_channels_per_card": 12,
-        "run_out_dir": "/mnt/cosmic_data/Run/beam_test_daq_test_10-6-25/",
+        "run_out_dir": "/mnt/cosmic_data/Run/beam_test_daq_test_10-10-25/",
         "hv_monitoring": true,
         "monitor_interval": 5
     },
@@ -70,8 +72,8 @@
     },
     "sub_runs": [
         {
-            "sub_run_name": "quick_test_480V",
-            "run_time": 60,
+            "sub_run_name": "quick_test_440V",
+            "run_time": 300,
             "hvs": {
                 "2": {
                     "0": 10,
@@ -94,9 +96,459 @@
         "banco_arm_length_y": 230
     },
     "included_detectors": [
-        "rd542_strip_1"
+        "banco_ladder160",
+        "banco_ladder163",
+        "banco_ladder157",
+        "banco_ladder162",
+        "rd542_plein_3"
     ],
     "detectors": [
+        {
+            "name": "banco_ladder157",
+            "det_type": "banco",
+            "det_center_coords": {
+                "x": -53.54,
+                "y": -4.270000000000003,
+                "z": 842.2
+            },
+            "det_orientation": {
+                "x": 0,
+                "y": 180,
+                "z": 0
+            },
+            "hv_channels": "banco",
+            "dream_feus": "banco"
+        },
+        {
+            "name": "banco_ladder162",
+            "det_type": "banco",
+            "det_center_coords": {
+                "x": -55.41,
+                "y": -4.270000000000003,
+                "z": 853.26
+            },
+            "det_orientation": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "hv_channels": "banco",
+            "dream_feus": "banco"
+        },
+        {
+            "name": "banco_ladder160",
+            "det_type": "banco",
+            "det_center_coords": {
+                "x": -53.21,
+                "y": -4.390000000000001,
+                "z": 971.45
+            },
+            "det_orientation": {
+                "x": 0,
+                "y": 180,
+                "z": 0
+            },
+            "hv_channels": "banco",
+            "dream_feus": "banco"
+        },
+        {
+            "name": "banco_ladder163",
+            "det_type": "banco",
+            "det_center_coords": {
+                "x": -55.03,
+                "y": -4.460000000000001,
+                "z": 982.5
+            },
+            "det_orientation": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "hv_channels": "banco",
+            "dream_feus": "banco"
+        },
+        {
+            "name": "urw_strip",
+            "det_type": "urw_strip",
+            "det_center_coords": {
+                "x": 0,
+                "y": 0,
+                "z": 799
+            },
+            "det_orientation": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "hv_channels": {
+                "drift": [
+                    0,
+                    0
+                ],
+                "resist_1": [
+                    3,
+                    1
+                ]
+            },
+            "dream_feus": {
+                "x_1": [
+                    6,
+                    5
+                ],
+                "x_2": [
+                    6,
+                    6
+                ],
+                "y_1": [
+                    6,
+                    7
+                ],
+                "y_2": [
+                    6,
+                    8
+                ]
+            }
+        },
+        {
+            "name": "urw_inter",
+            "det_type": "urw_inter",
+            "det_center_coords": {
+                "x": 10,
+                "y": 40,
+                "z": 712.7
+            },
+            "det_orientation": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "hv_channels": {
+                "drift": [
+                    0,
+                    1
+                ],
+                "resist_1": [
+                    3,
+                    2
+                ]
+            },
+            "dream_feus": {
+                "x_1": [
+                    6,
+                    1
+                ],
+                "x_2": [
+                    6,
+                    2
+                ],
+                "y_1": [
+                    6,
+                    3
+                ],
+                "y_2": [
+                    6,
+                    4
+                ]
+            }
+        },
+        {
+            "name": "asacusa_strip_1",
+            "det_type": "asacusa_strip",
+            "det_center_coords": {
+                "x": 0,
+                "y": 0,
+                "z": 605
+            },
+            "det_orientation": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "hv_channels": {
+                "drift": [
+                    0,
+                    2
+                ],
+                "resist_1": [
+                    3,
+                    3
+                ],
+                "resist_2": [
+                    3,
+                    4
+                ]
+            },
+            "dream_feus": {
+                "x_1": [
+                    4,
+                    5
+                ],
+                "x_2": [
+                    4,
+                    6
+                ],
+                "y_1": [
+                    4,
+                    7
+                ],
+                "y_2": [
+                    4,
+                    8
+                ]
+            }
+        },
+        {
+            "name": "asacusa_strip_2",
+            "det_type": "asacusa_strip",
+            "det_center_coords": {
+                "x": 0,
+                "y": 0,
+                "z": 508
+            },
+            "det_orientation": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "hv_channels": {
+                "drift": [
+                    0,
+                    3
+                ],
+                "resist_1": [
+                    3,
+                    5
+                ],
+                "resist_2": [
+                    3,
+                    6
+                ]
+            },
+            "dream_feus": {
+                "x_1": [
+                    4,
+                    1
+                ],
+                "x_2": [
+                    4,
+                    2
+                ],
+                "y_1": [
+                    4,
+                    3
+                ],
+                "y_2": [
+                    4,
+                    4
+                ]
+            }
+        },
+        {
+            "name": "strip_plein_1",
+            "det_type": "strip_plein",
+            "det_center_coords": {
+                "x": 0,
+                "y": 0,
+                "z": 411
+            },
+            "det_orientation": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "hv_channels": {
+                "drift": [
+                    0,
+                    6
+                ],
+                "resist_2": [
+                    3,
+                    7
+                ]
+            },
+            "dream_feus": {
+                "x_1": [
+                    3,
+                    5
+                ],
+                "x_2": [
+                    3,
+                    6
+                ],
+                "y_1": [
+                    3,
+                    7
+                ],
+                "y_2": [
+                    3,
+                    8
+                ]
+            }
+        },
+        {
+            "name": "strip_strip_1",
+            "det_type": "strip_strip",
+            "det_center_coords": {
+                "x": 9.2,
+                "y": 38.4,
+                "z": 712.7
+            },
+            "det_orientation": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "hv_channels": {
+                "drift": [
+                    0,
+                    6
+                ],
+                "resist_2": [
+                    3,
+                    7
+                ]
+            },
+            "dream_feus": {
+                "x_1": [
+                    6,
+                    1
+                ],
+                "x_2": [
+                    6,
+                    2
+                ],
+                "y_1": [
+                    6,
+                    3
+                ],
+                "y_2": [
+                    6,
+                    4
+                ]
+            }
+        },
+        {
+            "name": "inter_plein_1",
+            "det_type": "inter_plein",
+            "det_center_coords": {
+                "x": 9.2,
+                "y": 38.4,
+                "z": 712.7
+            },
+            "det_orientation": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "hv_channels": {
+                "drift": [
+                    0,
+                    6
+                ],
+                "resist_2": [
+                    3,
+                    7
+                ]
+            },
+            "dream_feus": {
+                "x_1": [
+                    6,
+                    1
+                ],
+                "x_2": [
+                    6,
+                    2
+                ],
+                "y_1": [
+                    6,
+                    3
+                ],
+                "y_2": [
+                    6,
+                    4
+                ]
+            }
+        },
+        {
+            "name": "p2_3",
+            "det_type": "p2",
+            "det_center_coords": {
+                "x": 10,
+                "y": 40,
+                "z": 712.7
+            },
+            "det_orientation": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "hv_channels": {
+                "drift": [
+                    0,
+                    6
+                ],
+                "mesh_1": [
+                    0,
+                    7
+                ]
+            },
+            "dream_feus": {
+                "x_1": [
+                    6,
+                    1
+                ],
+                "x_2": [
+                    6,
+                    2
+                ]
+            }
+        },
+        {
+            "name": "rd542_plein_1",
+            "det_type": "rd542_plein",
+            "det_center_coords": {
+                "x": 24,
+                "y": 75.6,
+                "z": 720.8
+            },
+            "det_orientation": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "hv_channels": {
+                "drift": [
+                    0,
+                    6
+                ],
+                "resist_1": [
+                    3,
+                    3
+                ],
+                "resist_2": [
+                    3,
+                    4
+                ]
+            },
+            "dream_feus": {
+                "x_1": [
+                    6,
+                    1
+                ],
+                "x_2": [
+                    6,
+                    2
+                ],
+                "y_1": [
+                    6,
+                    3
+                ],
+                "y_2": [
+                    6,
+                    4
+                ]
+            }
+        },
         {
             "name": "rd542_strip_1",
             "det_type": "rd542_strip",
@@ -140,6 +592,288 @@
                 "y_2": [
                     1,
                     4
+                ]
+            }
+        },
+        {
+            "name": "rd542_plein_2",
+            "det_type": "rd542_plein",
+            "det_center_coords": {
+                "x": 24,
+                "y": 75.6,
+                "z": 720.8
+            },
+            "det_orientation": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "hv_channels": {
+                "drift": [
+                    0,
+                    6
+                ],
+                "resist_1": [
+                    3,
+                    3
+                ],
+                "resist_2": [
+                    3,
+                    4
+                ]
+            },
+            "dream_feus": {
+                "x_1": [
+                    6,
+                    1
+                ],
+                "x_2": [
+                    6,
+                    2
+                ],
+                "y_1": [
+                    6,
+                    3
+                ],
+                "y_2": [
+                    6,
+                    4
+                ]
+            }
+        },
+        {
+            "name": "rd542_plein_3",
+            "det_type": "rd542_plein",
+            "det_center_coords": {
+                "x": 24,
+                "y": 75.6,
+                "z": 720.8
+            },
+            "det_orientation": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "hv_channels": {
+                "drift": [
+                    5,
+                    0
+                ],
+                "resist_1": [
+                    2,
+                    0
+                ],
+                "resist_2": [
+                    2,
+                    1
+                ]
+            },
+            "dream_feus": {
+                "x_1": [
+                    1,
+                    1
+                ],
+                "x_2": [
+                    1,
+                    2
+                ],
+                "y_1": [
+                    1,
+                    3
+                ],
+                "y_2": [
+                    1,
+                    4
+                ]
+            }
+        },
+        {
+            "name": "rd542_strip_2",
+            "det_type": "rd542_strip",
+            "det_center_coords": {
+                "x": 24,
+                "y": 75.6,
+                "z": 720.8
+            },
+            "det_orientation": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "hv_channels": {
+                "drift": [
+                    0,
+                    6
+                ],
+                "resist_1": [
+                    3,
+                    3
+                ],
+                "resist_2": [
+                    3,
+                    4
+                ]
+            },
+            "dream_feus": {
+                "x_1": [
+                    6,
+                    1
+                ],
+                "x_2": [
+                    6,
+                    2
+                ],
+                "y_1": [
+                    6,
+                    3
+                ],
+                "y_2": [
+                    6,
+                    4
+                ]
+            }
+        },
+        {
+            "name": "p2_1",
+            "det_type": "p2",
+            "det_center_coords": {
+                "x": 9.2,
+                "y": 38.4,
+                "z": 100.0
+            },
+            "det_orientation": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "hv_channels": {
+                "drift": [
+                    1,
+                    1
+                ],
+                "mesh": [
+                    1,
+                    0
+                ]
+            },
+            "dream_feus": {
+                "1": [
+                    3,
+                    1
+                ],
+                "2": [
+                    3,
+                    2
+                ],
+                "3": [
+                    3,
+                    3
+                ],
+                "4": [
+                    3,
+                    4
+                ],
+                "5": [
+                    3,
+                    5
+                ],
+                "6": [
+                    3,
+                    6
+                ],
+                "7": [
+                    3,
+                    7
+                ],
+                "8": [
+                    3,
+                    8
+                ],
+                "9": [
+                    4,
+                    1
+                ],
+                "10": [
+                    4,
+                    2
+                ],
+                "11": [
+                    4,
+                    3
+                ],
+                "12": [
+                    4,
+                    4
+                ],
+                "13": [
+                    4,
+                    5
+                ],
+                "14": [
+                    4,
+                    6
+                ],
+                "15": [
+                    4,
+                    7
+                ],
+                "16": [
+                    4,
+                    8
+                ]
+            }
+        },
+        {
+            "name": "scintillator_top",
+            "det_type": "scintillator",
+            "det_center_coords": {
+                "x": 0,
+                "y": 0,
+                "z": 1412
+            },
+            "det_orientation": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "dream_feus": {
+                "xy": [
+                    3,
+                    4
+                ]
+            },
+            "dream_feu_channels": {
+                "xy": [
+                    3,
+                    4,
+                    21
+                ]
+            }
+        },
+        {
+            "name": "scintillator_bottom",
+            "det_type": "scintillator",
+            "det_center_coords": {
+                "x": 0,
+                "y": 0,
+                "z": -76
+            },
+            "det_orientation": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "dream_feus": {
+                "xy": [
+                    3,
+                    4
+                ]
+            },
+            "dream_feu_channels": {
+                "xy": [
+                    3,
+                    4,
+                    20
                 ]
             }
         }

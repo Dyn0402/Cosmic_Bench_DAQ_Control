@@ -179,6 +179,40 @@ def save_run_config():
         return jsonify({"success": False, "message": str(e)}), 500
 
 
+@app.route('/list_json_configs')
+def list_json_configs():
+    folder = "./config/json_run_configs"
+    files = [f for f in os.listdir(folder) if f.endswith('.json')]
+    return jsonify(files)
+
+@app.route('/load_json_config/<filename>')
+def load_json_config(filename):
+    path = os.path.join("./config/json_run_configs", filename)
+    with open(path) as f:
+        return jsonify(json.load(f))
+
+@app.route('/save_json_config', methods=['POST'])
+def save_json_config():
+    data = request.get_json()
+    run_name = data.get('run_name', 'unnamed')
+    path = f"./config/json_run_configs/{run_name}.json"
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, 'w') as f:
+        json.dump(data, f, indent=4)
+    return f"Saved to {path}"
+
+@app.route('/save_json_template', methods=['POST'])
+def save_json_template():
+    req = request.get_json()
+    name = req.get('name')
+    data = req.get('data')
+    path = f"./config/json_templates/{name}"
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, 'w') as f:
+        json.dump(data, f, indent=4)
+    return f"Template saved to {path}"
+
+
 @socketio.on("start")
 def start(data):
     name = data.get("name")

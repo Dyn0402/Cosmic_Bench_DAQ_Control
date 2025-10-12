@@ -81,6 +81,55 @@
     <pre id="jsonDisplay" style="background:#111; color:#0f0; padding:1em; border-radius:6px; overflow-x:auto; max-height:400px;"></pre>
 </div>
 
+
+<!-- Run Config Editor Tab -->
+<div class="tab-pane fade" id="run-config-editor">
+    <h2>Run Config Editor</h2>
+
+    <!-- Load Config -->
+    <div class="mb-3">
+        <label for="configSelect" class="form-label">Select Config File:</label>
+        <select id="configSelect" class="form-select" style="max-width: 400px;">
+            <option value="">-- Choose a config --</option>
+        </select>
+        <button id="loadConfig" class="btn btn-primary mt-2">Load Config</button>
+    </div>
+
+    <div id="configEditor" style="display:none;">
+        <!-- Run Name -->
+        <div class="mb-3">
+            <label for="runName" class="form-label">Run Name:</label>
+            <input type="text" id="runName" class="form-control" style="max-width: 400px;">
+        </div>
+
+        <!-- Subruns -->
+        <div class="mb-4">
+            <h4>Sub-Runs</h4>
+            <div id="subRunsContainer"></div>
+            <button id="addSubRun" class="btn btn-secondary mt-2">+ Add Subrun</button>
+        </div>
+
+        <!-- Included Detectors -->
+        <div class="mb-4">
+            <h4>Included Detectors</h4>
+            <div id="includedDetectors"></div>
+        </div>
+
+        <!-- Detectors -->
+        <div class="mb-4">
+            <h4>Detectors</h4>
+            <div id="detectorsContainer"></div>
+        </div>
+
+        <!-- Save Buttons -->
+        <div class="mb-3">
+            <button id="saveRunConfig" class="btn btn-warning me-2">Save Run Config</button>
+            <button id="saveAsTemplate" class="btn btn-primary">Save As Template</button>
+        </div>
+    </div>
+</div>
+
+
 {% endblock %}
 
 {% block scripts %}
@@ -285,6 +334,200 @@ document.getElementById("saveRunConfig").addEventListener("click", () => {
     .then(data => alert(data.message))
     .catch(err => alert("Failed to save run config: " + err));
 });
+
+// ========== RUN CONFIG EDITOR ==========
+
+let currentRunConfig = null;
+
+async function refreshConfigList() {
+    const res = await fetch('/list_json_configs');
+    const configs = await res.json();
+    const select = document.getElementById('configSelect');
+    select.innerHTML = '<option value="">-- Choose a config --</option>';
+    configs.forEach(f => {
+        const opt = document.createElement('option');
+        opt.value = f;
+        opt.textContent = f;
+        select.appendChild(opt);
+    });
+}
+
+document.getElementById('loadConfig').addEventListener('click', async () => {
+    const name = document.getElementById('configSelect').value;
+    if (!name) return alert('Please select a config file.');
+
+    const res = await fetch(`/load_json_config/${name}`);
+    currentRunConfig = await res.json();
+    document.getElementById('configEditor').style.display = 'block';
+
+    document.getElementById('runName').value = currentRunConfig.run_name || '';
+
+    renderSubRuns();
+    renderDetectors();
+    renderIncludedDetectors();
+});
+
+function renderSubRuns() {
+    const container = document.getElementById('subRunsContainer');
+    container.innerHTML = '';
+
+    (currentRunConfig.sub_runs || []).forEach((sub, i) => {
+        const div = document.createElement('div');
+        div.className = 'border rounded p-3 mb-3';
+        div.innerHTML = `
+            <div class="d-flex justify-content-between">
+                <h5>Subrun ${i + 1}: <input type="text" class="form-control form-control-sm w-auto d-inline" value="${sub.sub_run_name}"></h5>
+                <button class="btn btn-danger btn-sm">Remove</button>
+            </div>
+            <label>Run Time (s):</label>
+            <input type="number" class="form-control mb-2" value="${sub.run_time}">
+            <div><b>HVs:</b></div>
+            <div class="ms-3" id="hvContainer-${i}"></div>
+            <button class="btn btn-sm btn-secondary mt-1" id="addSlot-${i}">+ Add Slot</button>
+        `;
+
+        // Remove subrun
+        div.querySelector('button.btn-danger').addEventListener('click', () => {
+            currentRunConfig.sub_runs.splice(i, 1);
+            renderSubRuns();
+        });
+
+        // Edit name and runtime
+        const [nameInput, timeInput] = div.querySelectorAll('input');
+        nameInput.addEventListener('input', e => sub.sub_run_name = e.target.value);
+        timeInput.addEventListener('input', e => sub.run_time = Number(e.target.value));
+
+        // HV structure
+        const hvContainer = div.querySelector(`#hvContainer-${i}`);
+        renderHVStructure(sub.hvs, hvContainer);
+
+        // Add slot
+        div.querySelector(`#addSlot-${i}`).addEventListener('click', () => {
+            const newSlot = Object.keys(sub.hvs).length;
+            sub.hvs[newSlot] = { "0": 0 };
+            renderSubRuns();
+        });
+
+        container.appendChild(div);
+    });
+}
+
+function renderHVStructure(hvs, container) {
+    container.innerHTML = '';
+    for (const [slot, channels] of Object.entries(hvs)) {
+        const slotDiv = document.createElement('div');
+        slotDiv.className = 'border p-2 mb-2';
+        slotDiv.innerHTML = `<b>Slot ${slot}</b> <button class="btn btn-sm btn-danger float-end">Remove Slot</button>`;
+
+        slotDiv.querySelector('button').addEventListener('click', () => {
+            delete hvs[slot];
+            renderSubRuns();
+        });
+
+        for (const [ch, val] of Object.entries(channels)) {
+            const chDiv = document.createElement('div');
+            chDiv.className = 'd-flex align-items-center mt-1';
+            chDiv.innerHTML = `
+                <label class="me-2">Ch ${ch}:</label>
+                <input type="number" class="form-control form-control-sm w-auto" value="${val}">
+                <button class="btn btn-sm btn-outline-danger ms-2">x</button>
+            `;
+            chDiv.querySelector('input').addEventListener('input', e => {
+                channels[ch] = Number(e.target.value);
+            });
+            chDiv.querySelector('button').addEventListener('click', () => {
+                delete channels[ch];
+                renderSubRuns();
+            });
+            slotDiv.appendChild(chDiv);
+        }
+
+        const addChBtn = document.createElement('button');
+        addChBtn.className = 'btn btn-sm btn-secondary mt-2';
+        addChBtn.textContent = '+ Add Channel';
+        addChBtn.addEventListener('click', () => {
+            const next = Object.keys(channels).length;
+            channels[next] = 0;
+            renderSubRuns();
+        });
+
+        slotDiv.appendChild(addChBtn);
+        container.appendChild(slotDiv);
+    }
+}
+
+document.getElementById('addSubRun').addEventListener('click', () => {
+    const newSub = {
+        sub_run_name: `subrun_${(currentRunConfig.sub_runs?.length || 0) + 1}`,
+        run_time: 60,
+        hvs: { "2": { "0": 10 } }
+    };
+    currentRunConfig.sub_runs = currentRunConfig.sub_runs || [];
+    currentRunConfig.sub_runs.push(newSub);
+    renderSubRuns();
+});
+
+function renderIncludedDetectors() {
+    const div = document.getElementById('includedDetectors');
+    div.innerHTML = '';
+    const included = currentRunConfig.included_detectors || [];
+    currentRunConfig.detectors.forEach(det => {
+        const label = document.createElement('label');
+        label.className = 'form-check';
+        const checked = included.includes(det.name) ? 'checked' : '';
+        label.innerHTML = `<input type="checkbox" class="form-check-input" ${checked}> ${det.name}`;
+        const cb = label.querySelector('input');
+        cb.addEventListener('change', () => {
+            if (cb.checked) included.push(det.name);
+            else included.splice(included.indexOf(det.name), 1);
+        });
+        div.appendChild(label);
+    });
+}
+
+function renderDetectors() {
+    const div = document.getElementById('detectorsContainer');
+    div.innerHTML = '';
+    currentRunConfig.detectors.forEach(det => {
+        const detDiv = document.createElement('div');
+        detDiv.className = 'border rounded p-3 mb-3';
+        detDiv.innerHTML = `
+            <h5>${det.name}</h5>
+            <label>Type:</label>
+            <input type="text" class="form-control mb-2" value="${det.det_type}">
+        `;
+        const typeInput = detDiv.querySelector('input');
+        typeInput.addEventListener('input', e => det.det_type = e.target.value);
+        div.appendChild(detDiv);
+    });
+}
+
+// ----- Save Run Config -----
+document.getElementById('saveRunConfig').addEventListener('click', async () => {
+    currentRunConfig.run_name = document.getElementById('runName').value;
+    const res = await fetch('/save_json_config', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(currentRunConfig)
+    });
+    alert(await res.text());
+});
+
+// ----- Save As Template -----
+document.getElementById('saveAsTemplate').addEventListener('click', async () => {
+    const newName = prompt('Enter new template name (e.g., my_template.json):');
+    if (!newName) return;
+    const res = await fetch('/save_json_template', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({name: newName, data: currentRunConfig})
+    });
+    alert(await res.text());
+});
+
+// Initialize list on load
+document.addEventListener('DOMContentLoaded', refreshConfigList);
+
 
 // --- HV Plots ---
 async function fetchHVData() {

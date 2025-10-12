@@ -31,6 +31,7 @@ class Config:
         self.save_fdfs = True  # True to save FDF files, False to delete after decoding
         self.zero_supress = True  # True let DREAM DAQ pedestal subtract and suppress zeros, False to save all ADC values
         self.start_time = None
+        self.write_all_dectors_to_json = False  # Only when making run config json template.
 
         self.dream_daq_info = {
             'ip': '192.168.10.8',
@@ -621,7 +622,8 @@ class Config:
             },
         ]
 
-        self.detectors = [det for det in self.detectors if det['name'] in self.included_detectors]
+        if not self.write_all_dectors_to_json:
+            self.detectors = [det for det in self.detectors if det['name'] in self.included_detectors]
 
     def write_to_file(self, file_path):
         with open(file_path, 'w') as file:
@@ -636,7 +638,7 @@ class Config:
 
 if __name__ == '__main__':
     # out_dir = '/local/home/dn277127/Bureau/beam_test_25/'
-    out_dir = 'C:/Users/Dylan/Desktop/test/'
+    out_dir = 'config/json_templates/'
 
     config = Config()
 
