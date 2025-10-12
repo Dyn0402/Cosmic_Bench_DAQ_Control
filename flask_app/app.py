@@ -135,25 +135,6 @@ def load_json_template(template_name):
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
 
-@app.route("/save_json_template", methods=["POST"])
-def save_json_template():
-    try:
-        data = request.get_json()
-        filename = data.get("filename")
-        content = data.get("content")
-
-        if not filename or not filename.endswith(".json"):
-            return jsonify({"success": False, "message": "Invalid filename"}), 400
-
-        path = os.path.join(CONFIG_TEMPLATE_DIR, filename)
-        with open(path, "w") as f:
-            json.dump(content, f, indent=4)
-
-        return jsonify({"success": True, "message": f"Template saved as {filename}"})
-    except Exception as e:
-        return jsonify({"success": False, "message": str(e)}), 500
-
-
 @app.route("/save_run_config", methods=["POST"])
 def save_run_config():
     try:
