@@ -123,8 +123,8 @@
 
         <!-- Save Buttons -->
         <div class="mb-3">
-            <button id="saveRunConfig" class="btn btn-warning me-2">Save Run Config</button>
-            <button id="saveAsTemplate" class="btn btn-primary">Save As Template</button>
+            <button id="saveRunConfigEditor" class="btn btn-warning me-2">Save Run Config</button>
+            <button id="saveAsTemplateEditor" class="btn btn-primary">Save As Template</button>
         </div>
     </div>
 </div>
@@ -503,7 +503,7 @@ function renderDetectors() {
 }
 
 // ----- Save Run Config -----
-document.getElementById('saveRunConfig').addEventListener('click', async () => {
+document.getElementById('saveRunConfigEditor').addEventListener('click', async () => {
     currentRunConfig.run_name = document.getElementById('runName').value;
     const res = await fetch('/save_json_config', {
         method: 'POST',
@@ -514,7 +514,7 @@ document.getElementById('saveRunConfig').addEventListener('click', async () => {
 });
 
 // ----- Save As Template -----
-document.getElementById('saveAsTemplate').addEventListener('click', async () => {
+document.getElementById('saveAsTemplateEditor').addEventListener('click', async () => {
     const newName = prompt('Enter new template name (e.g., my_template.json):');
     if (!newName) return;
     const res = await fetch('/save_json_template', {
