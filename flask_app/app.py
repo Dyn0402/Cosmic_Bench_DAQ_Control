@@ -144,8 +144,8 @@ def get_subruns():
         subruns = sorted(os.listdir(output_dir))
 
         # Ensure it matches item in cfg['subruns'][i]['sub_run_name'] if that key exists
-        if "subruns" in cfg:
-            valid_subruns = {sr.get("sub_run_name") for sr in cfg["subruns"] if "sub_run_name" in sr}
+        if "sub_runs" in cfg:
+            valid_subruns = {sr.get("sub_run_name") for sr in cfg["sub_runs"] if "sub_run_name" in sr}
             subruns = [sr for sr in subruns if sr in valid_subruns]
 
         return jsonify(subruns)
