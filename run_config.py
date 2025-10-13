@@ -17,13 +17,15 @@ class Config:
         self.run_name = 'beam_test_daq_test_10-10-25'
         self.daq_dir = '/local/home/banco/dylan/Run/'  # Maybe kill
         self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
-        self.data_out_dir = '/mnt/cosmic_data/Run/'
+        # self.base_out_dir = '/mnt_cosmic_data/'
+        self.base_out_dir = '/local/home/banco/dylan/out_dir/'
+        self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
         self.raw_daq_inner_dir = 'raw_daq_data'
         self.decoded_root_inner_dir = 'decoded_root'
         self.filtered_root_inner_dir = 'filtered_root'
         self.m3_tracking_inner_dir = 'm3_tracking_root'
-        self.detector_info_dir = f'/mnt/cosmic_data/config/detectors/'
+        self.detector_info_dir = f'{self.base_out_dir}config/detectors/'
         self.m3_feu_num = None
         self.power_off_hv_at_end = True  # True to power off HV at end of run
         self.filtering_by_m3 = False  # True to filter by m3 tracking, False to do no filtering
@@ -40,7 +42,7 @@ class Config:
             # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_SelfTrigger.cfg',
             'daq_config_template_path': '/local/home/banco/dylan/Run/config/TbSPS25.cfg',
             'run_directory': f'/local/home/banco/dylan/Run/{self.run_name}/',
-            'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
+            'data_out_dir': f'{self.base_out_dir}Run/{self.run_name}',
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
             'n_samples_per_waveform': 32,  # Number of samples per waveform to configure in DAQ
             'go_timeout': 5 * 60,  # Seconds to wait for 'Go' response from RunCtrl before assuming failure
@@ -56,14 +58,14 @@ class Config:
             # 'data_temp_dir': '/home/banco/dylan/Run/data',
             'daq_run_command': 'cd /home/banco/CERNTestBeam/framework/bin && ./test_multi_noiseocc_int',
             'data_temp_dir': '/home/banco/CERNTestBeam/data',
-            'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
+            'data_out_dir': f'{self.base_out_dir}Run/{self.run_name}',
             'data_inner_dir': 'banco_data'
         }
 
         self.dedip196_processor_info = {
             'ip': '132.166.10.196',
             'port': 1200,
-            'run_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
+            'run_dir': f'{self.base_out_dir}Run/{self.run_name}',
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
             'decoded_root_inner_dir': self.decoded_root_inner_dir,
             'm3_tracking_inner_dir': self.m3_tracking_inner_dir,
