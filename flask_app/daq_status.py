@@ -193,12 +193,21 @@ def get_daq_control_status():
         ("Stopping DAQ process", "Stopping DAQ", "warning"),
     ]
 
+    fields = []
+    for line in reversed(output.splitlines()):  # Find most recent "Sent: Start ..." line
+        if line.startswith("Sent: Start"):
+            parts = line.split()
+            if len(parts) >= 4:
+                fields.append({"label": "Subrun", "value": parts[2]})
+                fields.append({"label": "Runtime (min)", "value": int(parts[3]) / 60})
+            break
+
     for line in reversed(output.splitlines()):
         for flag, status, color in rules:
             if flag in line:
-                return {"status": status, "color": color, "fields": []}
+                return {"status": status, "color": color, "fields": fields}
 
-    return {"status": "UNKNOWN STATE", "color": "danger", "fields": []}
+    return {"status": "UNKNOWN STATE", "color": "danger", "fields": fields}
 
 
 def get_trigger_control_status():

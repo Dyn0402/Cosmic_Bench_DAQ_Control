@@ -140,7 +140,11 @@ def get_subruns():
         if not output_dir or not os.path.isdir(output_dir):
             return jsonify([])
 
-        subruns = sorted(os.listdir(output_dir))
+        subruns = sorted(
+            os.listdir(output_dir),
+            key=lambda f: os.path.getmtime(os.path.join(output_dir, f)),
+            reverse=True
+        )
 
         # Ensure it matches item in cfg['subruns'][i]['sub_run_name'] if that key exists
         if "sub_runs" in cfg:
