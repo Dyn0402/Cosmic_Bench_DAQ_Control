@@ -63,16 +63,6 @@ def status_all():
     return jsonify(statuses)
 
 
-# @app.route("/start_run", methods=["POST"])
-# def start_run():
-#     try:
-#         # Run your bash script in the background
-#         subprocess.Popen(["/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/bash_scripts/start_run.sh"])
-#         return jsonify({"success": True, "message": "Run started"})
-#     except Exception as e:
-#         return jsonify({"success": False, "message": str(e)}), 500
-
-
 @app.route("/start_run", methods=["POST"])
 def start_run():
     data = request.get_json()

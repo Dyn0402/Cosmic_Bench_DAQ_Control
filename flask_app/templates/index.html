@@ -184,12 +184,6 @@ function updateStatus() {
         });
 }
 
-// document.getElementById("start-run").addEventListener("click", () => {
-//   fetch("/start_run", { method: "POST" })
-//     .then(res => res.json())
-//     .then(data => alert(data.message))
-//     .catch(err => alert("Error: " + err));
-// });
 
 document.getElementById("start-run").addEventListener("click", () => {
   const select = document.getElementById("run-select");
@@ -414,7 +408,7 @@ function renderSubRuns() {
                 <h5>Subrun ${i + 1}: <input type="text" class="form-control form-control-sm w-auto d-inline" value="${sub.sub_run_name}"></h5>
                 <button class="btn btn-danger btn-sm">Remove</button>
             </div>
-            <label>Run Time (s):</label>
+            <label>Run Time (min):</label>
             <input type="number" class="form-control mb-2" value="${sub.run_time}">
             <div><b>HVs:</b></div>
             <div class="ms-3" id="hvContainer-${i}"></div>

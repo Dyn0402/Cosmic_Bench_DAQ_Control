@@ -199,7 +199,7 @@ def get_daq_control_status():
             parts = line.split()
             if len(parts) >= 4:
                 fields.append({"label": "Subrun", "value": parts[2]})
-                fields.append({"label": "Runtime (min)", "value": int(parts[3]) / 60})
+                fields.append({"label": "Runtime (min)", "value": parts[3]})
             break
 
     for line in reversed(output.splitlines()):

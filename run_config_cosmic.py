@@ -149,11 +149,11 @@ class Config:
         # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
         template = self.sub_runs[0]
         drift_vs = [800, 300, 100, 900, 200, 700, 400, 600, 150, 250, 75]
+        card = 0
+        channels = [6]
         for drift_v in drift_vs:
             sub_run = copy.deepcopy(template)
             sub_run['sub_run_name'] = f'drift_{drift_v}V'
-            card = 0
-            channels = [1]
             for channel in sub_run['hvs'][card]:
                 if channel in channels:
                     sub_run['hvs'][card][channel] = drift_v
