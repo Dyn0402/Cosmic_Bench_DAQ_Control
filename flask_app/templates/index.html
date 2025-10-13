@@ -14,6 +14,13 @@
       </select>
     </div>
     <div class="mb-3">
+        <label for="run-select" class="me-2">Run Config:</label>
+          <select id="run-select" class="form-select me-3" style="width:auto;"></select>
+
+          <label for="subrun-select" class="me-2">Subrun:</label>
+          <select id="subrun-select" class="form-select me-3" style="width:auto;">
+            <option value="">(none)</option>
+          </select>
         <button id="start-run" class="btn btn-success me-2">Start Run</button>
         <button id="stop-run" class="btn btn-danger">Stop Run</button>
         <button id="restart-all" class="btn btn-danger">Restart All</button>
@@ -613,6 +620,64 @@ async function updateHVPlots() {
         console.error("HV update failed:", err);
     }
 }
+
+async function loadRuns() {
+  const res = await fetch("/get_runs");
+  const runs = await res.json();
+  const runSelect = document.getElementById("run-select");
+  runSelect.innerHTML = "";
+  runs.forEach(r => {
+    const opt = document.createElement("option");
+    opt.value = r;
+    opt.textContent = r;
+    runSelect.appendChild(opt);
+  });
+  if (runs.length > 0) {
+    runSelect.value = runs[0];
+    loadSubruns();
+  }
+}
+
+async function loadSubruns() {
+  const runName = document.getElementById("run-select").value;
+  const res = await fetch(`/get_subruns?run=${encodeURIComponent(runName)}`);
+  const subruns = await res.json();
+  const subrunSelect = document.getElementById("subrun-select");
+  const prev = subrunSelect.value;
+  subrunSelect.innerHTML = "";
+  subruns.forEach(s => {
+    const opt = document.createElement("option");
+    opt.value = s;
+    opt.textContent = s;
+    subrunSelect.appendChild(opt);
+  });
+  if (subruns.includes(prev)) {
+    subrunSelect.value = prev; // preserve selection
+  } else if (subruns.length > 0) {
+    subrunSelect.value = subruns[subruns.length - 1]; // default to latest
+  }
+}
+
+// reload subruns periodically
+setInterval(loadSubruns, 5000);
+
+// reload subruns when run changes
+document.getElementById("run-select").addEventListener("change", loadSubruns);
+
+// initial load
+loadRuns();
+
+// start run button handler
+document.getElementById("start-run").addEventListener("click", async () => {
+  const runName = document.getElementById("run-select").value;
+  const res = await fetch("/start_run", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ config: runName })
+  });
+  const data = await res.json();
+  alert(data.message);
+});
 
 setInterval(updateStatus, 1000);  // update every 1s
 updateStatus();

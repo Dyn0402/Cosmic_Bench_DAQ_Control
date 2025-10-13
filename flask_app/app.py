@@ -116,6 +116,44 @@ def restart_all():
         return jsonify({"success": False, "message": str(e)}), 500
 
 
+@app.route("/get_runs")
+def get_runs():
+    runs = []
+    for f in os.listdir(CONFIG_RUN_DIR):
+        if f.endswith(".json"):
+            runs.append(f)
+    return jsonify(runs)
+
+@app.route("/get_subruns")
+def get_subruns():
+    run_name = request.args.get("run")
+    if not run_name:
+        return jsonify([])
+
+    config_path = os.path.join(CONFIG_RUN_DIR, run_name)
+    if not os.path.isfile(config_path):
+        return jsonify([])
+
+    try:
+        with open(config_path) as f:
+            cfg = json.load(f)
+        output_dir = cfg.get("run_out_dir")
+        if not output_dir or not os.path.isdir(output_dir):
+            return jsonify([])
+
+        subruns = sorted(os.listdir(output_dir))
+
+        # Ensure it matches item in cfg['subruns'][i]['sub_run_name'] if that key exists
+        if "subruns" in cfg:
+            valid_subruns = {sr.get("sub_run_name") for sr in cfg["subruns"] if "sub_run_name" in sr}
+            subruns = [sr for sr in subruns if sr in valid_subruns]
+
+        return jsonify(subruns)
+    except Exception as e:
+        print("Error reading subruns:", e)
+        return jsonify([])
+
+
 @app.route("/hv_data")
 def hv_data():
     try:
