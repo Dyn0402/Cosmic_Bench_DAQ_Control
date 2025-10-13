@@ -5,15 +5,6 @@
 <div class="tab-pane fade show active" id="overview">
     <h2>DAQ Overview</h2>
     <div class="mb-3">
-      <label for="runConfigSelect" class="form-label">Select Run Config:</label>
-      <select id="runConfigSelect" class="form-select" style="max-width:400px;">
-        <option value="">-- Choose a config --</option>
-        {% for cfg in run_configs %}
-          <option value="{{ cfg }}">{{ cfg }}</option>
-        {% endfor %}
-      </select>
-    </div>
-    <div class="mb-3">
         <label for="run-select" class="me-2">Run Config:</label>
           <select id="run-select" class="form-select me-3" style="width:auto;"></select>
 
@@ -201,7 +192,7 @@ function updateStatus() {
 // });
 
 document.getElementById("start-run").addEventListener("click", () => {
-  const select = document.getElementById("runConfigSelect");
+  const select = document.getElementById("run-select");
   const config = select.value;
 
   if (!config) {
