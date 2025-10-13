@@ -107,6 +107,15 @@ def stop_run():
         return jsonify({"success": False, "message": str(e)}), 500
 
 
+@app.route("/restart_all", methods=["POST"])
+def restart_all():
+    try:
+        subprocess.Popen(["/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/bash_scripts/restart_all_tmux_processes.sh"])
+        return jsonify({"success": True, "message": "All processes restarted"})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
 @app.route("/hv_data")
 def hv_data():
     try:
