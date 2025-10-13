@@ -157,7 +157,20 @@ def get_subruns():
 @app.route("/hv_data")
 def hv_data():
     try:
-        df = pd.read_csv(HV_CSV_PATH)
+        run_name = request.args.get("run")
+        subrun_name = request.args.get("subrun")
+        hv_file_name = request.args.get("hv_file", "hv_monitor.csv")
+
+        config_path = os.path.join(CONFIG_RUN_DIR, run_name)
+        if not os.path.isfile(config_path):
+            return jsonify([])
+
+        with open(config_path) as f:
+            cfg = json.load(f)
+        output_dir = cfg.get("run_out_dir")
+        hv_csv_path = os.path.join(output_dir, subrun_name, hv_file_name)
+
+        df = pd.read_csv(hv_csv_path)
         df = df.tail(HV_TAIL)
 
         # Extract timestamps

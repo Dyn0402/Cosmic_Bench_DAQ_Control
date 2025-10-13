@@ -566,8 +566,10 @@ document.addEventListener('DOMContentLoaded', refreshConfigList);
 
 // --- HV Plots ---
 async function fetchHVData() {
-    const resp = await fetch("/hv_data");
-    const data = await resp.json();
+    const run = document.getElementById("run-select").value;
+    const subrun = document.getElementById("subrun-select").value;
+    const res = await fetch(`/hv_data?run=${encodeURIComponent(run)}&subrun=${encodeURIComponent(subrun)}`);
+    const data = await res.json();
     if (!data.success) throw data.message;
     return data;
 }
