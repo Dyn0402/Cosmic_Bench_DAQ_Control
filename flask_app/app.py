@@ -35,6 +35,7 @@ sessions = {}
 
 @app.route("/")
 def index():
+    configs = [f for f in os.listdir(CONFIG_RUN_DIR) if f.endswith(".json")]
     return render_template("index.html", screens=TMUX_SESSIONS)
 
 
@@ -63,15 +64,39 @@ def status_all():
     return jsonify(statuses)
 
 
+# @app.route("/start_run", methods=["POST"])
+# def start_run():
+#     try:
+#         # Run your bash script in the background
+#         subprocess.Popen(["/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/bash_scripts/start_run.sh"])
+#         return jsonify({"success": True, "message": "Run started"})
+#     except Exception as e:
+#         return jsonify({"success": False, "message": str(e)}), 500
+
+
 @app.route("/start_run", methods=["POST"])
 def start_run():
-    try:
-        # Run your bash script in the background
-        subprocess.Popen(["/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/bash_scripts/start_run.sh"])
-        return jsonify({"success": True, "message": "Run started"})
-    except Exception as e:
-        return jsonify({"success": False, "message": str(e)}), 500
+    data = request.get_json()
+    config_file = data.get("config")
 
+    if not config_file:
+        return jsonify({"message": "No config selected"}), 400
+
+    config_path = os.path.join(CONFIG_RUN_DIR, config_file)
+    if not os.path.exists(config_path):
+        return jsonify({"message": f"Config not found: {config_path}"}), 404
+
+    script_path = "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/start_run.sh"
+    result = subprocess.run(
+        [script_path, config_path],
+        capture_output=True,
+        text=True
+    )
+
+    if result.returncode == 0:
+        return jsonify({"message": f"Run started with {config_file}"})
+    else:
+        return jsonify({"message": f"Error: {result.stderr}"}), 500
 
 @app.route("/stop_run", methods=["POST"])
 def stop_run():

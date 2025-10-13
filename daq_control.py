@@ -9,6 +9,7 @@ Created as Cosmic_Bench_DAQ_Control/daq_control.py
 """
 
 import os
+import sys
 import shutil
 from time import sleep
 from datetime import datetime
@@ -21,10 +22,20 @@ from DAQController import DAQController
 from run_config import Config
 from common_functions import *
 
+RUNCONFIG_REL_PATH = "config/json_run_configs/"
+
 
 def main():
     print("Starting DAQ Control")
-    config = Config()
+
+    config = Config()  # Initially just load run_config.py
+    if len(sys.argv) == 2:
+        config_path = os.path.join(RUNCONFIG_REL_PATH, sys.argv[1]) if not os.path.isabs(sys.argv[1]) else sys.argv[1]
+        print(f'Using run config file: {config_path}')
+        if not os.path.isfile(config_path):
+            print(f'File {config_path} does not exist, exiting')
+            return
+        config.load_from_file(config_path)  # If a config file is given, load it
     config.start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     banco = any(['banco' in detector_name for detector_name in config.included_detectors])
     m3 = any(['m3' in detector_name for detector_name in config.included_detectors])
