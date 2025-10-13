@@ -23,8 +23,7 @@ from daq_status import (get_dream_daq_status, get_hv_control_status, get_daq_con
 
 CONFIG_TEMPLATE_DIR = "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/config/json_templates"
 CONFIG_RUN_DIR = "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/config/json_run_configs"
-HV_CSV_PATH = "/mnt/cosmic_data/Run/beam_test_daq_test_10-10-25/quick_test_440V/hv_monitor.csv"  # PLACEHOLDER
-HV_TAIL = 200  # number of most recent rows to show
+HV_TAIL = 1000  # number of most recent rows to show
 
 
 app = Flask(__name__)
