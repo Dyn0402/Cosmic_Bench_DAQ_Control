@@ -20,7 +20,7 @@
     "dream_daq_info": {
         "ip": "192.168.10.8",
         "port": 1101,
-        "daq_config_template_path": "/local/home/banco/dylan/Run/config/CosmicTb_TPOT.cfg",
+        "daq_config_template_path": "/local/home/banco/dylan/Run/config/TbSPS25.cfg",
         "run_directory": "/local/home/banco/dylan/Run/beam_test_daq_test_10-10-25/",
         "data_out_dir": "/mnt/cosmic_data/Run/beam_test_daq_test_10-10-25",
         "raw_daq_inner_dir": "raw_daq_data",
@@ -96,10 +96,6 @@
         "banco_arm_length_y": 230
     },
     "included_detectors": [
-        "banco_ladder160",
-        "banco_ladder163",
-        "banco_ladder157",
-        "banco_ladder162",
         "rd542_plein_3"
     ],
     "detectors": [
