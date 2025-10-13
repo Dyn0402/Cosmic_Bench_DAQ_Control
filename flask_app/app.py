@@ -36,7 +36,7 @@ sessions = {}
 @app.route("/")
 def index():
     configs = [f for f in os.listdir(CONFIG_RUN_DIR) if f.endswith(".json")]
-    return render_template("index.html", screens=TMUX_SESSIONS)
+    return render_template("index.html", screens=TMUX_SESSIONS, run_configs=configs)
 
 
 @app.route("/status")
