@@ -86,7 +86,7 @@ def start_run():
     if not os.path.exists(config_path):
         return jsonify({"message": f"Config not found: {config_path}"}), 404
 
-    script_path = "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/start_run.sh"
+    script_path = "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/bash_scripts/start_run.sh"
     result = subprocess.run(
         [script_path, config_path],
         capture_output=True,
