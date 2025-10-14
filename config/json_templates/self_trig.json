@@ -1,10 +1,10 @@
 {
-    "run_name": "beam_test_daq_test_10-10-25",
+    "run_name": "rd542_plein_vfp_1_fe_test_10-14-25",
     "daq_dir": "/local/home/banco/dylan/Run/",
-    "run_dir": "/local/home/banco/dylan/Run/beam_test_daq_test_10-10-25/",
+    "run_dir": "/local/home/banco/dylan/Run/rd542_plein_vfp_1_fe_test_10-14-25/",
     "base_out_dir": "/local/home/banco/dylan/out_dir/",
     "data_out_dir": "/local/home/banco/dylan/out_dir/Run/",
-    "run_out_dir": "/local/home/banco/dylan/out_dir/Run/beam_test_daq_test_10-10-25/",
+    "run_out_dir": "/local/home/banco/dylan/out_dir/Run/rd542_plein_vfp_1_fe_test_10-14-25/",
     "raw_daq_inner_dir": "raw_daq_data",
     "decoded_root_inner_dir": "decoded_root",
     "filtered_root_inner_dir": "filtered_root",
@@ -22,8 +22,8 @@
         "ip": "192.168.10.8",
         "port": 1101,
         "daq_config_template_path": "/local/home/banco/dylan/Run/config/CosmicTb_SelfTrigger_thresh.cfg",
-        "run_directory": "/local/home/banco/dylan/Run/beam_test_daq_test_10-10-25/",
-        "data_out_dir": "/local/home/banco/dylan/out_dir/Run/beam_test_daq_test_10-10-25",
+        "run_directory": "/local/home/banco/dylan/Run/rd542_plein_vfp_1_fe_test_10-14-25/",
+        "data_out_dir": "/local/home/banco/dylan/out_dir/Run/rd542_plein_vfp_1_fe_test_10-14-25",
         "raw_daq_inner_dir": "raw_daq_data",
         "n_samples_per_waveform": 32,
         "go_timeout": 300,
@@ -36,13 +36,13 @@
         "port": 1100,
         "daq_run_command": "cd /home/banco/CERNTestBeam/framework/bin && ./test_multi_noiseocc_int",
         "data_temp_dir": "/home/banco/CERNTestBeam/data",
-        "data_out_dir": "/local/home/banco/dylan/out_dir/Run/beam_test_daq_test_10-10-25",
+        "data_out_dir": "/local/home/banco/dylan/out_dir/Run/rd542_plein_vfp_1_fe_test_10-14-25",
         "data_inner_dir": "banco_data"
     },
     "dedip196_processor_info": {
         "ip": "132.166.10.196",
         "port": 1200,
-        "run_dir": "/local/home/banco/dylan/out_dir/Run/beam_test_daq_test_10-10-25",
+        "run_dir": "/local/home/banco/dylan/out_dir/Run/rd542_plein_vfp_1_fe_test_10-14-25",
         "raw_daq_inner_dir": "raw_daq_data",
         "decoded_root_inner_dir": "decoded_root",
         "m3_tracking_inner_dir": "m3_tracking_root",
@@ -63,7 +63,7 @@
         "password": "admin",
         "n_cards": 6,
         "n_channels_per_card": 12,
-        "run_out_dir": "/local/home/banco/dylan/out_dir/Run/beam_test_daq_test_10-10-25/",
+        "run_out_dir": "/local/home/banco/dylan/out_dir/Run/rd542_plein_vfp_1_fe_test_10-14-25/",
         "hv_monitoring": true,
         "monitor_interval": 5
     },
@@ -74,7 +74,7 @@
     "sub_runs": [
         {
             "sub_run_name": "quick_test_445V",
-            "run_time": 300,
+            "run_time": 5,
             "hvs": {
                 "2": {
                     "1": 445
