@@ -7,11 +7,6 @@
     <div class="mb-3">
         <label for="run-select" class="me-2">Run Config:</label>
           <select id="run-select" class="form-select me-3" style="width:auto;"></select>
-
-          <label for="subrun-select" class="me-2">Subrun:</label>
-          <select id="subrun-select" class="form-select me-3" style="width:auto;">
-            <option value="">(none)</option>
-          </select>
         <button id="start-run" class="btn btn-success me-2">Start Run</button>
         <button id="stop-run" class="btn btn-danger">Stop Run</button>
         <button id="restart-all" class="btn btn-danger">Restart All</button>
@@ -23,7 +18,11 @@
     <hr class="my-4">
 
     <h3>HV Monitor</h3>
-    <p class="text-muted">Latest voltage and current readings from HV control system</p>
+    <p class="text-muted" style="color:#fff;">Latest voltage and current readings from HV control system</p>
+    <label for="hv-subrun-select" class="me-2">Subrun:</label>
+          <select id="hv-subrun-select" class="form-select me-3" style="width:auto;">
+            <option value="">(none)</option>
+          </select>
 
     <div id="hv-voltage-plot" style="width:100%;height:400px;"></div>
     <div id="hv-current-plot" style="width:100%;height:400px;"></div>
@@ -185,24 +184,24 @@ function updateStatus() {
 }
 
 
-document.getElementById("start-run").addEventListener("click", () => {
-  const select = document.getElementById("run-select");
-  const config = select.value;
-
-  if (!config) {
-    alert("Please select a run configuration first.");
-    return;
-  }
-
-  fetch("/start_run", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ config })
-  })
-  .then(res => res.json())
-  .then(data => alert(data.message))
-  .catch(err => alert("Error: " + err));
-});
+// document.getElementById("start-run").addEventListener("click", () => {
+//   const select = document.getElementById("run-select");
+//   const config = select.value;
+//
+//   if (!config) {
+//     alert("Please select a run configuration first.");
+//     return;
+//   }
+//
+//   fetch("/start_run", {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify({ config })
+//   })
+//   .then(res => res.json())
+//   .then(data => alert(data.message))
+//   .catch(err => alert("Error: " + err));
+// });
 
 document.getElementById("stop-run").addEventListener("click", () => {
   fetch("/stop_run", { method: "POST" })
@@ -561,7 +560,7 @@ document.addEventListener('DOMContentLoaded', refreshConfigList);
 // --- HV Plots ---
 async function fetchHVData() {
     const run = document.getElementById("run-select").value;
-    const subrun = document.getElementById("subrun-select").value;
+    const subrun = document.getElementById("hv-subrun-select").value;
     const res = await fetch(`/hv_data?run=${encodeURIComponent(run)}&subrun=${encodeURIComponent(subrun)}`);
     const data = await res.json();
     if (!data.success) throw data.message;
@@ -629,7 +628,7 @@ async function loadSubruns() {
   const runName = document.getElementById("run-select").value;
   const res = await fetch(`/get_subruns?run=${encodeURIComponent(runName)}`);
   const subruns = await res.json();
-  const subrunSelect = document.getElementById("subrun-select");
+  const subrunSelect = document.getElementById("hv-subrun-select");
   const prev = subrunSelect.value;
   subrunSelect.innerHTML = "";
   subruns.forEach(s => {

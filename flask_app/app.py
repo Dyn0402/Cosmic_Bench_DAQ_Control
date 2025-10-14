@@ -23,7 +23,9 @@ from daq_status import (get_dream_daq_status, get_hv_control_status, get_daq_con
 
 CONFIG_TEMPLATE_DIR = "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/config/json_templates"
 CONFIG_RUN_DIR = "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/config/json_run_configs"
+BASH_DIR = "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/bash_scripts"
 HV_TAIL = 1000  # number of most recent rows to show
+current_subrun_name = None
 
 
 app = Flask(__name__)
@@ -44,6 +46,8 @@ def status_all():
     for s in TMUX_SESSIONS:
         if s == "dream_daq":
             statuses[s] = get_dream_daq_status()
+            # If Subrun has changed, reset current_subrun_name
+            current_subrun_name = ''
         elif s == "hv_control":
             statuses[s] = get_hv_control_status()
         elif s == "daq_control":
@@ -75,7 +79,7 @@ def start_run():
     if not os.path.exists(config_path):
         return jsonify({"message": f"Config not found: {config_path}"}), 404
 
-    script_path = "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/bash_scripts/start_run.sh"
+    script_path = f"{BASH_DIR}/start_run.sh"
     result = subprocess.run(
         [script_path, config_path],
         capture_output=True,
@@ -90,7 +94,7 @@ def start_run():
 @app.route("/stop_run", methods=["POST"])
 def stop_run():
     try:
-        subprocess.Popen(["/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/bash_scripts/stop_run.sh"])
+        subprocess.Popen([f"{BASH_DIR}/stop_run.sh"])
         return jsonify({"success": True, "message": "Run stopped"})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
@@ -99,7 +103,7 @@ def stop_run():
 @app.route("/restart_all", methods=["POST"])
 def restart_all():
     try:
-        subprocess.Popen(["/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/bash_scripts/restart_all_tmux_processes.sh"])
+        subprocess.Popen([f"{BASH_DIR}/restart_all_tmux_processes.sh"])
         return jsonify({"success": True, "message": "All processes restarted"})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
