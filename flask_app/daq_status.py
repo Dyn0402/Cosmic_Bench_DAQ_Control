@@ -40,6 +40,9 @@ def get_dream_daq_status():
     if "_TakePedThr" in output:
         status = "Taking Pedestals"
         color = "warning"
+    elif "Scan trigger thresholds in process" in output:
+        status = "Scanning Trigger Thresholds"
+        color = "warning"
     elif "_TakeData:" in output:
         status = "RUNNING"
         color = "success"
