@@ -40,7 +40,8 @@ class Config:
             'port': 1101,
             # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_TPOT.cfg',
             # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_SelfTrigger.cfg',
-            'daq_config_template_path': '/local/home/banco/dylan/Run/config/TbSPS25.cfg',
+            'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_SelfTrigger_thresh.cfg',
+            # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/TbSPS25.cfg',
             'run_directory': f'/local/home/banco/dylan/Run/{self.run_name}/',
             'data_out_dir': f'{self.base_out_dir}Run/{self.run_name}',
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
@@ -100,18 +101,19 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'quick_test_440V',
+                'sub_run_name': 'quick_test_445V',
                 'run_time': 5 * 60,  # Minutes
                 'hvs': {
                     '2': {
                         # '0': 300,
-                        # '1': 440,
-                        '0': 10,
-                        '1': 10,
+                        '1': 445,
+                        # '0': 10,
+                        # '1': 10,
                     },
                     '5': {
                         # '0': 800,
-                        '0': 20,
+                        '0': 400,
+                        # '0': 20,
                     }
                 }
             },
@@ -145,7 +147,7 @@ class Config:
         #                            'strip_strip_1',
         #                            'scintillator_top']
         self.included_detectors = [  # 'banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
-                                   'rd542_plein_3']
+                                   'rd542_plein_vfp_1']
 
         self.detectors = [
             {
@@ -546,6 +548,31 @@ class Config:
                 },
             },
             {
+                'name': 'rd542_plein_vfp_1',
+                'det_type': 'rd542_plein',
+                'det_center_coords': {  # Center of detector
+                    'x': 24,  # mm
+                    'y': 75.6,  # mm
+                    'z': 720.8,  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': {
+                    'drift': (5, 0),
+                    # 'resist_1': (2, 0),
+                    'resist_2': (2, 1)
+                },
+                'dream_feus': {
+                    'x_1': (1, 1),  # Runs along x direction, indicates y hit location
+                    'x_2': (1, 2),
+                    'y_1': (1, 3),  # Runs along y direction, indicates x hit location
+                    'y_2': (1, 4),
+                },
+            },
+            {
                 'name': 'p2_1',
                 'det_type': 'p2',
                 'det_center_coords': {  # Center of detector
@@ -642,13 +669,14 @@ class Config:
 if __name__ == '__main__':
     # out_dir = '/local/home/dn277127/Bureau/beam_test_25/'
     out_dir = 'config/json_templates/'
+    config_name = 'self_trig.json'
 
     config = Config()
 
-    config.write_to_file(f'{out_dir}run_config_test.json')
+    config.write_to_file(f'{out_dir}{config_name}')
 
     print(config.sub_runs)
-    config.load_from_file(f'{out_dir}run_config_test.json')
+    config.load_from_file(f'{out_dir}{config_name}')
     print(config.sub_runs)
 
     print('donzo')
