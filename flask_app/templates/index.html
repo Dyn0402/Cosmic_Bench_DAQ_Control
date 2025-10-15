@@ -166,7 +166,8 @@ function updateStatus() {
         .then(r => r.json())
         .then(data => {
             // Check subrun change
-            const fields = daq_control?.fields || [];
+            const daq = data["daq_control"];
+            const fields = daq?.fields || [];
 
             // Find the "Subrun" field (if it exists)
             const subrunField = fields.find(f => f.label === "Subrun");
@@ -601,7 +602,7 @@ async function fetchHVData() {
 async function updateHVPlots() {
     try {
         const data = await fetchHVData();
-        if (!data.time || data.time.length === 0) {
+        if (!data) {
             console.log("No HV data available");
             return;
         }
