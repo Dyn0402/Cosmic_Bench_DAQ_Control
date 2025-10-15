@@ -1,2 +1,2 @@
 #!/bin/bash
-../python run_config.py
+python ../run_config.py
