@@ -44,11 +44,13 @@ class Config:
             # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_TPOT.cfg',
             # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_SelfTrigger.cfg',
             # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_SelfTrigger_thresh.cfg',
-            'daq_config_template_path': '/local/home/banco/dylan/Run/config/TbSPS25_test.cfg',
+            # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/TbSPS25_test.cfg',
+            'daq_config_template_path': '/local/home/banco/dylan/Run/config/Night_Run.cfg',
             'run_directory': f'/local/home/banco/dylan/Run/{self.run_name}/',
             'data_out_dir': f'{self.base_out_dir}Run/{self.run_name}',
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
-            'n_samples_per_waveform': 32,  # Number of samples per waveform to configure in DAQ
+            # 'n_samples_per_waveform': 32,  # Number of samples per waveform to configure in DAQ
+            'n_samples_per_waveform': 100,  # Number of samples per waveform to configure in DAQ
             'go_timeout': 5 * 60,  # Seconds to wait for 'Go' response from RunCtrl before assuming failure
             'max_run_time_addition': 60 * 5,  # Seconds to add to requested run time before killing run
             'copy_on_fly': True,  # True to copy raw data to out dir during run, False to copy after run
@@ -105,8 +107,8 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'quick_test_445V',
-                'run_time': 2,  # Minutes
+                'sub_run_name': 'night_test',
+                'run_time': 60 * 10,  # Minutes
                 'hvs': {
                     '2': {
                         # '0': 300,
@@ -150,7 +152,7 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'scintillator_top']
-        self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
+        self.included_detectors = [  # 'banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
                                    'rd542_plein_vfp_1']
 
         self.detectors = [

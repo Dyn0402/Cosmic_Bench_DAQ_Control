@@ -35,7 +35,7 @@ class DAQController:
 
         # If trigger switch is used, need to run past run time to bracket the trigger switch on/off. Else just run time.
         # DAQ resets timer when first trigger received, so only need short pause to be sure.
-        self.cfg_file_run_time = self.run_time if self.trigger_switch_client is None else self.run_time + 5  # minutes
+        self.cfg_file_run_time = self.run_time if self.trigger_switch_client is None else self.run_time + 5 / 60  # minutes
         self.cfg_file_path = None
         if self.cfg_template_file_path is not None:
             self.make_config_from_template()
