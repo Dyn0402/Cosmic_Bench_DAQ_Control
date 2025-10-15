@@ -158,11 +158,39 @@
 })();
 {% endfor %}
 
+let lastSubrun = null;
+
 // --- DAQ Overview JS ---
 function updateStatus() {
     fetch("/status")
         .then(r => r.json())
         .then(data => {
+            // Check subrun change
+            const fields = daq?.fields || [];
+
+            // Find the "Subrun" field (if it exists)
+            const subrunField = fields.find(f => f.label === "Subrun");
+            const subrun = subrunField ? subrunField.value : null;
+
+            // Check if Subrun exists and changed
+            if (subrun && subrun !== lastSubrun) {
+                const select = document.getElementById("hv-subrun-select");
+
+                // Update dropdown selection
+                // First, check if this subrun already exists as an option
+                let option = Array.from(select.options).find(opt => opt.value === subrun);
+                if (!option) {
+                    option = new Option(subrun, subrun);
+                    select.add(option);
+                }
+
+                // Select it
+                select.value = subrun;
+
+                // Update tracker variable
+                lastSubrun = subrun;
+            }
+
             let container = document.getElementById("status-cards");
             container.innerHTML = "";
             Object.entries(data).forEach(([name, info]) => {
@@ -184,11 +212,32 @@ function updateStatus() {
         });
 }
 
-document.getElementById("stop-run").addEventListener("click", () => {
-  fetch("/stop_run", { method: "POST" })
-    .then(res => res.json())
-    .then(data => alert(data.message))
-    .catch(err => alert("Error: " + err));
+document.getElementById("stop-run").addEventListener("click", async () => {
+  const res = await fetch("/stop_run", { method: "POST" });
+  const data = await res.json();
+
+  // Create a fading popup
+  const popup = document.createElement("div");
+  popup.textContent = data.message;
+  popup.style.position = "fixed";
+  popup.style.top = "80px";
+  popup.style.left = "50%";
+  popup.style.transform = "translateX(-50%)";
+  popup.style.background = "#dc3545";
+  popup.style.color = "#fff";
+  popup.style.padding = "1em 2em";
+  popup.style.borderRadius = "8px";
+  popup.style.boxShadow = "0 2px 8px rgba(0,0,0,0.2)";
+  popup.style.zIndex = "9999";
+  popup.style.opacity = "1";
+  popup.style.transition = "opacity 1s";
+
+  document.body.appendChild(popup);
+
+  setTimeout(() => {
+    popup.style.opacity = "0";
+    setTimeout(() => popup.remove(), 1000);
+  }, 2500);
 });
 
 document.getElementById("restart-all").addEventListener("click", () => {
@@ -648,8 +697,10 @@ document.getElementById("start-run").addEventListener("click", async () => {
   const popup = document.createElement("div");
   popup.textContent = data.message;
   popup.style.position = "fixed";
-  popup.style.top = "20px";
-  popup.style.right = "20px";
+  popup.style.top = "80px";
+  popup.style.left = "50%";
+  popup.style.transform = "translateX(-50%)";
+  popup.style.right = "auto";
   popup.style.background = "#28a745";
   popup.style.color = "#fff";
   popup.style.padding = "1em 2em";
@@ -666,16 +717,6 @@ document.getElementById("start-run").addEventListener("click", async () => {
     setTimeout(() => popup.remove(), 1000);
   }, 2500);
 });
-// document.getElementById("start-run").addEventListener("click", async () => {
-//   const runName = document.getElementById("run-select").value;
-//   const res = await fetch("/start_run", {
-//     method: "POST",
-//     headers: { "Content-Type": "application/json" },
-//     body: JSON.stringify({ config: runName })
-//   });
-//   const data = await res.json();
-//   alert(data.message);
-// });
 
 // load run_config.py config button handler
 document.getElementById("load-py-config").addEventListener("click", async () => {

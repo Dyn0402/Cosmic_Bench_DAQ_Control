@@ -26,7 +26,6 @@ CONFIG_TEMPLATE_DIR = f"{BASE_DIR}/config/json_templates"
 CONFIG_RUN_DIR = f"{BASE_DIR}/config/json_run_configs"
 BASH_DIR = f"{BASE_DIR}/bash_scripts"
 HV_TAIL = 1000  # number of most recent rows to show
-current_subrun_name = None
 
 
 app = Flask(__name__)
@@ -114,7 +113,7 @@ def restart_all():
 def load_py_config():
     try:
         subprocess.Popen(["python", f"{BASE_DIR}/run_config.py"])
-        return jsonify({"success": True, "message": "Python config loaded"})
+        return jsonify({"success": True, "message": "run_config.json updated from run_config.py"})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
 
