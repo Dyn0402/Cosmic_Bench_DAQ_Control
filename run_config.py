@@ -17,7 +17,7 @@ class Config:
     def __init__(self):
         # self.run_name = 'rd542_plein_vfp_1_fe_test2_10-15-25'
         # self.run_name = 'beam_test_dream_banco_daq_sync_test_10-15-25'
-        self.run_name = 'night_test_10-15-25'
+        self.run_name = 'night_test_non_zs_10-15-25'
         self.daq_dir = '/local/home/banco/dylan/Run/'  # Maybe kill
         self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
         # self.base_out_dir = '/mnt_cosmic_data/'
@@ -34,7 +34,7 @@ class Config:
         self.filtering_by_m3 = False  # True to filter by m3 tracking, False to do no filtering
         self.process_on_fly = False  # True to process data on fly, False to process after run
         self.save_fdfs = True  # True to save FDF files, False to delete after decoding
-        self.zero_supress = True  # True let DREAM DAQ pedestal subtract and suppress zeros, False to save all ADC values
+        self.zero_supress = False  # True let DREAM DAQ pedestal subtract and suppress zeros, False to save all ADC values
         self.start_time = None
         self.write_all_dectors_to_json = True  # Only when making run config json template.
 
@@ -107,8 +107,25 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'night_test',
-                'run_time': 60 * 10,  # Minutes
+                'sub_run_name': 'night_test_quick',
+                'run_time': 60 * 2,  # Minutes
+                'hvs': {
+                    '2': {
+                        # '0': 300,
+                        # '1': 445,
+                        '0': 10,
+                        '1': 10,
+                    },
+                    '5': {
+                        # '0': 800,
+                        # '0': 400,
+                        '0': 20,
+                    }
+                }
+            },
+            {
+                'sub_run_name': 'night_test_long',
+                'run_time': 60 * 8,  # Minutes
                 'hvs': {
                     '2': {
                         # '0': 300,
