@@ -16,8 +16,8 @@ import copy
 class Config:
     def __init__(self):
         # self.run_name = 'rd542_plein_vfp_1_fe_test2_10-15-25'
-        # self.run_name = 'beam_test_dream_banco_daq_sync_test_10-15-25'
-        self.run_name = 'night_test_10-15-25'
+        self.run_name = 'beam_test_dream_banco_daq_sync_test_10-15-25'
+        # self.run_name = 'night_test_10-15-25'
         self.daq_dir = '/local/home/banco/dylan/Run/'  # Maybe kill
         self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
         # self.base_out_dir = '/mnt_cosmic_data/'
@@ -58,10 +58,10 @@ class Config:
         self.banco_info = {
             'ip': '132.166.30.82',
             'port': 1100,
-            # 'daq_run_command': 'cd /home/banco/dylan/Run/framework/bin && ./test_multi_noiseocc_int',
-            # 'data_temp_dir': '/home/banco/dylan/Run/data',
-            'daq_run_command': 'cd /home/banco/CERNTestBeam/framework/bin && ./test_multi_noiseocc_int',
-            'data_temp_dir': '/home/banco/CERNTestBeam/data',
+            'daq_run_command': 'cd /home/banco/dylan/Run/framework/bin && ./test_multi_noiseocc_int',
+            'data_temp_dir': '/home/banco/dylan/Run/data',
+            # 'daq_run_command': 'cd /home/banco/CERNTestBeam/framework/bin && ./test_multi_noiseocc_int',
+            # 'data_temp_dir': '/home/banco/CERNTestBeam/data',
             'data_out_dir': f'{self.base_out_dir}Run/{self.run_name}',
             'data_inner_dir': 'banco_data'
         }
@@ -105,7 +105,7 @@ class Config:
         self.sub_runs = [
             {
                 'sub_run_name': 'quick_test_445V',
-                'run_time': 60 * 10,  # Minutes
+                'run_time': 2,  # Minutes
                 'hvs': {
                     '2': {
                         # '0': 300,
