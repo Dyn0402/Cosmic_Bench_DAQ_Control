@@ -109,7 +109,7 @@ def restart_all():
         return jsonify({"success": False, "message": str(e)}), 500
 
 
-@app.route('/load-py-config', methods=['POST'])
+@app.route('/load_run_config_py', methods=['POST'])
 def load_py_config():
     try:
         subprocess.Popen([f"{BASH_DIR}/load_py_config.py"])
