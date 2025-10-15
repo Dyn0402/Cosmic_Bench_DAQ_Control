@@ -147,6 +147,11 @@ def main():
                     if banco:
                         pass  # Process banco data
 
+                    if config.hv_info['hv_monitoring']:
+                        hv.send('End Monitoring')
+                        hv.receive()  # Stopping monitoring
+                        hv.receive()  # Finished monitoring
+
                     print(f'Finished with sub run {sub_run_name}, waiting 10 seconds before next run')
                     sleep(10)
         print('Run complete, closing down subsystems')
@@ -154,10 +159,6 @@ def main():
             hv.send('Power Off')
             hv.receive()  # Starting power off
             hv.receive()  # Finished power off
-        if config.hv_info['hv_monitoring']:
-            hv.send('End Monitoring')
-            hv.receive()  # Stopping monitoring
-            hv.receive()  # Finished monitoring
         hv.send('Finished')
         if banco:
             banco_daq.send('Finished')
