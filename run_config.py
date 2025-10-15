@@ -62,7 +62,8 @@ class Config:
             'data_temp_dir': '/home/banco/dylan/Run/data',
             # 'daq_run_command': 'cd /home/banco/CERNTestBeam/framework/bin && ./test_multi_noiseocc_int',
             # 'data_temp_dir': '/home/banco/CERNTestBeam/data',
-            'data_out_dir': f'{self.base_out_dir}Run/{self.run_name}',
+            # 'data_out_dir': f'{self.base_out_dir}Run/{self.run_name}',
+            'data_out_dir': f'/home/banco/dylan/Run/data_testing',
             'data_inner_dir': 'banco_data'
         }
 
