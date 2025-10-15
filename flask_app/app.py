@@ -21,9 +21,10 @@ from flask_socketio import SocketIO
 from daq_status import (get_dream_daq_status, get_hv_control_status, get_daq_control_status, get_trigger_control_status,
                         get_decoder_status, get_banco_tracker_status)
 
-CONFIG_TEMPLATE_DIR = "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/config/json_templates"
-CONFIG_RUN_DIR = "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/config/json_run_configs"
-BASH_DIR = "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/bash_scripts"
+BASE_DIR = "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control"
+CONFIG_TEMPLATE_DIR = f"{BASE_DIR}/config/json_templates"
+CONFIG_RUN_DIR = f"{BASE_DIR}/config/json_run_configs"
+BASH_DIR = f"{BASE_DIR}/bash_scripts"
 HV_TAIL = 1000  # number of most recent rows to show
 current_subrun_name = None
 
@@ -112,7 +113,7 @@ def restart_all():
 @app.route('/load_run_config_py', methods=['POST'])
 def load_py_config():
     try:
-        subprocess.Popen([f"{BASH_DIR}/load_py_config.sh"])
+        subprocess.Popen([f"python {BASE_DIR}/run_config.py"])
         return jsonify({"success": True, "message": "Python config loaded"})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
