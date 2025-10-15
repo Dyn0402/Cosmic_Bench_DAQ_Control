@@ -15,7 +15,8 @@ import copy
 
 class Config:
     def __init__(self):
-        self.run_name = 'rd542_plein_vfp_1_fe_test2_10-15-25'
+        # self.run_name = 'rd542_plein_vfp_1_fe_test2_10-15-25'
+        self.run_name = 'beam_test_dream_banco_daq_sync_test_10-15-25'
         self.daq_dir = '/local/home/banco/dylan/Run/'  # Maybe kill
         self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
         # self.base_out_dir = '/mnt_cosmic_data/'
@@ -147,7 +148,7 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'scintillator_top']
-        self.included_detectors = [  # 'banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
+        self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
                                    'rd542_plein_vfp_1']
 
         self.detectors = [
