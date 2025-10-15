@@ -10,6 +10,7 @@
         <button id="start-run" class="btn btn-success me-2">Start Run</button>
         <button id="stop-run" class="btn btn-danger">Stop Run</button>
         <button id="restart-all" class="btn btn-danger">Restart All</button>
+        <button id="load-py-config" class="btn btn-secondary">Load run_config.py Config</button>
     </div>
 
     <div class="row" id="status-cards">
@@ -182,26 +183,6 @@ function updateStatus() {
             });
         });
 }
-
-
-// document.getElementById("start-run").addEventListener("click", () => {
-//   const select = document.getElementById("run-select");
-//   const config = select.value;
-//
-//   if (!config) {
-//     alert("Please select a run configuration first.");
-//     return;
-//   }
-//
-//   fetch("/start_run", {
-//     method: "POST",
-//     headers: { "Content-Type": "application/json" },
-//     body: JSON.stringify({ config })
-//   })
-//   .then(res => res.json())
-//   .then(data => alert(data.message))
-//   .catch(err => alert("Error: " + err));
-// });
 
 document.getElementById("stop-run").addEventListener("click", () => {
   fetch("/stop_run", { method: "POST" })
@@ -664,6 +645,16 @@ document.getElementById("start-run").addEventListener("click", async () => {
   const data = await res.json();
   alert(data.message);
 });
+
+// load run_config.py config button handler
+document.getElementById("load-py-config").addEventListener("click", async () => {
+  const res = await fetch("/load_run_config_py", { method: "POST" });
+  const data = await res.json();
+  alert(data.message);
+  if (data.success) {
+    await loadRuns();
+    updateHVPlots();
+  }
 
 setInterval(updateStatus, 1000);  // update every 1s
 updateStatus();

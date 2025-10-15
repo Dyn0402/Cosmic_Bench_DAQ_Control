@@ -109,6 +109,15 @@ def restart_all():
         return jsonify({"success": False, "message": str(e)}), 500
 
 
+@app.route('/load-py-config', methods=['POST'])
+def load_py_config():
+    try:
+        subprocess.Popen([f"{BASH_DIR}/load_py_config.py"])
+        return jsonify({"success": True, "message": "Python config loaded"})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
 @app.route("/get_runs")
 def get_runs():
     runs = []

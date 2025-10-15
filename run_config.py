@@ -8,6 +8,7 @@ Created as Cosmic_Bench_DAQ_Control/run_config_template.py
 @author: Dylan Neff, Dylan
 """
 
+import sys
 import json
 import copy
 
@@ -668,15 +669,13 @@ class Config:
 
 if __name__ == '__main__':
     # out_dir = '/local/home/dn277127/Bureau/beam_test_25/'
-    out_dir = 'config/json_templates/'
-    config_name = 'self_trig.json'
+    # out_template_dir = 'config/json_templates/'
+    out_run_dir = 'config/json_run_configs/'
+
+    config_name = 'run_config.json'
 
     config = Config()
 
-    config.write_to_file(f'{out_dir}{config_name}')
-
-    print(config.sub_runs)
-    config.load_from_file(f'{out_dir}{config_name}')
-    print(config.sub_runs)
+    config.write_to_file(f'{out_run_dir}{config_name}')
 
     print('donzo')
