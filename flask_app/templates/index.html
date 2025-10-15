@@ -643,8 +643,39 @@ document.getElementById("start-run").addEventListener("click", async () => {
     body: JSON.stringify({ config: runName })
   });
   const data = await res.json();
-  alert(data.message);
+
+  // Create a fading popup
+  const popup = document.createElement("div");
+  popup.textContent = data.message;
+  popup.style.position = "fixed";
+  popup.style.top = "20px";
+  popup.style.right = "20px";
+  popup.style.background = "#28a745";
+  popup.style.color = "#fff";
+  popup.style.padding = "1em 2em";
+  popup.style.borderRadius = "8px";
+  popup.style.boxShadow = "0 2px 8px rgba(0,0,0,0.2)";
+  popup.style.zIndex = "9999";
+  popup.style.opacity = "1";
+  popup.style.transition = "opacity 1s";
+
+  document.body.appendChild(popup);
+
+  setTimeout(() => {
+    popup.style.opacity = "0";
+    setTimeout(() => popup.remove(), 1000);
+  }, 2500);
 });
+// document.getElementById("start-run").addEventListener("click", async () => {
+//   const runName = document.getElementById("run-select").value;
+//   const res = await fetch("/start_run", {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify({ config: runName })
+//   });
+//   const data = await res.json();
+//   alert(data.message);
+// });
 
 // load run_config.py config button handler
 document.getElementById("load-py-config").addEventListener("click", async () => {
@@ -655,6 +686,7 @@ document.getElementById("load-py-config").addEventListener("click", async () => 
     await loadRuns();
     updateHVPlots();
   }
+});
 
 setInterval(updateStatus, 1000);  // update every 1s
 updateStatus();
