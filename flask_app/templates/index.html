@@ -166,7 +166,7 @@ function updateStatus() {
         .then(r => r.json())
         .then(data => {
             // Check subrun change
-            const fields = daq?.fields || [];
+            const fields = daq_control?.fields || [];
 
             // Find the "Subrun" field (if it exists)
             const subrunField = fields.find(f => f.label === "Subrun");
@@ -593,6 +593,7 @@ async function fetchHVData() {
     const subrun = document.getElementById("hv-subrun-select").value;
     const res = await fetch(`/hv_data?run=${encodeURIComponent(run)}&subrun=${encodeURIComponent(subrun)}`);
     const data = await res.json();
+    if (!data || Object.keys(data).length === 0) return null;
     if (!data.success) throw data.message;
     return data;
 }
@@ -600,6 +601,10 @@ async function fetchHVData() {
 async function updateHVPlots() {
     try {
         const data = await fetchHVData();
+        if (!data.time || data.time.length === 0) {
+            console.log("No HV data available");
+            return;
+        }
         const time = data.time;
 
         const voltageTraces = Object.entries(data.voltage).map(([key, values]) => ({
