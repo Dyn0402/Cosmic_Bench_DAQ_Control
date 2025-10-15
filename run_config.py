@@ -44,7 +44,7 @@ class Config:
             # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_TPOT.cfg',
             # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_SelfTrigger.cfg',
             # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_SelfTrigger_thresh.cfg',
-            'daq_config_template_path': '/local/home/banco/dylan/Run/config/TbSPS25.cfg',
+            'daq_config_template_path': '/local/home/banco/dylan/Run/config/TbSPS25_test.cfg',
             'run_directory': f'/local/home/banco/dylan/Run/{self.run_name}/',
             'data_out_dir': f'{self.base_out_dir}Run/{self.run_name}',
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
