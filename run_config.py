@@ -15,9 +15,9 @@ import copy
 
 class Config:
     def __init__(self):
-        # self.run_name = 'rd542_plein_vfp_1_fe_test2_10-15-25'
+        self.run_name = 'rd542_plein_vfp_1_fe_test_10-16-25'
         # self.run_name = 'beam_test_dream_banco_daq_sync_test_10-15-25'
-        self.run_name = 'night_test_non_zs_10-15-25'
+        # self.run_name = 'night_test_non_zs_10-15-25'
         self.daq_dir = '/local/home/banco/dylan/Run/'  # Maybe kill
         self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
         # self.base_out_dir = '/mnt_cosmic_data/'
@@ -34,7 +34,7 @@ class Config:
         self.filtering_by_m3 = False  # True to filter by m3 tracking, False to do no filtering
         self.process_on_fly = False  # True to process data on fly, False to process after run
         self.save_fdfs = True  # True to save FDF files, False to delete after decoding
-        self.zero_supress = False  # True let DREAM DAQ pedestal subtract and suppress zeros, False to save all ADC values
+        self.zero_supress = True  # True let DREAM DAQ pedestal subtract and suppress zeros, False to save all ADC values
         self.start_time = None
         self.write_all_dectors_to_json = True  # Only when making run config json template.
 
@@ -43,9 +43,9 @@ class Config:
             'port': 1101,
             # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_TPOT.cfg',
             # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_SelfTrigger.cfg',
-            # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_SelfTrigger_thresh.cfg',
+            'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_SelfTrigger_thresh.cfg',
             # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/TbSPS25_test.cfg',
-            'daq_config_template_path': '/local/home/banco/dylan/Run/config/Night_Run.cfg',
+            # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/Night_Run.cfg',
             'run_directory': f'/local/home/banco/dylan/Run/{self.run_name}/',
             'data_out_dir': f'{self.base_out_dir}Run/{self.run_name}',
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
@@ -106,39 +106,39 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'night_test_quick',
-                'run_time': 60 * 2,  # Minutes
+                'sub_run_name': 'quick_test',
+                'run_time': 5,  # Minutes
                 'hvs': {
                     '2': {
                         # '0': 300,
-                        # '1': 445,
-                        '0': 10,
-                        '1': 10,
+                        '1': 445,
+                        # '0': 10,
+                        # '1': 10,
                     },
                     '5': {
                         # '0': 800,
-                        # '0': 400,
-                        '0': 20,
+                        '0': 400,
+                        # '0': 20,
                     }
                 }
             },
-            {
-                'sub_run_name': 'night_test_long',
-                'run_time': 60 * 8,  # Minutes
-                'hvs': {
-                    '2': {
-                        # '0': 300,
-                        # '1': 445,
-                        '0': 10,
-                        '1': 10,
-                    },
-                    '5': {
-                        # '0': 800,
-                        # '0': 400,
-                        '0': 20,
-                    }
-                }
-            },
+            # {
+            #     'sub_run_name': 'night_test_long',
+            #     'run_time': 60 * 8,  # Minutes
+            #     'hvs': {
+            #         '2': {
+            #             # '0': 300,
+            #             # '1': 445,
+            #             '0': 10,
+            #             '1': 10,
+            #         },
+            #         '5': {
+            #             # '0': 800,
+            #             # '0': 400,
+            #             '0': 20,
+            #         }
+            #     }
+            # },
         ]
 
         # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
