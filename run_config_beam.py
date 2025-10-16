@@ -16,8 +16,8 @@ import copy
 class Config:
     def __init__(self):
         # self.run_name = 'rd542_plein_vfp_1_fe_test_10-16-25'
-        # self.run_name = 'beam_test_dream_banco_daq_sync_test_10-16-25'
-        self.run_name = 'night_test_non_zs_10-16-25'
+        self.run_name = 'beam_test_dream_banco_daq_sync_test_10-16-25'
+        # self.run_name = 'night_test_non_zs_10-15-25'
         self.daq_dir = '/local/home/banco/dylan/Run/'  # Maybe kill
         self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
         # self.base_out_dir = '/mnt_cosmic_data/'
@@ -106,21 +106,37 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'night_test_short',
-                'run_time': 5,  # Minutes
+                'sub_run_name': 'quick_test_1',
+                'run_time': 1.5,  # Minutes
                 'hvs': {
                     '2': {
-                        '2': 54,
+                        # '0': 300,
+                        # '1': 445,
+                        '0': 15,
+                        '1': 5,
                     },
+                    '5': {
+                        # '0': 800,
+                        # '0': 400,
+                        '0': 20,
+                    }
                 }
             },
             {
-                'sub_run_name': 'night_test_long',
-                'run_time': 60 * 8,  # Minutes
+                'sub_run_name': 'sub_run_2',
+                'run_time': 2,  # Minutes
                 'hvs': {
                     '2': {
-                        '2': 54,
+                        # '0': 300,
+                        # '1': 445,
+                        '0': 10,
+                        '1': 8,
                     },
+                    '5': {
+                        # '0': 800,
+                        # '0': 400,
+                        '0': 12,
+                    }
                 }
             },
         ]
@@ -152,10 +168,8 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'scintillator_top']
-        self.included_detectors = [  # 'banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
-                                   # 'rd542_plein_vfp_1',
-            'test_det'
-        ]
+        self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
+                                   'rd542_plein_vfp_1']
 
         self.detectors = [
             {
@@ -656,26 +670,6 @@ class Config:
                 },
                 'dream_feu_channels': {
                     'xy': (3, 4, 20),
-                }
-            },
-            {
-                'name': 'scintillator_test',
-                'det_type': 'scintillator',
-                'det_center_coords': {  # Center of detector
-                    'x': 0,  # mm
-                    'y': 0,  # mm
-                    'z': 1412,  # mm  1163 + 145 + 110 from geometry diagram
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'dream_feus': {
-                    'xy': (3, 4),
-                },
-                'dream_feu_channels': {
-                    'xy': (3, 4, 21),
                 }
             },
         ]
