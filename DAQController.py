@@ -152,28 +152,36 @@ class DAQController:
                 return False
 
             res = self.dream_daq_client.receive()
-            if res != 'Dream DAQ taking pedestals':
+            if res != 'Dream DAQ taking pedestals' and res != 'Dream DAQ started':
                 print('Error taking pedestals')
                 return False
 
-            res = self.dream_daq_client.receive()
-            if res != 'Dream DAQ started':
-                print('Error starting DAQ')
-                return False
-            self.run_start_time = time()
-
-            if self.trigger_switch_client is not None:
-                sleep(5)  # Wait a bit to ensure DAQ is running before starting trigger
-                self.trigger_switch_client.send('on')
+            if res == 'Dream DAQ taking pedestals':  # Wait for pedestals to finish if taking
+                res = self.dream_daq_client.receive()
+            # if res != 'Dream DAQ started':
+            #     print('Error starting DAQ')
+            #     return False
+            if res == 'Dream DAQ started':
                 self.run_start_time = time()
-                self.trigger_switch_client.receive()
 
-            if self.trigger_switch_client:  # Wait for run to finish
-                sleep(self.run_time * 60 - (time() - self.run_start_time))
-                # if time() - self.run_start_time >= self.run_time * 60:
-                self.trigger_switch_client.send('off')
-                self.measured_run_time = time() - self.run_start_time
-                self.trigger_switch_client.receive()
+                if self.trigger_switch_client is not None:
+                    sleep(5)  # Wait a bit to ensure DAQ is running before starting trigger
+                    self.trigger_switch_client.send('on')
+                    self.run_start_time = time()
+                    self.trigger_switch_client.receive()
+
+                if self.trigger_switch_client:  # Wait for run to finish
+                    sleep(self.run_time * 60 - (time() - self.run_start_time))
+                    # if time() - self.run_start_time >= self.run_time * 60:
+                    self.trigger_switch_client.send('off')
+                    self.measured_run_time = time() - self.run_start_time
+                    self.trigger_switch_client.receive()
+            elif res == 'Dream DAQ has finished':   # Only taking pedestals
+                print('Dream only took pedestals')
+                self.measured_run_time = 0
+            else:
+                print('Error during DAQ run')
+                return False
 
             res = self.dream_daq_client.receive()  # Wait for dream daq to finish
             if res != 'Dream DAQ stopped':

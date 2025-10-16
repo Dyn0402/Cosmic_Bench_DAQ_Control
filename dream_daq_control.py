@@ -79,6 +79,10 @@ def main():
                         while True:
                             output = process.stdout.readline()
 
+                            if output == '' and process.poll() is not None:
+                                server.send("Dream DAQ has finished")  # If only taking pedestals or a failure
+                                break
+
                             if batch_mode:
                                 if not taking_pedestals and '_TakePedThr' in output.strip():
                                     taking_pedestals = True
@@ -114,37 +118,36 @@ def main():
                                 server.send('Dream DAQ timed out')
                                 break
 
-                        stop_event = threading.Event()
-                        server.set_timeout(1.0)  # Set timeout for socket operations
+                        if process.poll() is None:  # Process still running, start main run
+                            stop_event = threading.Event()
+                            server.set_timeout(1.0)  # Set timeout for socket operations
 
-                        stop_thread = threading.Thread(target=listen_for_stop, args=(server, stop_event))
-                        stop_thread.start()
-                        screen_clear_period = 30
-                        screen_clear_timer = time.time()
-                        # sleep(2)
-                        while True:  # DAQ running
-                            if stop_event.is_set():
-                                process.stdin.write('g')
-                                process.stdin.flush()
-                                print('Stop command received. Stopping DAQ.')
-                                break
+                            stop_thread = threading.Thread(target=listen_for_stop, args=(server, stop_event))
+                            stop_thread.start()
+                            # screen_clear_period = 30
+                            # screen_clear_timer = time.time()
+                            while True:  # DAQ running
+                                if stop_event.is_set():
+                                    process.stdin.write('g')
+                                    process.stdin.flush()
+                                    print('Stop command received. Stopping DAQ.')
+                                    break
 
-                            if time.time() - screen_clear_timer > screen_clear_period:  # Clear terminal every 5 minutes
-                                clear_terminal()
-                                screen_clear_timer = time.time()
+                                # if time.time() - screen_clear_timer > screen_clear_period:  # Clear terminal every 5 minutes
+                                #     clear_terminal()
+                                #     screen_clear_timer = time.time()
 
-                            output = process.stdout.readline()
-                            if output == '' and process.poll() is not None:
-                                print('DAQ process finished.')
-                                break
-                            if output.strip() != '':
-                                print(output.strip())
-                        # server.set_blocking(True)
-                        print('Waiting for DAQ process to terminate.')
-                        stop_event.set()  # Tell the listener thread to stop
-                        stop_thread.join()
-                        print('Listener thread joined.')
-                        server.set_timeout(None)
+                                output = process.stdout.readline()
+                                if output == '' and process.poll() is not None:
+                                    print('DAQ process finished.')
+                                    break
+                                if output.strip() != '':
+                                    print(output.strip())
+                            print('Waiting for DAQ process to terminate.')
+                            stop_event.set()  # Tell the listener thread to stop
+                            stop_thread.join()
+                            print('Listener thread joined.')
+                            server.set_timeout(None)
 
                         # DAQ finished
                         if copy_on_fly:

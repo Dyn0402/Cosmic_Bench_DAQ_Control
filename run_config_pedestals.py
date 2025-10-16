@@ -11,18 +11,20 @@ Created as Cosmic_Bench_DAQ_Control/run_config_template.py
 import sys
 import json
 import copy
+from datetime import datetime
 
 
 class Config:
     def __init__(self):
         # self.run_name = 'rd542_plein_vfp_1_fe_test2_10-15-25'
         # self.run_name = 'beam_test_dream_banco_daq_sync_test_10-15-25'
-        self.run_name = 'night_test_non_zs_10-15-25'
+        date_time_str = datetime.now().strftime('%m-%d-%y_%H-%M-%S')
+        self.run_name = f'pedestals_{date_time_str}'
         self.daq_dir = '/local/home/banco/dylan/Run/'  # Maybe kill
         self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
         # self.base_out_dir = '/mnt_cosmic_data/'
         self.base_out_dir = '/local/home/banco/dylan/out_dir/'
-        self.data_out_dir = f'{self.base_out_dir}Run/'
+        self.data_out_dir = f'{self.base_out_dir}pedestals_noise/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
         self.raw_daq_inner_dir = 'raw_daq_data'
         self.decoded_root_inner_dir = 'decoded_root'
@@ -41,11 +43,7 @@ class Config:
         self.dream_daq_info = {
             'ip': '192.168.10.8',
             'port': 1101,
-            # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_TPOT.cfg',
-            # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_SelfTrigger.cfg',
-            # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_SelfTrigger_thresh.cfg',
-            # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/TbSPS25_test.cfg',
-            'daq_config_template_path': '/local/home/banco/dylan/Run/config/Night_Run.cfg',
+            'daq_config_template_path': '/local/home/banco/dylan/Run/config/TbSPS25_ped.cfg',
             'run_directory': f'/local/home/banco/dylan/Run/{self.run_name}/',
             'data_out_dir': f'{self.base_out_dir}Run/{self.run_name}',
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
@@ -168,7 +166,7 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'scintillator_top']
-        self.included_detectors = [  # 'banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
+        self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
                                    'rd542_plein_vfp_1']
 
         self.detectors = [
