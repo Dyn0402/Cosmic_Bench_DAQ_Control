@@ -337,7 +337,7 @@ def check_weiner_lv_status(weiner_ps_info):
                   f'({v_meas} V measured, {v_expected} +/- {v_tol} V expected), exiting sub-run')
             return False
 
-        i_meas = channel_info['measured_current']
+        i_meas = channel_status['measured_current']
         i_expected = channel_info['expected_current']
         i_tol = channel_info['current_tolerance']
         if not (i_expected - i_tol <= float(i_meas) <= i_expected + i_tol):
