@@ -32,7 +32,7 @@ def get_pl512_status(url="http://192.168.10.222"):
                 global_status = cells[1].get_text(strip=True)
 
     # --- Channel status ---
-    channels = []
+    channels = {}
     channels_table = soup.find("caption", string="Output Channels")
     if channels_table:
         parent = channels_table.find_parent("table")
@@ -49,7 +49,7 @@ def get_pl512_status(url="http://192.168.10.222"):
                     "measured_terminal_voltage": cells[5],
                     "status": cells[6],
                 }
-                channels.append(channel_info)
+                channels.update({cells[0]: channel_info})
 
     return {
         "status": "ok",
@@ -62,7 +62,7 @@ if __name__ == "__main__":
     status = get_pl512_status()
     if status["status"] == "ok":
         print("Power Supply Status:", status["power_supply_status"])
-        for channel in status["channels"]:
+        for channel_name, channel in status["channels"].items():
             print(f"Channel {channel['channel']}:")
             print(f"  Sense Voltage: {channel['sense_voltage']}")
             print(f"  Current Limit: {channel['current_limit']}")
