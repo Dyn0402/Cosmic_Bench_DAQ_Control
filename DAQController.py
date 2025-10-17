@@ -171,7 +171,9 @@ class DAQController:
                     self.trigger_switch_client.receive()
 
                 if self.trigger_switch_client:  # Wait for run to finish
-                    sleep(self.run_time * 60 - (time() - self.run_start_time))
+                    sleep_time = self.run_time * 60 - (time() - self.run_start_time)
+                    print(f'Waiting for {sleep_time:.1f} seconds of run time...')
+                    sleep(sleep_time)
                     # if time() - self.run_start_time >= self.run_time * 60:
                     self.trigger_switch_client.send('off')
                     self.measured_run_time = time() - self.run_start_time
