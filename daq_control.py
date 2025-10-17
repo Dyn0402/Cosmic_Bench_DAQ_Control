@@ -21,6 +21,7 @@ from DAQController import DAQController
 
 from run_config import Config
 from common_functions import *
+from weiner_ps_monitor import get_pl512_status
 
 RUNCONFIG_REL_PATH = "config/json_run_configs/"
 
@@ -111,6 +112,12 @@ def main():
             if banco:
                 trigger_switch.send('off')  # Turn off trigger to make sure daqs are synced
                 trigger_switch.receive()
+
+            if config.weiner_ps_info:  # Ensure ps is on before starting run
+                weiner_ok = check_weiner_lv_status(config.weiner_ps_info)
+                if not weiner_ok:
+                    print(f'Weiner Power Supply check failed, skipping sub run {sub_run_name}')
+                    continue
 
             print(f'Ramping HVs for {sub_run_name}')
             if config.hv_info['hv_monitoring']:  # Monitor hv and write to file
@@ -300,6 +307,45 @@ def file_num_still_running(fdf_dir, file_num, wait_time=30, silent=False):
         if new_sizes[i] > old_sizes[i]:
             return True
     return False
+
+
+def check_weiner_lv_status(weiner_ps_info):
+    """
+    Check the weiner power supply status and ensure it is on and at expected voltages/currents.
+    :param weiner_ps_info: Weiner power supply info from run config.
+    :return:
+    """
+    ps_status = get_pl512_status(f'http://{weiner_ps_info["ip"]}')
+    if ps_status['power_supply_status'] != 'ON':
+        print('Weiner Power Supply is not ON, exiting sub-run')
+        return False
+    for channel in weiner_ps_info['channels']:
+        channel_status = ps_status['channels'].get(channel, None)
+        if channel_status is None:
+            print(f'Weiner Power Supply Channel {channel} not found, exiting sub-run')
+            return False
+        if channel_status['status'] != 'ON':
+            print(f'Weiner Power Supply Channel {channel} is not ON, exiting sub-run')
+            return False
+        channel_info = weiner_ps_info['channels'][channel]
+
+        v_meas = channel_status['measured_sense_voltage']
+        v_expected = channel_info['expected_voltage']
+        v_tol = channel_info['voltage_tolerance']
+        if not (v_expected - v_tol <= float(v_meas) <= v_expected + v_tol):
+            print(f'Weiner Power Supply Channel {channel} voltage out of tolerance '
+                  f'({v_meas} V measured, {v_expected} +/- {v_tol} V expected), exiting sub-run')
+            return False
+
+        i_meas = channel_info['measured_current']
+        i_expected = channel_info['expected_current']
+        i_tol = channel_info['current_tolerance']
+        if not (i_expected - i_tol <= float(i_meas) <= i_expected + i_tol):
+            print(f'Weiner Power Supply Channel {channel} current out of tolerance '
+                  f'({i_meas} A measured, {i_expected} +/- {i_tol} A expected), exiting sub-run')
+            return False
+    print('Weiner Power Supply status OK, continuing with sub-run')
+    return True
 
 
 if __name__ == '__main__':
