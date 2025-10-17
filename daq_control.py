@@ -113,7 +113,7 @@ def main():
                 trigger_switch.send('off')  # Turn off trigger to make sure daqs are synced
                 trigger_switch.receive()
 
-            if config.weiner_ps_info:  # Ensure ps is on before starting run
+            if getattr(config, 'weiner_ps_info', None):  # Ensure ps is on before starting run
                 weiner_ok = check_weiner_lv_status(config.weiner_ps_info)
                 if not weiner_ok:
                     print(f'Weiner Power Supply check failed, skipping sub run {sub_run_name}')
