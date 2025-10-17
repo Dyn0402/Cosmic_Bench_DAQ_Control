@@ -40,9 +40,9 @@ class Config:
             'ip': '192.168.10.222',
             'channels': {  # Check only the channels which exist here
                 'U0': {
-                    'expected_voltage': 4500,  # mv
+                    'expected_voltage': 4.5,  # V
                     'expected_current': 30,  # A
-                    'voltage_tolerance': 400,  # mv
+                    'voltage_tolerance': 0.4,  # V
                     'current_tolerance': 5,  # A
                 },
             }
