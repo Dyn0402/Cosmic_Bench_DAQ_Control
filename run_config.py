@@ -17,7 +17,7 @@ class Config:
     def __init__(self):
         # self.run_name = 'rd542_plein_vfp_1_fe_test_10-16-25'
         # self.run_name = 'beam_test_dream_banco_daq_sync_test_10-16-25'
-        self.run_name = 'night_test_non_zs_10-20-25'
+        self.run_name = 'night_test_non_zs_config2_10-20-25'
         self.daq_dir = '/local/home/banco/dylan/Run/'  # Maybe kill
         self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
         # self.base_out_dir = '/mnt_cosmic_data/'
@@ -45,8 +45,8 @@ class Config:
             # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_SelfTrigger.cfg',
             # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_SelfTrigger_thresh.cfg',
             # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/TbSPS25_test.cfg',
-            'daq_config_template_path': '/local/home/banco/dylan/Run/config/Night_Run.cfg',
-            # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/Night_Run2.cfg',
+            # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/Night_Run.cfg',
+            'daq_config_template_path': '/local/home/banco/dylan/Run/config/Night_Run2.cfg',
             'run_directory': f'/local/home/banco/dylan/Run/{self.run_name}/',
             'data_out_dir': f'{self.base_out_dir}Run/{self.run_name}',
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
