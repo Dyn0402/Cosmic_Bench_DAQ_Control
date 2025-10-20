@@ -8,13 +8,18 @@ Created as Cosmic_Bench_DAQ_Control/trigger_switch_control.py
 @author: Dylan Neff, Dylan
 """
 
+import sys
 import time
 import RPi.GPIO as GPIO
 from Server import Server
 
 
 def main():
-    port, gpio_pin = 1100, 17
+    if len(sys.argv) == 3:
+        port = int(sys.argv[1])
+        gpio_pin = int(sys.argv[2])
+    else:
+        port, gpio_pin = 1100, 17
     while True:  # Keep the server listening forever
         try:  # If there is some error, just restart the server
             with Server(port=port) as server:  # Initialize server on specified port
