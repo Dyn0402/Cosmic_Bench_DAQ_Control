@@ -46,7 +46,7 @@ def main():
         except Exception as e:
             print(f'Error: {e}')
         trigger_switch('on', pin=gpio_pin)  # Make sure to leave trigger on by default
-        GPIO.cleanup()
+        GPIO.cleanup(gpio_pin)
     print('donzo')
 
 
@@ -97,7 +97,7 @@ def send_triggers(num_triggers=100, freq_hz=10, pulse_freq_ratio=1, pulse_level=
         else:
             GPIO.output(pin, GPIO.LOW)
         time.sleep(delay)
-    GPIO.cleanup()
+    GPIO.cleanup(pin)
 
 
 if __name__ == '__main__':

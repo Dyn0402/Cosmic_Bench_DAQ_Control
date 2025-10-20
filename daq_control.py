@@ -36,7 +36,10 @@ def main():
         if not os.path.isfile(config_path):
             print(f'File {config_path} does not exist, exiting')
             return
-        config.load_from_file(config_path)  # If a config file is given, load it
+        if config_path.endswith('.json'):
+            config.load_from_file(config_path)  # If a config file is given, load it
+        elif config_path.endswith('.py'):
+            pass
     config.start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     banco = any(['banco' in detector_name for detector_name in config.included_detectors])
     m3 = any(['m3' in detector_name for detector_name in config.included_detectors])
