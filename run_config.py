@@ -51,7 +51,7 @@ class Config:
             'data_out_dir': f'{self.base_out_dir}Run/{self.run_name}',
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
             # 'n_samples_per_waveform': 16,  # Number of samples per waveform to configure in DAQ
-            'n_samples_per_waveform': 285,  # Number of samples per waveform to configure in DAQ
+            'n_samples_per_waveform': 290,  # Number of samples per waveform to configure in DAQ
             'go_timeout': 5 * 60,  # Seconds to wait for 'Go' response from RunCtrl before assuming failure
             'max_run_time_addition': 60 * 5,  # Seconds to add to requested run time before killing run
             'copy_on_fly': True,  # True to copy raw data to out dir during run, False to copy after run
