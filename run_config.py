@@ -14,7 +14,7 @@ import copy
 
 class Config:
     def __init__(self):
-        self.run_name = 'rd5_grid_vfp_1_co2_fe55_10-21-25'
+        self.run_name = 'rd5_grid_vfp_1_co2_fe55_zs_10-21-25'
         # self.daq_dir = '/local/home/usernsw/dylan/Run/'  # Maybe kill
         # self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -29,7 +29,7 @@ class Config:
         self.filtering_by_m3 = False  # True to filter by m3 tracking, False to do no filtering
         self.process_on_fly = False  # True to process data on fly, False to process after run
         self.save_fdfs = True  # True to save FDF files, False to delete after decoding
-        self.zero_supress = False  # True let DREAM DAQ pedestal subtract and suppress zeros, False to save all ADC values
+        self.zero_supress = True  # True let DREAM DAQ pedestal subtract and suppress zeros, False to save all ADC values
         self.start_time = None  # '2024-06-03 15:30:00'  # 'YYYY-MM-DD HH:MM:SS' or None to start immediately
         self.gas = 'Ar/CO2/Iso 93/5/2'  # Gas type for run
 
