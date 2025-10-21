@@ -14,7 +14,7 @@ import copy
 
 class Config:
     def __init__(self):
-        self.run_name = 'rd5_grid_vfp_1_co2_fe55_zs_10-21-25'
+        self.run_name = 'rd5_grid_vfp_1_co2_fe55_zs2_10-21-25'
         # self.daq_dir = '/local/home/usernsw/dylan/Run/'  # Maybe kill
         # self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -114,7 +114,7 @@ class Config:
                         # 1: 800,
                         # 2: 800,
                         # 3: 800,
-                        6: 450,
+                        6: 500,
                         # 7: 460,
                         8: 500,
                         9: 500,
@@ -131,8 +131,8 @@ class Config:
                     3: {
                         # 1: 410,
                         # 2: 410,
-                        3: 490,
-                        4: 490,
+                        3: 510,
+                        4: 500,
                         # 5: 450,
                         # 6: 450,
                         # 7: 450,
@@ -652,7 +652,7 @@ class Config:
             },
             {
                 'name': 'rd5_grid_vfp_1',
-                'det_type': 'rd5_plein',
+                'det_type': 'rd5_grid_vfp',
                 'det_center_coords': {  # Center of detector
                     'x': 24,  # mm
                     'y': 75.6,  # mm
@@ -669,10 +669,10 @@ class Config:
                     'resist_2': (2, 1)
                 },
                 'dream_feus': {
-                    'x_1': (1, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (1, 2),
-                    'y_1': (1, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (1, 4),
+                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
+                    'x_2': (6, 2),
+                    'y_1': (6, 3),  # Runs along y direction, indicates x hit location
+                    'y_2': (6, 4),
                 },
             },
             {
