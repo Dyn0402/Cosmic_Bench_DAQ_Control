@@ -14,7 +14,8 @@ import copy
 
 class Config:
     def __init__(self):
-        self.run_name = 'rd5_grid_vfp_1_co2_fe55_zs2_10-21-25'
+        # self.run_name = 'rd5_grid_vfp_1_co2_fe55_zs2_10-21-25'
+        self.run_name = 'rd5_grid_vfp_1_co2_10-21-25'
         # self.daq_dir = '/local/home/usernsw/dylan/Run/'  # Maybe kill
         # self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -29,7 +30,7 @@ class Config:
         self.filtering_by_m3 = False  # True to filter by m3 tracking, False to do no filtering
         self.process_on_fly = False  # True to process data on fly, False to process after run
         self.save_fdfs = True  # True to save FDF files, False to delete after decoding
-        self.zero_supress = True  # True let DREAM DAQ pedestal subtract and suppress zeros, False to save all ADC values
+        self.zero_supress = False  # True let DREAM DAQ pedestal subtract and suppress zeros, False to save all ADC values
         self.start_time = None  # '2024-06-03 15:30:00'  # 'YYYY-MM-DD HH:MM:SS' or None to start immediately
         self.gas = 'Ar/CO2/Iso 93/5/2'  # Gas type for run
 
@@ -37,8 +38,8 @@ class Config:
             # 'ip': '192.168.10.100',
             'ip': '192.168.10.1',
             'port': 1101,
-            # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_TPOT.cfg',
-            'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_SelfTrigger_thresh.cfg',
+            'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_TPOT.cfg',
+            # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_SelfTrigger_thresh.cfg',
             'run_directory': f'/local/home/usernsw/dylan/Run/{self.run_name}/',
             'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
@@ -106,15 +107,15 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'quick_test_fe55',
-                'run_time': 5,  # Minutes
+                'sub_run_name': 'quick_test',
+                'run_time': 30,  # Minutes
                 'hvs': {
                     0: {
                         # 0: 800,
                         # 1: 800,
                         # 2: 800,
                         # 3: 800,
-                        6: 500,
+                        6: 400,
                         # 7: 460,
                         8: 500,
                         9: 500,
@@ -131,8 +132,46 @@ class Config:
                     3: {
                         # 1: 410,
                         # 2: 410,
-                        3: 510,
-                        4: 500,
+                        3: 540,
+                        4: 520,
+                        # 5: 450,
+                        # 6: 450,
+                        # 7: 450,
+                        8: 460,
+                        9: 460,
+                        10: 460,
+                        11: 460,
+                    }
+                }
+            },
+            {
+                'sub_run_name': 'longer_test',
+                'run_time': 60 * 5,  # Minutes
+                'hvs': {
+                    0: {
+                        # 0: 800,
+                        # 1: 800,
+                        # 2: 800,
+                        # 3: 800,
+                        6: 400,
+                        # 7: 460,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    1: {
+                        # 0: 0,
+                        # 1: 600,
+                    },
+                    2: {
+                        # 0: 450,
+                    },
+                    3: {
+                        # 1: 410,
+                        # 2: 410,
+                        3: 540,
+                        4: 520,
                         # 5: 450,
                         # 6: 450,
                         # 7: 450,
