@@ -144,6 +144,7 @@ def main():
                                     sub_out_dir, sub_run_dir, daq_trigger_switch, dream_daq, config.zero_supress,
                                     config.dream_daq_info.get('n_samples_per_waveform', None))
 
+                print(f'Starting run for sub run {sub_run_name}')
                 try:
                     run_daq_controller(*daq_control_args)
 
@@ -190,6 +191,7 @@ def run_daq_controller(config_template_path, sub_run_name, run_time, sub_out_dir
 
     daq_success = False
     while not daq_success:  # Rerun if failure
+        print('Starting DAQ Controller')
         daq_success = daq_controller.run()
 
 
