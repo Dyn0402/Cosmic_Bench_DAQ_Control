@@ -224,6 +224,7 @@ class DAQController:
         return run_successful
 
     def make_config_from_template(self):
+        print('Making config file from template...')
         dest = self.run_directory if self.run_directory is not None else self.original_working_directory
         cfg_file_name = os.path.basename(self.cfg_template_file_path)
         self.cfg_file_path = f'{dest}/{cfg_file_name}'
