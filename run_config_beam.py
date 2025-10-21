@@ -15,7 +15,7 @@ import copy
 
 class Config:
     def __init__(self):
-        self.run_name = 'rd542_strip_vfp_1_fe_test_10-16-25'
+        self.run_name = 'rd5_strip_vfp_1_fe_test_10-16-25'
         self.daq_dir = '/local/home/banco/dylan/Run/'  # Maybe kill
         self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
         # self.base_out_dir = '/mnt_cosmic_data/'
@@ -179,7 +179,7 @@ class Config:
         #                            'strip_strip_1',
         #                            'scintillator_top']
         self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
-                                   'rd542_plein_vfp_1']
+                                   'rd5_plein_vfp_1']
 
         self.detectors = [
             {
@@ -455,8 +455,8 @@ class Config:
                 },
             },
             {
-                'name': 'rd542_plein_1',
-                'det_type': 'rd542_plein',
+                'name': 'rd5_plein_1',
+                'det_type': 'rd5_plein',
                 'det_center_coords': {  # Center of detector
                     'x': 24,  # mm
                     'y': 75.6,  # mm
@@ -480,8 +480,8 @@ class Config:
                 },
             },
             {
-                'name': 'rd542_strip_1',
-                'det_type': 'rd542_strip',
+                'name': 'rd5_strip_1',
+                'det_type': 'rd5_strip',
                 'det_center_coords': {  # Center of detector
                     'x': 24,  # mm
                     'y': 75.6,  # mm
@@ -505,8 +505,8 @@ class Config:
                 },
             },
             {
-                'name': 'rd542_plein_2',
-                'det_type': 'rd542_plein',
+                'name': 'rd5_plein_2',
+                'det_type': 'rd5_plein',
                 'det_center_coords': {  # Center of detector
                     'x': 24,  # mm
                     'y': 75.6,  # mm
@@ -530,8 +530,8 @@ class Config:
                 },
             },
             {
-                'name': 'rd542_plein_3',
-                'det_type': 'rd542_plein',
+                'name': 'rd5_plein_3',
+                'det_type': 'rd5_plein',
                 'det_center_coords': {  # Center of detector
                     'x': 24,  # mm
                     'y': 75.6,  # mm
@@ -555,8 +555,8 @@ class Config:
                 },
             },
             {
-                'name': 'rd542_strip_2',
-                'det_type': 'rd542_strip',
+                'name': 'rd5_strip_2',
+                'det_type': 'rd5_strip',
                 'det_center_coords': {  # Center of detector
                     'x': 24,  # mm
                     'y': 75.6,  # mm
@@ -580,8 +580,8 @@ class Config:
                 },
             },
             {
-                'name': 'rd542_plein_vfp_1',
-                'det_type': 'rd542_plein',
+                'name': 'rd5_plein_vfp_1',
+                'det_type': 'rd5_plein',
                 'det_center_coords': {  # Center of detector
                     'x': 24,  # mm
                     'y': 75.6,  # mm

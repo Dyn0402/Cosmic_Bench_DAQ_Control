@@ -130,8 +130,8 @@ def define_dets():
             },
         },
         {
-            'det_type': 'rd542_plein',
-            'strip_map_type': 'rd542',
+            'det_type': 'rd5_plein',
+            'strip_map_type': 'rd5',
             'resist_map_type': 'plein',
             'det_size': {  # Size of detector based on the extent of the readout pads (active area may be smaller)
                 'x': 1.0 * 128.5,  # mm
@@ -140,8 +140,8 @@ def define_dets():
             },
         },
         {
-            'det_type': 'rd542_strip',
-            'strip_map_type': 'rd542',
+            'det_type': 'rd5_strip',
+            'strip_map_type': 'rd5',
             'resist_map_type': 'strip',
             'det_size': {  # Size of detector based on the extent of the readout pads (active area may be smaller)
                 'x': 1.0 * 128.5,  # mm
@@ -150,9 +150,39 @@ def define_dets():
             },
         },
         {
-            'det_type': 'rd542_grid',
-            'strip_map_type': 'rd542',
+            'det_type': 'rd5_grid',
+            'strip_map_type': 'rd5',
             'resist_map_type': 'grid',
+            'det_size': {  # Size of detector based on the extent of the readout pads (active area may be smaller)
+                'x': 1.0 * 128.5,  # mm
+                'y': 1.2 * 128.5,  # mm
+                'z': 4,  # mm
+            },
+        },
+        {
+            'det_type': 'rd5_plein_vfp',
+            'strip_map_type': 'rd5',
+            'resist_map_type': 'plein_vfp',
+            'det_size': {  # Size of detector based on the extent of the readout pads (active area may be smaller)
+                'x': 1.0 * 128.5,  # mm
+                'y': 1.2 * 128.5,  # mm
+                'z': 4,  # mm
+            },
+        },
+        {
+            'det_type': 'rd5_strip_vfp',
+            'strip_map_type': 'rd5',
+            'resist_map_type': 'strip_vfp',
+            'det_size': {  # Size of detector based on the extent of the readout pads (active area may be smaller)
+                'x': 1.0 * 128.5,  # mm
+                'y': 1.2 * 128.5,  # mm
+                'z': 4,  # mm
+            },
+        },
+        {
+            'det_type': 'rd5_grid_vfp',
+            'strip_map_type': 'rd5',
+            'resist_map_type': 'grid_vfp',
             'det_size': {  # Size of detector based on the extent of the readout pads (active area may be smaller)
                 'x': 1.0 * 128.5,  # mm
                 'y': 1.2 * 128.5,  # mm
