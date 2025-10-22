@@ -105,6 +105,7 @@ def main():
 
         create_dir_if_not_exist(config.run_out_dir)
         config.write_to_file(f'{config.run_out_dir}run_config.json')
+        input(f'Run Config written to {config.run_out_dir}run_config.json, press Enter to begin run...')
         for sub_run in config.sub_runs:
             sub_run_name = sub_run['sub_run_name']
             # sub_run_dir = f'{config.dream_daq_info["run_directory"]}{sub_run_name}/'

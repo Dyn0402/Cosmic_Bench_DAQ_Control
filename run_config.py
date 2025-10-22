@@ -17,8 +17,8 @@ class Config:
     def __init__(self):
         # self.run_name = 'rd5_strip_vfp_1_fe_test_10-16-25'
         self.run_name = 'beam_daq_test_10-22-25'
-        self.daq_dir = '/local/home/banco/dylan/Run/'  # Maybe kill
-        self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
+        # self.daq_dir = '/local/home/banco/dylan/Run/'  # Maybe kill
+        # self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
         # self.base_out_dir = '/mnt_cosmic_data/'
         self.base_out_dir = '/local/home/banco/dylan/out_dir/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
@@ -66,7 +66,7 @@ class Config:
             'copy_on_fly': True,  # True to copy raw data to out dir during run, False to copy after run
             'batch_mode': True,  # Run Dream RunCtrl in batch mode. Not implemented for cosmic bench CPU.
             'zero_suppress': True,  # True to run in zero suppression mode, False to run in full readout mode
-            'pedestals_dir': f'{self.base_out_dir}/pedestals_noise/',  # None to ignore, else top directory for pedestal runs
+            'pedestals_dir': f'{self.base_out_dir}pedestals_noise/',  # None to ignore, else top directory for pedestal runs
             'pedestals': 'latest',  # 'latest' for most recent, otherwise specify directory name, eg "pedestals_10-22-25_13-43-34"
         }
 

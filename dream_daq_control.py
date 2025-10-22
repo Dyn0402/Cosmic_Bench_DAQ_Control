@@ -368,7 +368,7 @@ def get_pedestals(pedestals_dir, pedestals, run_dir, out_dir=None):
             print('No pedestal directories found.')
             return None
         # Sort directories by date and get latest
-        pedestal_dirs.sort(key=lambda date_str: datetime.strptime(date_str, 'pedestals_%m-%d-%Y_%H-%M-%S'))
+        pedestal_dirs.sort(key=lambda date_str: datetime.strptime(date_str, 'pedestals_%m-%d-%y_%H-%M-%S'))
         latest_pedestal_dir = pedestal_dirs[-1]
         pedestals_prg_dir = f'{pedestals_dir}/{latest_pedestal_dir}/{sub_run_name}/'
     else:
