@@ -8,6 +8,7 @@ Created as Cosmic_Bench_DAQ_Control/send_run_config_to_processor.py
 @author: Dylan Neff, Dylan
 """
 
+import os
 import sys
 from Client import Client
 
@@ -18,8 +19,7 @@ def main():
     if len(sys.argv) != 2:
         print('No run config path given')
         return
-    run_config_file = sys.argv[1]
-    run_config_path = f'{RUNCONFIG_REL_PATH}{run_config_file}'
+    run_config_path = os.path.join(RUNCONFIG_REL_PATH, sys.argv[1]) if not os.path.isabs(sys.argv[1]) else sys.argv[1]
 
     processor_server_client = Client('192.168.10.8', 1250)
 

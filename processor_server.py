@@ -25,14 +25,14 @@ current_config_lock = threading.Lock()
 
 def processor_worker():
     """Background worker to process configs sequentially."""
-    global stop_event, config_queue, current_config, current_config_lock
+    global stop_event, config_queue, current_config
 
     while True:
         config_path = config_queue.get()
         if config_path is None:
             with current_config_lock:
                 current_config = None
-            print("Processor server shutting down.")
+            print("[Processor] Server shutting down.")
             break
 
         with current_config_lock:
@@ -45,25 +45,22 @@ def processor_worker():
         try:
             proc.process_on_the_fly()
         except Exception as e:
-            print(f"[Processor] Error in Processor: {e}")
+            print(f"[Processor] Error: {e}")
         finally:
             print(f"[Processor] Finished for config: {config_path}\n")
             with current_config_lock:
                 current_config = None
 
 
-def print_status_if_changed(last_status):
-    """Compare status with previous and print only if changed."""
-    with current_config_lock:
-        curr = current_config
-    running = not stop_event.is_set()
-    qsize = config_queue.qsize()
-
-    current_status = (curr, running, qsize)
-    if current_status != last_status:
-        print(f"[Status] Queue: {qsize}, Running: {running}, Current config: {curr}")
-        return current_status
-    return last_status
+def queue_monitor(interval: float = 10.0):
+    """Prints queue and processor status periodically."""
+    while True:
+        with current_config_lock:
+            curr = current_config
+        running = not stop_event.is_set()
+        qsize = config_queue.qsize()
+        print(f"[Monitor] Queue size: {qsize}, Running: {running}, Current config: {curr}")
+        time.sleep(interval)
 
 
 def main():
@@ -72,15 +69,16 @@ def main():
     if len(sys.argv) == 2:
         port = int(sys.argv[1])
     else:
-        port = 1250
+        port = 1200
 
-    # Start background processing thread
+    # Start background processor and monitor threads
     processor_thread = threading.Thread(target=processor_worker, daemon=True)
     processor_thread.start()
 
-    print(f"Processor Server started on port {port}")
+    monitor_thread = threading.Thread(target=queue_monitor, args=(10.0,), daemon=True)
+    monitor_thread.start()
 
-    last_status = (None, None, None)
+    print(f"[Server] Processor Server started on port {port}")
 
     while True:
         try:
@@ -89,9 +87,9 @@ def main():
                 server.send("Processor server connected")
 
                 msg = server.receive()
-                while msg and msg.lower() != "finished":
+                while msg and msg.lower() != "quit":
                     if msg.startswith("config "):
-                        config_path = msg.replace("config ", "").strip()
+                        config_path = msg.replace("config", "").strip()
                         print(f"[Server] Received config: {config_path}")
 
                         # Stop current processing if needed
@@ -99,7 +97,6 @@ def main():
                             print("[Server] Signaling current Processor to stop before switching configs...")
                             stop_event.set()
 
-                        # Queue new config
                         config_queue.put(config_path)
                         server.send(f"Queued new config for processing: {config_path}")
 
@@ -117,14 +114,10 @@ def main():
                     else:
                         server.send("Unknown command. Try 'config <path>', 'stop', or 'status'.")
 
-                    # print status if changed since last loop
-                    last_status = print_status_if_changed(last_status)
-
                     msg = server.receive()
         except Exception as e:
             print(f"[Server] Error: {e}")
             time.sleep(2)
-            last_status = print_status_if_changed(last_status)
 
 
 if __name__ == "__main__":

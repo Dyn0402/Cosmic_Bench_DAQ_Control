@@ -255,7 +255,8 @@ class Processor:
                 with self.decoder as dec:
                     dec.process_all()
                 print('Finished decoding\n')
-            print(f'Waiting to check for new files again, good time to exit...\n')
+            print(f'Waiting to check for new files again, good time to exit...\n'
+                  f'Config: {self.config_path}, Output Dir: {self.output_dir}\n')
             for _ in range(60):  # 1-minute sleep, but interruptible
                 if self.stop_event.is_set():
                     print('Stop signal received. Exiting on-the-fly processing.')
