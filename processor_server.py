@@ -69,7 +69,7 @@ def main():
     if len(sys.argv) == 2:
         port = int(sys.argv[1])
     else:
-        port = 1200
+        port = 1250
 
     # Start background processor and monitor threads
     processor_thread = threading.Thread(target=processor_worker, daemon=True)
