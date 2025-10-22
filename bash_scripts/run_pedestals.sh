@@ -1,6 +1,6 @@
 #!/bin/bash
 
-python ../run_config_pedestals.py
+python run_config_pedestals.py
 
 CONFIG_PATH="run_config_pedestals.json"
 
