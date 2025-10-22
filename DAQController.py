@@ -15,10 +15,9 @@ from time import time, sleep
 
 
 class DAQController:
-    def __init__(self, cfg_template_file_path=None, run_time=10, out_name=None, run_dir=None, out_dir=None,
-                 trigger_switch_client=None, dream_daq_client=None, zero_suppress_mode=False, samples_per_waveform=None):
+    def __init__(self, cfg_template_file_path=None, run_time=10, out_name=None, out_dir=None,
+                 trigger_switch_client=None, dream_daq_client=None):
         self.cfg_template_file_path = cfg_template_file_path
-        self.run_directory = run_dir  # Relative to run_directory if not None
         self.out_directory = out_dir
         self.out_name = out_name
         self.trigger_switch_client = trigger_switch_client
