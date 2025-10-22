@@ -888,6 +888,12 @@ class Config:
         with open(file_path, 'w') as file:
             json.dump(self.__dict__, file, indent=4)
 
+    def load_from_file(self, file_path):
+        with open(file_path, 'r') as file:
+            data = json.load(file)
+            self.__dict__.clear()
+            self.__dict__.update(data)
+
 
 if __name__ == '__main__':
     out_dir = '/local/home/dn277127/Bureau/beam_test_25/'
