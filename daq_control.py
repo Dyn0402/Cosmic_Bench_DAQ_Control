@@ -48,7 +48,8 @@ def main():
     hv_ip, hv_port = config.hv_control_info['ip'], config.hv_control_info['port']
     trigger_switch_ip, trigger_switch_port = config.trigger_switch_info['ip'], config.trigger_switch_info['port']
     banco_daq_ip, banco_daq_port = config.banco_info['ip'], config.banco_info['port']
-    dedip196_ip, dedip196_port = config.dedip196_processor_info['ip'], config.dedip196_processor_info['port']
+    if config.process_on_fly:
+        dedip196_ip, dedip196_port = config.dedip196_processor_info['ip'], config.dedip196_processor_info['port']
     if m3:
         sedip28_ip, sedip28_port = config.sedip28_processor_info['ip'], config.sedip28_processor_info['port']
     else:
