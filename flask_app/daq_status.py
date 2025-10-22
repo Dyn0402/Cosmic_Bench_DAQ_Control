@@ -216,14 +216,14 @@ def get_daq_control_status():
 def get_trigger_veto_control_status():
     try:
         output = subprocess.check_output(
-            ["tmux", "capture-pane", "-pS", "-10", "-t", "trigger_control:0.0"],
+            ["tmux", "capture-pane", "-pS", "-10", "-t", "trigger_veto_control:0.0"],
             text=True
         )
     except subprocess.CalledProcessError:
         return {
             "status": "ERROR",
             "color": "danger",
-            "fields": [{"label": "Details", "value": "trigger_control tmux not running"}]
+            "fields": [{"label": "Details", "value": "trigger_veto_control tmux not running"}]
         }
 
     rules = [
