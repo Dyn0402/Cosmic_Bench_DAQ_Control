@@ -44,8 +44,8 @@ class Config:
             'ip': '192.168.10.8',
             'port': 1101,
             'daq_config_template_path': '/local/home/banco/dylan/Run/config/TbSPS25_ped.cfg',
-            'run_directory': f'{self.base_out_dir}Run/{self.run_name}',
-            'data_out_dir': f'{self.base_out_dir}Run/{self.run_name}',
+            'run_directory': self.run_out_dir,
+            'data_out_dir': self.run_out_dir,
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
             'n_samples_per_waveform': 16,  # Number of samples per waveform to configure in DAQ
             'go_timeout': 5 * 60,  # Seconds to wait for 'Go' response from RunCtrl before assuming failure
@@ -105,7 +105,7 @@ class Config:
         self.sub_runs = [
             {
                 'sub_run_name': 'pedestal_dummy',
-                'run_time': 1,  # Minutes
+                'run_time': 0.25,  # Minutes
                 'hvs': {
                 }
             },
