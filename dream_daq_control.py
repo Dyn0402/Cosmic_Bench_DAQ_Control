@@ -50,7 +50,12 @@ def main():
                 while 'Finished' not in res:
                     if 'Start' in res:
                         print(res)
-                        sub_run_name, run_time, cfg_file_run_time = res.split()[-3], float((res.split()[-2])), res.split()[-1]
+                        res_parts = res.strip().split()
+                        print(f'Res parts: {res_parts}')
+                        sub_run_name = res_parts[-3]
+                        run_time = float(res_parts[-2])
+                        cfg_file_run_time = float(res_parts[-1])
+                        # sub_run_name, run_time, cfg_file_run_time = res.split()[-3], float((res.split()[-2])), res.split()[-1]
                         print(f'Sub-run name: {sub_run_name}, Run time: {run_time} minutes')
                         sub_run_out_raw_inner_dir = f'{out_directory}/{sub_run_name}/{raw_daq_inner_dir}/'
                         create_dir_if_not_exist(sub_run_out_raw_inner_dir)
