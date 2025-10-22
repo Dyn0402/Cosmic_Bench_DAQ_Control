@@ -241,6 +241,37 @@ def get_trigger_veto_control_status():
     return {"status": "UNKNOWN STATE", "color": "danger", "fields": []}
 
 
+def get_trigger_gen_control_status():
+    try:
+        output = subprocess.check_output(
+            ["tmux", "capture-pane", "-pS", "-10", "-t", "trigger_gen_control:0.0"],
+            text=True
+        )
+    except subprocess.CalledProcessError:
+        return {
+            "status": "ERROR",
+            "color": "danger",
+            "fields": [{"label": "Details", "value": "trigger_gen_control tmux not running"}]
+        }
+
+    rules = [
+        ("Trigger ", "RUNNING", "success"),
+        ("Stopped sending triggers", "STOPPED", "warning"),
+        ("Listening on ", "WAITING", "secondary"),
+    ]
+
+    # collect trigger number if present (e.g. `Trigger 103343`)
+    fields = []
+    trg_matches = re.findall(r"\bTrigger\s+(\d+)\b", output)
+    if trg_matches:
+        fields.append({"label": "Trigger", "value": trg_matches[-1]})
+    for line in reversed(output.splitlines()):
+        for flag, status, color in rules:
+            if flag in line:
+                return {"status": status, "color": color, "fields": fields}
+    return {"status": "UNKNOWN STATE", "color": "danger", "fields": fields}
+
+
 def get_banco_tracker_status():
     try:
         output = subprocess.check_output(

@@ -87,7 +87,10 @@ def main():
         if config.generate_external_triggers:
             trigger_gen.send('Connected to daq_control')
             trigger_gen.receive()
-            trigger_gen.send('send triggers 1000000 1000 0.1')
+            n_triggers = config.trigger_gen_info['n_triggers']
+            trig_rate = config.trigger_gen_info['trigger_rate']
+            pulse_freq_ratio = config.trigger_gen_info['pulse_freq_ratio']
+            trigger_gen.send(f'send triggers {n_triggers} {trig_rate} {pulse_freq_ratio}')
             trigger_gen.receive()
 
         if banco:
@@ -185,6 +188,8 @@ def main():
         hv.send('Finished')
         if config.generate_external_triggers:
             trigger_gen.send('stop triggers')
+            trigger_gen.receive()
+            trigger_gen.send('Finished')
         if banco:
             banco_daq.send('Finished')
             trigger_switch.send('Finished')

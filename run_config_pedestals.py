@@ -107,6 +107,9 @@ class Config:
         self.trigger_gen_info = {
             'ip': '192.168.10.101',
             'port': 1105,
+            'n_triggers': 1000000,  # Number of triggers to send during run
+            'trigger_rate': 200,  # Hz  Trigger rate to send during run
+            'pulse_freq_ratio': 0.1,  # Ratio of pulse frequency to trigger frequency
         }
 
         self.sub_runs = [

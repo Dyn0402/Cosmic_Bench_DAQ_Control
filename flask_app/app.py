@@ -18,8 +18,7 @@ import pandas as pd
 from flask import Flask, render_template, jsonify, request
 from flask_socketio import SocketIO
 
-from daq_status import (get_dream_daq_status, get_hv_control_status, get_daq_control_status, get_trigger_veto_control_status,
-                        get_decoder_status, get_banco_tracker_status)
+from daq_status import *
 
 BASE_DIR = "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control"
 CONFIG_TEMPLATE_DIR = f"{BASE_DIR}/config/json_templates"
@@ -46,14 +45,14 @@ def status_all():
     for s in TMUX_SESSIONS:
         if s == "dream_daq":
             statuses[s] = get_dream_daq_status()
-            # If Subrun has changed, reset current_subrun_name
-            current_subrun_name = ''
         elif s == "hv_control":
             statuses[s] = get_hv_control_status()
         elif s == "daq_control":
             statuses[s] = get_daq_control_status()
         elif s == "trigger_veto_control":
             statuses[s] = get_trigger_veto_control_status()
+        elif s == "trigger_gen_control":
+            statuses[s] = get_trigger_gen_control_status()
         elif s == "decoder":
             statuses[s] = get_decoder_status()
         elif s == "banco_tracker":
