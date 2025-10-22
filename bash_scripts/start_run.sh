@@ -7,6 +7,9 @@ if [ -z "$CONFIG_PATH" ]; then
   exit 1
 fi
 
+# Check if run output directory exists, iterate run name if so
+python iterate_run_num.py "$CONFIG_PATH"
+
 COMMAND="python daq_control.py \"$CONFIG_PATH\""
 
 # Send command to the tmux session

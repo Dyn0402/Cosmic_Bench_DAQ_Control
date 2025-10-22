@@ -57,6 +57,8 @@ def main():
         sedip28_ip, sedip28_port = None, None
     if config.generate_external_triggers:
         trigger_gen_ip, trigger_gen_port = config.trigger_gen_info['ip'], config.trigger_gen_info['port']
+    else:
+        trigger_gen_ip, trigger_gen_port = None, None
 
     dream_daq_ip, dream_daq_port = config.dream_daq_info['ip'], config.dream_daq_info['port']
 

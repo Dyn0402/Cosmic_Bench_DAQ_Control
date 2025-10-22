@@ -14,7 +14,7 @@ import copy
 
 
 class Config:
-    def __init__(self):
+    def __init__(self, config_path=None):
         # self.run_name = 'rd5_strip_vfp_1_fe_test_10-16-25'
         self.run_name = 'beam_daq_test_10-22-25'
         # self.daq_dir = '/local/home/banco/dylan/Run/'  # Maybe kill
@@ -117,6 +117,14 @@ class Config:
         self.trigger_switch_info = {
             'ip': '192.168.10.101',
             'port': 1100,
+        }
+
+        self.trigger_gen_info = {
+            'ip': '192.168.10.101',
+            'port': 1105,
+            'n_triggers': 1000000,  # Number of triggers to send during run
+            'trigger_rate': 200,  # Hz  Trigger rate to send during run
+            'pulse_freq_ratio': 0.1,  # Ratio of pulse frequency to trigger frequency
         }
 
         self.sub_runs = [
@@ -691,6 +699,9 @@ class Config:
 
         if not self.write_all_dectors_to_json:
             self.detectors = [det for det in self.detectors if det['name'] in self.included_detectors]
+
+        if config_path:  # Clear everything and load from file
+            self.load_from_file(config_path)
 
     def write_to_file(self, file_path):
         with open(file_path, 'w') as file:

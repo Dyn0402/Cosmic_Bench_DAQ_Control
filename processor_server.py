@@ -87,7 +87,7 @@ def main():
                 server.send("Processor server connected")
 
                 msg = server.receive()
-                while msg and msg.lower() != "quit":
+                while msg and msg.lower() != "finished":
                     if msg.startswith("config "):
                         config_path = msg.replace("config ", "").strip()
                         print(f"[Server] Received config: {config_path}")
