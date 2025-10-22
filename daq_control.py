@@ -46,18 +46,23 @@ def main():
     m3 = False if config.m3_feu_num is None else m3
 
     hv_ip, hv_port = config.hv_control_info['ip'], config.hv_control_info['port']
-    trigger_switch_ip, trigger_switch_port = config.trigger_switch_info['ip'], config.trigger_switch_info['port']
-    banco_daq_ip, banco_daq_port = config.banco_info['ip'], config.banco_info['port']
+    if banco:
+        trigger_switch_ip, trigger_switch_port = config.trigger_switch_info['ip'], config.trigger_switch_info['port']
+        banco_daq_ip, banco_daq_port = config.banco_info['ip'], config.banco_info['port']
     if config.process_on_fly:
         dedip196_ip, dedip196_port = config.dedip196_processor_info['ip'], config.dedip196_processor_info['port']
     if m3:
         sedip28_ip, sedip28_port = config.sedip28_processor_info['ip'], config.sedip28_processor_info['port']
     else:
         sedip28_ip, sedip28_port = None, None
+    if config.generate_external_triggers:
+        trigger_gen_ip, trigger_gen_port = config.trigger_gen_info['ip'], config.trigger_gen_info['port']
+
     dream_daq_ip, dream_daq_port = config.dream_daq_info['ip'], config.dream_daq_info['port']
 
     hv_client = Client(hv_ip, hv_port)
     trigger_switch_client = Client(trigger_switch_ip, trigger_switch_port) if banco else nullcontext()
+    trigger_gen_client = Client(trigger_gen_ip, trigger_gen_port) if banco else nullcontext()
     banco_daq_client = Client(banco_daq_ip, banco_daq_port) if banco else nullcontext()
     dedip196_processor_client = Client(dedip196_ip, dedip196_port) if config.process_on_fly else nullcontext()
     sedip28_processor_client = Client(sedip28_ip, sedip28_port) if m3 and config.process_on_fly else nullcontext()
@@ -65,6 +70,7 @@ def main():
 
     with hv_client as hv, \
             trigger_switch_client as trigger_switch, \
+            trigger_gen_client as trigger_gen, \
             banco_daq_client as banco_daq, \
             dedip196_processor_client as dedip196_processor, \
             sedip28_processor_client as sedip28_processor, \
@@ -77,6 +83,9 @@ def main():
         dream_daq.send('Connected to daq_control')
         dream_daq.receive()
         dream_daq.send_json(config.dream_daq_info)
+
+        if config.generate_external_triggers:
+            trigger_gen.send('send triggers 1000000 1000 0.1')
 
         if banco:
             trigger_switch.send('Connected to daq_control')
@@ -171,6 +180,8 @@ def main():
             hv.receive()  # Starting power off
             hv.receive()  # Finished power off
         hv.send('Finished')
+        if config.generate_external_triggers:
+            trigger_gen.send('stop triggers')
         if banco:
             banco_daq.send('Finished')
             trigger_switch.send('Finished')

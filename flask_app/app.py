@@ -31,7 +31,7 @@ HV_TAIL = 1000  # number of most recent rows to show
 app = Flask(__name__)
 socketio = SocketIO(app)
 
-TMUX_SESSIONS = ["hv_control", "dream_daq", "decoder", "daq_control", "trigger_control", "banco_tracker"]
+TMUX_SESSIONS = ["hv_control", "dream_daq", "decoder", "daq_control", "trigger_veto_control", "trigger_gen_control", "banco_tracker"]
 sessions = {}
 
 @app.route("/")
@@ -109,11 +109,20 @@ def restart_all():
         return jsonify({"success": False, "message": str(e)}), 500
 
 
-@app.route('/load_run_config_py', methods=['POST'])
+@app.route("/load_run_config_py", methods=['POST'])
 def load_py_config():
     try:
         subprocess.Popen(["python", f"{BASE_DIR}/run_config.py"])
         return jsonify({"success": True, "message": "run_config.json updated from run_config.py"})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@app.route("/take_pedestals", methods=["POST"])
+def take_pedestals():
+    try:
+        subprocess.Popen([f"{BASH_DIR}/run_pedestals.sh"])
+        return jsonify({"success": True, "message": "Taking pedestals"})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
 

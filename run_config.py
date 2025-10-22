@@ -35,6 +35,7 @@ class Config:
         self.save_fdfs = True  # True to save FDF files, False to delete after decoding
         self.start_time = None
         self.write_all_dectors_to_json = True  # Only when making run config json template.
+        self.generate_external_triggers = False  # If true, use raspberry pi to generate external triggers for DAQ
         self.gas = 'Ar/CO2/Iso 93/5/2'  # Gas type for run
 
         self.weiner_ps_info = {  # If this exists, check for Weiner LV before applying any HV

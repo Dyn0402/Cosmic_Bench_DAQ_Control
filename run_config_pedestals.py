@@ -38,6 +38,7 @@ class Config:
         self.save_fdfs = True  # True to save FDF files, False to delete after decoding
         self.start_time = None
         self.write_all_dectors_to_json = True  # Only when making run config json template.
+        self.generate_external_triggers = True  # If true, use raspberry pi to generate external triggers for DAQ
         self.gas = 'Ar/CO2/Iso 93/5/2'  # Gas type for run
 
         self.dream_daq_info = {
@@ -101,6 +102,11 @@ class Config:
         self.trigger_switch_info = {
             'ip': '192.168.10.101',
             'port': 1100,
+        }
+
+        self.trigger_gen_info = {
+            'ip': '192.168.10.101',
+            'port': 1105,
         }
 
         self.sub_runs = [

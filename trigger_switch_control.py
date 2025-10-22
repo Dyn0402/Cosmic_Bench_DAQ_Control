@@ -10,11 +10,18 @@ Created as Cosmic_Bench_DAQ_Control/trigger_switch_control.py
 
 import sys
 import time
+import threading
 import RPi.GPIO as GPIO
 from Server import Server
 
+# Globals for background trigger control
+trigger_thread = None
+stop_event = threading.Event()
+
 
 def main():
+    global trigger_thread, stop_event
+
     if len(sys.argv) == 3:
         port = int(sys.argv[1])
         gpio_pin = int(sys.argv[2])
@@ -34,22 +41,64 @@ def main():
                     elif 'off' in res:
                         trigger_switch('off', pin=gpio_pin)
                         server.send(f'Trigger switch turned off')
+
                     elif 'send triggers' in res:
+                        # Stop any currently running trigger thread first
+                        if trigger_thread and trigger_thread.is_alive():
+                            stop_event.set()
+                            trigger_thread.join()
+
                         try:
-                            parts = res.strip().split()
-                            num_triggers = int(parts[2])
-                            freq_hz = float(parts[3])
-                            pulse_freq_ratio = float(parts[4])
-                            send_triggers(num_triggers=num_triggers, freq_hz=freq_hz,
-                                          pulse_freq_ratio=pulse_freq_ratio, pin=gpio_pin)
-                            server.send(f'Sent {num_triggers} triggers at {freq_hz} Hz with pulse ratio {pulse_freq_ratio}')
+                            parts = res.replace('send triggers', '').strip().split()
+                            num_triggers = int(parts[0])
+                            freq_hz = float(parts[1])
+                            pulse_freq_ratio = float(parts[2])
+
+                            stop_event.clear()
+                            trigger_thread = threading.Thread(
+                                target=send_triggers,
+                                kwargs=dict(
+                                    num_triggers=num_triggers,
+                                    freq_hz=freq_hz,
+                                    pulse_freq_ratio=pulse_freq_ratio,
+                                    pin=gpio_pin,
+                                    stop_event=stop_event,
+                                ),
+                                daemon=True
+                            )
+                            trigger_thread.start()
+                            server.send(
+                                f'Started sending {num_triggers} triggers at {freq_hz} Hz with pulse ratio {pulse_freq_ratio}')
+
                         except (IndexError, ValueError) as e:
                             server.send(f'Error parsing send triggers command: {e}')
+
+                    elif 'stop triggers' in res:
+                        if trigger_thread and trigger_thread.is_alive():
+                            stop_event.set()
+                            trigger_thread.join()
+                            server.send('Stopped sending triggers')
+                        else:
+                            server.send('No trigger process is running')
+                    # elif 'send triggers' in res:
+                    #     try:
+                    #         parts = res.replace('send triggers', '').strip().split()
+                    #         num_triggers = int(parts[0])
+                    #         freq_hz = float(parts[1])
+                    #         pulse_freq_ratio = float(parts[2])
+                    #         send_triggers(num_triggers=num_triggers, freq_hz=freq_hz,
+                    #                       pulse_freq_ratio=pulse_freq_ratio, pin=gpio_pin)
+                    #         server.send(f'Sent {num_triggers} triggers at {freq_hz} Hz with pulse ratio {pulse_freq_ratio}')
+                    #     except (IndexError, ValueError) as e:
+                    #         server.send(f'Error parsing send triggers command: {e}')
                     else:
                         server.send('Unknown Command')
                     res = server.receive()
         except Exception as e:
             print(f'Error: {e}')
+        if trigger_thread and trigger_thread.is_alive():
+            stop_event.set()
+            trigger_thread.join()
         trigger_switch('on', pin=gpio_pin)  # Make sure to leave trigger on by default
         GPIO.cleanup(gpio_pin)
     print('donzo')

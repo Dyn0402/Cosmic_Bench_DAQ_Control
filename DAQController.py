@@ -25,14 +25,18 @@ class DAQController:
         self.original_working_directory = os.getcwd()
 
         self.run_time = run_time  # minutes
-        self.max_run_time = self.run_time + 10  # minutes After this time assume stuck and kill
+        self.max_run_time = self.run_time + 5  # minutes After this time assume stuck and kill
         self.go_timeout = 8  # minutes
         self.run_start_time = None
         self.measured_run_time = None
 
+        self.wait_for_banco_time = 10
+        self.dream_overrun_time = 12 / 60  # minutes, needs to be at least wait_for_banco_time in case no triggers
+
         # If trigger switch is used, need to run past run time to bracket the trigger switch on/off. Else just run time.
         # DAQ resets timer when first trigger received, so only need short pause to be sure.
-        self.cfg_file_run_time = self.run_time if self.trigger_switch_client is None else self.run_time + 5 / 60  # minutes
+        self.cfg_file_run_time = self.run_time if self.trigger_switch_client is None \
+            else self.run_time + self.dream_overrun_time  # minutes
 
     def __enter__(self):
         return self
@@ -66,7 +70,7 @@ class DAQController:
                 self.run_start_time = time()
 
                 if self.trigger_switch_client is not None:
-                    sleep(5)  # Wait a bit to ensure DAQ is running before starting trigger
+                    sleep(self.wait_for_banco_time)  # Wait a bit to ensure DAQs are running before starting trigger
                     self.trigger_switch_client.send('on')
                     self.run_start_time = time()
                     self.trigger_switch_client.receive()

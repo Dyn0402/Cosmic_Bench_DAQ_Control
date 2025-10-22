@@ -11,6 +11,7 @@
         <button id="stop-run" class="btn btn-danger">Stop Run</button>
         <button id="restart-all" class="btn btn-danger">Restart All</button>
         <button id="load-py-config" class="btn btn-secondary">Load run_config.py Config</button>
+        <button id="take-pedestals" class="btn btn-secondary">Take Pedestals</button>
     </div>
 
     <div class="row" id="status-cards">
@@ -722,6 +723,35 @@ document.getElementById("start-run").addEventListener("click", async () => {
     popup.style.opacity = "0";
     setTimeout(() => popup.remove(), 1000);
   }, 2500);
+});
+
+// take pedestals button handler
+document.getElementById("take-pedestals").addEventListener("click", async () => {
+  const res = await fetch("/take_pedestals", { method: "POST" });
+  const data = await res.json();
+
+  // Create a fading popup
+    const popup = document.createElement("div");
+    popup.textContent = data.message;
+    popup.style.position = "fixed";
+    popup.style.top = "80px";
+    popup.style.left = "50%";
+    popup.style.transform = "translateX(-50%)";
+    popup.style.background = "#17a2b8";
+    popup.style.color = "#fff";
+    popup.style.padding = "1em 2em";
+    popup.style.borderRadius = "8px";
+    popup.style.boxShadow = "0 2px 8px rgba(0,0,0.2)";
+    popup.style.zIndex = "9999";
+    popup.style.opacity = "1";
+    popup.style.transition = "opacity 1s";
+
+    document.body.appendChild(popup);
+
+    setTimeout(() => {
+      popup.style.opacity = "0";
+      setTimeout(() => popup.remove(), 1000);
+    }, 2500);
 });
 
 // load run_config.py config button handler
