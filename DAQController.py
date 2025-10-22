@@ -25,7 +25,7 @@ class DAQController:
         self.original_working_directory = os.getcwd()
 
         self.run_time = run_time  # minutes
-        self.max_run_time = self.run_time + 5  # minutes After this time assume stuck and kill
+        self.max_run_time = self.run_time + 10  # minutes After this time assume stuck and kill
         self.go_timeout = 8  # minutes
         self.run_start_time = None
         self.measured_run_time = None
@@ -77,6 +77,7 @@ class DAQController:
                     sleep(sleep_time)
                     # if time() - self.run_start_time >= self.run_time * 60:
                     self.trigger_switch_client.send('off')
+                    print('Holding triggers')
                     self.measured_run_time = time() - self.run_start_time
                     self.trigger_switch_client.receive()
             elif res == 'Dream DAQ has finished':   # Only taking pedestals
