@@ -319,6 +319,6 @@ class DAQController:
 #                 break
 #
 #         new_lines.append(line)
-
-    with open(output_path, 'w') as f:
-        f.writelines(new_lines)
+#
+#     with open(output_path, 'w') as f:
+#         f.writelines(new_lines)
