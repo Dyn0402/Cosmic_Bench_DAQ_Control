@@ -57,14 +57,12 @@ def main():
         sedip28_ip, sedip28_port = None, None
     if config.generate_external_triggers:
         trigger_gen_ip, trigger_gen_port = config.trigger_gen_info['ip'], config.trigger_gen_info['port']
-    else:
-        trigger_gen_ip, trigger_gen_port = None, None
 
     dream_daq_ip, dream_daq_port = config.dream_daq_info['ip'], config.dream_daq_info['port']
 
     hv_client = Client(hv_ip, hv_port)
     trigger_switch_client = Client(trigger_switch_ip, trigger_switch_port) if banco else nullcontext()
-    trigger_gen_client = Client(trigger_gen_ip, trigger_gen_port) if banco else nullcontext()
+    trigger_gen_client = Client(trigger_gen_ip, trigger_gen_port) if config.generate_external_triggers else nullcontext()
     banco_daq_client = Client(banco_daq_ip, banco_daq_port) if banco else nullcontext()
     dedip196_processor_client = Client(dedip196_ip, dedip196_port) if config.process_on_fly else nullcontext()
     sedip28_processor_client = Client(sedip28_ip, sedip28_port) if m3 and config.process_on_fly else nullcontext()
