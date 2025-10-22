@@ -32,9 +32,9 @@ class Config:
         self.filtering_by_m3 = False  # True to filter by m3 tracking, False to do no filtering
         self.process_on_fly = False  # True to process data on fly, False to process after run
         self.save_fdfs = True  # True to save FDF files, False to delete after decoding
-        self.zero_supress = True  # True let DREAM DAQ pedestal subtract and suppress zeros, False to save all ADC values
         self.start_time = None
         self.write_all_dectors_to_json = True  # Only when making run config json template.
+        self.gas = 'Ar/CO2/Iso 93/5/2'  # Gas type for run
 
         self.weiner_ps_info = {  # If this exists, check for Weiner LV before applying any HV
             'ip': '192.168.10.222',
@@ -63,7 +63,10 @@ class Config:
             'go_timeout': 5 * 60,  # Seconds to wait for 'Go' response from RunCtrl before assuming failure
             'max_run_time_addition': 60 * 5,  # Seconds to add to requested run time before killing run
             'copy_on_fly': True,  # True to copy raw data to out dir during run, False to copy after run
-            'batch_mode': True  # Run Dream RunCtrl in batch mode. Not implemented for cosmic bench CPU.
+            'batch_mode': True,  # Run Dream RunCtrl in batch mode. Not implemented for cosmic bench CPU.
+            'zero_suppress': True,  # True to run in zero suppression mode, False to run in full readout mode
+            'pedestals_dir': f'{self.base_out_dir}/pedestals_noise/',  # None to ignore, else top directory for pedestal runs
+            'pedestals': 'latest',  # 'latest' for most recent, otherwise specify directory name, eg "pedestals_10-22-25_13-43-34"
         }
 
         self.banco_info = {

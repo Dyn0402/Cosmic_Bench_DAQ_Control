@@ -30,8 +30,8 @@ class Config:
         self.filtering_by_m3 = False  # True to filter by m3 tracking, False to do no filtering
         self.process_on_fly = False  # True to process data on fly, False to process after run
         self.save_fdfs = True  # True to save FDF files, False to delete after decoding
-        self.zero_supress = False  # True let DREAM DAQ pedestal subtract and suppress zeros, False to save all ADC values
         self.start_time = None  # '2024-06-03 15:30:00'  # 'YYYY-MM-DD HH:MM:SS' or None to start immediately
+        self.write_all_dectors_to_json = False  # Only when making run config json template.
         self.gas = 'Ar/CO2/Iso 93/5/2'  # Gas type for run
 
         self.dream_daq_info = {
@@ -46,7 +46,8 @@ class Config:
             'go_timeout': 5 * 60,  # Seconds to wait for 'Go' response from RunCtrl before assuming failure
             'max_run_time_addition': 60 * 5,  # Seconds to add to requested run time before killing run
             'copy_on_fly': True,  # True to copy raw data to out dir during run, False to copy after run
-            'batch_mode': True  # Run Dream RunCtrl in batch mode. Not implemented for cosmic bench C
+            'batch_mode': True,  # Run Dream RunCtrl in batch mode. Not implemented for cosmic bench C
+            'zero_suppress': False,  # True to run in zero suppression mode, False to run in full readout mode
         }
 
         self.banco_info = {
@@ -882,7 +883,8 @@ class Config:
             },
         ]
 
-        self.detectors = [det for det in self.detectors if det['name'] in self.included_detectors]
+        if not self.write_all_dectors_to_json:
+            self.detectors = [det for det in self.detectors if det['name'] in self.included_detectors]
 
     def write_to_file(self, file_path):
         with open(file_path, 'w') as file:

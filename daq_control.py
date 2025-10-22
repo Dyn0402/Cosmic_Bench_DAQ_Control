@@ -141,7 +141,7 @@ def main():
 
                 daq_trigger_switch = trigger_switch if banco else None
                 daq_control_args = (config.dream_daq_info['daq_config_template_path'], sub_run_name, sub_run['run_time'],
-                                    sub_out_dir, sub_run_dir, daq_trigger_switch, dream_daq, config.zero_supress,
+                                    sub_out_dir, sub_run_dir, daq_trigger_switch, dream_daq, config.zero_suppress,
                                     config.dream_daq_info.get('n_samples_per_waveform', None))
 
                 print(f'Starting run for sub run {sub_run_name}')

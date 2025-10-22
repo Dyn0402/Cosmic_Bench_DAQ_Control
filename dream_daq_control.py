@@ -10,6 +10,7 @@ Created as Cosmic_Bench_DAQ_Control/dream_daq_control
 
 import os
 import sys
+import re
 from subprocess import Popen, PIPE
 import pty
 from time import sleep
@@ -38,6 +39,8 @@ def main():
                 max_run_time_addition = dream_info['max_run_time_addition']
                 copy_on_fly = dream_info['copy_on_fly']
                 batch_mode = dream_info['batch_mode']
+                zero_supress = dream_info.get('zero_suppress', False)
+                samples_per_waveform = dream_info.get('n_samples_per_waveform', None)
                 original_working_directory = os.getcwd()
 
                 create_dir_if_not_exist(run_directory)
@@ -47,7 +50,7 @@ def main():
                 while 'Finished' not in res:
                     if 'Start' in res:
                         print(res)
-                        sub_run_name, run_time = res.split()[-2], int(float((res.split()[-1])))
+                        sub_run_name, run_time, cfg_file_run_time = res.split()[-3], float((res.split()[-2])), res.split()[-1]
                         print(f'Sub-run name: {sub_run_name}, Run time: {run_time} minutes')
                         sub_run_out_raw_inner_dir = f'{out_directory}/{sub_run_name}/{raw_daq_inner_dir}/'
                         create_dir_if_not_exist(sub_run_out_raw_inner_dir)
@@ -59,7 +62,14 @@ def main():
                         else:
                             sub_run_dir = os.getcwd()
 
-                        cfg_run_path = os.path.join(os.getcwd(), os.path.basename(cfg_template_path))
+                        # Make cfg from template
+                        cfg_run_path = make_config_from_template(sub_run_dir, cfg_template_path, cfg_file_run_time,
+                                                                 zero_supress, samples_per_waveform)
+                        # cfg_run_path = os.path.join(os.getcwd(), os.path.basename(cfg_template_path))
+
+                        # Copy dream config file to out directory for future reference
+                        shutil.copy(cfg_run_path, sub_run_out_raw_inner_dir)
+
                         run_command = f'RunCtrl -c {cfg_run_path} -f {sub_run_name}'
                         if batch_mode:
                             run_command += ' -b'
@@ -279,6 +289,70 @@ def clear_terminal():
         os.system('cls' if os.name == 'nt' else 'clear')
     except:
         print('Failed to clear terminal')  # Ignore any errors
+
+
+def make_config_from_template(run_dir, cfg_template_file_path, cfg_file_run_time, zero_suppress_mode=False,
+                              samples_per_waveform=None):
+    print('Making config file from template...')
+    dest = run_dir
+    cfg_file_name = os.path.basename(cfg_template_file_path)
+    cfg_file_path = f'{dest}/{cfg_file_name}'
+    shutil.copy(cfg_template_file_path, cfg_file_path)
+
+    # Copy all Grace* files from template directory to run directory
+    template_dir = os.path.dirname(cfg_template_file_path)
+    for file in os.listdir(template_dir):
+        if file.startswith('Grace_'):
+            shutil.copy(f'{template_dir}/{file}', f'{dest}/{file}')
+
+    updates = {  # Update config file with desired parameters
+        "Sys DaqRun Time": cfg_file_run_time * 60,  # Seconds
+        "Sys DaqRun Mode": 'ZS' if zero_suppress_mode else 'Raw',
+    }
+    if samples_per_waveform is not None:
+        updates["Sys NbOfSamples"] = samples_per_waveform  # Use specified number of samples
+    update_config_value(cfg_file_path, updates)
+
+    return cfg_file_path
+
+
+def update_config_value(filepath, updates, output_path=None):
+    """
+    Updates parameters in a free-form config file without changing spacing/comments.
+
+    Parameters
+    ----------
+    filepath : str or Path
+        Path to the input config file.
+    updates : dict
+        Keys are full parameter flags (e.g., "Sys DaqRun Trig"),
+        values are the new values to insert.
+    output_path : str or Path, optional
+        Where to save the updated file. Defaults to overwriting the original.
+    """
+    output_path = output_path or filepath
+    with open(filepath, 'r') as f:
+        lines = f.readlines()
+
+    updates = {re.escape(k.strip()): str(v) for k, v in updates.items()}
+    new_lines = []
+
+    for line in lines:
+        if re.match(r'^\s*#', line) or not line.strip():
+            new_lines.append(line)
+            continue
+
+        for flag_pattern, new_value in updates.items():
+            pattern = rf"^(\s*{flag_pattern}\s+)([^\s#]+)(?=(\s*#|$))"
+            if re.search(pattern, line):
+                # Use a lambda to avoid backreference confusion
+                line = re.sub(pattern, lambda m: f"{m.group(1)}{new_value}", line)
+                break
+
+        new_lines.append(line)
+
+    with open(output_path, 'w') as f:
+        f.writelines(new_lines)
 
 
 if __name__ == '__main__':

@@ -30,22 +30,22 @@ class DAQController:
         self.go_timeout = 8  # minutes
         self.run_start_time = None
         self.measured_run_time = None
-        self.zero_suppress_mode = zero_suppress_mode
-        self.samples_per_waveform = samples_per_waveform  # If None use whatever is in cfg file
+        # self.zero_suppress_mode = zero_suppress_mode
+        # self.samples_per_waveform = samples_per_waveform  # If None use whatever is in cfg file
 
         # If trigger switch is used, need to run past run time to bracket the trigger switch on/off. Else just run time.
         # DAQ resets timer when first trigger received, so only need short pause to be sure.
         self.cfg_file_run_time = self.run_time if self.trigger_switch_client is None else self.run_time + 5 / 60  # minutes
-        self.cfg_file_path = None
-        if self.cfg_template_file_path is not None:
-            self.make_config_from_template()
-            if self.out_directory is not None:  # Copy config file to out directory for future reference
-                shutil.copy(self.cfg_file_path, f'{self.out_directory}/{os.path.basename(self.cfg_file_path)}')
+        # self.cfg_file_path = None
+        # if self.cfg_template_file_path is not None:
+        #     self.make_config_from_template()
+        #     if self.out_directory is not None:  # Copy config file to out directory for future reference
+        #         shutil.copy(self.cfg_file_path, f'{self.out_directory}/{os.path.basename(self.cfg_file_path)}')
 
-        if out_name is None:
-            self.run_command = f'RunCtrl -c {self.cfg_file_path} -f test'  # Think I need an out name
-        else:
-            self.run_command = f'RunCtrl -c {self.cfg_file_path} -f {out_name}'
+        # if out_name is None:
+        #     self.run_command = f'RunCtrl -c {self.cfg_file_path} -f test'  # Think I need an out name
+        # else:
+        #     self.run_command = f'RunCtrl -c {self.cfg_file_path} -f {out_name}'
 
     def __enter__(self):
         return self
@@ -145,7 +145,7 @@ class DAQController:
             self.trigger_switch_client.silent = True
 
         try:
-            self.dream_daq_client.send(f'Start {self.out_name} {self.run_time}')
+            self.dream_daq_client.send(f'Start {self.out_name} {self.run_time} {self.cfg_file_run_time}')
             res = self.dream_daq_client.receive()
             if res != 'Dream DAQ starting':
                 print('Error starting Dream DAQ')
@@ -223,26 +223,26 @@ class DAQController:
 
         return run_successful
 
-    def make_config_from_template(self):
-        print('Making config file from template...')
-        dest = self.run_directory if self.run_directory is not None else self.original_working_directory
-        cfg_file_name = os.path.basename(self.cfg_template_file_path)
-        self.cfg_file_path = f'{dest}/{cfg_file_name}'
-        shutil.copy(self.cfg_template_file_path, self.cfg_file_path)
-
-        # Copy all Grace* files from template directory to run directory
-        template_dir = os.path.dirname(self.cfg_template_file_path)
-        for file in os.listdir(template_dir):
-            if file.startswith('Grace_'):
-                shutil.copy(f'{template_dir}/{file}', f'{dest}/{file}')
-
-        updates = {  # Update config file with desired parameters
-            "Sys DaqRun Time": self.cfg_file_run_time * 60,  # Seconds
-            "Sys DaqRun Mode": 'ZS' if self.zero_suppress_mode else 'Raw',
-        }
-        if self.samples_per_waveform is not None:
-            updates["Sys NbOfSamples"] = self.samples_per_waveform  # Use specified number of samples
-        update_config_value(self.cfg_file_path, updates)
+    # def make_config_from_template(self):
+    #     print('Making config file from template...')
+    #     dest = self.run_directory if self.run_directory is not None else self.original_working_directory
+    #     cfg_file_name = os.path.basename(self.cfg_template_file_path)
+    #     self.cfg_file_path = f'{dest}/{cfg_file_name}'
+    #     shutil.copy(self.cfg_template_file_path, self.cfg_file_path)
+    #
+    #     # Copy all Grace* files from template directory to run directory
+    #     template_dir = os.path.dirname(self.cfg_template_file_path)
+    #     for file in os.listdir(template_dir):
+    #         if file.startswith('Grace_'):
+    #             shutil.copy(f'{template_dir}/{file}', f'{dest}/{file}')
+    #
+    #     updates = {  # Update config file with desired parameters
+    #         "Sys DaqRun Time": self.cfg_file_run_time * 60,  # Seconds
+    #         "Sys DaqRun Mode": 'ZS' if self.zero_suppress_mode else 'Raw',
+    #     }
+    #     if self.samples_per_waveform is not None:
+    #         updates["Sys NbOfSamples"] = self.samples_per_waveform  # Use specified number of samples
+    #     update_config_value(self.cfg_file_path, updates)
 
         # with open(self.cfg_file_path, 'r') as file:
         #     cfg_lines = file.readlines()
@@ -277,48 +277,48 @@ class DAQController:
                 file.write('None')
 
 
-def move_data_files(src_dir, dest_dir):
-    for file in os.listdir(src_dir):
-        if file.endswith('.fdf'):
-            shutil.move(f'{src_dir}/{file}', f'{dest_dir}/{file}')
-            # Copy for now, maybe move and clean up later when more confident
-            # shutil.copy(f'{src_dir}/{file}', f'{dest_dir}/{file}')
-
-
-def update_config_value(filepath, updates, output_path=None):
-    """
-    Updates parameters in a free-form config file without changing spacing/comments.
-
-    Parameters
-    ----------
-    filepath : str or Path
-        Path to the input config file.
-    updates : dict
-        Keys are full parameter flags (e.g., "Sys DaqRun Trig"),
-        values are the new values to insert.
-    output_path : str or Path, optional
-        Where to save the updated file. Defaults to overwriting the original.
-    """
-    output_path = output_path or filepath
-    with open(filepath, 'r') as f:
-        lines = f.readlines()
-
-    updates = {re.escape(k.strip()): str(v) for k, v in updates.items()}
-    new_lines = []
-
-    for line in lines:
-        if re.match(r'^\s*#', line) or not line.strip():
-            new_lines.append(line)
-            continue
-
-        for flag_pattern, new_value in updates.items():
-            pattern = rf"^(\s*{flag_pattern}\s+)([^\s#]+)(?=(\s*#|$))"
-            if re.search(pattern, line):
-                # Use a lambda to avoid backreference confusion
-                line = re.sub(pattern, lambda m: f"{m.group(1)}{new_value}", line)
-                break
-
-        new_lines.append(line)
+# def move_data_files(src_dir, dest_dir):
+#     for file in os.listdir(src_dir):
+#         if file.endswith('.fdf'):
+#             shutil.move(f'{src_dir}/{file}', f'{dest_dir}/{file}')
+#             # Copy for now, maybe move and clean up later when more confident
+#             # shutil.copy(f'{src_dir}/{file}', f'{dest_dir}/{file}')
+#
+#
+# def update_config_value(filepath, updates, output_path=None):
+#     """
+#     Updates parameters in a free-form config file without changing spacing/comments.
+#
+#     Parameters
+#     ----------
+#     filepath : str or Path
+#         Path to the input config file.
+#     updates : dict
+#         Keys are full parameter flags (e.g., "Sys DaqRun Trig"),
+#         values are the new values to insert.
+#     output_path : str or Path, optional
+#         Where to save the updated file. Defaults to overwriting the original.
+#     """
+#     output_path = output_path or filepath
+#     with open(filepath, 'r') as f:
+#         lines = f.readlines()
+#
+#     updates = {re.escape(k.strip()): str(v) for k, v in updates.items()}
+#     new_lines = []
+#
+#     for line in lines:
+#         if re.match(r'^\s*#', line) or not line.strip():
+#             new_lines.append(line)
+#             continue
+#
+#         for flag_pattern, new_value in updates.items():
+#             pattern = rf"^(\s*{flag_pattern}\s+)([^\s#]+)(?=(\s*#|$))"
+#             if re.search(pattern, line):
+#                 # Use a lambda to avoid backreference confusion
+#                 line = re.sub(pattern, lambda m: f"{m.group(1)}{new_value}", line)
+#                 break
+#
+#         new_lines.append(line)
 
     with open(output_path, 'w') as f:
         f.writelines(new_lines)
