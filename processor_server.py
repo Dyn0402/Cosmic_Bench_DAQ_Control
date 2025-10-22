@@ -72,7 +72,7 @@ def main():
     if len(sys.argv) == 2:
         port = int(sys.argv[1])
     else:
-        port = 1200
+        port = 1250
 
     # Start background processing thread
     processor_thread = threading.Thread(target=processor_worker, daemon=True)
@@ -89,7 +89,7 @@ def main():
                 server.send("Processor server connected")
 
                 msg = server.receive()
-                while msg and msg.lower() != "quit":
+                while msg and msg.lower() != "finished":
                     if msg.startswith("config "):
                         config_path = msg.replace("config", "").strip()
                         print(f"[Server] Received config: {config_path}")

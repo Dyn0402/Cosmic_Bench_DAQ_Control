@@ -84,7 +84,7 @@ class Config:
         }
 
         self.dedip196_processor_info = {
-            'ip': '132.166.10.196',
+            'ip': '192.168.10.8',
             'port': 1200,
             'run_dir': f'{self.base_out_dir}Run/{self.run_name}',
             'raw_daq_inner_dir': self.raw_daq_inner_dir,

@@ -295,73 +295,73 @@ def save_json_template():
     return f"Template saved to {path}"
 
 
-# @socketio.on("start")
-# def start(data):
-#     name = data.get("name")
-#     if name in sessions:
-#         return  # already attached
-#
-#     pid, fd = pty.fork()
-#     if pid == 0:
-#         # Child: attach to tmux session
-#         os.execvp("tmux", ["tmux", "attach-session", "-t", name])
-#     else:
-#         # Parent: keep FD for reading/writing
-#         sessions[name] = fd
-#
-#         def read_fd(fd, session_name):
-#             while True:
-#                 try:
-#                     r, _, _ = select.select([fd], [], [], 0.1)
-#                     if fd in r:
-#                         output = os.read(fd, 1024).decode(errors="ignore")
-#                         socketio.emit(f"output-{session_name}", output)
-#                 except OSError:
-#                     break
-#
-#         threading.Thread(target=read_fd, args=(fd, name), daemon=True).start()
-#
-# # Generic input handler for all sessions
-# for s in TMUX_SESSIONS:
-#     @socketio.on(f"input-{s}")
-#     def make_input(session_name=s):
-#         def handle_input(data):
-#             os.write(sessions[session_name], data.encode())
-#         return handle_input
-
-def get_tmux_output(session_name):
-    """Return recent lines from a tmux session."""
-    try:
-        result = subprocess.run(
-            ["tmux", "capture-pane", "-pt", session_name, "-S", "-1000"],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-        )
-        return result.stdout
-    except Exception as e:
-        return f"[Error reading {session_name}: {e}]"
-
-
-def monitor_session(session_name, interval=1):
-    """Poll tmux session periodically and send updates only when changed."""
-    last_output = ""
-    while True:
-        output = get_tmux_output(session_name)
-        if output != last_output:
-            socketio.emit(f"output-{session_name}", output)
-            last_output = output
-        time.sleep(interval)
-
-
 @socketio.on("start")
 def start(data):
-    """Begin monitoring the given tmux session (read-only)."""
     name = data.get("name")
-    if not name or name in sessions:
-        return
-    sessions[name] = True  # track active sessions
-    threading.Thread(target=monitor_session, args=(name,), daemon=True).start()
+    if name in sessions:
+        return  # already attached
+
+    pid, fd = pty.fork()
+    if pid == 0:
+        # Child: attach to tmux session
+        os.execvp("tmux", ["tmux", "attach-session", "-t", name])
+    else:
+        # Parent: keep FD for reading/writing
+        sessions[name] = fd
+
+        def read_fd(fd, session_name):
+            while True:
+                try:
+                    r, _, _ = select.select([fd], [], [], 0.1)
+                    if fd in r:
+                        output = os.read(fd, 1024).decode(errors="ignore")
+                        socketio.emit(f"output-{session_name}", output)
+                except OSError:
+                    break
+
+        threading.Thread(target=read_fd, args=(fd, name), daemon=True).start()
+
+# Generic input handler for all sessions
+for s in TMUX_SESSIONS:
+    @socketio.on(f"input-{s}")
+    def make_input(session_name=s):
+        def handle_input(data):
+            os.write(sessions[session_name], data.encode())
+        return handle_input
+
+# def get_tmux_output(session_name):
+#     """Return recent lines from a tmux session."""
+#     try:
+#         result = subprocess.run(
+#             ["tmux", "capture-pane", "-pt", session_name, "-S", "-1000"],
+#             stdout=subprocess.PIPE,
+#             stderr=subprocess.PIPE,
+#             text=True,
+#         )
+#         return result.stdout
+#     except Exception as e:
+#         return f"[Error reading {session_name}: {e}]"
+#
+#
+# def monitor_session(session_name, interval=1):
+#     """Poll tmux session periodically and send updates only when changed."""
+#     last_output = ""
+#     while True:
+#         output = get_tmux_output(session_name)
+#         if output != last_output:
+#             socketio.emit(f"output-{session_name}", output)
+#             last_output = output
+#         time.sleep(interval)
+#
+#
+# @socketio.on("start")
+# def start(data):
+#     """Begin monitoring the given tmux session (read-only)."""
+#     name = data.get("name")
+#     if not name or name in sessions:
+#         return
+#     sessions[name] = True  # track active sessions
+#     threading.Thread(target=monitor_session, args=(name,), daemon=True).start()
 
 
 if __name__ == "__main__":
