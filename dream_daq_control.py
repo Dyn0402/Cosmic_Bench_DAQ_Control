@@ -358,21 +358,44 @@ def get_pedestals(pedestals_dir, pedestals, run_dir, out_dir=None):
     :return:
     """
     sub_run_name = 'pedestals_noise'  # Standard name for pedestal runs
+    if not os.path.isdir(pedestals_dir):
+        print(f'Pedestals directory `{pedestals_dir}` does not exist.')
+        return None
+
     if pedestals == 'latest':
-        # Find latest pedestal files in pedestals_dir. Directories named pedestals_MM-DD-YYYY_HH-MM-SS
-        pedestal_dirs = []
+        # Find latest pedestal files in pedestals_dir. Directories named pedestals_MM-DD-YY_HH-MM-SS or pedestals_MM-DD-YYYY_HH-MM-SS
+        valid_dirs = []
         for item in os.listdir(pedestals_dir):
-            if os.path.isdir(f'{pedestals_dir}/{item}') and item.startswith('pedestals_'):
-                pedestal_dirs.append(item)
-        if len(pedestal_dirs) == 0:
-            print('No pedestal directories found.')
+            full_path = os.path.join(pedestals_dir, item)
+            if not os.path.isdir(full_path) or not item.startswith('pedestals_'):
+                continue
+
+            # Validate the trailing datetime portion; accept either two- or four-digit year
+            date_part = item[len('pedestals_'):]
+            parsed_dt = None
+            for fmt in ('%m-%d-%y_%H-%M-%S', '%m-%d-%Y_%H-%M-%S'):
+                try:
+                    parsed_dt = datetime.strptime(date_part, fmt)
+                    break
+                except ValueError:
+                    continue
+
+            if parsed_dt is None:
+                # ignore directories that don't match the expected datetime format
+                continue
+
+            valid_dirs.append((parsed_dt, item))
+
+        if not valid_dirs:
+            print('No pedestal directories found matching the expected datetime format.')
             return None
-        # Sort directories by date and get latest
-        pedestal_dirs.sort(key=lambda date_str: datetime.strptime(date_str, 'pedestals_%m-%d-%y_%H-%M-%S'))
-        latest_pedestal_dir = pedestal_dirs[-1]
-        pedestals_prg_dir = f'{pedestals_dir}/{latest_pedestal_dir}/{sub_run_name}/'
+
+        # sort by parsed datetime and pick latest
+        valid_dirs.sort(key=lambda x: x[0])
+        latest_pedestal_dir = valid_dirs[-1][1]
+        pedestals_prg_dir = os.path.join(pedestals_dir, latest_pedestal_dir, sub_run_name) + os.sep
     else:
-        pedestals_prg_dir = f'{pedestals_dir}/{pedestals}/{sub_run_name}/'
+        pedestals_prg_dir = os.path.join(pedestals_dir, pedestals, sub_run_name) + os.sep
 
     # For each .prg file found in pedestals_prg_dir (eg TbSPS25_pedestals_noise_pedthr_251022_14H39_000_04_ped.prg)
     # get the type (_thr.prg or _ped.prg) and feu number (_03_) and copy to run_dir with name reconstructed with these
