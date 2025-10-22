@@ -14,6 +14,7 @@ import re
 from subprocess import Popen, PIPE
 import pty
 from time import sleep
+from datetime import datetime
 import traceback
 import shutil
 import threading
@@ -41,6 +42,8 @@ def main():
                 batch_mode = dream_info['batch_mode']
                 zero_supress = dream_info.get('zero_suppress', False)
                 samples_per_waveform = dream_info.get('n_samples_per_waveform', None)
+                pedestals_dir = dream_info.get('pedestals_dir', None)
+                pedestals = dream_info.get('pedestals', None)
                 original_working_directory = os.getcwd()
 
                 create_dir_if_not_exist(run_directory)
@@ -51,11 +54,9 @@ def main():
                     if 'Start' in res:
                         print(res)
                         res_parts = res.strip().split()
-                        print(f'Res parts: {res_parts}')
                         sub_run_name = res_parts[-3]
                         run_time = float(res_parts[-2])
                         cfg_file_run_time = float(res_parts[-1])
-                        # sub_run_name, run_time, cfg_file_run_time = res.split()[-3], float((res.split()[-2])), res.split()[-1]
                         print(f'Sub-run name: {sub_run_name}, Run time: {run_time} minutes')
                         sub_run_out_raw_inner_dir = f'{out_directory}/{sub_run_name}/{raw_daq_inner_dir}/'
                         create_dir_if_not_exist(sub_run_out_raw_inner_dir)
@@ -70,10 +71,12 @@ def main():
                         # Make cfg from template
                         cfg_run_path = make_config_from_template(sub_run_dir, cfg_template_path, cfg_file_run_time,
                                                                  zero_supress, samples_per_waveform)
-                        # cfg_run_path = os.path.join(os.getcwd(), os.path.basename(cfg_template_path))
 
                         # Copy dream config file to out directory for future reference
                         shutil.copy(cfg_run_path, sub_run_out_raw_inner_dir)
+
+                        if pedestals_dir is not None:  # If pedestals_dir is not None, copy pedestal files to run dir.
+                            get_pedestals(pedestals_dir, pedestals, sub_run_dir, sub_run_out_raw_inner_dir)
 
                         run_command = f'RunCtrl -c {cfg_run_path} -f {sub_run_name}'
                         if batch_mode:
@@ -229,21 +232,6 @@ def copy_files_on_the_fly(sub_run_dir, sub_out_dir, daq_finished_event, check_in
         sleep(check_interval)  # Check every 5 seconds
 
 
-# Done in DAQController
-# def make_config_from_template(cfg_template_path, run_directory, run_time):
-#     cfg_file_name = os.path.basename(cfg_template_path)
-#     cfg_file_path = f'{run_directory}/{cfg_file_name}'.replace('//', '/')
-#     shutil.copy(cfg_template_path, cfg_file_path)
-#     with open(cfg_file_path, 'r') as file:
-#         cfg_lines = file.readlines()
-#     for i, line in enumerate(cfg_lines):
-#         if 'Sys DaqRun Time' in line:
-#             cfg_lines[i] = cfg_lines[i].replace('0', f'{run_time}')
-#     with open(cfg_file_path, 'w') as file:
-#         file.writelines(cfg_lines)
-#     return cfg_file_path
-
-
 def file_num_still_running(fdf_dir, file_num, wait_time=30, silent=False):
     """
     Check if dream DAQ is still running by finding all fdfs with file_num and checking to see if any file size
@@ -358,6 +346,55 @@ def update_config_value(filepath, updates, output_path=None):
 
     with open(output_path, 'w') as f:
         f.writelines(new_lines)
+
+
+def get_pedestals(pedestals_dir, pedestals, run_dir, out_dir=None):
+    """
+    Get pedestal files from specified directory and copy to run directory with proper naming.
+    :param pedestals_dir: Directory containing pedestal runs
+    :param pedestals: 'latest' or specific pedestal run directory name
+    :param run_dir: Directory of current run to copy pedestal files to
+    :param out_dir: If a copy of pedestal files should also be placed in out_dir
+    :return:
+    """
+    sub_run_name = 'pedestals_noise'  # Standard name for pedestal runs
+    if pedestals == 'latest':
+        # Find latest pedestal files in pedestals_dir. Directories named pedestals_MM-DD-YYYY_HH-MM-SS
+        pedestal_dirs = []
+        for item in os.listdir(pedestals_dir):
+            if os.path.isdir(f'{pedestals_dir}/{item}') and item.startswith('pedestals_'):
+                pedestal_dirs.append(item)
+        if len(pedestal_dirs) == 0:
+            print('No pedestal directories found.')
+            return None
+        # Sort directories by date and get latest
+        pedestal_dirs.sort(key=lambda date_str: datetime.strptime(date_str, 'pedestals_%m-%d-%Y_%H-%M-%S'))
+        latest_pedestal_dir = pedestal_dirs[-1]
+        pedestals_prg_dir = f'{pedestals_dir}/{latest_pedestal_dir}/{sub_run_name}/'
+    else:
+        pedestals_prg_dir = f'{pedestals_dir}/{pedestals}/{sub_run_name}/'
+
+    # For each .prg file found in pedestals_prg_dir (eg TbSPS25_pedestals_noise_pedthr_251022_14H39_000_04_ped.prg)
+    # get the type (_thr.prg or _ped.prg) and feu number (_03_) and copy to run_dir with name reconstructed with these
+    # two parameters (eg dream_pedestals_thresholds_03_thr.prg)
+    for file in os.listdir(pedestals_prg_dir):
+        if file.endswith('.prg') and sub_run_name in file:
+            feu_num_search = re.search(r'_(\d{2})_', file)
+            if feu_num_search:
+                feu_num = feu_num_search.group(1)
+                if '_ped.prg' in file:
+                    dest_file_name = f'dream_pedestals_{feu_num}_ped.prg'
+                elif '_thr.prg' in file:
+                    dest_file_name = f'dream_thresholds_{feu_num}_thr.prg'
+                else:
+                    print(f'Unknown pedestal file type for {file}, skipping.')
+                    continue
+                shutil.copy(f'{pedestals_prg_dir}/{file}', f'{run_dir}/{dest_file_name}')
+                if out_dir:
+                    shutil.copy(f'{out_dir}/{file}', f'{run_dir}/{file}')
+                print(f'Copied pedestal file {file} to {dest_file_name}')
+            else:
+                print(f'Could not find FEU number in pedestal file name {file}, skipping.')
 
 
 if __name__ == '__main__':

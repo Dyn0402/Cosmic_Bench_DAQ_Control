@@ -8,65 +8,46 @@ Created as Cosmic_Bench_DAQ_Control/run_config_template.py
 @author: Dylan Neff, Dylan
 """
 
-import sys
 import json
 import copy
 
 
 class Config:
     def __init__(self):
-        self.run_name = 'rd5_strip_vfp_1_fe_test_10-16-25'
-        self.daq_dir = '/local/home/banco/dylan/Run/'  # Maybe kill
-        self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
-        # self.base_out_dir = '/mnt_cosmic_data/'
-        self.base_out_dir = '/local/home/banco/dylan/out_dir/'
-        self.data_out_dir = f'{self.base_out_dir}Run/'
+        # self.run_name = 'rd5_grid_vfp_1_co2_fe55_zs2_10-21-25'
+        self.run_name = 'rd5_grid_vfp_1_co2_10-21-25'
+        # self.daq_dir = '/local/home/usernsw/dylan/Run/'  # Maybe kill
+        # self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
+        self.data_out_dir = '/mnt/cosmic_data/Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
         self.raw_daq_inner_dir = 'raw_daq_data'
         self.decoded_root_inner_dir = 'decoded_root'
         self.filtered_root_inner_dir = 'filtered_root'
         self.m3_tracking_inner_dir = 'm3_tracking_root'
-        self.detector_info_dir = f'{self.base_out_dir}config/detectors/'
-        self.m3_feu_num = None
-        self.power_off_hv_at_end = True  # True to power off HV at end of run
+        self.detector_info_dir = f'/mnt/cosmic_data/config/detectors/'
+        self.m3_feu_num = 1
+        self.power_off_hv_at_end = False  # True to power off HV at end of run
         self.filtering_by_m3 = False  # True to filter by m3 tracking, False to do no filtering
         self.process_on_fly = False  # True to process data on fly, False to process after run
         self.save_fdfs = True  # True to save FDF files, False to delete after decoding
-        self.start_time = None
-        self.write_all_dectors_to_json = True  # Only when making run config json template.
+        self.start_time = None  # '2024-06-03 15:30:00'  # 'YYYY-MM-DD HH:MM:SS' or None to start immediately
+        self.write_all_dectors_to_json = False  # Only when making run config json template.
         self.gas = 'Ar/CO2/Iso 93/5/2'  # Gas type for run
 
-        self.weiner_ps_info = {  # If this exists, check for Weiner LV before applying any HV
-            'ip': '192.168.10.222',
-            'channels': {  # Check only the channels which exist here
-                'U0': {
-                    'expected_voltage': 4.5,  # V
-                    'expected_current': 30,  # A
-                    'voltage_tolerance': 0.4,  # V
-                    'current_tolerance': 5,  # A
-                },
-            }
-        }
-
         self.dream_daq_info = {
-            'ip': '192.168.10.8',
+            # 'ip': '192.168.10.100',
+            'ip': '192.168.10.1',
             'port': 1101,
-            # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_TPOT.cfg',
-            # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_SelfTrigger.cfg',
-            # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_SelfTrigger_thresh.cfg',
-            'daq_config_template_path': '/local/home/banco/dylan/Run/config/TbSPS25_test.cfg',
-            # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/Night_Run.cfg',
-            'run_directory': f'/local/home/banco/dylan/Run/{self.run_name}/',
-            'data_out_dir': f'{self.base_out_dir}Run/{self.run_name}',
+            'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_TPOT.cfg',
+            # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_SelfTrigger_thresh.cfg',
+            'run_directory': f'/local/home/usernsw/dylan/Run/{self.run_name}/',
+            'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
-            'n_samples_per_waveform': 16,  # Number of samples per waveform to configure in DAQ
             'go_timeout': 5 * 60,  # Seconds to wait for 'Go' response from RunCtrl before assuming failure
             'max_run_time_addition': 60 * 5,  # Seconds to add to requested run time before killing run
             'copy_on_fly': True,  # True to copy raw data to out dir during run, False to copy after run
-            'batch_mode': True,  # Run Dream RunCtrl in batch mode. Not implemented for cosmic bench CPU.
-            'zero_suppress': True,  # True to run in zero suppression mode, False to run in full readout mode
-            'pedestals_dir': f'{self.base_out_dir}/pedestals_noise/',  # None to ignore, else top directory for pedestal runs
-            'pedestals': 'latest',  # 'latest' for most recent, otherwise specify directory name, eg "pedestals_10-22-25_13-43-34"
+            'batch_mode': True,  # Run Dream RunCtrl in batch mode. Not implemented for cosmic bench C
+            'zero_suppress': False,  # True to run in zero suppression mode, False to run in full readout mode
         }
 
         self.banco_info = {
@@ -74,17 +55,14 @@ class Config:
             'port': 1100,
             'daq_run_command': 'cd /home/banco/dylan/Run/framework/bin && ./test_multi_noiseocc_int',
             'data_temp_dir': '/home/banco/dylan/Run/data',
-            # 'daq_run_command': 'cd /home/banco/CERNTestBeam/framework/bin && ./test_multi_noiseocc_int',
-            # 'data_temp_dir': '/home/banco/CERNTestBeam/data',
-            # 'data_out_dir': f'{self.base_out_dir}Run/{self.run_name}',
-            'data_out_dir': f'/home/banco/dylan/Run/data_testing',
+            'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
             'data_inner_dir': 'banco_data'
         }
 
         self.dedip196_processor_info = {
             'ip': '132.166.10.196',
             'port': 1200,
-            'run_dir': f'{self.base_out_dir}Run/{self.run_name}',
+            'run_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
             'decoded_root_inner_dir': self.decoded_root_inner_dir,
             'm3_tracking_inner_dir': self.m3_tracking_inner_dir,
@@ -92,24 +70,35 @@ class Config:
             'convert_path': '/local/home/banco/dylan/decode/convert_vec_tree_to_array',
             'detector_info_dir': self.detector_info_dir,
             'filtered_root_inner_dir': self.filtered_root_inner_dir,
-            'out_type': 'both',  # 'vec', 'array', or 'both'
+            'out_type': 'array',  # 'vec', 'array', or 'both'
+            'm3_feu_num': self.m3_feu_num,
+        }
+
+        self.sedip28_processor_info = {
+            'ip': '192.168.10.1',
+            'port': 1200,
+            'run_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
+            'raw_daq_inner_dir': self.raw_daq_inner_dir,
+            'm3_tracking_inner_dir': self.m3_tracking_inner_dir,
+            'tracking_run_dir': '/local/home/usernsw/dylan/m3_tracking/',
+            'tracking_sh_path': '/local/home/usernsw/dylan/m3_tracking/run_tracking_single.sh',
             'm3_feu_num': self.m3_feu_num,
         }
 
         self.hv_control_info = {
-            'ip': '192.168.10.8',
+            'ip': '192.168.10.1',
             'port': 1100,
         }
 
         self.hv_info = {
-            'ip': '192.168.10.199',
+            'ip': '192.168.10.81',
             'username': 'admin',
             'password': 'admin',
-            'n_cards': 6,
+            'n_cards': 4,
             'n_channels_per_card': 12,
             'run_out_dir': self.run_out_dir,
             'hv_monitoring': True,  # True to monitor HV during run, False to not monitor
-            'monitor_interval': 5,  # Seconds between HV monitoring
+            'monitor_interval': 2,  # Seconds between HV monitoring
         }
 
         self.trigger_switch_info = {
@@ -119,36 +108,78 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'quick_test_1',
-                'run_time': 1.5,  # Minutes
+                'sub_run_name': 'quick_test',
+                'run_time': 30,  # Minutes
                 'hvs': {
-                    '2': {
-                        # '0': 300,
-                        # '1': 445,
-                        '0': 15,
-                        '1': 5,
+                    0: {
+                        # 0: 800,
+                        # 1: 800,
+                        # 2: 800,
+                        # 3: 800,
+                        6: 400,
+                        # 7: 460,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
                     },
-                    '5': {
-                        # '0': 800,
-                        # '0': 400,
-                        '0': 20,
+                    1: {
+                        # 0: 0,
+                        # 1: 600,
+                    },
+                    2: {
+                        # 0: 450,
+                    },
+                    3: {
+                        # 1: 410,
+                        # 2: 410,
+                        3: 540,
+                        4: 520,
+                        # 5: 450,
+                        # 6: 450,
+                        # 7: 450,
+                        8: 460,
+                        9: 460,
+                        10: 460,
+                        11: 460,
                     }
                 }
             },
             {
-                'sub_run_name': 'sub_run_2',
-                'run_time': 2,  # Minutes
+                'sub_run_name': 'longer_test',
+                'run_time': 60 * 5,  # Minutes
                 'hvs': {
-                    '2': {
-                        # '0': 300,
-                        # '1': 445,
-                        '0': 10,
-                        '1': 8,
+                    0: {
+                        # 0: 800,
+                        # 1: 800,
+                        # 2: 800,
+                        # 3: 800,
+                        6: 400,
+                        # 7: 460,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
                     },
-                    '5': {
-                        # '0': 800,
-                        # '0': 400,
-                        '0': 12,
+                    1: {
+                        # 0: 0,
+                        # 1: 600,
+                    },
+                    2: {
+                        # 0: 450,
+                    },
+                    3: {
+                        # 1: 410,
+                        # 2: 410,
+                        3: 540,
+                        4: 520,
+                        # 5: 450,
+                        # 6: 450,
+                        # 7: 450,
+                        8: 460,
+                        9: 460,
+                        10: 460,
+                        11: 460,
                     }
                 }
             },
@@ -156,11 +187,12 @@ class Config:
 
         # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
         # template = self.sub_runs[0]
-        # for drift_v in range(50, 800, 50):
+        # drift_vs = [800, 300, 100, 900, 200, 700, 400, 600, 150, 250, 75]
+        # card = 0
+        # channels = [6]
+        # for drift_v in drift_vs:
         #     sub_run = copy.deepcopy(template)
-        #     sub_run['sub_run_name'] = f'drift_{drift_v}'
-        #     card = 0
-        #     channels = [1]
+        #     sub_run['sub_run_name'] = f'drift_{drift_v}V'
         #     for channel in sub_run['hvs'][card]:
         #         if channel in channels:
         #             sub_run['hvs'][card][channel] = drift_v
@@ -180,9 +212,9 @@ class Config:
         # self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
-        #                            'scintillator_top']
-        self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
-                                   'rd5_plein_vfp_1']
+        #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
+        self.included_detectors = ['rd5_grid_vfp_1',
+                                   'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
 
         self.detectors = [
             {
@@ -379,6 +411,57 @@ class Config:
                     'y_2': (3, 8),
                 },
             },
+            # {
+            #     'name': 'inter_grid_1',
+            #     'det_type': 'inter_grid',
+            #     'det_center_coords': {  # Center of detector
+            #         'x': 0,  # mm
+            #         'y': 0,  # mm
+            #         'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
+            #              1 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
+            #     },
+            #     'det_orientation': {
+            #         'x': 0,  # deg  Rotation about x axis
+            #         'y': 0,  # deg  Rotation about y axis
+            #         'z': 0,  # deg  Rotation about z axis
+            #     },
+            #     'hv_channels': {
+            #         'drift': (0, 6),
+            #         # 'resist_1': (3, 7),
+            #         'resist_2': (2, 0)
+            #     },
+            #     'dream_feus': {
+            #         'x_1': (3, 5),  # Runs along x direction, indicates y hit location
+            #         'x_2': (3, 6),
+            #         'y_1': (3, 7),  # Runs along y direction, indicates x hit location
+            #         'y_2': (3, 8),
+            #     },
+            # },
+            # {
+            #     'name': 'strip_grid_1',
+            #     'det_type': 'strip_grid',
+            #     'det_center_coords': {  # Center of detector
+            #         'x': 0,  # mm
+            #         'y': 0,  # mm
+            #         'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
+            #              0 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
+            #     },
+            #     'det_orientation': {
+            #         'x': 0,  # deg  Rotation about x axis
+            #         'y': 0,  # deg  Rotation about y axis
+            #         'z': 0,  # deg  Rotation about z axis
+            #     },
+            #     'hv_channels': {
+            #         'drift': (0, 7),
+            #         'resist_2': (3, 7)
+            #     },
+            #     'dream_feus': {
+            #         'x_1': (3, 1),  # Runs along x direction, indicates y hit location
+            #         'x_2': (3, 2),
+            #         'y_1': (3, 3),  # Runs along y direction, indicates x hit location
+            #         'y_2': (3, 4),
+            #     },
+            # },
             {
                 'name': 'strip_strip_1',
                 'det_type': 'strip_strip',
@@ -496,15 +579,15 @@ class Config:
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
-                    'drift': (5, 0),
-                    'resist_1': (2, 0),
-                    'resist_2': (2, 1)
+                    'drift': (0, 6),
+                    'resist_1': (3, 3),
+                    'resist_2': (3, 4)
                 },
                 'dream_feus': {
-                    'x_1': (1, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (1, 2),
-                    'y_1': (1, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (1, 4),
+                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
+                    'x_2': (6, 2),
+                    'y_1': (6, 3),  # Runs along y direction, indicates x hit location
+                    'y_2': (6, 4),
                 },
             },
             {
@@ -546,24 +629,24 @@ class Config:
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
-                    'drift': (5, 0),
-                    'resist_1': (2, 0),
-                    'resist_2': (2, 1)
+                    'drift': (0, 6),
+                    'resist_1': (3, 3),
+                    'resist_2': (3, 4)
                 },
                 'dream_feus': {
-                    'x_1': (1, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (1, 2),
-                    'y_1': (1, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (1, 4),
+                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
+                    'x_2': (6, 2),
+                    'y_1': (6, 3),  # Runs along y direction, indicates x hit location
+                    'y_2': (6, 4),
                 },
             },
             {
                 'name': 'rd5_strip_2',
                 'det_type': 'rd5_strip',
                 'det_center_coords': {  # Center of detector
-                    'x': 24,  # mm
-                    'y': 75.6,  # mm
-                    'z': 720.8,  # mm
+                    'x': -34.16,  # mm
+                    'y': 33.09,  # mm
+                    'z': 708.9,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -608,6 +691,31 @@ class Config:
                 },
             },
             {
+                'name': 'rd5_grid_vfp_1',
+                'det_type': 'rd5_grid_vfp',
+                'det_center_coords': {  # Center of detector
+                    'x': 24,  # mm
+                    'y': 75.6,  # mm
+                    'z': 720.8,  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': {
+                    'drift': (5, 0),
+                    'resist_1': (2, 0),
+                    'resist_2': (2, 1)
+                },
+                'dream_feus': {
+                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
+                    'x_2': (6, 2),
+                    'y_1': (6, 3),  # Runs along y direction, indicates x hit location
+                    'y_2': (6, 4),
+                },
+            },
+            {
                 'name': 'p2_1',
                 'det_type': 'p2',
                 'det_center_coords': {  # Center of detector
@@ -643,6 +751,94 @@ class Config:
                     '14': (4, 6),
                     '15': (4, 7),
                     '16': (4, 8),
+                },
+            },
+            {
+                'name': 'm3_bot_bot',
+                'det_type': 'm3',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': 24,  # mm  28 from geometry diagram, 24 from m3 config json
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': {  # Don't know HTM# matching to geometric layout, guessing
+                    'drift': (0, 8),
+                    'mesh_1': (3, 8)
+                },
+                'dream_feus': {  # Guesses
+                    'x_1': (1, 1),  # Runs along x direction, indicates y hit location
+                    'y_1': (1, 2),  # Runs along y direction, indicates x hit location
+                },
+            },
+            {
+                'name': 'm3_bot_top',
+                'det_type': 'm3',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': 144,  # mm  145 from geometry diagram, 144 from m3 config json
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': {  # Don't know HTM# matching to geometric layout, guessing
+                    'drift': (0, 9),
+                    'mesh_1': (3, 9)
+                },
+                'dream_feus': {  # Guesses
+                    'x_1': (1, 3),  # Runs along x direction, indicates y hit location
+                    'y_1': (1, 4),  # Runs along y direction, indicates x hit location
+                },
+            },
+            {
+                'name': 'm3_top_bot',
+                'det_type': 'm3',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': 1185,  # mm  1163 + 28 from geometry diagram, 1185 from m3 config json
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': {  # Don't know HTM# matching to geometric layout, guessing
+                    'drift': (0, 10),
+                    'mesh_1': (3, 10)
+                },
+                'dream_feus': {  # Guesses
+                    'x_1': (1, 5),  # Runs along x direction, indicates y hit location
+                    'y_1': (1, 6),  # Runs along y direction, indicates x hit location
+                },
+            },
+            {
+                'name': 'm3_top_top',
+                'det_type': 'm3',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': 1302,  # mm  1163 + 145 from geometry diagram, 1302 from m3 config json
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': {  # Don't know HTM# matching to geometric layout, guessing
+                    'drift': (0, 11),
+                    'mesh_1': (3, 11)
+                },
+                'dream_feus': {  # Guesses
+                    'x_1': (1, 7),  # Runs along x direction, indicates y hit location
+                    'y_1': (1, 8),  # Runs along y direction, indicates x hit location
                 },
             },
             {
@@ -702,14 +898,8 @@ class Config:
 
 
 if __name__ == '__main__':
-    # out_dir = '/local/home/dn277127/Bureau/beam_test_25/'
-    # out_template_dir = 'config/json_templates/'
-    out_run_dir = 'config/json_run_configs/'
-
-    config_name = 'run_config.json'
-
+    out_dir = '/local/home/dn277127/Bureau/beam_test_25/'
+    # out_dir = 'C:/Users/Dylan/Desktop/banco_test3/'
     config = Config()
-
-    config.write_to_file(f'{out_run_dir}{config_name}')
-
+    config.write_to_file(f'{out_dir}run_config_test.json')
     print('donzo')
