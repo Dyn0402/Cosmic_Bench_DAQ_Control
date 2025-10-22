@@ -86,6 +86,7 @@ def main():
 
         if config.generate_external_triggers:
             trigger_gen.send('send triggers 1000000 1000 0.1')
+            trigger_gen.receive()
 
         if banco:
             trigger_switch.send('Connected to daq_control')

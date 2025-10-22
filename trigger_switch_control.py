@@ -125,14 +125,18 @@ def trigger_switch(state, pin=17):
         print('Unknown trigger switch state')
 
 
-def send_triggers(num_triggers=100, freq_hz=10, pulse_freq_ratio=1, pulse_level='low', pin=17):
+def send_triggers(num_triggers=100, freq_hz=10, pulse_freq_ratio=1, pulse_level='low', pin=17, stop_event=None,
+                  report_interval=1.0):
     """
-    Send a number of triggers at a given frequency
+    Send a number of triggers at a given frequency.
+
     :param num_triggers: Number of triggers to send
     :param freq_hz: Frequency in Hz to send triggers
     :param pulse_freq_ratio: Ratio of pulse width to frequency period (0 < ratio <= 1)
     :param pulse_level: Level of the pulse, either 'low' or 'high'
     :param pin: GPIO pin number to use
+    :param stop_event: threading.Event to allow early stop (optional)
+    :param report_interval: seconds between printing the current trigger number (None or <=0 to disable)
     :return:
     """
     period = 1.0 / freq_hz
@@ -140,18 +144,32 @@ def send_triggers(num_triggers=100, freq_hz=10, pulse_freq_ratio=1, pulse_level=
     delay = period - pulse_length
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(pin, GPIO.OUT)
-    for _ in range(num_triggers):
-        if pulse_level == 'low':
-            GPIO.output(pin, GPIO.LOW)
-        else:
-            GPIO.output(pin, GPIO.HIGH)
-        time.sleep(pulse_length)
-        if pulse_level == 'low':
-            GPIO.output(pin, GPIO.HIGH)
-        else:
-            GPIO.output(pin, GPIO.LOW)
-        time.sleep(delay)
-    GPIO.cleanup(pin)
+
+    last_report = time.perf_counter()
+    try:
+        for i in range(1, num_triggers + 1):
+            if stop_event and stop_event.is_set():
+                break
+
+            if pulse_level == 'low':
+                GPIO.output(pin, GPIO.LOW)
+            else:
+                GPIO.output(pin, GPIO.HIGH)
+
+            time.sleep(pulse_length)
+
+            if pulse_level == 'low':
+                GPIO.output(pin, GPIO.HIGH)
+            else:
+                GPIO.output(pin, GPIO.LOW)
+
+            time.sleep(delay)
+
+            if report_interval and report_interval > 0 and (time.perf_counter() - last_report) >= report_interval:
+                print(f'Trigger {i}')
+                last_report = time.perf_counter()
+    finally:
+        GPIO.cleanup(pin)
 
 
 if __name__ == '__main__':
