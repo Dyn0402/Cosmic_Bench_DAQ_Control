@@ -691,7 +691,7 @@ if __name__ == '__main__':
     # out_template_dir = 'config/json_templates/'
     out_run_dir = 'config/json_run_configs/'
 
-    config_name = 'run_config.json'
+    config_name = 'run_config_pedestals.json'
 
     config = Config()
 
