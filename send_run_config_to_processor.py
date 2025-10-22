@@ -9,7 +9,7 @@ Created as Cosmic_Bench_DAQ_Control/send_run_config_to_processor.py
 """
 
 import sys
-import Client
+from Client import Client
 
 RUNCONFIG_REL_PATH = "config/json_run_configs/"
 
