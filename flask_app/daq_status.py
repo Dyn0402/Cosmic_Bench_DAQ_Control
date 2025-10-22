@@ -262,9 +262,14 @@ def get_trigger_gen_control_status():
 
     # collect trigger number if present (e.g. `Trigger 103343`)
     fields = []
-    trg_matches = re.findall(r"\bTrigger\s+(\d+)\b", output)
-    if trg_matches:
-        fields.append({"label": "Trigger", "value": trg_matches[-1]})
+    trg_iter = list(re.finditer(r"\bTrigger\s+(\d+)\b", output))
+    if trg_iter:
+        last_trg = trg_iter[-1]
+        tr_num = last_trg.group(1)
+        # Only include trigger if there is no "Stopped sending triggers" after this match
+        if "Stopped sending triggers" not in output[last_trg.end():]:
+            fields.append({"label": "Trigger", "value": tr_num})
+
     for line in reversed(output.splitlines()):
         for flag, status, color in rules:
             if flag in line:
@@ -289,6 +294,7 @@ def get_banco_tracker_status():
         ("Waiting for trigger...", "RUNNING", "success"),
         ("Triggers to the MOSAIC (trgCount)", "RUNNING", "success"),
         ("ROOT files ready to be closed", "RUNNING", "success"),
+        ('- trains: ', "RUNNING", "success"),
         ("Banco DAQ stopped", "STOPPED", "warning"),
         ("Listening on ", "WAITING", "secondary"),
     ]

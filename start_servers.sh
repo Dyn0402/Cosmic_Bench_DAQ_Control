@@ -27,6 +27,7 @@ start_tmux() {
 start_tmux hv_control "python hv_control.py"
 start_tmux dream_daq "python dream_daq_control.py"
 start_tmux decoder "python processing_control.py"
+start_tmux processor "python processor_server.py"
 start_tmux daq_control "echo 'Daq control session started'"
 start_tmux trigger_veto_control "bash_scripts/start_trigger_veto_control.sh"
 start_tmux trigger_gen_control "bash_scripts/start_trigger_gen_control.sh"

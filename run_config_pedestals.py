@@ -16,12 +16,10 @@ from datetime import datetime
 
 class Config:
     def __init__(self):
-        # self.run_name = 'rd5_plein_vfp_1_fe_test2_10-15-25'
-        # self.run_name = 'beam_test_dream_banco_daq_sync_test_10-15-25'
         date_time_str = datetime.now().strftime('%m-%d-%y_%H-%M-%S')
         self.run_name = f'pedestals_{date_time_str}'
-        self.daq_dir = '/local/home/banco/dylan/Run/'  # Maybe kill
-        self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
+        # self.daq_dir = '/local/home/banco/dylan/Run/'  # Maybe kill
+        # self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
         # self.base_out_dir = '/mnt_cosmic_data/'
         self.base_out_dir = '/local/home/banco/dylan/out_dir/'
         self.data_out_dir = f'{self.base_out_dir}pedestals_noise/'
@@ -68,21 +66,6 @@ class Config:
             'data_inner_dir': 'banco_data'
         }
 
-        # self.dedip196_processor_info = {
-        #     'ip': '132.166.10.196',
-        #     'port': 1200,
-        #     'run_dir': f'{self.base_out_dir}Run/{self.run_name}',
-        #     'raw_daq_inner_dir': self.raw_daq_inner_dir,
-        #     'decoded_root_inner_dir': self.decoded_root_inner_dir,
-        #     'm3_tracking_inner_dir': self.m3_tracking_inner_dir,
-        #     'decode_path': '/local/home/banco/dylan/decode/decode',
-        #     'convert_path': '/local/home/banco/dylan/decode/convert_vec_tree_to_array',
-        #     'detector_info_dir': self.detector_info_dir,
-        #     'filtered_root_inner_dir': self.filtered_root_inner_dir,
-        #     'out_type': 'both',  # 'vec', 'array', or 'both'
-        #     'm3_feu_num': self.m3_feu_num,
-        # }
-
         self.hv_control_info = {
             'ip': '192.168.10.8',
             'port': 1100,
@@ -120,18 +103,6 @@ class Config:
                 }
             },
         ]
-
-        # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
-        # template = self.sub_runs[0]
-        # for drift_v in range(50, 800, 50):
-        #     sub_run = copy.deepcopy(template)
-        #     sub_run['sub_run_name'] = f'drift_{drift_v}'
-        #     card = 0
-        #     channels = [1]
-        #     for channel in sub_run['hvs'][card]:
-        #         if channel in channels:
-        #             sub_run['hvs'][card][channel] = drift_v
-        #     self.sub_runs.append(sub_run)
 
         self.bench_geometry = {
             'p1_z': 227,  # mm  To the top of P1 from the top of PB

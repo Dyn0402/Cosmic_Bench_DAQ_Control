@@ -18,6 +18,7 @@ import json
 import time
 from pathlib import Path
 from typing import Dict, Any, Optional
+from threading import Event
 
 from Client import Client
 from common_functions import get_feu_num_from_fdf_file_name, get_file_num_from_fdf_file_name
@@ -193,14 +194,19 @@ class TrackerProcessorManager:
 
 
 class Processor:
-    def __init__(self, config_path: str):
+    def __init__(self, config_path: str, stop_event: Optional[Event] = None):
+        self.config_path = config_path
         self.config = self._load_config(config_path)
         self.output_dir = Path(self.config["run_out_dir"])
+        self.stop_event = stop_event or Event()
 
         self.decoder: Optional[DecoderProcessorManager] = None
         self.tracker: Optional[TrackerProcessorManager] = None
 
     def _init_processors(self):
+        self.tracker = None
+        self.decoder = None
+
         if "sedip28_processor_info" in self.config:  # Need to also clean up now
             self.tracker = TrackerProcessorManager(self.config, self.output_dir)
 
@@ -236,7 +242,7 @@ class Processor:
         Wait for new files and process them accordingly.
         :return:
         """
-        while True:
+        while not self.stop_event.is_set():
             self._init_processors()
             if self.tracker:
                 print('Checking for new tracking files to process')
@@ -250,4 +256,8 @@ class Processor:
                     dec.process_all()
                 print('Finished decoding\n')
             print(f'Waiting to check for new files again, good time to exit...\n')
-            time.sleep(60)  # Wait before checking for new files again
+            for _ in range(60):  # 1-minute sleep, but interruptible
+                if self.stop_event.is_set():
+                    print('Stop signal received. Exiting on-the-fly processing.')
+                    return
+                time.sleep(1)
