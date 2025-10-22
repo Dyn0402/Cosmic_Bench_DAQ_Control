@@ -46,7 +46,7 @@ def main():
         # Open the original json config path file and update the run_name
         with open(config_path, 'r') as f:
             config_json = f.read()
-        config_json = config_json.replace(f'"run_name": "{run_name}"', f'"run_name": "{new_run_name}"')
+        config_json = config_json.replace(run_name, new_run_name)  # Not very robust but works for now
         with open(config_path, 'w') as f:
             f.write(config_json)
         print(f"Updated run name to {new_run_name} in config.")
