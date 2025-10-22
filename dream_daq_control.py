@@ -391,7 +391,7 @@ def get_pedestals(pedestals_dir, pedestals, run_dir, out_dir=None):
                     continue
                 shutil.copy(f'{pedestals_prg_dir}/{file}', f'{run_dir}/{dest_file_name}')
                 if out_dir:
-                    shutil.copy(f'{out_dir}/{file}', f'{run_dir}/{file}')
+                    shutil.copy(f'{run_dir}/{file}', f'{out_dir}{file}')
                 print(f'Copied pedestal file {file} to {dest_file_name}')
             else:
                 print(f'Could not find FEU number in pedestal file name {file}, skipping.')
