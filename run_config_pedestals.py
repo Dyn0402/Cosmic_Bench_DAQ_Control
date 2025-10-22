@@ -44,13 +44,13 @@ class Config:
             'ip': '192.168.10.8',
             'port': 1101,
             'daq_config_template_path': '/local/home/banco/dylan/Run/config/TbSPS25_ped.cfg',
-            'run_directory': f'/local/home/banco/dylan/Run/{self.run_name}/',
+            'run_directory': f'{self.base_out_dir}Run/{self.run_name}',
             'data_out_dir': f'{self.base_out_dir}Run/{self.run_name}',
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
             'n_samples_per_waveform': 16,  # Number of samples per waveform to configure in DAQ
             'go_timeout': 5 * 60,  # Seconds to wait for 'Go' response from RunCtrl before assuming failure
             'max_run_time_addition': 60 * 5,  # Seconds to add to requested run time before killing run
-            'copy_on_fly': True,  # True to copy raw data to out dir during run, False to copy after run
+            'copy_on_fly': False,  # True to copy raw data to out dir during run, False to copy after run
             'batch_mode': True  # Run Dream RunCtrl in batch mode. Not implemented for cosmic bench CPU.
         }
 
@@ -104,37 +104,9 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'night_test_quick',
-                'run_time': 60 * 2,  # Minutes
+                'sub_run_name': 'pedestal_dummy',
+                'run_time': 1,  # Minutes
                 'hvs': {
-                    '2': {
-                        # '0': 300,
-                        # '1': 445,
-                        '0': 10,
-                        '1': 10,
-                    },
-                    '5': {
-                        # '0': 800,
-                        # '0': 400,
-                        '0': 20,
-                    }
-                }
-            },
-            {
-                'sub_run_name': 'night_test_long',
-                'run_time': 60 * 8,  # Minutes
-                'hvs': {
-                    '2': {
-                        # '0': 300,
-                        # '1': 445,
-                        '0': 10,
-                        '1': 10,
-                    },
-                    '5': {
-                        # '0': 800,
-                        # '0': 400,
-                        '0': 20,
-                    }
                 }
             },
         ]
