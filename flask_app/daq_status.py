@@ -213,7 +213,7 @@ def get_daq_control_status():
     return {"status": "UNKNOWN STATE", "color": "danger", "fields": fields}
 
 
-def get_trigger_control_status():
+def get_trigger_veto_control_status():
     try:
         output = subprocess.check_output(
             ["tmux", "capture-pane", "-pS", "-10", "-t", "trigger_control:0.0"],

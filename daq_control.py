@@ -85,6 +85,8 @@ def main():
         dream_daq.send_json(config.dream_daq_info)
 
         if config.generate_external_triggers:
+            trigger_gen.send('Connected to daq_control')
+            trigger_gen.receive()
             trigger_gen.send('send triggers 1000000 1000 0.1')
             trigger_gen.receive()
 

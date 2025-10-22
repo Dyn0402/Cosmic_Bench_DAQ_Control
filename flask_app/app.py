@@ -18,7 +18,7 @@ import pandas as pd
 from flask import Flask, render_template, jsonify, request
 from flask_socketio import SocketIO
 
-from daq_status import (get_dream_daq_status, get_hv_control_status, get_daq_control_status, get_trigger_control_status,
+from daq_status import (get_dream_daq_status, get_hv_control_status, get_daq_control_status, get_trigger_veto_control_status,
                         get_decoder_status, get_banco_tracker_status)
 
 BASE_DIR = "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control"
@@ -52,8 +52,8 @@ def status_all():
             statuses[s] = get_hv_control_status()
         elif s == "daq_control":
             statuses[s] = get_daq_control_status()
-        elif s == "trigger_control":
-            statuses[s] = get_trigger_control_status()
+        elif s == "trigger_veto_control":
+            statuses[s] = get_trigger_veto_control_status()
         elif s == "decoder":
             statuses[s] = get_decoder_status()
         elif s == "banco_tracker":
