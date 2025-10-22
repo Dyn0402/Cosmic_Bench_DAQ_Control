@@ -91,7 +91,7 @@ def main():
                 msg = server.receive()
                 while msg and msg.lower() != "finished":
                     if msg.startswith("config "):
-                        config_path = msg.replace("config", "").strip()
+                        config_path = msg.replace("config ", "").strip()
                         print(f"[Server] Received config: {config_path}")
 
                         # Stop current processing if needed
