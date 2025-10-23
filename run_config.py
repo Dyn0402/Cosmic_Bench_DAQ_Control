@@ -14,11 +14,12 @@ import copy
 
 
 class Config:
-    def __init__(self, config_path=None):
-        # self.run_name = 'rd5_strip_vfp_1_fe_test_10-16-25'
-        self.run_name = 'beam_daq_test'
-        # self.daq_dir = '/local/home/banco/dylan/Run/'  # Maybe kill
-        # self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
+    def __init__(self):
+        # self.run_name = 'rd5_plein_vfp_1_fe_test_10-16-25'
+        # self.run_name = 'beam_test_dream_banco_daq_sync_test_10-16-25'
+        self.run_name = 'night_test_non_zs_config2-2_10-23-25'
+        self.daq_dir = '/local/home/banco/dylan/Run/'  # Maybe kill
+        self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
         # self.base_out_dir = '/mnt_cosmic_data/'
         self.base_out_dir = '/local/home/banco/dylan/out_dir/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
@@ -37,18 +38,7 @@ class Config:
         self.write_all_dectors_to_json = True  # Only when making run config json template.
         self.generate_external_triggers = False  # If true, use raspberry pi to generate external triggers for DAQ
         self.gas = 'Ar/CO2/Iso 93/5/2'  # Gas type for run
-
-        self.weiner_ps_info = {  # If this exists, check for Weiner LV before applying any HV
-            'ip': '192.168.10.222',
-            'channels': {  # Check only the channels which exist here
-                'U0': {
-                    'expected_voltage': 4.5,  # V
-                    'expected_current': 30,  # A
-                    'voltage_tolerance': 0.4,  # V
-                    'current_tolerance': 5,  # A
-                },
-            }
-        }
+        self.trigger_threshold = "6 mV on amp mean channel"
 
         self.dream_daq_info = {
             'ip': '192.168.10.8',
@@ -56,18 +46,20 @@ class Config:
             # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_TPOT.cfg',
             # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_SelfTrigger.cfg',
             # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_SelfTrigger_thresh.cfg',
-            'daq_config_template_path': '/local/home/banco/dylan/Run/config/TbSPS25_test.cfg',
+            # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/TbSPS25_test.cfg',
             # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/Night_Run.cfg',
+            'daq_config_template_path': '/local/home/banco/dylan/Run/config/Night_Run2.cfg',
             'run_directory': f'/local/home/banco/dylan/Run/{self.run_name}/',
             'data_out_dir': f'{self.base_out_dir}Run/{self.run_name}',
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
-            'n_samples_per_waveform': 16,  # Number of samples per waveform to configure in DAQ
+            # 'n_samples_per_waveform': 16,  # Number of samples per waveform to configure in DAQ
+            'n_samples_per_waveform': 100,  # Number of samples per waveform to configure in DAQ
             'go_timeout': 5 * 60,  # Seconds to wait for 'Go' response from RunCtrl before assuming failure
             'max_run_time_addition': 60 * 5,  # Seconds to add to requested run time before killing run
             'copy_on_fly': True,  # True to copy raw data to out dir during run, False to copy after run
             'batch_mode': True,  # Run Dream RunCtrl in batch mode. Not implemented for cosmic bench CPU.
-            'zero_suppress': True,  # True to run in zero suppression mode, False to run in full readout mode
-            'pedestals_dir': f'{self.base_out_dir}pedestals_noise/',  # None to ignore, else top directory for pedestal runs
+            'zero_suppress': False,  # True to run in zero suppression mode, False to run in full readout mode
+            'pedestals_dir': None,  # None to ignore, else top directory for pedestal runs
             'pedestals': 'latest',  # 'latest' for most recent, otherwise specify directory name, eg "pedestals_10-22-25_13-43-34"
         }
 
@@ -84,7 +76,7 @@ class Config:
         }
 
         self.dedip196_processor_info = {
-            'ip': '192.168.10.8',
+            'ip': '132.166.10.196',
             'port': 1200,
             'run_dir': f'{self.base_out_dir}Run/{self.run_name}',
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
@@ -129,37 +121,21 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'quick_test_1',
-                'run_time': 1.5,  # Minutes
+                'sub_run_name': 'night_test_short',
+                'run_time': 30,  # Minutes
                 'hvs': {
                     '2': {
-                        # '0': 300,
-                        # '1': 445,
-                        '0': 15,
-                        '1': 5,
+                        '2': 54,
                     },
-                    '5': {
-                        # '0': 800,
-                        # '0': 400,
-                        '0': 20,
-                    }
                 }
             },
             {
-                'sub_run_name': 'sub_run_2',
-                'run_time': 2,  # Minutes
+                'sub_run_name': 'night_test_long',
+                'run_time': 60 * 10,  # Minutes
                 'hvs': {
                     '2': {
-                        # '0': 300,
-                        # '1': 445,
-                        '0': 10,
-                        '1': 8,
+                        '2': 54,
                     },
-                    '5': {
-                        # '0': 800,
-                        # '0': 400,
-                        '0': 12,
-                    }
                 }
             },
         ]
@@ -191,8 +167,10 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'scintillator_top']
-        self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
-                                   'rd5_plein_vfp_1']
+        self.included_detectors = [  # 'banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
+                                   # 'rd5_plein_vfp_1',
+            'scintillator_test'
+        ]
 
         self.detectors = [
             {
@@ -695,13 +673,30 @@ class Config:
                     'xy': (3, 4, 20),
                 }
             },
+            {
+                'name': 'scintillator_test',
+                'det_type': 'scintillator',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': 1412,  # mm  1163 + 145 + 110 from geometry diagram
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'dream_feus': {
+                    'xy': (6, 7),
+                },
+                'dream_feu_channels': {
+                    'xy': (6, 7, 52),
+                }
+            },
         ]
 
         if not self.write_all_dectors_to_json:
             self.detectors = [det for det in self.detectors if det['name'] in self.included_detectors]
-
-        if config_path:  # Clear everything and load from file
-            self.load_from_file(config_path)
 
     def write_to_file(self, file_path):
         with open(file_path, 'w') as file:
