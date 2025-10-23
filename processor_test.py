@@ -28,7 +28,8 @@ def main():
     # processor = Processor('/local/home/banco/dylan/out_dir/Run/night_test_non_zs_config2-2_10-20-25/run_config.json')
     # processor = Processor('/mnt/cosmic_data/Run/rd5_grid_vfp_1_co2_fe55_zs2_10-21-25/run_config.json')
     # processor = Processor('/mnt/cosmic_data/Run/rd5_grid_vfp_1_co2_10-21-25/run_config.json')
-    processor = Processor('/mnt/beam_test_25_data/rd5_grid_vfp_1_co2_10-21-25/run_config.json')
+    # processor = Processor('/mnt/beam_test_25_data/rd5_grid_vfp_1_co2_10-21-25/run_config.json')
+    processor = Processor('/local/home/banco/dylan/out_dir/Run/night_test_non_zs_config2-2_10-23-25/run_config.json')
     # processor.config['save_fds'] = True
 
     # processor.process_all()

@@ -1,0 +1,10 @@
+{
+    "det_type": "rd5_grid_esl",
+    "strip_map_type": "rd5",
+    "resist_map_type": "grid_esl",
+    "det_size": {
+        "x": 128.5,
+        "y": 154.2,
+        "z": 4
+    }
+}
