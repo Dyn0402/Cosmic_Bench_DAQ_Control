@@ -11,7 +11,7 @@ Created as Cosmic_Bench_DAQ_Control/dream_daq_control
 import os
 import sys
 import re
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, STDOUT
 import pty
 from time import sleep
 from datetime import datetime
@@ -81,8 +81,6 @@ def main():
                         run_command = f'RunCtrl -c {cfg_run_path} -f {sub_run_name}'
                         if batch_mode:
                             run_command += ' -b'
-
-                        input(f'Running command: {run_command}, press Enter to continue...')
 
                         process = Popen(run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, text=True)
                         start, taking_pedestals, run_successful = time.time(), False, True
