@@ -43,7 +43,8 @@ class Config:
             # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_TPOT.cfg',
             'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_TPOT_P2.cfg',
             # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_SelfTrigger_thresh.cfg',
-            'run_directory': f'/local/home/usernsw/dylan/Run/{self.run_name}/',
+            # 'run_directory': f'/local/home/usernsw/dylan/Run/{self.run_name}/',
+            'run_directory': f'/data/cosmic_data/Run/{self.run_name}/',
             'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
             'go_timeout': 7 * 60,  # Seconds to wait for 'Go' response from RunCtrl before assuming failure
