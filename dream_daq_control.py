@@ -97,9 +97,9 @@ def main():
                         while True:
                             output = process.stdout.readline()
 
-                            if output == '' and process.poll() is not None:
-                                server.send("Dream DAQ has finished")  # If only taking pedestals or a failure
-                                break
+                            # if output == '' and process.poll() is not None:
+                            #     server.send("Dream DAQ has finished")  # If only taking pedestals or a failure
+                            #     break
 
                             if batch_mode:
                                 if not taking_pedestals and '_TakePedThr' in output.strip():
@@ -122,8 +122,9 @@ def main():
                                     server.send('Dream DAQ started')
                                     break
 
-                            if output.strip() != '':
-                                print(output.strip())
+                            # if output.strip() != '':
+                            #     print(output.strip())
+                            print(output)
 
                             pedestals_time_out = time.time() - start > go_timeout and taking_pedestals
                             run_time_out = time.time() - start > max_run_time * 60
