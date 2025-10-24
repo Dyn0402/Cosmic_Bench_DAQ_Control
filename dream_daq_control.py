@@ -82,6 +82,8 @@ def main():
                         if batch_mode:
                             run_command += ' -b'
 
+                        input(f'Running command: {run_command}, press Enter to continue...')
+
                         process = Popen(run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
                         start, taking_pedestals, run_successful = time.time(), False, True
                         server.send('Dream DAQ starting')
@@ -94,16 +96,12 @@ def main():
                                                                                args=copy_files_args)
                             copy_files_on_the_fly_thread.start()
 
-                        n_polls = 0
                         while True:
                             output = process.stdout.readline()
 
                             if output == '' and process.poll() is not None:
-                                n_polls += 1
-                                if n_polls >= 120:
-                                    server.send("Dream DAQ has finished")  # If only taking pedestals or a failure
-                                    break
-                                sleep(1)
+                                server.send("Dream DAQ has finished")  # If only taking pedestals or a failure
+                                break
                             else:
                                 n_polls = 0
 
