@@ -15,7 +15,8 @@ import copy
 class Config:
     def __init__(self):
         # self.run_name = 'rd5_grid_vfp_1_co2_fe55_zs2_10-21-25'
-        self.run_name = 'rd5_plein_esl_1_co2_10-23-25'
+        # self.run_name = 'rd5_plein_esl_1_co2_10-23-25'
+        self.run_name = 'rd5_strip2_p2_weekend_scan_10-24-25'
         # self.daq_dir = '/local/home/usernsw/dylan/Run/'  # Maybe kill
         # self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
         self.data_out_dir = '/mnt/cosmic_data/Run/'
@@ -39,7 +40,8 @@ class Config:
             # 'ip': '192.168.10.100',
             'ip': '192.168.10.1',
             'port': 1101,
-            'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_TPOT.cfg',
+            # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_TPOT.cfg',
+            'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_TPOT_P2.cfg',
             # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_SelfTrigger_thresh.cfg',
             'run_directory': f'/local/home/usernsw/dylan/Run/{self.run_name}/',
             'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
@@ -117,95 +119,51 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'test',
-                'run_time': 60 * 40,  # Minutes
+                'sub_run_name': 'eic_drift_850V_p2_mesh_420V',
+                'run_time': 60 * 5,  # Minutes
                 'hvs': {
                     0: {
-                        # 0: 800,
-                        # 1: 800,
-                        # 2: 800,
-                        # 3: 800,
-                        6: 420,
-                        # 7: 460,
+                        6: 850,
                         8: 500,
                         9: 500,
                         10: 500,
                         11: 500,
                     },
                     1: {
-                        # 0: 0,
-                        # 1: 600,
-                    },
-                    2: {
-                        # 0: 450,
+                        0: 700,
+                        1: 420,
                     },
                     3: {
-                        # 1: 410,
-                        # 2: 410,
-                        3: 320,
-                        4: 585,
-                        # 5: 450,
-                        # 6: 450,
-                        # 7: 450,
-                        8: 460,
-                        9: 460,
-                        10: 460,
-                        11: 460,
+                        3: 530,
+                        4: 530,
+                        8: 455,
+                        9: 455,
+                        10: 455,
+                        11: 455,
                     }
                 }
             },
-            # {
-            #     'sub_run_name': 'longer_test',
-            #     'run_time': 60 * 5,  # Minutes
-            #     'hvs': {
-            #         0: {
-            #             # 0: 800,
-            #             # 1: 800,
-            #             # 2: 800,
-            #             # 3: 800,
-            #             6: 400,
-            #             # 7: 460,
-            #             8: 500,
-            #             9: 500,
-            #             10: 500,
-            #             11: 500,
-            #         },
-            #         1: {
-            #             # 0: 0,
-            #             # 1: 600,
-            #         },
-            #         2: {
-            #             # 0: 450,
-            #         },
-            #         3: {
-            #             # 1: 410,
-            #             # 2: 410,
-            #             3: 100,
-            #             4: 520,
-            #             # 5: 450,
-            #             # 6: 450,
-            #             # 7: 450,
-            #             8: 460,
-            #             9: 460,
-            #             10: 460,
-            #             11: 460,
-            #         }
-            #     }
-            # },
         ]
 
         # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
-        # template = self.sub_runs[0]
-        # drift_vs = [800, 300, 100, 900, 200, 700, 400, 600, 150, 250, 75]
-        # card = 0
-        # channels = [6]
-        # for drift_v in drift_vs:
-        #     sub_run = copy.deepcopy(template)
-        #     sub_run['sub_run_name'] = f'drift_{drift_v}V'
-        #     for channel in sub_run['hvs'][card]:
-        #         if channel in channels:
-        #             sub_run['hvs'][card][channel] = drift_v
-        #     self.sub_runs.append(sub_run)
+        template = self.sub_runs[0]
+        eic_drift_vs = [50, 100, 150, 200, 300, 400, 500, 600, 700, 800]
+        p2_mesh_vs = [415, 410, 405, 400, 395, 390, 385, 380, 375, 370]
+
+        drift_card_channel = {'card': 0, 'channel': 6}
+        mesh_card_channel = {'card': 1, 'channel': 1}
+
+        # Create sub-runs
+        for drift_v, mesh_v in zip(eic_drift_vs, p2_mesh_vs):
+            sub_run = copy.deepcopy(template)
+            sub_run["sub_run_name"] = f"eic_drift_{drift_v}V_p2_mesh_{mesh_v}V"
+
+            # Set the voltages
+            sub_run["hvs"][drift_card_channel['card']][drift_card_channel['channel']] = drift_v
+            sub_run["hvs"][mesh_card_channel['card']][mesh_card_channel['channel']] = mesh_v
+
+            self.sub_runs.append(sub_run)
+
 
         self.bench_geometry = {
             'p1_z': 227,  # mm  To the top of P1 from the top of PB
@@ -222,7 +180,7 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
-        self.included_detectors = ['rd5_plein_esl_1',
+        self.included_detectors = ['rd5_strip_2', 'p2_1',
                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
 
         self.detectors = [
@@ -668,10 +626,10 @@ class Config:
                     'resist_2': (3, 4)
                 },
                 'dream_feus': {
-                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (6, 2),
-                    'y_1': (6, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (6, 4),
+                    'x_1': (6, 0),  # Runs along x direction, indicates y hit location
+                    'x_2': (6, 1),
+                    'y_1': (6, 2),  # Runs along y direction, indicates x hit location
+                    'y_2': (6, 3),
                 },
             },
             {
@@ -765,26 +723,30 @@ class Config:
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
-                    'drift': (1, 1),
-                    'mesh': (1, 0),
+                    'drift': (1, 0),
+                    'mesh': (1, 1),
                 },
                 'dream_feus': {
-                    '1': (3, 1),
-                    '2': (3, 2),
-                    '3': (3, 3),
-                    '4': (3, 4),
-                    '5': (3, 5),
-                    '6': (3, 6),
-                    '7': (3, 7),
-                    '8': (3, 8),
-                    '9': (4, 1),
-                    '10': (4, 2),
-                    '11': (4, 3),
-                    '12': (4, 4),
-                    '13': (4, 5),
-                    '14': (4, 6),
-                    '15': (4, 7),
-                    '16': (4, 8),
+                    '0': (7, 0),
+                    '1': (7, 1),
+                    '2': (3, 0),
+                    '3': (3, 1),
+                    '4': (3, 2),
+                    '5': (3, 3),
+                    '6': (3, 4),
+                    '7': (3, 5),
+                    '8': (3, 6),
+                    '9': (3, 7),
+                    '10': (4, 0),
+                    '11': (4, 1),
+                    '12': (4, 2),
+                    '13': (4, 3),
+                    '14': (4, 4),
+                    '15': (4, 5),
+                    '16': (4, 6),
+                    '17': (4, 7),
+                    '18': (7, 2),
+                    '19': (7, 3),
                 },
             },
             {
