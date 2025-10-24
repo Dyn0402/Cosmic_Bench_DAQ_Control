@@ -100,7 +100,7 @@ def main():
 
                             if output == '' and process.poll() is not None:
                                 n_polls += 1
-                                if n_polls >= 3:
+                                if n_polls >= 120:
                                     server.send("Dream DAQ has finished")  # If only taking pedestals or a failure
                                     break
                                 sleep(1)
