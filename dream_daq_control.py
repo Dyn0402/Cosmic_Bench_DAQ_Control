@@ -84,7 +84,7 @@ def main():
 
                         input(f'Running command: {run_command}, press Enter to continue...')
 
-                        process = Popen(run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
+                        process = Popen(run_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, text=True)
                         start, taking_pedestals, run_successful = time.time(), False, True
                         server.send('Dream DAQ starting')
                         max_run_time = run_time + max_run_time_addition
@@ -293,14 +293,14 @@ def make_config_from_template(run_dir, cfg_template_file_path, cfg_file_run_time
     print('Making config file from template...')
     dest = run_dir
     cfg_file_name = os.path.basename(cfg_template_file_path)
-    cfg_file_path = f'{dest}/{cfg_file_name}'
+    cfg_file_path = f'{dest}{cfg_file_name}'
     shutil.copy(cfg_template_file_path, cfg_file_path)
 
     # Copy all Grace* files from template directory to run directory
     template_dir = os.path.dirname(cfg_template_file_path)
     for file in os.listdir(template_dir):
         if file.startswith('Grace_'):
-            shutil.copy(f'{template_dir}/{file}', f'{dest}/{file}')
+            shutil.copy(f'{template_dir}/{file}', f'{dest}{file}')
 
     updates = {  # Update config file with desired parameters
         "Sys DaqRun Time": cfg_file_run_time * 60,  # Seconds
