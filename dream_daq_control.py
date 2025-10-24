@@ -97,11 +97,9 @@ def main():
                         while True:
                             output = process.stdout.readline()
 
-                            # NEED THIS FOR PEDESTAL ONLY!!
-                            # if output == '' and process.poll() is not None:
-                            #     server.send("Dream DAQ has finished")  # If only taking pedestals or a failure
-                            #     break
-                            # NEED THIS FOR PEDESTAL ONLY!!
+                            if output == '' and process.poll() is not None:
+                                server.send("Dream DAQ has finished")  # If only taking pedestals or a failure
+                                break
 
                             if batch_mode:
                                 if not taking_pedestals and '_TakePedThr' in output.strip():
