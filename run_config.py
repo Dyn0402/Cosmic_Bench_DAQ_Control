@@ -15,7 +15,7 @@ import copy
 class Config:
     def __init__(self):
         # self.run_name = 'rd5_strip_2_co2_10-27-25'
-        self.run_name = 'rd5_strip_esl_1_co2_fe55_10-27-25'
+        self.run_name = 'rd5_strip_esl_1_co2_fe55_zs_10-27-25'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
         self.raw_daq_inner_dir = 'raw_daq_data'
@@ -48,7 +48,7 @@ class Config:
             'max_run_time_addition': 60 * 5,  # Seconds to add to requested run time before killing run
             'copy_on_fly': True,  # True to copy raw data to out dir during run, False to copy after run
             'batch_mode': True,  # Run Dream RunCtrl in batch mode. Not implemented for cosmic bench C
-            'zero_suppress': False,  # True to run in zero suppression mode, False to run in full readout mode
+            'zero_suppress': True,  # True to run in zero suppression mode, False to run in full readout mode
         }
 
         self.banco_info = {
