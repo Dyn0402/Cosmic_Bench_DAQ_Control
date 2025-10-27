@@ -15,7 +15,8 @@ import copy
 class Config:
     def __init__(self):
         # self.run_name = 'rd5_strip_2_co2_10-27-25'
-        self.run_name = 'rd5_strip_esl_1_co2_fe55_zs_r510_10-27-25'
+        # self.run_name = 'rd5_strip_esl_1_co2_fe55_zs_r510_10-27-25'
+        self.run_name = 'rd5_plein_esl_1_co2_fe55_zs_10-27-25'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
         self.raw_daq_inner_dir = 'raw_daq_data'
@@ -121,7 +122,7 @@ class Config:
                 'run_time': 5,  # Minutes
                 'hvs': {
                     0: {
-                        6: 500,
+                        6: 420,
                         8: 500,
                         9: 500,
                         10: 500,
@@ -129,7 +130,7 @@ class Config:
                     },
                     3: {
                         3: 510,
-                        4: 510,
+                        4: 600,
                         8: 455,
                         9: 455,
                         10: 455,
