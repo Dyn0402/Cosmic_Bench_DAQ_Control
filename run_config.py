@@ -14,7 +14,8 @@ import copy
 
 class Config:
     def __init__(self):
-        self.run_name = 'rd5_strip_2_co2_10-27-25'
+        # self.run_name = 'rd5_strip_2_co2_10-27-25'
+        self.run_name = 'rd5_strip_esl_1_co2_fe55_10-27-25'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
         self.raw_daq_inner_dir = 'raw_daq_data'
@@ -36,9 +37,9 @@ class Config:
             # 'ip': '192.168.10.100',
             'ip': '192.168.10.1',
             'port': 1101,
-            'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_TPOT.cfg',
+            # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_TPOT.cfg',
             # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_TPOT_P2.cfg',
-            # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_SelfTrigger_thresh.cfg',
+            'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_SelfTrigger_thresh.cfg',
             # 'run_directory': f'/local/home/usernsw/dylan/Run/{self.run_name}/',
             'run_directory': f'/data/cosmic_data/Run/{self.run_name}/',
             'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
@@ -175,7 +176,7 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
-        self.included_detectors = ['rd5_strip_2',
+        self.included_detectors = ['rd5_strip_esl_1',
                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
 
         self.detectors = [
@@ -701,6 +702,37 @@ class Config:
                     'y_1': (6, 3),  # Runs along y direction, indicates x hit location
                     'y_2': (6, 4),
                 },
+            },
+            {
+                'name': 'rd5_strip_esl_1',
+                'det_type': 'rd5_strip_esl',
+                'det_center_coords': {  # Center of detector
+                    'x': 24,  # mm
+                    'y': 75.6,  # mm
+                    'z': 720.8,  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': {
+                    'drift': (5, 0),
+                    'resist_1': (2, 0),
+                    'resist_2': (2, 1)
+                },
+                'dream_feus': {
+                    'x_1': (6, 0),  # Runs along x direction, indicates y hit location
+                    'x_2': (6, 1),
+                    'y_1': (6, 2),  # Runs along y direction, indicates x hit location
+                    'y_2': (6, 3),
+                },
+                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
+                    'x_1': True,
+                    'x_2': True,
+                    'y_1': False,
+                    'y_2': False,
+                }
             },
             {
                 'name': 'p2_1',
