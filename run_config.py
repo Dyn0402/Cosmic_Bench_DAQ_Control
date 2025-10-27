@@ -15,8 +15,8 @@ import copy
 class Config:
     def __init__(self):
         # self.run_name = 'rd5_strip_2_co2_10-27-25'
-        # self.run_name = 'rd5_strip_esl_1_co2_fe55_zs_r510_10-27-25'
-        self.run_name = 'rd5_plein_esl_1_co2_fe55_zs_10-27-25'
+        self.run_name = 'rd5_strip_esl_1_co2_cosmics_10-27-25'
+        # self.run_name = 'rd5_plein_esl_1_co2_fe55_zs_10-27-25'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
         self.raw_daq_inner_dir = 'raw_daq_data'
@@ -38,9 +38,9 @@ class Config:
             # 'ip': '192.168.10.100',
             'ip': '192.168.10.1',
             'port': 1101,
-            # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_TPOT.cfg',
+            'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_TPOT.cfg',
             # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_TPOT_P2.cfg',
-            'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_SelfTrigger_thresh.cfg',
+            # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_SelfTrigger_thresh.cfg',
             # 'run_directory': f'/local/home/usernsw/dylan/Run/{self.run_name}/',
             'run_directory': f'/data/cosmic_data/Run/{self.run_name}/',
             'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
@@ -62,14 +62,14 @@ class Config:
         }
 
         self.dedip196_processor_info = {
-            'ip': '132.166.10.196',
-            'port': 1200,
+            'ip': '192.168.10.1',
+            'port': 1201,
             'run_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
             'decoded_root_inner_dir': self.decoded_root_inner_dir,
             'm3_tracking_inner_dir': self.m3_tracking_inner_dir,
-            'decode_path': '/local/home/banco/dylan/decode/decode',
-            'convert_path': '/local/home/banco/dylan/decode/convert_vec_tree_to_array',
+            'decode_path': '/local/home/usernsw/dylan/decode/decode',
+            'convert_path': '/local/home/usernsw/dylan/decode/convert_vec_tree_to_array',
             'detector_info_dir': self.detector_info_dir,
             'filtered_root_inner_dir': self.filtered_root_inner_dir,
             'out_type': 'array',  # 'vec', 'array', or 'both'
@@ -119,18 +119,18 @@ class Config:
         self.sub_runs = [
             {
                 'sub_run_name': 'quick_test',
-                'run_time': 5,  # Minutes
+                'run_time': 60 * 24,  # Minutes
                 'hvs': {
                     0: {
-                        6: 420,
+                        6: 500,
                         8: 500,
                         9: 500,
                         10: 500,
                         11: 500,
                     },
                     3: {
-                        3: 510,
-                        4: 600,
+                        3: 525,
+                        4: 525,
                         8: 455,
                         9: 455,
                         10: 455,
@@ -718,9 +718,9 @@ class Config:
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
-                    'drift': (5, 0),
-                    'resist_1': (2, 0),
-                    'resist_2': (2, 1)
+                    'drift': (0, 6),
+                    'resist_1': (3, 3),
+                    'resist_2': (3, 4)
                 },
                 'dream_feus': {
                     'x_1': (6, 0),  # Runs along x direction, indicates y hit location
