@@ -14,7 +14,11 @@ import copy
 
 class Config:
     def __init__(self):
-        self.run_name = 'rd5_strip_2_co2_10-27-25'
+        # self.run_name = 'rd5_grid_vfp_1_co2_fe55_zs2_10-21-25'
+        # self.run_name = 'rd5_plein_esl_1_co2_10-23-25'
+        self.run_name = 'p2_weekend_mesh_scan_10-24-25'
+        # self.daq_dir = '/local/home/usernsw/dylan/Run/'  # Maybe kill
+        # self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
         self.data_out_dir = '/mnt/cosmic_data/Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
         self.raw_daq_inner_dir = 'raw_daq_data'
@@ -116,19 +120,23 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'quick_test',
+                'sub_run_name': 'p2_mesh_420V',
                 'run_time': 60 * 4,  # Minutes
                 'hvs': {
                     0: {
-                        6: 800,
+                        # 6: 850,
                         8: 500,
                         9: 500,
                         10: 500,
                         11: 500,
                     },
+                    1: {
+                        0: 700,
+                        1: 420,
+                    },
                     3: {
-                        3: 530,
-                        4: 530,
+                        # 3: 530,
+                        # 4: 530,
                         8: 455,
                         9: 455,
                         10: 455,
@@ -139,25 +147,25 @@ class Config:
         ]
 
         # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
-        # template = self.sub_runs[0]
-        # # eic_drift_vs = [50, 100, 150, 200, 300, 400, 500, 600, 700, 800]
-        # p2_mesh_vs = [415, 410, 405, 400, 395, 390, 385, 380, 375, 370]
-        #
-        # # drift_card_channel = {'card': 0, 'channel': 6}
-        # mesh_card_channel = {'card': 1, 'channel': 1}
-        #
-        # # Create sub-runs
-        # # for drift_v, mesh_v in zip(eic_drift_vs, p2_mesh_vs):
-        # for mesh_v in p2_mesh_vs:
-        #     sub_run = copy.deepcopy(template)
-        #     # sub_run["sub_run_name"] = f"eic_drift_{drift_v}V_p2_mesh_{mesh_v}V"
-        #     sub_run["sub_run_name"] = f"p2_mesh_{mesh_v}V"
-        #
-        #     # Set the voltages
-        #     # sub_run["hvs"][drift_card_channel['card']][drift_card_channel['channel']] = drift_v
-        #     sub_run["hvs"][mesh_card_channel['card']][mesh_card_channel['channel']] = mesh_v
-        #
-        #     self.sub_runs.append(sub_run)
+        template = self.sub_runs[0]
+        # eic_drift_vs = [50, 100, 150, 200, 300, 400, 500, 600, 700, 800]
+        p2_mesh_vs = [415, 410, 405, 400, 395, 390, 385, 380, 375, 370]
+
+        # drift_card_channel = {'card': 0, 'channel': 6}
+        mesh_card_channel = {'card': 1, 'channel': 1}
+
+        # Create sub-runs
+        # for drift_v, mesh_v in zip(eic_drift_vs, p2_mesh_vs):
+        for mesh_v in p2_mesh_vs:
+            sub_run = copy.deepcopy(template)
+            # sub_run["sub_run_name"] = f"eic_drift_{drift_v}V_p2_mesh_{mesh_v}V"
+            sub_run["sub_run_name"] = f"p2_mesh_{mesh_v}V"
+
+            # Set the voltages
+            # sub_run["hvs"][drift_card_channel['card']][drift_card_channel['channel']] = drift_v
+            sub_run["hvs"][mesh_card_channel['card']][mesh_card_channel['channel']] = mesh_v
+
+            self.sub_runs.append(sub_run)
 
 
         self.bench_geometry = {
@@ -175,7 +183,7 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
-        self.included_detectors = ['rd5_strip_2',
+        self.included_detectors = ['p2_1',
                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
 
         self.detectors = [
