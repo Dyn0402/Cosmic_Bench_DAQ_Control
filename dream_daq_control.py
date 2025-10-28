@@ -47,7 +47,7 @@ def main():
                 original_working_directory = os.getcwd()
 
                 create_dir_if_not_exist(run_directory)
-                create_dir_if_not_exist(out_directory)
+                # create_dir_if_not_exist(out_directory)  # Think this is causing race condition with daq_control.py
 
                 res = server.receive()
                 while 'Finished' not in res:
