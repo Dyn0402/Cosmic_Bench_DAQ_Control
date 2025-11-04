@@ -88,6 +88,7 @@ class Config:
             'filtered_root_inner_dir': self.filtered_root_inner_dir,
             'out_type': 'both',  # 'vec', 'array', or 'both'
             'm3_feu_num': self.m3_feu_num,
+            'on-the-fly_timeout': 2  # hours or None If running on-the-fly, time out and die after this time.
         }
 
         self.hv_control_info = {
