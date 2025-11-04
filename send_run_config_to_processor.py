@@ -30,7 +30,7 @@ def main():
     # Get open tmux port by looking at live tmux session names
     decoder_port = get_open_decoder_port(min_decoder_port)
 
-    # TODO: Update run_config_path json with new port in dedip196_processor_info:port
+    # Update run_config_path json with new port in dedip196_processor_info:port
     with open(run_config_path, 'r') as file:
         data = json.load(file)
     data['dedip196_processor_info']['port'] = decoder_port
