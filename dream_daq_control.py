@@ -227,7 +227,9 @@ def copy_files_on_the_fly(sub_run_dir, sub_out_dir, daq_finished_event, check_in
         if not file_num_still_running(sub_run_dir, file_num, silent=True):
             for file_name in os.listdir(sub_run_dir):
                 if file_name.endswith('.fdf') and get_file_num_from_fdf_file_name(file_name, -2) == file_num:
-                    shutil.move(f'{sub_run_dir}{file_name}', f'{sub_out_dir}{file_name}')
+                    # shutil.move(f'{sub_run_dir}{file_name}', f'{sub_out_dir}{file_name}')
+                    # Copy instead of move to keep a redundant copy of the fdfs.
+                    shutil.copy(f'{sub_run_dir}{file_name}', f'{sub_out_dir}{file_name}')
             file_num += 1
         sleep(check_interval)  # Check every 5 seconds
 
