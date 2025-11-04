@@ -11,6 +11,7 @@ Created as Cosmic_Bench_DAQ_Control/send_run_config_to_processor.py
 import os
 import sys
 from subprocess import Popen, PIPE
+import json
 
 
 BASE_DIR = "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control"
@@ -30,6 +31,11 @@ def main():
     decoder_port = get_open_decoder_port(min_decoder_port)
 
     # TODO: Update run_config_path json with new port in dedip196_processor_info:port
+    with open(run_config_path, 'r') as file:
+        data = json.load(file)
+    data['dedip196_processor_info']['port'] = decoder_port
+    with open(run_config_path, 'w') as file:
+        json.dump(data, file)
 
     # Start a tmux decoder_port session --> Just run python processing_control.py port
     # bash_scripts/start_tmux.sh decoder "python processing_control.py"

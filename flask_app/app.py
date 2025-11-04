@@ -31,8 +31,10 @@ HV_TAIL = 1000  # number of most recent rows to show
 app = Flask(__name__)
 socketio = SocketIO(app)
 
-TMUX_SESSIONS = ["hv_control", "dream_daq", "decoder", "daq_control", "trigger_veto_control", "trigger_gen_control",
-                 "banco_tracker", "processor"]
+# TMUX_SESSIONS = ["hv_control", "dream_daq", "decoder", "daq_control", "trigger_veto_control", "trigger_gen_control",
+#                  "banco_tracker", "processor"]
+TMUX_SESSIONS = ["hv_control", "dream_daq", "daq_control", "trigger_veto_control", "trigger_gen_control",
+                 "banco_tracker"]
 sessions = {}
 
 @app.route("/")
