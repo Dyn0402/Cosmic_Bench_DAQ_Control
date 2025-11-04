@@ -58,6 +58,7 @@ class DecoderProcessorManager:
         self.client.receive()
 
     def process_all(self):
+        new_files = False
         for sub_run in sorted(self.output_dir.iterdir()):
             print(f'Processing run {sub_run.name}')
             if not sub_run.is_dir():
@@ -97,9 +98,11 @@ class DecoderProcessorManager:
                 print(f'No new files to process for run {sub_run.name}')
                 continue
 
+            new_files = True  # Found new files
             for file_num in to_process_file_nums:
                 print(f'Processing file_num {file_num} for run {sub_run.name}')
                 self._process_file(file_num, sub_run.name)
+        return new_files
 
     def _process_file(self, file_num: int, sub_run_name: str):
         # Decode
@@ -198,6 +201,7 @@ class Processor:
         self.config_path = config_path
         self.config = self._load_config(config_path)
         self.output_dir = Path(self.config["run_out_dir"])
+        self.timeout = self.config['dedip196_processor_info'].get('on-the-fly_timeout', None)
         self.stop_event = stop_event or Event()
 
         self.decoder: Optional[DecoderProcessorManager] = None
@@ -242,6 +246,7 @@ class Processor:
         Wait for new files and process them accordingly.
         :return:
         """
+        last_file_found = time.time()
         while not self.stop_event.is_set():
             self._init_processors()
             if self.tracker:
@@ -253,7 +258,9 @@ class Processor:
             if self.decoder:
                 print('Checking for new files to decode')
                 with self.decoder as dec:
-                    dec.process_all()
+                    new_files = dec.process_all()
+                    if new_files:
+                        last_file_found = time.time()
                 print('Finished decoding\n')
             print(f'Waiting to check for new files again, good time to exit...\n'
                   f'Config: {self.config_path}, Output Dir: {self.output_dir}\n')
@@ -262,3 +269,9 @@ class Processor:
                     print('Stop signal received. Exiting on-the-fly processing.')
                     return
                 time.sleep(1)
+
+            time_since_last_new_files = time.time() - last_file_found
+            if self.timeout is not None:
+                if time_since_last_new_files >= self.timeout * 60 * 60:  # Hours to seconds
+                    print(f'Processing-on-the-fly timing out after {time_since_last_new_files} seconds')
+                    self.stop_event.set()
