@@ -15,11 +15,7 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        # self.run_name = 'rd5_strip_vfp_1_fe_test_10-16-25'
         self.run_name = 'beam_daq_test'
-        # self.daq_dir = '/local/home/banco/dylan/Run/'  # Maybe kill
-        # self.run_dir = f'{self.daq_dir}{self.run_name}/'  # Maybe kill
-        # self.base_out_dir = '/mnt_cosmic_data/'
         self.base_out_dir = '/local/home/banco/dylan/out_dir/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -29,12 +25,12 @@ class Config:
         self.m3_tracking_inner_dir = 'm3_tracking_root'
         self.detector_info_dir = f'{self.base_out_dir}config/detectors/'
         self.m3_feu_num = None
-        self.power_off_hv_at_end = True  # True to power off HV at end of run
+        self.power_off_hv_at_end = False  # True to power off HV at end of run
         self.filtering_by_m3 = False  # True to filter by m3 tracking, False to do no filtering
         self.process_on_fly = False  # True to process data on fly, False to process after run
         self.save_fdfs = True  # True to save FDF files, False to delete after decoding
         self.start_time = None
-        self.write_all_dectors_to_json = True  # Only when making run config json template.
+        self.write_all_dectors_to_json = True  # Only when making run config json template. Maybe do always?
         self.generate_external_triggers = False  # If true, use raspberry pi to generate external triggers for DAQ
         self.gas = 'Ar/CO2/Iso 93/5/2'  # Gas type for run
 
@@ -53,11 +49,7 @@ class Config:
         self.dream_daq_info = {
             'ip': '192.168.10.8',
             'port': 1101,
-            # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_TPOT.cfg',
-            # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_SelfTrigger.cfg',
-            # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/CosmicTb_SelfTrigger_thresh.cfg',
             'daq_config_template_path': '/local/home/banco/dylan/Run/config/TbSPS25_test.cfg',
-            # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/Night_Run.cfg',
             'run_directory': f'/local/home/banco/dylan/Run/{self.run_name}/',
             'data_out_dir': f'{self.base_out_dir}Run/{self.run_name}',
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
@@ -133,14 +125,10 @@ class Config:
                 'run_time': 1.5,  # Minutes
                 'hvs': {
                     '2': {
-                        # '0': 300,
-                        # '1': 445,
                         '0': 15,
                         '1': 5,
                     },
                     '5': {
-                        # '0': 800,
-                        # '0': 400,
                         '0': 20,
                     }
                 }
@@ -150,14 +138,10 @@ class Config:
                 'run_time': 2,  # Minutes
                 'hvs': {
                     '2': {
-                        # '0': 300,
-                        # '1': 445,
                         '0': 10,
                         '1': 8,
                     },
                     '5': {
-                        # '0': 800,
-                        # '0': 400,
                         '0': 12,
                     }
                 }
@@ -177,9 +161,6 @@ class Config:
         #     self.sub_runs.append(sub_run)
 
         self.bench_geometry = {
-            'p1_z': 227,  # mm  To the top of P1 from the top of PB
-            'bottom_level_z': 82,  # mm  From the top of P1 to the bottom level of stand
-            'level_z_spacing': 97,  # mm  Spacing between levels on stand
             'board_thickness': 5,  # mm  Thickness of PCB for test boards  Guess!
             'banco_arm_bottom_to_center': (193 - 172) / 2,  # mm from bottom of lower banco arm to center of banco arm
             'banco_arm_separation_z': 172 - 41,  # mm from bottom of lower banco arm to bottom of upper banco arm
@@ -187,10 +168,6 @@ class Config:
             'banco_arm_length_y': 230,  # mm from left edge of banco arm to right edge of banco arm
         }
 
-        # self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
-        #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
-        #                            'strip_strip_1',
-        #                            'scintillator_top']
         self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
                                    'rd5_plein_vfp_1']
 
@@ -259,14 +236,14 @@ class Config:
                 'hv_channels': 'banco',
                 'dream_feus': 'banco',
             },
+
             {
                 'name': 'urw_strip',
                 'det_type': 'urw_strip',
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
-                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
-                         5 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
+                    'z': 0,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -283,43 +260,21 @@ class Config:
                     'y_1': (6, 7),  # Runs along y direction, indicates x hit location
                     'y_2': (6, 8),
                 },
+                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
+                    'x_1': True,
+                    'x_2': True,
+                    'y_1': False,
+                    'y_2': False,
+                }
             },
+
             {
                 'name': 'urw_inter',
                 'det_type': 'urw_inter',
                 'det_center_coords': {  # Center of detector
-                    # 'x': 0,  # mm
-                    # 'y': 0,  # mm
-                    # 'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
-                    #      4 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
-                    'x': 10,  # mm
-                    'y': 40,  # mm
-                    'z': 712.7,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (0, 1),
-                    'resist_1': (3, 2)
-                },
-                'dream_feus': {
-                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (6, 2),
-                    'y_1': (6, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (6, 4),
-                },
-            },
-            {
-                'name': 'asacusa_strip_1',
-                'det_type': 'asacusa_strip',
-                'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
-                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
-                         3 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
+                    'z': 0,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -327,25 +282,30 @@ class Config:
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
-                    'drift': (0, 2),
-                    'resist_1': (3, 3),
-                    'resist_2': (3, 4),
+                    'drift': (0, 0),
+                    'resist_1': (3, 1)
                 },
                 'dream_feus': {
-                    'x_1': (4, 5),  # Runs along x direction, indicates y hit location
-                    'x_2': (4, 6),
-                    'y_1': (4, 7),  # Runs along y direction, indicates x hit location
-                    'y_2': (4, 8),
+                    'x_1': (6, 5),  # Runs along x direction, indicates y hit location
+                    'x_2': (6, 6),
+                    'y_1': (6, 7),  # Runs along y direction, indicates x hit location
+                    'y_2': (6, 8),
                 },
+                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
+                    'x_1': True,
+                    'x_2': True,
+                    'y_1': False,
+                    'y_2': False,
+                }
             },
+
             {
                 'name': 'asacusa_strip_2',
                 'det_type': 'asacusa_strip',
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
-                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
-                         2 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
+                    'z': 0,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -353,25 +313,30 @@ class Config:
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
-                    'drift': (0, 3),
-                    'resist_1': (3, 5),
-                    'resist_2': (3, 6)
+                    'drift': (0, 0),
+                    'resist_1': (3, 1)
                 },
                 'dream_feus': {
-                    'x_1': (4, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (4, 2),
-                    'y_1': (4, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (4, 4),
+                    'x_1': (6, 5),  # Runs along x direction, indicates y hit location
+                    'x_2': (6, 6),
+                    'y_1': (6, 7),  # Runs along y direction, indicates x hit location
+                    'y_2': (6, 8),
                 },
+                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
+                    'x_1': True,
+                    'x_2': True,
+                    'y_1': False,
+                    'y_2': False,
+                }
             },
+
             {
-                'name': 'strip_plein_1',
-                'det_type': 'strip_plein',
+                'name': 'rd5_plein_saral_2',
+                'det_type': 'rd5_plein_saral',
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
-                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
-                         1 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
+                    'z': 0,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -379,25 +344,30 @@ class Config:
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
-                    'drift': (0, 6),
-                    'resist_2': (3, 7),
+                    'drift': (0, 0),
+                    'resist_1': (3, 1)
                 },
                 'dream_feus': {
-                    'x_1': (3, 5),  # Runs along x direction, indicates y hit location
-                    'x_2': (3, 6),
-                    'y_1': (3, 7),  # Runs along y direction, indicates x hit location
-                    'y_2': (3, 8),
+                    'x_1': (6, 5),  # Runs along x direction, indicates y hit location
+                    'x_2': (6, 6),
+                    'y_1': (6, 7),  # Runs along y direction, indicates x hit location
+                    'y_2': (6, 8),
                 },
+                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
+                    'x_1': True,
+                    'x_2': True,
+                    'y_1': False,
+                    'y_2': False,
+                }
             },
+
             {
-                'name': 'strip_strip_1',
-                'det_type': 'strip_strip',
+                'name': 'rd5_plein_saral_3',
+                'det_type': 'rd5_plein_saral',
                 'det_center_coords': {  # Center of detector
-                    'x': 9.2,  # mm
-                    'y': 38.4,  # mm
-                    # 'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
-                    #      5 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
-                    'z': 712.7,  # mm
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': 0,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -405,25 +375,30 @@ class Config:
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
-                    'drift': (0, 6),
-                    'resist_2': (3, 7),
+                    'drift': (0, 0),
+                    'resist_1': (3, 1)
                 },
                 'dream_feus': {
-                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (6, 2),
-                    'y_1': (6, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (6, 4),
+                    'x_1': (6, 5),  # Runs along x direction, indicates y hit location
+                    'x_2': (6, 6),
+                    'y_1': (6, 7),  # Runs along y direction, indicates x hit location
+                    'y_2': (6, 8),
                 },
+                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
+                    'x_1': True,
+                    'x_2': True,
+                    'y_1': False,
+                    'y_2': False,
+                }
             },
+
             {
-                'name': 'inter_plein_1',
-                'det_type': 'inter_plein',
+                'name': 'rd5_strip_saral_2',
+                'det_type': 'rd5_strip_saral',
                 'det_center_coords': {  # Center of detector
-                    'x': 9.2,  # mm
-                    'y': 38.4,  # mm
-                    # 'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
-                    #      5 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
-                    'z': 712.7,  # mm
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': 0,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -431,27 +406,247 @@ class Config:
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
-                    'drift': (0, 6),
-                    'resist_2': (3, 7),
+                    'drift': (0, 0),
+                    'resist_1': (3, 1)
                 },
                 'dream_feus': {
-                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (6, 2),
-                    'y_1': (6, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (6, 4),
+                    'x_1': (6, 5),  # Runs along x direction, indicates y hit location
+                    'x_2': (6, 6),
+                    'y_1': (6, 7),  # Runs along y direction, indicates x hit location
+                    'y_2': (6, 8),
                 },
+                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
+                    'x_1': True,
+                    'x_2': True,
+                    'y_1': False,
+                    'y_2': False,
+                }
             },
+
             {
-                'name': 'p2_3',
+                'name': 'rd5_grid_saral_1',
+                'det_type': 'rd5_grid_saral',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': 0,  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': {
+                    'drift': (0, 0),
+                    'resist_1': (3, 1)
+                },
+                'dream_feus': {
+                    'x_1': (6, 5),  # Runs along x direction, indicates y hit location
+                    'x_2': (6, 6),
+                    'y_1': (6, 7),  # Runs along y direction, indicates x hit location
+                    'y_2': (6, 8),
+                },
+                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
+                    'x_1': True,
+                    'x_2': True,
+                    'y_1': False,
+                    'y_2': False,
+                }
+            },
+
+            {
+                'name': 'rd5_plein_vfp_1',
+                'det_type': 'rd5_plein_vfp',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': 0,  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': {
+                    'drift': (0, 0),
+                    'resist_1': (3, 1)
+                },
+                'dream_feus': {
+                    'x_1': (6, 5),  # Runs along x direction, indicates y hit location
+                    'x_2': (6, 6),
+                    'y_1': (6, 7),  # Runs along y direction, indicates x hit location
+                    'y_2': (6, 8),
+                },
+                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
+                    'x_1': True,
+                    'x_2': True,
+                    'y_1': False,
+                    'y_2': False,
+                }
+            },
+
+            {
+                'name': 'rd5_strip_vfp_1',
+                'det_type': 'rd5_strip_vfp',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': 0,  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': {
+                    'drift': (0, 0),
+                    'resist_1': (3, 1)
+                },
+                'dream_feus': {
+                    'x_1': (6, 5),  # Runs along x direction, indicates y hit location
+                    'x_2': (6, 6),
+                    'y_1': (6, 7),  # Runs along y direction, indicates x hit location
+                    'y_2': (6, 8),
+                },
+                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
+                    'x_1': True,
+                    'x_2': True,
+                    'y_1': False,
+                    'y_2': False,
+                }
+            },
+
+            {
+                'name': 'rd5_grid_vfp_1',
+                'det_type': 'rd5_grid_vfp',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': 0,  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': {
+                    'drift': (0, 0),
+                    'resist_1': (3, 1)
+                },
+                'dream_feus': {
+                    'x_1': (6, 5),  # Runs along x direction, indicates y hit location
+                    'x_2': (6, 6),
+                    'y_1': (6, 7),  # Runs along y direction, indicates x hit location
+                    'y_2': (6, 8),
+                },
+                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
+                    'x_1': True,
+                    'x_2': True,
+                    'y_1': False,
+                    'y_2': False,
+                }
+            },
+
+            {
+                'name': 'rd5_plein_esl_1',
+                'det_type': 'rd5_plein_esl',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': 0,  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': {
+                    'drift': (0, 0),
+                    'resist_1': (3, 1)
+                },
+                'dream_feus': {
+                    'x_1': (6, 5),  # Runs along x direction, indicates y hit location
+                    'x_2': (6, 6),
+                    'y_1': (6, 7),  # Runs along y direction, indicates x hit location
+                    'y_2': (6, 8),
+                },
+                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
+                    'x_1': True,
+                    'x_2': True,
+                    'y_1': False,
+                    'y_2': False,
+                }
+            },
+
+            {
+                'name': 'rd5_strip_esl_1',
+                'det_type': 'rd5_strip_esl',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': 0,  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': {
+                    'drift': (0, 0),
+                    'resist_1': (3, 1)
+                },
+                'dream_feus': {
+                    'x_1': (6, 5),  # Runs along x direction, indicates y hit location
+                    'x_2': (6, 6),
+                    'y_1': (6, 7),  # Runs along y direction, indicates x hit location
+                    'y_2': (6, 8),
+                },
+                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
+                    'x_1': True,
+                    'x_2': True,
+                    'y_1': False,
+                    'y_2': False,
+                }
+            },
+
+            {
+                'name': 'rd5_grid_esl_1',
+                'det_type': 'rd5_grid_esl',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': 0,  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': {
+                    'drift': (0, 0),
+                    'resist_1': (3, 1)
+                },
+                'dream_feus': {
+                    'x_1': (6, 5),  # Runs along x direction, indicates y hit location
+                    'x_2': (6, 6),
+                    'y_1': (6, 7),  # Runs along y direction, indicates x hit location
+                    'y_2': (6, 8),
+                },
+                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
+                    'x_1': True,
+                    'x_2': True,
+                    'y_1': False,
+                    'y_2': False,
+                }
+            },
+
+            {
+                'name': 'p2_small_1',
                 'det_type': 'p2',
                 'det_center_coords': {  # Center of detector
-                    # 'x': 0,  # mm
-                    # 'y': 0,  # mm
-                    # 'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
-                    #      4 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
-                    'x': 10,  # mm
-                    'y': 40,  # mm
-                    'z': 712.7,  # mm
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': 0,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -466,14 +661,19 @@ class Config:
                     'x_1': (6, 1),
                     'x_2': (6, 2),
                 },
+                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
+                    'x_1': True,
+                    'x_2': True,
+                }
             },
+
             {
-                'name': 'rd5_plein_1',
-                'det_type': 'rd5_plein',
+                'name': 'p2_small_2',
+                'det_type': 'p2',
                 'det_center_coords': {  # Center of detector
-                    'x': 24,  # mm
-                    'y': 75.6,  # mm
-                    'z': 720.8,  # mm
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': 0,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -482,143 +682,20 @@ class Config:
                 },
                 'hv_channels': {
                     'drift': (0, 6),
-                    'resist_1': (3, 3),
-                    'resist_2': (3, 4)
+                    'mesh_1': (0, 7)
                 },
                 'dream_feus': {
-                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
+                    'x_1': (6, 1),
                     'x_2': (6, 2),
-                    'y_1': (6, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (6, 4),
                 },
+                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
+                    'x_1': True,
+                    'x_2': True,
+                }
             },
+
             {
-                'name': 'rd5_strip_1',
-                'det_type': 'rd5_strip',
-                'det_center_coords': {  # Center of detector
-                    'x': 24,  # mm
-                    'y': 75.6,  # mm
-                    'z': 720.8,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (5, 0),
-                    'resist_1': (2, 0),
-                    'resist_2': (2, 1)
-                },
-                'dream_feus': {
-                    'x_1': (1, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (1, 2),
-                    'y_1': (1, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (1, 4),
-                },
-            },
-            {
-                'name': 'rd5_plein_2',
-                'det_type': 'rd5_plein',
-                'det_center_coords': {  # Center of detector
-                    'x': 24,  # mm
-                    'y': 75.6,  # mm
-                    'z': 720.8,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (0, 6),
-                    'resist_1': (3, 3),
-                    'resist_2': (3, 4)
-                },
-                'dream_feus': {
-                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (6, 2),
-                    'y_1': (6, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (6, 4),
-                },
-            },
-            {
-                'name': 'rd5_plein_3',
-                'det_type': 'rd5_plein',
-                'det_center_coords': {  # Center of detector
-                    'x': 24,  # mm
-                    'y': 75.6,  # mm
-                    'z': 720.8,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (5, 0),
-                    'resist_1': (2, 0),
-                    'resist_2': (2, 1)
-                },
-                'dream_feus': {
-                    'x_1': (1, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (1, 2),
-                    'y_1': (1, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (1, 4),
-                },
-            },
-            {
-                'name': 'rd5_strip_2',
-                'det_type': 'rd5_strip',
-                'det_center_coords': {  # Center of detector
-                    'x': 24,  # mm
-                    'y': 75.6,  # mm
-                    'z': 720.8,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (0, 6),
-                    'resist_1': (3, 3),
-                    'resist_2': (3, 4)
-                },
-                'dream_feus': {
-                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (6, 2),
-                    'y_1': (6, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (6, 4),
-                },
-            },
-            {
-                'name': 'rd5_plein_vfp_1',
-                'det_type': 'rd5_plein',
-                'det_center_coords': {  # Center of detector
-                    'x': 24,  # mm
-                    'y': 75.6,  # mm
-                    'z': 720.8,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (5, 0),
-                    # 'resist_1': (2, 0),
-                    'resist_2': (2, 1)
-                },
-                'dream_feus': {
-                    'x_1': (1, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (1, 2),
-                    'y_1': (1, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (1, 4),
-                },
-            },
-            {
-                'name': 'p2_1',
+                'name': 'p2_large_1',
                 'det_type': 'p2',
                 'det_center_coords': {  # Center of detector
                     'x': 9.2,  # mm
@@ -655,46 +732,7 @@ class Config:
                     '16': (4, 8),
                 },
             },
-            {
-                'name': 'scintillator_top',
-                'det_type': 'scintillator',
-                'det_center_coords': {  # Center of detector
-                    'x': 0,  # mm
-                    'y': 0,  # mm
-                    'z': 1412,  # mm  1163 + 145 + 110 from geometry diagram
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'dream_feus': {
-                    'xy': (3, 4),
-                },
-                'dream_feu_channels': {
-                    'xy': (3, 4, 21),
-                }
-            },
-            {
-                'name': 'scintillator_bottom',
-                'det_type': 'scintillator',
-                'det_center_coords': {  # Center of detector
-                    'x': 0,  # mm
-                    'y': 0,  # mm
-                    'z': 24 - 100,  # mm  24 - 100 from geometry diagram
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'dream_feus': {
-                    'xy': (3, 4),
-                },
-                'dream_feu_channels': {
-                    'xy': (3, 4, 20),
-                }
-            },
+
         ]
 
         if not self.write_all_dectors_to_json:
@@ -715,11 +753,9 @@ class Config:
 
 
 if __name__ == '__main__':
-    # out_dir = '/local/home/dn277127/Bureau/beam_test_25/'
-    # out_template_dir = 'config/json_templates/'
     out_run_dir = 'config/json_run_configs/'
 
-    config_name = 'run_config.json'
+    config_name = 'run_config_beam.json'
 
     config = Config()
 

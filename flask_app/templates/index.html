@@ -10,7 +10,7 @@
         <button id="start-run" class="btn btn-success me-2">Start Run</button>
         <button id="stop-run" class="btn btn-danger">Stop Run</button>
         <button id="restart-all" class="btn btn-danger">Restart All</button>
-        <button id="load-py-config" class="btn btn-secondary">Load run_config.py Config</button>
+        <button id="run-config-py" class="btn btn-secondary">Run from run_config_beam.py</button>
         <button id="take-pedestals" class="btn btn-secondary">Take Pedestals</button>
     </div>
 
@@ -754,13 +754,40 @@ document.getElementById("take-pedestals").addEventListener("click", async () => 
     }, 2500);
 });
 
-// load run_config.py config button handler
-document.getElementById("load-py-config").addEventListener("click", async () => {
-  const res = await fetch("/load_run_config_py", { method: "POST" });
+// Run run_config_beam.py config button handler
+document.getElementById("run-config-py").addEventListener("click", async () => {
+  const res = await fetch("/run_config_py", { method: "POST" });
   const data = await res.json();
-  alert(data.message);
+  
+  // Create a fading popup
+  const popup = document.createElement("div");
+  popup.textContent = data.message;
+  popup.style.position = "fixed";
+  popup.style.top = "80px";
+  popup.style.left = "50%";
+  popup.style.transform = "translateX(-50%)";
+  popup.style.right = "auto";
+  popup.style.background = "#28a745";
+  popup.style.color = "#fff";
+  popup.style.padding = "1em 2em";
+  popup.style.borderRadius = "8px";
+  popup.style.boxShadow = "0 2px 8px rgba(0,0,0,0.2)";
+  popup.style.zIndex = "9999";
+  popup.style.opacity = "1";
+  popup.style.transition = "opacity 1s";
+
+  document.body.appendChild(popup);
+
+  setTimeout(() => {
+    popup.style.opacity = "0";
+    setTimeout(() => popup.remove(), 1000);
+  }, 2500);  
+    
   if (data.success) {
     await loadRuns();
+    const runSelect = document.getElementById("run-select");
+    runSelect.value = "run_config_beam.json";
+    await loadSubruns();
     updateHVPlots();
   }
 });

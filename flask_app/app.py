@@ -110,11 +110,25 @@ def restart_all():
         return jsonify({"success": False, "message": str(e)}), 500
 
 
-@app.route("/load_run_config_py", methods=['POST'])
-def load_py_config():
+@app.route("/run_config_py", methods=['POST'])
+def run_config_py():
     try:
-        subprocess.Popen(["python", f"{BASE_DIR}/run_config.py"])
-        return jsonify({"success": True, "message": "run_config.json updated from run_config.py"})
+        subprocess.Popen(["python", f"{BASE_DIR}/run_config_beam.py"])
+        config_path = os.path.join(CONFIG_RUN_DIR, 'run_config_beam.json')
+        if not os.path.exists(config_path):
+            return jsonify({"message": f"Config not found: {config_path}"}), 404
+
+        script_path = f"{BASH_DIR}/start_run.sh"
+        result = subprocess.run(
+            [script_path, config_path],
+            capture_output=True,
+            text=True
+        )
+
+        if result.returncode == 0:
+            return jsonify({"message": f"Run started with loaded run_config_beam.py"})
+        else:
+            return jsonify({"message": f"Error: {result.stderr}"}), 500
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
 
