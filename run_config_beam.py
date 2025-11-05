@@ -15,8 +15,8 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        self.run_name = 'beam_daq_test'
-        self.base_out_dir = '/local/home/banco/dylan/out_dir/'
+        self.run_name = 'banco_test_run'
+        self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
         self.raw_daq_inner_dir = 'raw_daq_data'
@@ -50,7 +50,8 @@ class Config:
             'ip': '192.168.10.8',
             'port': 1101,
             'daq_config_template_path': '/local/home/banco/dylan/Run/config/TbSPS25_test.cfg',
-            'run_directory': f'/local/home/banco/dylan/Run/{self.run_name}/',
+            # 'run_directory': f'/local/home/banco/dylan/Run/{self.run_name}/',
+            'run_directory': f'/mnt/data/beam_sps_25/dream_run/{self.run_name}/',
             'data_out_dir': f'{self.base_out_dir}Run/{self.run_name}',
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
             'n_samples_per_waveform': 16,  # Number of samples per waveform to configure in DAQ
@@ -64,14 +65,15 @@ class Config:
         }
 
         self.banco_info = {
-            'ip': '132.166.30.82',
+            'ip': '128.141.41.199',
             'port': 1100,
             'daq_run_command': 'cd /home/banco/dylan/Run/framework/bin && ./test_multi_noiseocc_int',
-            'data_temp_dir': '/home/banco/dylan/Run/data',
+            # 'data_temp_dir': '/home/banco/dylan/Run/data',
+            'data_temp_dir': '/home/banco/dylan/Run/data_testing',
             # 'daq_run_command': 'cd /home/banco/CERNTestBeam/framework/bin && ./test_multi_noiseocc_int',
             # 'data_temp_dir': '/home/banco/CERNTestBeam/data',
-            # 'data_out_dir': f'{self.base_out_dir}Run/{self.run_name}',
-            'data_out_dir': f'/home/banco/dylan/Run/data_testing',
+            'data_out_dir': f'/mnt/data/beam_sps_25/Run/{self.run_name}',
+            # 'data_out_dir': f'/home/banco/dylan/Run/data_testing',
             'data_inner_dir': 'banco_data'
         }
 
@@ -115,38 +117,38 @@ class Config:
         self.trigger_gen_info = {
             'ip': '192.168.10.101',
             'port': 1105,
-            'n_triggers': 1000000,  # Number of triggers to send during run
+            'n_triggers': 6000000,  # Number of triggers to send during run
             'trigger_rate': 200,  # Hz  Trigger rate to send during run
             'pulse_freq_ratio': 0.1,  # Ratio of pulse frequency to trigger frequency
         }
 
         self.sub_runs = [
             {
-                'sub_run_name': 'quick_test_1',
-                'run_time': 1.5,  # Minutes
+                'sub_run_name': 'random_banco',
+                'run_time': 8 * 60,  # Minutes
                 'hvs': {
-                    '2': {
-                        '0': 15,
-                        '1': 5,
-                    },
-                    '5': {
-                        '0': 20,
-                    }
+                    # '2': {
+                    #     '0': 15,
+                    #     '1': 5,
+                    # },
+                    # '5': {
+                    #     '0': 20,
+                    # }
                 }
             },
-            {
-                'sub_run_name': 'sub_run_2',
-                'run_time': 2,  # Minutes
-                'hvs': {
-                    '2': {
-                        '0': 10,
-                        '1': 8,
-                    },
-                    '5': {
-                        '0': 12,
-                    }
-                }
-            },
+            # {
+            #     'sub_run_name': 'sub_run_2',
+            #     'run_time': 2,  # Minutes
+            #     'hvs': {
+            #         '2': {
+            #             '0': 10,
+            #             '1': 8,
+            #         },
+            #         '5': {
+            #             '0': 12,
+            #         }
+            #     }
+            # },
         ]
 
         # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
@@ -169,17 +171,17 @@ class Config:
             'banco_arm_length_y': 230,  # mm from left edge of banco arm to right edge of banco arm
         }
 
-        self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
-                                   'rd5_plein_vfp_1']
+        self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162']  #,
+                                   # 'rd5_plein_vfp_1']
 
         self.detectors = [
             {
                 'name': 'banco_ladder157',
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
-                    'x': -13.54 - 40,  # mm  Guess from previous alignment plus shift measurement
-                    'y': -34.27 + 30,  # mm
-                    'z': 842.20,  # mm
+                    'x': -13.54,  # mm  Guess from previous alignment plus shift measurement
+                    'y': 10.0,  # mm
+                    'z': 842.20 - 842.20 + 60,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -193,9 +195,9 @@ class Config:
                 'name': 'banco_ladder162',
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
-                    'x': -15.41 - 40,  # mm  Guess from previous alignment plus shift measurement
-                    'y': -34.27 + 30,  # mm
-                    'z': 853.26,  # mm
+                    'x': -15.41,  # mm  Guess from previous alignment plus shift measurement
+                    'y': 10.0,  # mm
+                    'z': 853.26 - 842.20 + 60,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -209,9 +211,9 @@ class Config:
                 'name': 'banco_ladder160',
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
-                    'x': -13.21 - 40,  # mm  Guess from previous alignment plus shift measurement
-                    'y': -34.39 + 30,  # mm
-                    'z': 971.45,  # mm
+                    'x': -13.21,  # mm  Guess from previous alignment plus shift measurement
+                    'y': 10.0,  # mm
+                    'z': 971.45 - 842.20 + 60,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -225,9 +227,9 @@ class Config:
                 'name': 'banco_ladder163',
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
-                    'x': -15.03 - 40,  # mm  Guess from previous alignment plus shift measurement
-                    'y': -34.46 + 30,  # mm
-                    'z': 982.50,  # mm
+                    'x': -15.03,  # mm  Guess from previous alignment plus shift measurement
+                    'y': 10.0,  # mm
+                    'z': 982.50 - 842.20 + 60,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
