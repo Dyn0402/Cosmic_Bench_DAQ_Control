@@ -1,7 +1,8 @@
 #!/bin/bash
 
 USER="banco"
-HOST="alicemftsac.extra.cea.fr"
+#HOST="alicemftsac.extra.cea.fr"
+HOST="128.141.41.199"
 REMOTE_DIR="dylan/Cosmic_Bench_DAQ_Control"
 SCRIPT="banco_daq_control.py"
 SCREEN_NAME="banco_alpide_control"
