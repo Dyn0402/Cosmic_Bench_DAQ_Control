@@ -80,6 +80,9 @@ def main():
         hv.receive()
         hv.send_json(config.hv_info)
 
+        create_dir_if_not_exist(config.run_out_dir)
+        config.write_to_file(f'{config.run_out_dir}run_config.json')
+
         dream_daq.send('Connected to daq_control')
         dream_daq.receive()
         dream_daq.send_json(config.dream_daq_info)
@@ -118,8 +121,6 @@ def main():
 
         sleep(2)  # Wait for all clients to do what they need to do (specifically, create directories)
 
-        create_dir_if_not_exist(config.run_out_dir)
-        config.write_to_file(f'{config.run_out_dir}run_config.json')
         for sub_run in config.sub_runs:
             sub_run_name = sub_run['sub_run_name']
             # sub_run_dir = f'{config.dream_daq_info["run_directory"]}{sub_run_name}/'
