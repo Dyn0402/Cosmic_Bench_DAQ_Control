@@ -704,39 +704,39 @@ document.getElementById("run-select").addEventListener("change", loadSubruns);
 loadRuns();
 
 // start run button handler
-document.getElementById("start-run").addEventListener("click", async () => {
-  const runName = document.getElementById("run-select").value;
-  const res = await fetch("/start_run", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ config: runName })
-  });
-  const data = await res.json();
-
-  // Create a fading popup
-  const popup = document.createElement("div");
-  popup.textContent = data.message;
-  popup.style.position = "fixed";
-  popup.style.top = "80px";
-  popup.style.left = "50%";
-  popup.style.transform = "translateX(-50%)";
-  popup.style.right = "auto";
-  popup.style.background = "#28a745";
-  popup.style.color = "#fff";
-  popup.style.padding = "1em 2em";
-  popup.style.borderRadius = "8px";
-  popup.style.boxShadow = "0 2px 8px rgba(0,0,0,0.2)";
-  popup.style.zIndex = "9999";
-  popup.style.opacity = "1";
-  popup.style.transition = "opacity 1s";
-
-  document.body.appendChild(popup);
-
-  setTimeout(() => {
-    popup.style.opacity = "0";
-    setTimeout(() => popup.remove(), 1000);
-  }, 2500);
-});
+// document.getElementById("start-run").addEventListener("click", async () => {
+//   const runName = document.getElementById("run-select").value;
+//   const res = await fetch("/start_run", {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify({ config: runName })
+//   });
+//   const data = await res.json();
+//
+//   // Create a fading popup
+//   const popup = document.createElement("div");
+//   popup.textContent = data.message;
+//   popup.style.position = "fixed";
+//   popup.style.top = "80px";
+//   popup.style.left = "50%";
+//   popup.style.transform = "translateX(-50%)";
+//   popup.style.right = "auto";
+//   popup.style.background = "#28a745";
+//   popup.style.color = "#fff";
+//   popup.style.padding = "1em 2em";
+//   popup.style.borderRadius = "8px";
+//   popup.style.boxShadow = "0 2px 8px rgba(0,0,0,0.2)";
+//   popup.style.zIndex = "9999";
+//   popup.style.opacity = "1";
+//   popup.style.transition = "opacity 1s";
+//
+//   document.body.appendChild(popup);
+//
+//   setTimeout(() => {
+//     popup.style.opacity = "0";
+//     setTimeout(() => popup.remove(), 1000);
+//   }, 2500);
+// });
 
 // take pedestals button handler
 document.getElementById("take-pedestals").addEventListener("click", async () => {
