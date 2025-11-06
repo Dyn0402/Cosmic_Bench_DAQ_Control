@@ -116,6 +116,7 @@ def restart_all():
 def run_config_py():
     try:
         subprocess.Popen(["python", f"{BASE_DIR}/run_config_beam.py"])
+        time.sleep(1)
         config_path = os.path.join(CONFIG_RUN_DIR, 'run_config_beam.json')
         if not os.path.exists(config_path):
             return jsonify({"message": f"Config not found: {config_path}"}), 404
