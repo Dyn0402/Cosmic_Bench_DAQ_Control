@@ -5,12 +5,13 @@
 <div class="tab-pane fade show active" id="overview">
     <h2>DAQ Overview</h2>
     <div class="mb-3">
-        <label for="run-select" class="me-2">Run Config:</label>
+<!--        <label for="run-select" class="me-2">Run Config:</label>-->
           <select id="run-select" class="form-select me-3" style="width:auto;"></select>
-        <button id="start-run" class="btn btn-success me-2">Start Run</button>
+<!--        <button id="start-run" class="btn btn-success me-2">Start Run</button>-->
+        <button id="run-config-py" class="btn btn-success me-2">Start Run</button>
         <button id="stop-run" class="btn btn-danger">Stop Run</button>
         <button id="restart-all" class="btn btn-danger">Restart All</button>
-        <button id="run-config-py" class="btn btn-secondary">Run from run_config_beam.py</button>
+<!--        <button id="run-config-py" class="btn btn-secondary">Run from run_config_beam.py</button>-->
         <button id="take-pedestals" class="btn btn-secondary">Take Pedestals</button>
     </div>
 
@@ -644,21 +645,33 @@ async function updateHVPlots() {
     }
 }
 
+// async function loadRuns() {
+//   const res = await fetch("/get_runs");
+//   const runs = await res.json();
+//   const runSelect = document.getElementById("run-select");
+//   runSelect.innerHTML = "";
+//   runs.forEach(r => {
+//     const opt = document.createElement("option");
+//     opt.value = r;
+//     opt.textContent = r;
+//     runSelect.appendChild(opt);
+//   });
+//   if (runs.length > 0) {
+//     runSelect.value = runs[0];
+//     loadSubruns();
+//   }
+// }
+
 async function loadRuns() {
-  const res = await fetch("/get_runs");
-  const runs = await res.json();
+    // Hack to only allow run_config_beam.json
   const runSelect = document.getElementById("run-select");
   runSelect.innerHTML = "";
-  runs.forEach(r => {
-    const opt = document.createElement("option");
-    opt.value = r;
-    opt.textContent = r;
-    runSelect.appendChild(opt);
-  });
-  if (runs.length > 0) {
-    runSelect.value = runs[0];
-    loadSubruns();
-  }
+  const opt = document.createElement("option");
+  opt.value = "run_config_beam.json";
+  opt.textContent = "run_config_beam.json";
+  runSelect.appendChild(opt);
+  runSelect.value = "run_config_beam.json";
+  loadSubruns();
 }
 
 async function loadSubruns() {
