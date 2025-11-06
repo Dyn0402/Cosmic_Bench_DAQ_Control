@@ -49,7 +49,8 @@ class Config:
         self.dream_daq_info = {
             'ip': '192.168.10.8',
             'port': 1101,
-            'daq_config_template_path': '/local/home/banco/dylan/Run/config/TbSPS25_test.cfg',
+            # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/TbSPS25_test.cfg',
+            'daq_config_template_path': '/mnt/data/beam_sps_25/Run/config/TbSPS25_test.cfg',
             # 'run_directory': f'/local/home/banco/dylan/Run/{self.run_name}/',
             'run_directory': f'/mnt/data/beam_sps_25/dream_run/{self.run_name}/',
             'data_out_dir': f'{self.base_out_dir}Run/{self.run_name}',
@@ -67,9 +68,10 @@ class Config:
         self.banco_info = {
             'ip': '128.141.41.199',
             'port': 1100,
-            'daq_run_command': 'cd /home/banco/dylan/Run/framework/bin && ./test_multi_noiseocc_int',
+            # 'daq_run_command': 'cd /home/banco/dylan/Run/framework/bin && ./test_multi_noiseocc_int',
+            'daq_run_command': 'cd /home/banco/SPS_Test_Beam_25/framework/bin && ./test_multi_noiseocc_int',
             # 'data_temp_dir': '/home/banco/dylan/Run/data',
-            'data_temp_dir': '/home/banco/dylan/Run/data_testing',
+            'data_temp_dir': '/home/banco/SPS_Test_Beam_25/data',
             # 'daq_run_command': 'cd /home/banco/CERNTestBeam/framework/bin && ./test_multi_noiseocc_int',
             # 'data_temp_dir': '/home/banco/CERNTestBeam/data',
             'data_out_dir': f'/mnt/data/beam_sps_25/Run/{self.run_name}',
