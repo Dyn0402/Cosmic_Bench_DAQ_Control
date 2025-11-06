@@ -96,11 +96,11 @@ def main():
                     res = server.receive()
         except Exception as e:
             print(f'Error: {e}')
-        if trigger_thread and trigger_thread.is_alive():
-            stop_event.set()
-            trigger_thread.join()
-        trigger_switch('on', pin=gpio_pin)  # Make sure to leave trigger on by default
-        GPIO.cleanup(gpio_pin)
+        # if trigger_thread and trigger_thread.is_alive():
+        #     stop_event.set()
+        #     trigger_thread.join()
+        # trigger_switch('on', pin=gpio_pin)  # Make sure to leave trigger on by default
+        # GPIO.cleanup(gpio_pin)
     print('donzo')
 
 
