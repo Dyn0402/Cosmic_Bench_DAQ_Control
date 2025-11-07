@@ -102,22 +102,17 @@ class Config:
         ]
 
         self.bench_geometry = {
-            'p1_z': 227,  # mm  To the top of P1 from the top of PB
-            'bottom_level_z': 82,  # mm  From the top of P1 to the bottom level of stand
-            'level_z_spacing': 97,  # mm  Spacing between levels on stand
             'board_thickness': 5,  # mm  Thickness of PCB for test boards  Guess!
             'banco_arm_bottom_to_center': (193 - 172) / 2,  # mm from bottom of lower banco arm to center of banco arm
+            'banco_ladder_separation_z': 11.0,  # mm Space between ladders on same arm.
             'banco_arm_separation_z': 172 - 41,  # mm from bottom of lower banco arm to bottom of upper banco arm
             'banco_arm_right_y': 34 + 100,  # mm from center of banco to right edge of banco arm
             'banco_arm_length_y': 230,  # mm from left edge of banco arm to right edge of banco arm
         }
 
-        # self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
-        #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
-        #                            'strip_strip_1',
-        #                            'scintillator_top']
         self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
-                                   'rd5_plein_vfp_1']
+                                   'rd5_plein_esl_1', 'rd5_plein_saral_2', 'rd5_plein_vfp_1', 'asacusa_strip_2',
+                                   'urw_inter', 'rd5_grid_saral_1', 'rd5_strip_saral_1', 'rd5_strip_esl_1']
 
         self.detectors = [
             {
