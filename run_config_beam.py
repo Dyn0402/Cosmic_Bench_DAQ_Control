@@ -119,7 +119,7 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'overnight_first_beam',
+                'sub_run_name': 'subrun_1',
                 'run_time': 6 * 60,  # Minutes
                 'hvs': {
                     # '2': {
