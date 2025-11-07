@@ -126,7 +126,7 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'random_banco',
+                'sub_run_name': 'overnight_first_beam',
                 'run_time': 8 * 60,  # Minutes
                 'hvs': {
                     # '2': {
