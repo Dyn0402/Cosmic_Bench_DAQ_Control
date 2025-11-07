@@ -16,7 +16,7 @@ import threading
 import time
 import json
 import pandas as pd
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, send_from_directory, abort
 from flask_socketio import SocketIO, emit
 
 from daq_status import *
@@ -337,6 +337,35 @@ def start(data):
                     break
 
         threading.Thread(target=read_fd, args=(fd, name), daemon=True).start()
+
+
+@app.route("/list_pngs")
+def list_pngs():
+    directory = request.args.get("dir")
+    if not directory:
+        return jsonify(success=False, message="No directory specified")
+    if not os.path.isdir(directory):
+        return jsonify(success=False, message=f"Invalid directory: {directory}")
+
+    pngs = [f for f in os.listdir(directory) if f.lower().endswith(".png")]
+    if not pngs:
+        return jsonify(success=True, images=[])
+
+    # Create static-serving routes for these files
+    image_urls = [f"/serve_png?dir={directory}&file={f}" for f in pngs]
+    return jsonify(success=True, images=image_urls)
+
+
+@app.route("/serve_png")
+def serve_png():
+    directory = request.args.get("dir")
+    filename = request.args.get("file")
+    if not directory or not filename:
+        abort(400, "Missing parameters")
+    if not os.path.isfile(os.path.join(directory, filename)):
+        abort(404, "File not found")
+    return send_from_directory(directory, filename)
+
 
 # Generic input handler for all sessions
 for s in TMUX_SESSIONS:

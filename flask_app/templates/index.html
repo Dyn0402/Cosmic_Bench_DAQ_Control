@@ -5,13 +5,10 @@
 <div class="tab-pane fade show active" id="overview">
     <h2>DAQ Overview</h2>
     <div class="mb-3">
-<!--        <label for="run-select" class="me-2">Run Config:</label>-->
           <select id="run-select" class="form-select me-3" style="width:auto;"></select>
-<!--        <button id="start-run" class="btn btn-success me-2">Start Run</button>-->
         <button id="run-config-py" class="btn btn-success me-2">Start Run</button>
         <button id="stop-run" class="btn btn-danger">Stop Run</button>
         <button id="restart-all" class="btn btn-danger">Restart All</button>
-<!--        <button id="run-config-py" class="btn btn-secondary">Run from run_config_beam.py</button>-->
         <button id="take-pedestals" class="btn btn-secondary">Take Pedestals</button>
     </div>
 
@@ -138,6 +135,22 @@
         </div>
     </div>
 </div>
+
+
+<!-- Online QA Viewer Tab -->
+<div class="tab-pane fade" id="png-viewer">
+    <h2>Online QA</h2>
+    <div class="mb-3">
+        <label for="png-dir" class="form-label">Enter Directory Path:</label>
+        <input type="text" id="png-dir" class="form-control" style="max-width:600px;" placeholder="/path/to/png/folder">
+        <button id="load-pngs" class="btn btn-primary mt-2">Load Images</button>
+    </div>
+
+    <div id="png-gallery" class="row mt-4">
+        <!-- Images will be dynamically inserted here -->
+    </div>
+</div>
+
 
 
 {% endblock %}
@@ -645,23 +658,6 @@ async function updateHVPlots() {
     }
 }
 
-// async function loadRuns() {
-//   const res = await fetch("/get_runs");
-//   const runs = await res.json();
-//   const runSelect = document.getElementById("run-select");
-//   runSelect.innerHTML = "";
-//   runs.forEach(r => {
-//     const opt = document.createElement("option");
-//     opt.value = r;
-//     opt.textContent = r;
-//     runSelect.appendChild(opt);
-//   });
-//   if (runs.length > 0) {
-//     runSelect.value = runs[0];
-//     loadSubruns();
-//   }
-// }
-
 async function loadRuns() {
     // Hack to only allow run_config_beam.json
   const runSelect = document.getElementById("run-select");
@@ -702,41 +698,6 @@ document.getElementById("run-select").addEventListener("change", loadSubruns);
 
 // initial load
 loadRuns();
-
-// start run button handler
-// document.getElementById("start-run").addEventListener("click", async () => {
-//   const runName = document.getElementById("run-select").value;
-//   const res = await fetch("/start_run", {
-//     method: "POST",
-//     headers: { "Content-Type": "application/json" },
-//     body: JSON.stringify({ config: runName })
-//   });
-//   const data = await res.json();
-//
-//   // Create a fading popup
-//   const popup = document.createElement("div");
-//   popup.textContent = data.message;
-//   popup.style.position = "fixed";
-//   popup.style.top = "80px";
-//   popup.style.left = "50%";
-//   popup.style.transform = "translateX(-50%)";
-//   popup.style.right = "auto";
-//   popup.style.background = "#28a745";
-//   popup.style.color = "#fff";
-//   popup.style.padding = "1em 2em";
-//   popup.style.borderRadius = "8px";
-//   popup.style.boxShadow = "0 2px 8px rgba(0,0,0,0.2)";
-//   popup.style.zIndex = "9999";
-//   popup.style.opacity = "1";
-//   popup.style.transition = "opacity 1s";
-//
-//   document.body.appendChild(popup);
-//
-//   setTimeout(() => {
-//     popup.style.opacity = "0";
-//     setTimeout(() => popup.remove(), 1000);
-//   }, 2500);
-// });
 
 // take pedestals button handler
 document.getElementById("take-pedestals").addEventListener("click", async () => {
@@ -804,6 +765,42 @@ document.getElementById("run-config-py").addEventListener("click", async () => {
     updateHVPlots();
   }
 });
+
+// --- PNG Viewer JS ---
+document.getElementById("load-pngs").addEventListener("click", async () => {
+    const dir = document.getElementById("png-dir").value.trim();
+    if (!dir) return alert("Please enter a directory path");
+
+    const res = await fetch(`/list_pngs?dir=${encodeURIComponent(dir)}`);
+    const data = await res.json();
+    const gallery = document.getElementById("png-gallery");
+    gallery.innerHTML = "";
+
+    if (!data.success) {
+        gallery.innerHTML = `<p class="text-danger">Error: ${data.message}</p>`;
+        return;
+    }
+
+    if (data.images.length === 0) {
+        gallery.innerHTML = "<p>No PNGs found in this directory.</p>";
+        return;
+    }
+
+    data.images.forEach(imgUrl => {
+        const col = document.createElement("div");
+        col.className = "col-md-3 mb-3";
+        col.innerHTML = `
+            <div class="card bg-dark text-white">
+                <img src="${imgUrl}" class="card-img-top" style="object-fit:contain;max-height:200px;">
+                <div class="card-body p-2">
+                    <small>${imgUrl.split('/').pop()}</small>
+                </div>
+            </div>
+        `;
+        gallery.appendChild(col);
+    });
+});
+
 
 setInterval(updateStatus, 1000);  // update every 1s
 updateStatus();
