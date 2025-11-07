@@ -15,7 +15,7 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        self.run_name = 'run_3'
+        self.run_name = 'run_4'
         self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -131,35 +131,35 @@ class Config:
                     # }
                 }
             },
-            {
-                'sub_run_name': 'sub_run_2',
-                'run_time': 2,  # Minutes
-                'hvs': {
-                    '2': {
-                        '0': 620,
-                        '1': 440,
-                        '2': 500,
-                        '3': 520,
-                        '4': 480,
-                        '5': 620,
-                        '6': 490,
-                        '7': 480,
-                        '8': 480,
-                        '9': 495,
-                        '10': 480,
-                    },
-                    '5': {
-                        '0': 500,
-                        '1': 500,
-                        '6': 600,
-                        '7': 420,
-                        '8': 600,
-                        '9': 420,
-                        '10': 600,
-                        '11': 420,
-                    }
-                }
-            },
+            # {
+            #     'sub_run_name': 'sub_run_2',
+            #     'run_time': 2,  # Minutes
+            #     'hvs': {
+            #         '2': {
+            #             '0': 620,
+            #             '1': 440,
+            #             '2': 500,
+            #             '3': 520,
+            #             '4': 480,
+            #             '5': 620,
+            #             '6': 490,
+            #             '7': 480,
+            #             '8': 480,
+            #             '9': 495,
+            #             '10': 480,
+            #         },
+            #         '5': {
+            #             '0': 500,
+            #             '1': 500,
+            #             '6': 600,
+            #             '7': 420,
+            #             '8': 600,
+            #             '9': 420,
+            #             '10': 600,
+            #             '11': 420,
+            #         }
+            #     }
+            # },
         ]
 
         # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
