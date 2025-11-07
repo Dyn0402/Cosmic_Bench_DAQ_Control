@@ -50,7 +50,7 @@ class Config:
             'ip': '192.168.10.8',
             'port': 1101,
             # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/TbSPS25_test.cfg',
-            'daq_config_template_path': '/mnt/data/beam_sps_25/dream_run/config/TbSPS25_test.cfg',
+            'daq_config_template_path': '/mnt/data/beam_sps_25/dream_run/config/TbSPS25.cfg',
             # 'run_directory': f'/local/home/banco/dylan/Run/{self.run_name}/',
             'run_directory': f'/mnt/data/beam_sps_25/dream_run/{self.run_name}/',
             'data_out_dir': f'{self.base_out_dir}Run/{self.run_name}',
