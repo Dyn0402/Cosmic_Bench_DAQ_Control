@@ -15,7 +15,7 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        self.run_name = 'beam_test_run'
+        self.run_name = 'run_0'
         self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -49,9 +49,7 @@ class Config:
         self.dream_daq_info = {
             'ip': '192.168.10.8',
             'port': 1101,
-            # 'daq_config_template_path': '/local/home/banco/dylan/Run/config/TbSPS25_test.cfg',
             'daq_config_template_path': '/mnt/data/beam_sps_25/dream_run/config/TbSPS25.cfg',
-            # 'run_directory': f'/local/home/banco/dylan/Run/{self.run_name}/',
             'run_directory': f'/mnt/data/beam_sps_25/dream_run/{self.run_name}/',
             'data_out_dir': f'{self.base_out_dir}Run/{self.run_name}',
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
@@ -68,14 +66,9 @@ class Config:
         self.banco_info = {
             'ip': '128.141.41.199',
             'port': 1100,
-            # 'daq_run_command': 'cd /home/banco/dylan/Run/framework/bin && ./test_multi_noiseocc_int',
             'daq_run_command': 'cd /home/banco/SPS_Test_Beam_25/framework/bin && ./test_multi_noiseocc_int',
-            # 'data_temp_dir': '/home/banco/dylan/Run/data',
             'data_temp_dir': '/home/banco/SPS_Test_Beam_25/data',
-            # 'daq_run_command': 'cd /home/banco/CERNTestBeam/framework/bin && ./test_multi_noiseocc_int',
-            # 'data_temp_dir': '/home/banco/CERNTestBeam/data',
             'data_out_dir': f'/mnt/data/beam_sps_25/Run/{self.run_name}',
-            # 'data_out_dir': f'/home/banco/dylan/Run/data_testing',
             'data_inner_dir': 'banco_data'
         }
 
@@ -127,7 +120,7 @@ class Config:
         self.sub_runs = [
             {
                 'sub_run_name': 'overnight_first_beam',
-                'run_time': 8 * 60,  # Minutes
+                'run_time': 6 * 60,  # Minutes
                 'hvs': {
                     # '2': {
                     #     '0': 15,
