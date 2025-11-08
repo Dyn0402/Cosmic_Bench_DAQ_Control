@@ -450,7 +450,7 @@ def get_desync_monitor_status():
         color = "warning"
         fields.append({"label": "Banco Sync", "value": "❌ Internal mismatch"})
     elif banco_sync is True:
-        fields.append({"label": "Banco Sync", "value": "✅ All detectors aligned"})
+        fields.append({"label": "Banco Sync", "value": "✅ All ladders aligned"})
 
     # Add diff/time details
     if diff_val is not None:

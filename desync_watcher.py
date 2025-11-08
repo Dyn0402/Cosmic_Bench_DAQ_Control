@@ -110,7 +110,8 @@ class DeSyncMonitor:
             "dream_events",
             "banco_triggers",          # stringified list of triggers
             "difference",              # dream vs banco max diff
-            "banco_internal_diff"      # internal spread among banco detectors
+            "banco_synced",            # boolean, is banco synced between it's ladders
+            "banco_ladder_triggers",   # Last 4 banco trigger counts, probably each ladder
         ]
 
         # For desync tracking
@@ -275,7 +276,7 @@ class DeSyncMonitor:
                     print(f"⚠️ Persistent desync detected (Δ={current_diff} for {duration:.1f}s). Stopping run.")
                     try:
                         subprocess.run(
-                            ["/bash_scripts/stop_run.sh"],
+                            ["/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/bash_scripts/stop_run.sh"],
                             check=True,
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE,
@@ -325,7 +326,7 @@ class DeSyncMonitor:
                     print(f"⚠️ Persistent Banco internal desync detected (for {banco_duration:.1f}s). Stopping run.")
                     try:
                         subprocess.run(
-                            ["/bash_scripts/stop_run.sh"],
+                            ["/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/bash_scripts/stop_run.sh"],
                             check=True,
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE,
