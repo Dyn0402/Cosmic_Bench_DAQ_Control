@@ -421,7 +421,7 @@ def get_desync_monitor_status():
 
     # Build field details for display
     if diff_val is not None:
-        fields.append({"label": "Δ (Triggers - Events)", "value": str(diff_val)})
+        fields.append({"label": "Δ (banco - dream)", "value": str(diff_val)})
     if time_left is not None:
         fields.append({"label": "Seconds until stop", "value": f"{time_left:.1f}"})
 
