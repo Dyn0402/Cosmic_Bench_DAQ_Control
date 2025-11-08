@@ -8,7 +8,7 @@ sessions=$(tmux list-sessions -F "#{session_name}" 2>/dev/null)
 
 # Restart servers in detached screen
 screen -dmS restart_tmux bash -c '
-  sleep 2
+  sleep 20
   /local/home/banco/dylan/Cosmic_Bench_DAQ_Control/start_servers.sh
 '
 
