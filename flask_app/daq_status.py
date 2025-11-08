@@ -291,6 +291,7 @@ def get_banco_tracker_status():
         }
 
     rules = [
+        ('boost/v1.72.0-alice1-54(31):ERROR:105: Unable to locate a modulefile for ', "NOT READY YET", "danger"),
         ("Waiting for trigger...", "RUNNING", "success"),
         ("Triggers to the MOSAIC (trgCount)", "RUNNING", "success"),
         ("ROOT files ready to be closed", "RUNNING", "success"),
