@@ -14,6 +14,7 @@ import csv
 import time
 import threading
 import subprocess
+import json
 from datetime import datetime
 
 from Server import Server
@@ -187,7 +188,8 @@ class DeSyncMonitor:
         return {
             "status": status,
             "triggers": latest_trigger,
-            "banco_sync": banco_sync
+            "banco_sync": banco_sync,
+            'triggers_list': triggers_list
         }
 
     def log_status(self):
@@ -206,7 +208,8 @@ class DeSyncMonitor:
             dream["events"],
             banco["triggers"],
             diff,
-            banco["banco_sync"]
+            banco["banco_sync"],
+            json.dumps(banco["triggers_list"])  # serialize list
         ]
 
         # Write CSV header once
@@ -216,13 +219,6 @@ class DeSyncMonitor:
 
         with open(self.csv_path, "a", newline="") as f:
             csv.writer(f).writerow(row)
-
-        # Print Banco internal status each iteration
-        if banco["banco_sync"] is False:
-            print(
-                f"[{datetime.now().strftime('%H:%M:%S')}] ⚠️  Banco internal desync detected: last 4 triggers differ.")
-        elif banco["banco_sync"] is True:
-            print(f"[{datetime.now().strftime('%H:%M:%S')}] ✅ Banco internal sync OK.")
 
         return row
 
@@ -286,8 +282,8 @@ class DeSyncMonitor:
         print(f"Starting DeSyncMonitor thread (interval={self.interval}s)...")
         while not self.stop_event.is_set():
             row = self.log_status()
-            diff = row[-2]  # difference
-            banco_internal_diff = row[-1]  # internal diff
+            diff = row[-3]  # difference
+            banco_internal_diff = row[-2]  # internal diff
             self.check_desync(diff, banco_internal_diff)
             if self.stop_event.wait(self.interval):
                 break
