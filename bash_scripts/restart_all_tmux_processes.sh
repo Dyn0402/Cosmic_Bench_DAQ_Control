@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Restart servers in detached screen
+screen -dmS restart_tmux bash -c '
+  sleep 2
+  /local/home/banco/dylan/Cosmic_Bench_DAQ_Control/start_servers.sh
+'
+
 tmux list-sessions -F "#{session_name}" 2>/dev/null | grep -vE '^(decoder_|processor_|analyzer_)' | xargs -r -n1 tmux kill-session -t
 
 ## Patterns of tmux session names to KEEP
