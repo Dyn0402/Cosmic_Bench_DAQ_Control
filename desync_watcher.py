@@ -222,35 +222,49 @@ class DeSyncMonitor:
 
         return row
 
-    def check_desync(self, diff, banco_internal_diff):
+    def check_desync(self, diff, banco_sync):
         """Track differences and trigger stop_run.sh if persistent desync detected."""
         now = time.time()
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        # Keep small buffer
+        # Store (timestamp, diff)
         if diff is not None:
             self.last_diffs.append((now, diff))
-        if len(self.last_diffs) > self.min_points * 2:
-            self.last_diffs = self.last_diffs[-self.min_points * 2:]
+
+        # Keep enough history, but not too much (e.g. last 5 minutes)
+        cutoff = now - 300
+        self.last_diffs = [(t, d) for t, d in self.last_diffs if t >= cutoff]
 
         if len(self.last_diffs) < self.min_points:
             print(f"[{timestamp}] Waiting for enough data points... ({len(self.last_diffs)}/{self.min_points})")
             return False
 
-        diffs = [d for _, d in self.last_diffs[-self.min_points:]]
-        times = [t for t, _ in self.last_diffs[-self.min_points:]]
-        duration = times[-1] - times[0]
+        # Split recent diffs/times
+        diffs = [d for _, d in self.last_diffs]
+        times = [t for t, _ in self.last_diffs]
         current_diff = diffs[-1]
 
-        # Print Banco internal consistency
-        if banco_internal_diff is None:
-            print(f"[{timestamp}] ⚠️ Banco internal sync status unknown.")
-        elif isinstance(banco_internal_diff, int) and banco_internal_diff > 0:
-            print(f"[{timestamp}] ⚠️ Banco internal mismatch detected: spread={banco_internal_diff}")
+        # Find the most recent time the diff changed
+        for i in range(len(diffs) - 2, -1, -1):
+            if diffs[i] != current_diff:
+                last_change_time = times[i + 1]
+                break
+        else:
+            last_change_time = times[0]  # diff has never changed in history
 
-        # Desync logic as before
-        if all(d == diffs[0] for d in diffs) and diffs[0] != 0:
-            time_remaining = max(0, self.min_duration - duration)
+        duration = now - last_change_time
+        time_remaining = max(0, self.min_duration - duration)
+
+        # Print Banco internal consistency
+        if banco_sync is None:
+            print(f"[{timestamp}] Banco internal sync status unknown.")
+        elif not banco_sync:
+            print(f"[{timestamp}] ⚠️ Banco internal desync detected!")
+        else:
+            print(f"[{timestamp}] ✅ Banco internal sync OK.")
+
+        # If diff is constant and nonzero
+        if current_diff != 0:
             print(f"[{timestamp}] Δ={current_diff} constant for {duration:.1f}s "
                   f"({time_remaining:.1f}s until stop if persists)")
 
@@ -272,22 +286,11 @@ class DeSyncMonitor:
                 return True
         else:
             if self.desync_triggered:
-                print(f"[{timestamp}] Desync resolved or changing (Δ={current_diff}). Resetting trigger.")
+                print(f"[{timestamp}] Desync resolved (Δ={current_diff}). Resetting trigger.")
             self.desync_triggered = False
             print(f"[{timestamp}] Δ={current_diff} (no persistent desync)")
 
         return False
-
-    def run(self):
-        print(f"Starting DeSyncMonitor thread (interval={self.interval}s)...")
-        while not self.stop_event.is_set():
-            row = self.log_status()
-            diff = row[-3]  # difference
-            banco_internal_diff = row[-2]  # internal diff
-            self.check_desync(diff, banco_internal_diff)
-            if self.stop_event.wait(self.interval):
-                break
-        print("DeSyncMonitor thread stopped.")
 
 
 # class DeSyncMonitor:
