@@ -118,6 +118,7 @@ class DeSyncMonitor:
         self.last_diffs = []       # (timestamp, diff)
         self.last_banco_syncs = []  # (timestamp, banco_sync)
         self.desync_triggered = False
+        self.sent_run_stop = False
 
         # Initialize CSV header if needed
         if not os.path.exists(self.csv_path):
@@ -274,17 +275,19 @@ class DeSyncMonitor:
                 if not self.desync_triggered:
                     self.desync_triggered = True
                     print(f"⚠️ Persistent desync detected (Δ={current_diff} for {duration:.1f}s). Stopping run.")
-                    try:
-                        subprocess.run(
-                            ["/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/bash_scripts/stop_run.sh"],
-                            check=True,
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE,
-                            text=True
-                        )
-                        print("✅ stop_run.sh executed successfully.")
-                    except subprocess.CalledProcessError as e:
-                        print(f"❌ Error executing stop_run.sh: {e}")
+                    if not self.sent_run_stop:
+                        try:
+                            self.sent_run_stop = True
+                            subprocess.run(
+                                ["/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/bash_scripts/stop_run.sh"],
+                                check=True,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE,
+                                text=True
+                            )
+                            print("✅ stop_run.sh executed successfully.")
+                        except subprocess.CalledProcessError as e:
+                            print(f"❌ Error executing stop_run.sh: {e}")
                 return True
         else:
             if self.desync_triggered:
@@ -324,17 +327,19 @@ class DeSyncMonitor:
                 if not self.desync_triggered:
                     self.desync_triggered = True
                     print(f"⚠️ Persistent Banco internal desync detected (for {banco_duration:.1f}s). Stopping run.")
-                    try:
-                        subprocess.run(
-                            ["/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/bash_scripts/stop_run.sh"],
-                            check=True,
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE,
-                            text=True
-                        )
-                        print("✅ stop_run.sh executed successfully.")
-                    except subprocess.CalledProcessError as e:
-                        print(f"❌ Error executing stop_run.sh: {e}")
+                    if not self.sent_run_stop:
+                        self.sent_run_stop = True
+                        try:
+                            subprocess.run(
+                                ["/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/bash_scripts/stop_run.sh"],
+                                check=True,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE,
+                                text=True
+                            )
+                            print("✅ stop_run.sh executed successfully.")
+                        except subprocess.CalledProcessError as e:
+                            print(f"❌ Error executing stop_run.sh: {e}")
                 return True
         else:
             if self.desync_triggered:
