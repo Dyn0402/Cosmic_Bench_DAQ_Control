@@ -128,8 +128,16 @@ def run_config_py():
             text=True
         )
 
+        # Load config path json to get run name
+        try:
+            with open(config_path) as f:
+                cfg = json.load(f)
+            run_name = cfg.get("run_name", "Unknown")
+        except Exception as e:
+            run_name = "Error loading run name"
+
         if result.returncode == 0:
-            return jsonify({"message": f"Run started with loaded run_config_beam.py"})
+            return jsonify({"message": f"Run started with loaded run_config_beam.py", "run_name": run_name})
         else:
             return jsonify({"message": f"Error: {result.stderr}"}), 500
     except Exception as e:
@@ -185,6 +193,24 @@ def get_subruns():
     except Exception as e:
         print("Error reading subruns:", e)
         return jsonify([])
+
+@app.route("/get_run_name")
+def get_run_name():
+    run_name = request.args.get("run")
+    if not run_name:
+        return jsonify({"success": False, "message": "No run specified"}), 400
+
+    config_path = os.path.join(CONFIG_RUN_DIR, run_name)
+    if not os.path.isfile(config_path):
+        return jsonify({"success": False, "message": "Run config not found"}), 404
+
+    try:
+        with open(config_path) as f:
+            cfg = json.load(f)
+        actual_run_name = cfg.get("run_name", "Unknown")
+        return jsonify({"success": True, "run_name": actual_run_name})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
 
 
 @app.route("/hv_data")

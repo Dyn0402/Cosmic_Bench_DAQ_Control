@@ -11,6 +11,9 @@
         <button id="restart-all" class="btn btn-danger">Restart All</button>
         <button id="take-pedestals" class="btn btn-secondary">Take Pedestals</button>
     </div>
+    <div class="mt-2">
+        <small class="text-muted">Current run:&nbsp;<span id="run-display">None</span></small>
+    </div>
 
     <div class="row" id="status-cards">
         <!-- Status cards populated dynamically -->
@@ -173,6 +176,7 @@
 })();
 {% endfor %}
 
+let run = null;
 let lastSubrun = null;
 
 // --- DAQ Overview JS ---
@@ -249,6 +253,8 @@ document.getElementById("stop-run").addEventListener("click", async () => {
   popup.style.transition = "opacity 1s";
 
   document.body.appendChild(popup);
+
+  run = null;
 
   setTimeout(() => {
     popup.style.opacity = "0";
@@ -758,6 +764,7 @@ document.getElementById("run-config-py").addEventListener("click", async () => {
   }, 2500);  
     
   if (data.success) {
+    run = data.run_name;
     await loadRuns();
     const runSelect = document.getElementById("run-select");
     runSelect.value = "run_config_beam.json";
@@ -800,6 +807,13 @@ document.getElementById("load-pngs").addEventListener("click", async () => {
         gallery.appendChild(col);
     });
 });
+
+// keep the displayed run updated by reading the global `run` variable
+setInterval(function(){
+    var el = document.getElementById('run-display');
+    if (!el) return;
+    el.textContent = (typeof run !== 'undefined' && run) ? run : 'None';
+}, 500);
 
 
 setInterval(updateStatus, 1000);  // update every 1s
