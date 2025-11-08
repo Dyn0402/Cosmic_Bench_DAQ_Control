@@ -8,7 +8,7 @@ if [ -z "$CONFIG_PATH" ]; then
 fi
 
 # Check if run output directory exists, iterate run name if so
-python iterate_run_num.py "$CONFIG_PATH"
+#python iterate_run_num.py "$CONFIG_PATH"  # Not working, skip for now!
 
 COMMAND="python daq_control.py \"$CONFIG_PATH\""
 

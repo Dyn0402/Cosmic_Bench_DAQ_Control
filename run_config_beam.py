@@ -15,7 +15,7 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        self.run_name = 'desync_test'
+        self.run_name = 'run_14'
         self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -139,6 +139,54 @@ class Config:
                     # '5': {
                     #     '0': 20,
                     # }
+                }
+            },
+            {
+                'sub_run_name': 'subrun_2',
+                'run_time': 6 * 60,  # Minutes
+                'hvs': {
+                }
+            },
+            {
+                'sub_run_name': 'subrun_3',
+                'run_time': 6 * 60,  # Minutes
+                'hvs': {
+                }
+            },
+            {
+                'sub_run_name': 'subrun_4',
+                'run_time': 6 * 60,  # Minutes
+                'hvs': {
+                }
+            },
+            {
+                'sub_run_name': 'subrun_5',
+                'run_time': 6 * 60,  # Minutes
+                'hvs': {
+                }
+            },
+            {
+                'sub_run_name': 'subrun_6',
+                'run_time': 6 * 60,  # Minutes
+                'hvs': {
+                }
+            },
+            {
+                'sub_run_name': 'subrun_7',
+                'run_time': 6 * 60,  # Minutes
+                'hvs': {
+                }
+            },
+            {
+                'sub_run_name': 'subrun_8',
+                'run_time': 6 * 60,  # Minutes
+                'hvs': {
+                }
+            },
+            {
+                'sub_run_name': 'subrun_9',
+                'run_time': 6 * 60,  # Minutes
+                'hvs': {
                 }
             },
             # {
