@@ -767,6 +767,7 @@ document.getElementById("run-config-py").addEventListener("click", async () => {
     
   if (data.success) {
     run = data.run_name;
+    console.log("Setting run to:", run);
     await loadRuns();
     const runSelect = document.getElementById("run-select");
     runSelect.value = "run_config_beam.json";
@@ -814,6 +815,7 @@ document.getElementById("load-pngs").addEventListener("click", async () => {
 setInterval(function(){
     var el = document.getElementById('run-display');
     if (!el) return;
+    console.log("Updating run display to:", run);
     el.textContent = (typeof run !== 'undefined' && run) ? run : 'None';
 }, 500);
 
