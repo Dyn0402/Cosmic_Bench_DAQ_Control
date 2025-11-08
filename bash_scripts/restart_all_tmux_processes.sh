@@ -6,6 +6,12 @@ KEEP_PATTERNS=("decoder_" "processor_" "analyzer_")
 # Get all tmux sessions
 sessions=$(tmux list-sessions -F "#{session_name}" 2>/dev/null)
 
+# Restart servers in detached screen
+screen -dmS restart_tmux bash -c '
+  sleep 2
+  /local/home/banco/dylan/Cosmic_Bench_DAQ_Control/start_servers.sh
+'
+
 # Determine which to kill
 for s in $sessions; do
   keep=false
@@ -20,12 +26,6 @@ for s in $sessions; do
     tmux kill-session -t "$s"
   fi
 done
-
-# Restart servers in detached screen
-screen -dmS restart_tmux bash -c '
-  sleep 2
-  /local/home/banco/dylan/Cosmic_Bench_DAQ_Control/start_servers.sh
-'
 
 
 ## Start a detached screen that will handle the restart
