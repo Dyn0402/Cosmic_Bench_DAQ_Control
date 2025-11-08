@@ -23,11 +23,16 @@ INACTIVITY_TIMEOUT_HOURS = 2     # exit if no new data for this long
 
 
 def main():
-    if len(sys.argv) != 2:
+    if len(sys.argv) <= 2:
         print("Usage: python analyzer_control.py run_config_json_path")
         sys.exit(1)
 
     run_config_json_path = sys.argv[1]
+
+
+    if len(sys.argv) == 3:
+        pass
+
     config = load_config(run_config_json_path)
 
     run_name = config["run_name"]
@@ -54,14 +59,16 @@ def main():
         print(f"{filtered_root_dir} found. Waiting {POST_DIR_WAIT} seconds for files to stabilize.")
         time.sleep(POST_DIR_WAIT)
 
+        first_look = True
         # Monitor for new files or changes
         prev_snapshot = get_dir_snapshot(filtered_root_dir)
 
         while True:
+            print(f"Checking for new data in {filtered_root_dir}...")
             time.sleep(CHECK_INTERVAL)
             new_snapshot = get_dir_snapshot(filtered_root_dir)
 
-            if new_snapshot != prev_snapshot:
+            if len(new_snapshot) > 0 and (first_look or new_snapshot != prev_snapshot):
                 print(f"New data detected in {filtered_root_dir}. Resetting inactivity timer.")
                 last_activity_time = time.time()
                 prev_snapshot = new_snapshot
@@ -78,6 +85,7 @@ def main():
                     ]
                     print(f"Running: {' '.join(cmd)}")
                     Popen(cmd, start_new_session=True)
+            first_look = False
 
             # Timeout check
             if time.time() - last_activity_time > timeout_seconds:
