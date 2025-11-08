@@ -425,8 +425,9 @@ def get_desync_monitor_status():
     if time_left is not None:
         fields.append({"label": "Seconds until stop", "value": f"{time_left:.1f}"})
 
-    # Check if listening in last line
-    if len(fields) == 0 and "Listening on " in output.splitlines()[-1]:
+    # Check if listening in two lines
+    last_lines = output.splitlines()[-3:]
+    if len(last_lines) >= 2 and any("Listening on " in line for line in last_lines):
         status = "WAITING"
         color = "secondary"
 
