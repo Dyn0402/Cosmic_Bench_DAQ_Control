@@ -77,7 +77,7 @@ def main():
                 for detector in included_detectors:
                     cmd = [
                         "python",
-                        "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/online_qa_plots.py",
+                        "/local/home/banco/dylan/saclay_micromegas/online_qa_plots.py",
                         daq_type,
                         run_name,
                         sub_run_name,
