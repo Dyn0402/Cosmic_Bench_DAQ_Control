@@ -44,6 +44,8 @@ def main():
     # Start a tmux processor_port session --> Wait for decoder to start, then run the on-the-fly processing loop
     start_tmux(f'processor_{decoder_port}', f'"sleep 20; python processor_runner.py {decoder_port} {run_config_path}"')
 
+    # Start a tmux analyzer session --> Let analyzer wait for data and process
+
     print('donzo')
 
 
