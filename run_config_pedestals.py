@@ -55,10 +55,7 @@ class Config:
             'ip': '128.141.41.199',
             'port': 1100,
             'daq_run_command': 'cd /home/banco/SPS_Test_Beam_25/framework/bin && ./test_multi_noiseocc_int',
-            'data_temp_dir': '/home/banco/SPS_Test_Beam_25/noise_data',
-            # 'daq_run_command': 'cd /home/banco/CERNTestBeam/framework/bin && ./test_multi_noiseocc_int',
-            # 'data_temp_dir': '/home/banco/CERNTestBeam/data',
-            # 'data_out_dir': f'{self.base_out_dir}Run/{self.run_name}',
+            'data_temp_dir': '/home/banco/SPS_Test_Beam_25/data',
             'data_out_dir': self.run_out_dir,
             'data_inner_dir': 'banco_data'
         }
