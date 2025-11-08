@@ -179,10 +179,6 @@ class Config:
                 if channel in channels:
                     sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
             self.sub_runs.append(sub_run)
-            for channel in sub_run['hvs'][card]:
-                if channel in channels:
-                    sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
-            self.sub_runs.append(sub_run)
 
         # Append copies of sub_runs with same voltages but different run names
         # template = self.sub_runs[0]
