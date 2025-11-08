@@ -211,7 +211,7 @@ class Config:
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
                     'x': -13.54,  # mm  Guess from previous alignment plus shift measurement
-                    'y': self.bench_geometry['banco_movable_y_position'],  # mm
+                    'y': self.bench_geometry['banco_moveable_y_position'],  # mm
                     'z': 842.20 - 842.20 + 500,  # mm
                 },
                 'det_orientation': {
@@ -227,7 +227,7 @@ class Config:
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
                     'x': -15.41,  # mm  Guess from previous alignment plus shift measurement
-                    'y': self.bench_geometry['banco_movable_y_position'],  # mm
+                    'y': self.bench_geometry['banco_moveable_y_position'],  # mm
                     # 'z': 853.26 - 842.20 + 500,  # mm
                     'z': 500 + self.bench_geometry['banco_ladder_separation_z'],  # mm
                 },
@@ -244,7 +244,7 @@ class Config:
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
                     'x': -13.21,  # mm  Guess from previous alignment plus shift measurement
-                    'y': 10.0,  # mm
+                    'y': self.bench_geometry['banco_moveable_y_position'],  # mm
                     'z': 600,  # mm
                 },
                 'det_orientation': {
@@ -260,7 +260,7 @@ class Config:
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
                     'x': -15.03,  # mm  Guess from previous alignment plus shift measurement
-                    'y': self.bench_geometry['banco_movable_y_position'],  # mm
+                    'y': self.bench_geometry['banco_moveable_y_position'],  # mm
                     'z': 600 + self.bench_geometry['banco_ladder_separation_z'],  # mm
                 },
                 'det_orientation': {
