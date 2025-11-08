@@ -249,7 +249,7 @@ class DeSyncMonitor:
         # Print Banco internal consistency
         if banco_internal_diff is None:
             print(f"[{timestamp}] ⚠️ Banco internal sync status unknown.")
-        elif isinstance(banco_internal_diff, int) > 0:
+        elif isinstance(banco_internal_diff, int) and banco_internal_diff > 0:
             print(f"[{timestamp}] ⚠️ Banco internal mismatch detected: spread={banco_internal_diff}")
 
         # Desync logic as before
