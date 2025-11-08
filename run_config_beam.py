@@ -133,92 +133,31 @@ class Config:
                 'sub_run_name': 'subrun_1',
                 'run_time': 6 * 60,  # Minutes
                 'hvs': {
-                    # '2': {
-                    #     '0': 15,
-                    #     '1': 5,
-                    # },
-                    # '5': {
-                    #     '0': 20,
-                    # }
+                    '2': {
+                        '0': 670,
+                        '1': 490,
+                        '2': 550,
+                        '3': 570,
+                        '4': 530,
+                        '5': 670,
+                        '6': 540,
+                        '7': 530,
+                        '8': 530,
+                        '9': 545,
+                        '10': 530,
+                    },
+                    '5': {
+                        '0': 500,
+                        '1': 500,
+                        '6': 640,
+                        '7': 440,
+                        '8': 700,
+                        '9': 500,
+                        '10': 700,
+                        '11': 500,
+                    }
                 }
             },
-            {
-                'sub_run_name': 'subrun_2',
-                'run_time': 6 * 60,  # Minutes
-                'hvs': {
-                }
-            },
-            {
-                'sub_run_name': 'subrun_3',
-                'run_time': 6 * 60,  # Minutes
-                'hvs': {
-                }
-            },
-            {
-                'sub_run_name': 'subrun_4',
-                'run_time': 6 * 60,  # Minutes
-                'hvs': {
-                }
-            },
-            {
-                'sub_run_name': 'subrun_5',
-                'run_time': 6 * 60,  # Minutes
-                'hvs': {
-                }
-            },
-            {
-                'sub_run_name': 'subrun_6',
-                'run_time': 6 * 60,  # Minutes
-                'hvs': {
-                }
-            },
-            {
-                'sub_run_name': 'subrun_7',
-                'run_time': 6 * 60,  # Minutes
-                'hvs': {
-                }
-            },
-            {
-                'sub_run_name': 'subrun_8',
-                'run_time': 6 * 60,  # Minutes
-                'hvs': {
-                }
-            },
-            {
-                'sub_run_name': 'subrun_9',
-                'run_time': 6 * 60,  # Minutes
-                'hvs': {
-                }
-            },
-            # {
-            #     'sub_run_name': 'sub_run_2',
-            #     'run_time': 2,  # Minutes
-            #     'hvs': {
-            #         '2': {
-            #             '0': 620,
-            #             '1': 440,
-            #             '2': 500,
-            #             '3': 520,
-            #             '4': 480,
-            #             '5': 620,
-            #             '6': 490,
-            #             '7': 480,
-            #             '8': 480,
-            #             '9': 495,
-            #             '10': 480,
-            #         },
-            #         '5': {
-            #             '0': 500,
-            #             '1': 500,
-            #             '6': 600,
-            #             '7': 420,
-            #             '8': 600,
-            #             '9': 420,
-            #             '10': 600,
-            #             '11': 420,
-            #         }
-            #     }
-            # },
         ]
 
         # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
@@ -232,6 +171,13 @@ class Config:
         #         if channel in channels:
         #             sub_run['hvs'][card][channel] = drift_v
         #     self.sub_runs.append(sub_run)
+
+        # Append copies of sub_runs with same voltages but different run names
+        template = self.sub_runs[0]
+        for i in range(1, 6):
+            sub_run = copy.deepcopy(template)
+            sub_run['sub_run_name'] = f'subrun_{i+1}'
+            self.sub_runs.append(sub_run)
 
         self.bench_geometry = {
             'board_thickness': 5,  # mm  Thickness of PCB for test boards  Guess!
