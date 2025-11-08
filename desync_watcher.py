@@ -115,6 +115,7 @@ class DeSyncMonitor:
 
         # For desync tracking
         self.last_diffs = []       # (timestamp, diff)
+        self.last_banco_syncs = []  # (timestamp, banco_sync)
         self.desync_triggered = False
 
         # Initialize CSV header if needed
@@ -231,12 +232,20 @@ class DeSyncMonitor:
         if diff is not None:
             self.last_diffs.append((now, diff))
 
+        if banco_sync is not None:
+            self.last_banco_syncs.append((now, banco_sync))
+
         # Keep enough history, but not too much (e.g. last 5 minutes)
         cutoff = now - 300
         self.last_diffs = [(t, d) for t, d in self.last_diffs if t >= cutoff]
+        self.last_banco_syncs = [(t, s) for t, s in self.last_banco_syncs if t >= cutoff]
 
         if len(self.last_diffs) < self.min_points:
             print(f"[{timestamp}] Waiting for enough data points... ({len(self.last_diffs)}/{self.min_points})")
+            return False
+
+        if len(self.last_banco_syncs) < self.min_points:
+            print(f"[{timestamp}] Waiting for enough Banco sync data points... ({len(self.last_banco_syncs)}/{self.min_points})")
             return False
 
         # Split recent diffs/times
@@ -254,14 +263,6 @@ class DeSyncMonitor:
 
         duration = now - last_change_time
         time_remaining = max(0, self.min_duration - duration)
-
-        # Print Banco internal consistency
-        if banco_sync is None:
-            print(f"[{timestamp}] Banco internal sync status unknown.")
-        elif not banco_sync:
-            print(f"[{timestamp}] ⚠️ Banco internal desync detected!")
-        else:
-            print(f"[{timestamp}] ✅ Banco internal sync OK.")
 
         # If diff is constant and nonzero
         if current_diff != 0:
@@ -289,6 +290,56 @@ class DeSyncMonitor:
                 print(f"[{timestamp}] Desync resolved (Δ={current_diff}). Resetting trigger.")
             self.desync_triggered = False
             print(f"[{timestamp}] Δ={current_diff} (no persistent desync)")
+
+        # Print Banco internal consistency
+        if banco_sync is None:
+            print(f"[{timestamp}] Banco internal sync status unknown.")
+        elif not banco_sync:
+            print(f"[{timestamp}] ⚠️ Banco internal desync detected!")
+        else:
+            print(f"[{timestamp}] ✅ Banco internal sync OK.")
+
+        # Split recent banco syncs
+        banco_syncs = [s for _, s in self.last_banco_syncs]
+        banco_sync_times = [t for t, _ in self.last_banco_syncs]
+        current_banco_sync = banco_syncs[-1]
+
+        # Find the most recent time the banco sync changed
+        for i in range(len(banco_syncs) - 2, -1, -1):
+            if banco_syncs[i] != current_banco_sync:
+                last_banco_change_time = banco_sync_times[i + 1]
+                break
+        else:
+            last_banco_change_time = banco_sync_times[0]  # sync has never changed in history
+
+        banco_duration = now - last_banco_change_time
+        banco_time_remaining = max(0, self.min_duration - banco_duration)
+
+        # If banco is currently desynced and has been for long enough
+        if current_banco_sync is False:
+            print(f"[{timestamp}] Banco internal desync for {banco_duration:.1f}s "
+                  f"({banco_time_remaining:.1f}s until stop if persists)")
+            if banco_duration >= self.min_duration:
+                if not self.desync_triggered:
+                    self.desync_triggered = True
+                    print(f"⚠️ Persistent Banco internal desync detected (for {banco_duration:.1f}s). Stopping run.")
+                    try:
+                        subprocess.run(
+                            ["/bash_scripts/stop_run.sh"],
+                            check=True,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE,
+                            text=True
+                        )
+                        print("✅ stop_run.sh executed successfully.")
+                    except subprocess.CalledProcessError as e:
+                        print(f"❌ Error executing stop_run.sh: {e}")
+                return True
+        else:
+            if self.desync_triggered:
+                print(f"[{timestamp}] Banco internal desync resolved. Resetting trigger.")
+            self.desync_triggered = False
+            print(f"[{timestamp}] Banco internal sync OK.")
 
         return False
 
