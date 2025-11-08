@@ -137,7 +137,7 @@ def run_config_py():
             run_name = "Error loading run name"
 
         if result.returncode == 0:
-            return jsonify({"message": f"Run started with loaded run_config_beam.py", "run_name": run_name})
+            return jsonify({"success": True, "message": f"Run started with loaded run_config_beam.py", "run_name": run_name})
         else:
             return jsonify({"message": f"Error: {result.stderr}"}), 500
     except Exception as e:
