@@ -4,17 +4,17 @@
 <!-- DAQ Overview Tab -->
 <div class="tab-pane fade show active" id="overview">
     <h2>DAQ Overview</h2>
+    <div class="mt-2">
+        <h6 class="text-white mb-0" style="font-size:1.1rem; font-weight:600;">
+            Current run:&nbsp;<span id="run-display" style="color:#fff; font-weight:700;">None</span>
+        </h6>
+    </div>
     <div class="mb-3">
           <select id="run-select" class="form-select me-3" style="width:auto;"></select>
         <button id="run-config-py" class="btn btn-success me-2">Start Run</button>
         <button id="stop-run" class="btn btn-danger">Stop Run</button>
         <button id="restart-all" class="btn btn-danger">Restart All</button>
         <button id="take-pedestals" class="btn btn-secondary">Take Pedestals</button>
-    </div>
-    <div class="mt-2">
-        <h6 class="text-white mb-0" style="font-size:1.1rem; font-weight:600;">
-            Current run:&nbsp;<span id="run-display" style="color:#fff; font-weight:700;">None</span>
-        </h6>
     </div>
 
     <div class="row" id="status-cards">
