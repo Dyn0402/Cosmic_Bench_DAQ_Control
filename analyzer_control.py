@@ -17,13 +17,13 @@ from subprocess import Popen
 
 # ==== CONFIGURABLE PARAMETERS ====
 CHECK_INTERVAL = 60              # seconds between checks for new data
-POST_DIR_WAIT = 120              # seconds to wait after directory first appears
+POST_DIR_WAIT = 10              # seconds to wait after directory first appears
 INACTIVITY_TIMEOUT_HOURS = 2     # exit if no new data for this long
 # =================================
 
 
 def main():
-    if len(sys.argv) <= 2:
+    if len(sys.argv) < 2:
         print("Usage: python analyzer_control.py run_config_json_path")
         sys.exit(1)
 
@@ -77,7 +77,7 @@ def main():
                 for detector in included_detectors:
                     cmd = [
                         "python",
-                        "online_qa_plots.py",
+                        "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/online_qa_plots.py",
                         daq_type,
                         run_name,
                         sub_run_name,
