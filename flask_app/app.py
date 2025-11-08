@@ -31,10 +31,8 @@ HV_TAIL = 1000  # number of most recent rows to show
 app = Flask(__name__)
 socketio = SocketIO(app)
 
-# TMUX_SESSIONS = ["hv_control", "dream_daq", "decoder", "daq_control", "trigger_veto_control", "trigger_gen_control",
-#                  "banco_tracker", "processor"]
 TMUX_SESSIONS = ["hv_control", "dream_daq", "daq_control", "trigger_veto_control", "trigger_gen_control",
-                 "banco_tracker"]
+                 "banco_tracker", "desync_monitor"]
 sessions = {}
 
 @app.route("/")
@@ -61,6 +59,8 @@ def status_all():
             statuses[s] = get_decoder_status()
         elif s == "banco_tracker":
             statuses[s] = get_banco_tracker_status()
+        elif s == "desync_monitor":
+            statuses[s] = get_desync_monitor_status()
         else:
             statuses[s] = {
                 "status": "READY",

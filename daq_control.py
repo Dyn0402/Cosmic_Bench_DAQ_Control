@@ -57,6 +57,11 @@ def main():
         sedip28_ip, sedip28_port = None, None
     if config.generate_external_triggers:
         trigger_gen_ip, trigger_gen_port = config.trigger_gen_info['ip'], config.trigger_gen_info['port']
+    watch_for_desync = getattr(config, 'watch_for_desync', False)
+    if watch_for_desync:
+        desync_watch_ip, desync_watch_port = config.desync_watcher_info['ip'], config.desync_watcher_info['port']
+    else:
+        desync_watch_ip, desync_watch_port = None, None
 
     dream_daq_ip, dream_daq_port = config.dream_daq_info['ip'], config.dream_daq_info['port']
 
@@ -67,6 +72,7 @@ def main():
     dedip196_processor_client = Client(dedip196_ip, dedip196_port) if config.process_on_fly else nullcontext()
     sedip28_processor_client = Client(sedip28_ip, sedip28_port) if m3 and config.process_on_fly else nullcontext()
     dream_daq_client = Client(dream_daq_ip, dream_daq_port)
+    desync_watch_client = Client(desync_watch_ip, desync_watch_port) if watch_for_desync else nullcontext()
 
     with hv_client as hv, \
             trigger_switch_client as trigger_switch, \
@@ -74,7 +80,8 @@ def main():
             banco_daq_client as banco_daq, \
             dedip196_processor_client as dedip196_processor, \
             sedip28_processor_client as sedip28_processor, \
-            dream_daq_client as dream_daq:
+            dream_daq_client as dream_daq, \
+            desync_watch_client as desync_watcher:
 
         hv.send('Connected to daq_control')
         hv.receive()
@@ -119,6 +126,11 @@ def main():
                 sedip28_processor.receive()
                 sedip28_processor.send_json(config.sedip28_processor_info)
 
+        if watch_for_desync:
+            desync_watcher.send('Connected to daq_control')
+            desync_watcher.receive()
+            desync_watcher.send_json(config.desync_watcher_info)
+
         sleep(2)  # Wait for all clients to do what they need to do (specifically, create directories)
 
         for sub_run in config.sub_runs:
@@ -156,6 +168,12 @@ def main():
                     banco_daq.send(f'Start {sub_run_name}')
                     banco_daq.receive()
 
+                if watch_for_desync:
+                    desync_watcher.send('Start Monitoring')
+                    desync_watcher.receive()
+                    desync_watcher.send_json(sub_run)
+                    desync_watcher.receive()
+
                 daq_trigger_switch = trigger_switch if banco else None
                 daq_control_args = (config.dream_daq_info['daq_config_template_path'], sub_run_name, sub_run['run_time'],
                                     sub_out_dir, daq_trigger_switch, dream_daq)
@@ -179,6 +197,11 @@ def main():
                         hv.receive()  # Stopping monitoring
                         hv.receive()  # Finished monitoring
 
+                    if watch_for_desync:
+                        desync_watcher.send('End Monitoring')
+                        desync_watcher.receive()  # Stopping monitoring
+                        desync_watcher.receive()  # Finished monitoring
+
                     print(f'Finished with sub run {sub_run_name}, waiting 10 seconds before next run')
                     sleep(10)
         print('Run complete, closing down subsystems')
@@ -195,6 +218,8 @@ def main():
             banco_daq.send('Finished')
             trigger_switch.send('Finished')
         dream_daq.send('Finished')
+        if watch_for_desync:
+            desync_watcher.send('Finished')
         if config.process_on_fly:
             dedip196_processor.send('Finished')
             if m3:

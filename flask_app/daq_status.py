@@ -367,3 +367,66 @@ def get_decoder_status():
                 return {"status": status, "color": color, "fields": []}
 
     return {"status": "UNKNOWN STATE", "color": "danger", "fields": []}
+
+
+def get_desync_monitor_status():
+    try:
+        output = subprocess.check_output(
+            ["tmux", "capture-pane", "-pS", "-30", "-t", "desync_monitor:0.0"],
+            text=True
+        )
+    except subprocess.CalledProcessError:
+        return {
+            "status": "ERROR",
+            "color": "danger",
+            "fields": [{"label": "Details", "value": "desync_monitor tmux not running"}]
+        }
+
+    # Default fields
+    fields = []
+
+    # Parse latest Δ and timing info
+    last_line = ""
+    for line in reversed(output.splitlines()):
+        if "Δ=" in line:
+            last_line = line.strip()
+            break
+
+    # Extract difference and countdown if present
+    m = re.search(r"Δ=(-?\d+)", last_line)
+    diff_val = int(m.group(1)) if m else None
+
+    m_time = re.search(r"([0-9.]+)s until stop", last_line)
+    time_left = float(m_time.group(1)) if m_time else None
+
+    # Determine state and color
+    if "Persistent desync detected" in output or "⚠️" in output:
+        status = "DESYNC DETECTED"
+        color = "danger"
+    elif diff_val is not None and diff_val != 0:
+        # Getting close to desync if countdown exists
+        if time_left is not None:
+            if time_left < 10:
+                status = "IMMINENT DESYNC"
+                color = "warning"
+            else:
+                status = "MONITORING (DESYNC TREND)"
+                color = "success"
+        else:
+            status = "MONITORING"
+            color = "success"
+    else:
+        status = "SYNCED"
+        color = "success"
+
+    # Build field details for display
+    if diff_val is not None:
+        fields.append({"label": "Δ (Triggers - Events)", "value": str(diff_val)})
+    if time_left is not None:
+        fields.append({"label": "Seconds until stop", "value": f"{time_left:.1f}"})
+
+    return {
+        "status": status,
+        "color": color,
+        "fields": fields or [{"label": "Details", "value": "No recent desync output"}]
+    }

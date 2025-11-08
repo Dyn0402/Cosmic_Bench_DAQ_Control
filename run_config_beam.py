@@ -15,7 +15,7 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        self.run_name = 'run_4'
+        self.run_name = 'desync_test'
         self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -32,6 +32,7 @@ class Config:
         self.start_time = None
         self.write_all_dectors_to_json = True  # Only when making run config json template. Maybe do always?
         self.generate_external_triggers = False  # If true, use raspberry pi to generate external triggers for DAQ
+        self.watch_for_desync = True  # If true, run desync watcher during run
         self.gas = 'Ar/CO2/Iso 93/5/2'  # Gas type for run
 
         self.weiner_ps_info = {  # If this exists, check for Weiner LV before applying any HV
@@ -115,6 +116,15 @@ class Config:
             'n_triggers': 6000000,  # Number of triggers to send during run
             'trigger_rate': 200,  # Hz  Trigger rate to send during run
             'pulse_freq_ratio': 0.1,  # Ratio of pulse frequency to trigger frequency
+        }
+
+        self.desync_watcher_info = {
+            'ip': '192.168.10.8',
+            'port': 1105,
+            'run_out_dir': f'{self.base_out_dir}Run/{self.run_name}',
+            'check_interval': 0.5,  # Seconds between checking for desync
+            'min_points': 5,  # Minimum number of desynced points to flag desync
+            'min_duration': 6,  # Seconds minimum duration of desync to flag desync
         }
 
         self.sub_runs = [
