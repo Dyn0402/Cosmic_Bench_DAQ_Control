@@ -292,6 +292,17 @@ class DeSyncMonitor:
 
         return False
 
+    def run(self):
+        print(f"Starting DeSyncMonitor thread (interval={self.interval}s)...")
+        while not self.stop_event.is_set():
+            row = self.log_status()
+            diff = row[-3]  # difference
+            banco_internal_diff = row[-2]  # internal diff
+            self.check_desync(diff, banco_internal_diff)
+            if self.stop_event.wait(self.interval):
+                break
+        print("DeSyncMonitor thread stopped.")
+
 
 # class DeSyncMonitor:
 #     def __init__(self, stop_event, interval=5, csv_path="daq_status_log.csv",
