@@ -15,7 +15,7 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        self.run_name = 'run_16'
+        self.run_name = 'run_17'
         self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -130,8 +130,8 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'subrun_1',
-                'run_time': 6 * 60,  # Minutes
+                'sub_run_name': 'resist_hv_-0',
+                'run_time': 20,  # Minutes
                 'hvs': {
                     '2': {
                         '0': 670,
@@ -161,23 +161,35 @@ class Config:
         ]
 
         # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
-        # template = self.sub_runs[0]
-        # for drift_v in range(50, 800, 50):
-        #     sub_run = copy.deepcopy(template)
-        #     sub_run['sub_run_name'] = f'drift_{drift_v}'
-        #     card = 0
-        #     channels = [1]
-        #     for channel in sub_run['hvs'][card]:
-        #         if channel in channels:
-        #             sub_run['hvs'][card][channel] = drift_v
-        #     self.sub_runs.append(sub_run)
+        template = self.sub_runs[0]
+        resist_diffs = [-10, -20]
+        for resist_diff in resist_diffs:
+            sub_run = copy.deepcopy(template)
+            sub_run['sub_run_name'] = f'resist_hv_{resist_diff}'
+
+            card = '2'
+            channels = ['0', '1', '2', '3', '4', '7', '8', '9', '10']  # Resist channels
+            for channel in sub_run['hvs'][card]:
+                if channel in channels:
+                    sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
+
+            card = '5'
+            channels = ['6', '7', '8', '9', '10', '11']  # Resist channels
+            for channel in sub_run['hvs'][card]:
+                if channel in channels:
+                    sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
+            self.sub_runs.append(sub_run)
+            for channel in sub_run['hvs'][card]:
+                if channel in channels:
+                    sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
+            self.sub_runs.append(sub_run)
 
         # Append copies of sub_runs with same voltages but different run names
-        template = self.sub_runs[0]
-        for i in range(1, 6):
-            sub_run = copy.deepcopy(template)
-            sub_run['sub_run_name'] = f'subrun_{i+1}'
-            self.sub_runs.append(sub_run)
+        # template = self.sub_runs[0]
+        # for i in range(1, 6):
+        #     sub_run = copy.deepcopy(template)
+        #     sub_run['sub_run_name'] = f'subrun_{i+1}'
+        #     self.sub_runs.append(sub_run)
 
         self.bench_geometry = {
             'board_thickness': 5,  # mm  Thickness of PCB for test boards  Guess!
@@ -186,6 +198,7 @@ class Config:
             'banco_arm_separation_z': 172 - 41,  # mm from bottom of lower banco arm to bottom of upper banco arm
             'banco_arm_right_y': 34 + 100,  # mm from center of banco to right edge of banco arm
             'banco_arm_length_y': 230,  # mm from left edge of banco arm to right edge of banco arm
+            'banco_moveable_y_position': 0.0,  # mm  Offset from moving table. Positive moves banco up.
         }
 
         self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
@@ -198,7 +211,7 @@ class Config:
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
                     'x': -13.54,  # mm  Guess from previous alignment plus shift measurement
-                    'y': 10.0,  # mm
+                    'y': self.bench_geometry['banco_movable_y_position'],  # mm
                     'z': 842.20 - 842.20 + 500,  # mm
                 },
                 'det_orientation': {
@@ -214,7 +227,7 @@ class Config:
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
                     'x': -15.41,  # mm  Guess from previous alignment plus shift measurement
-                    'y': 10.0,  # mm
+                    'y': self.bench_geometry['banco_movable_y_position'],  # mm
                     # 'z': 853.26 - 842.20 + 500,  # mm
                     'z': 500 + self.bench_geometry['banco_ladder_separation_z'],  # mm
                 },
@@ -247,7 +260,7 @@ class Config:
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
                     'x': -15.03,  # mm  Guess from previous alignment plus shift measurement
-                    'y': 10.0,  # mm
+                    'y': self.bench_geometry['banco_movable_y_position'],  # mm
                     'z': 600 + self.bench_geometry['banco_ladder_separation_z'],  # mm
                 },
                 'det_orientation': {
