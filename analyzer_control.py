@@ -12,7 +12,7 @@ import sys
 import json
 import os
 import time
-from subprocess import Popen
+import subprocess
 
 
 # ==== CONFIGURABLE PARAMETERS ====
@@ -84,7 +84,7 @@ def main():
                         detector,
                     ]
                     print(f"Running: {' '.join(cmd)}")
-                    Popen(cmd, start_new_session=True)
+                    subprocess.run(cmd, check=True)  # waits for completion
             first_look = False
 
             # Timeout check
