@@ -806,7 +806,7 @@ document.getElementById("run-config-py").addEventListener("click", async () => {
 
 // --- PNG Viewer JS ---
 async function fetchDirs(subdir = "") {
-    const res = await fetch(`/list_dirs?subdir=${encodeURIComponent(subdir)}`);
+    const res = await fetch(`/list_analysis_dirs?subdir=${encodeURIComponent(subdir)}`);
     return await res.json();
 }
 
