@@ -149,8 +149,8 @@
 
   <div class="row g-3">
     <div class="col-md-4">
-      <label for="run-select" class="form-label">Run:</label>
-      <select id="run-select" class="form-select">
+      <label for="run-select-qa" class="form-label">Run:</label>
+      <select id="run-select-qa" class="form-select">
         <option value="">Select run...</option>
       </select>
     </div>
@@ -812,7 +812,7 @@ async function fetchDirs(subdir = "") {
 
 // Populate first-level runs on load
 document.addEventListener("DOMContentLoaded", async () => {
-    const runSelect = document.getElementById("run-select");
+    const runSelect = document.getElementById("run-select-qa");
     const res = await fetchDirs();
     if (res.success) {
         res.subdirs.forEach(d => {
@@ -825,7 +825,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // Handle Run selection → populate Subruns
-document.getElementById("run-select").addEventListener("change", async (e) => {
+document.getElementById("run-select-qa").addEventListener("change", async (e) => {
     const run = e.target.value;
     const subrunSelect = document.getElementById("subrun-select");
     const detectorSelect = document.getElementById("detector-select");
