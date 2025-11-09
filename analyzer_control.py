@@ -16,9 +16,9 @@ import subprocess
 
 
 # ==== CONFIGURABLE PARAMETERS ====
-CHECK_INTERVAL = 60              # seconds between checks for new data
-POST_DIR_WAIT = 10              # seconds to wait after directory first appears
-INACTIVITY_TIMEOUT_HOURS = 2     # exit if no new data for this long
+CHECK_INTERVAL = 1              # seconds between checks for new data
+POST_DIR_WAIT = 1              # seconds to wait after directory first appears
+INACTIVITY_TIMEOUT_HOURS = 0.1     # exit if no new data for this long
 # =================================
 
 
@@ -90,9 +90,6 @@ def main():
                         continue
                     print(f"Running: {' '.join(cmd)}")
                     subprocess.run(cmd, check=True)  # waits for completion
-                    print("Sleeping for debug...")
-                    time.sleep(5)  # Debug sleep
-                    print("Continuing after debug sleep...")
             first_look = False
 
             # Timeout check
