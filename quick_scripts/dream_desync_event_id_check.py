@@ -33,8 +33,13 @@ def main():
     banco_data_branch = banco_tree['fData']
     dream_event_id_branch = dream_tree['eventId']
 
-    print('banco data shape:', banco_data_branch.array(library='np').shape)
-    print('dream eventId shape:', dream_event_id_branch.array(library='np').shape)
+    banco_data = banco_data_branch.array(library='np')
+    dream_event_ids = dream_event_id_branch.array(library='np')
+
+    trg_nums, chip_nums, col_nums, row_nums = banco_data['trgNum'], banco_data['chipId'], banco_data['col'], banco_data['row']
+
+    print(f'Max trgNum in banco: {np.max(trg_nums)}')
+    print(f'Max eventId in dream: {np.max(dream_event_ids)}')
 
     print('donzo')
 
