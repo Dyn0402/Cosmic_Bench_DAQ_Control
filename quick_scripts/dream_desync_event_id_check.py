@@ -24,6 +24,12 @@ def main():
     print('banco keys:', banco_file.keys())
     print('dream keys:', dream_file.keys())
 
+    banco_tree = banco_file['pixTree']
+    dream_tree = dream_file['nt']
+
+    print('banco branches:', banco_tree.keys())
+    print('dream branches:', dream_tree.keys())
+
     print('donzo')
 
 
