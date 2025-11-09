@@ -160,8 +160,8 @@ class Config:
         }
 
         self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
-                                   'rd5_plein_esl_1', 'rd5_plein_saral_2', 'rd5_plein_vfp_1', 'asacusa_strip_2',
-                                   'urw_inter', 'rd5_grid_saral_1', 'rd5_strip_saral_1', 'rd5_strip_esl_1', 'urw_strip']
+                                   'rd5_plein_esl_1', 'rd5_plein_saral_2', 'rd5_plein_vfp_1', 'urw_strip',
+                                   'urw_inter', 'rd5_grid_saral_1', 'rd5_strip_saral_1', 'rd5_strip_esl_1']
 
         self.detectors = [
             {
@@ -248,16 +248,16 @@ class Config:
                     'resist_2': (2, 3)
                 },
                 'dream_feus': {
-                    'x_1': (3, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (3, 2),
-                    'y_1': (3, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (3, 4),
+                    'x_1': (2, 5),  # Runs along x direction, indicates y hit location
+                    'x_2': (2, 6),
+                    'y_1': (2, 7),  # Runs along y direction, indicates x hit location
+                    'y_2': (2, 8),
                 },
                 'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
                     'x_1': True,
                     'x_2': True,
-                    'y_1': False,
-                    'y_2': False,
+                    'y_1': True,
+                    'y_2': True,
                 }
             },
 
