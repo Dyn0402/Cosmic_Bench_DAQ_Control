@@ -15,7 +15,7 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        self.run_name = 'run_24'
+        self.run_name = 'run_24_2'
         self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -68,7 +68,7 @@ class Config:
         self.banco_info = {
             'ip': '128.141.41.199',
             'port': 1100,
-            'daq_run_command': 'cd /home/banco/CERNTestBeam/framework/bin && ./test_multi_noiseocc_int',
+            'daq_run_command': 'cd /home/banco/SPS_Test_Beam_25/framework/bin && ./test_multi_noiseocc_int',
             'data_temp_dir': '/home/banco/SPS_Test_Beam_25/data',
             'data_out_dir': f'/mnt/data/beam_sps_25/Run/{self.run_name}',
             'data_inner_dir': 'banco_data'
@@ -179,6 +179,9 @@ class Config:
                 if channel in channels:
                     sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
             self.sub_runs.append(sub_run)
+
+        # Remove the first two sub_runs to keep only the modified ones
+        self.sub_runs = self.sub_runs[1:]
 
         # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
         # template = self.sub_runs[0]
