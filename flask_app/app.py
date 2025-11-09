@@ -32,8 +32,8 @@ HV_TAIL = 1000  # number of most recent rows to show
 app = Flask(__name__)
 socketio = SocketIO(app)
 
-TMUX_SESSIONS = ["hv_control", "dream_daq", "daq_control", "trigger_veto_control", "trigger_gen_control",
-                 "banco_tracker", "desync_monitor"]
+TMUX_SESSIONS = ["daq_control", "dream_daq", "banco_tracker", "desync_monitor", "hv_control", "trigger_veto_control",
+                 "trigger_gen_control"]
 sessions = {}
 
 @app.route("/")
@@ -44,30 +44,30 @@ def index():
 
 @app.route("/status")
 def status_all():
-    statuses = {}
-    for s in TMUX_SESSIONS:
+    statuses = []
+
+    ordered_sessions = TMUX_SESSIONS  # Fix ordering
+
+    for s in ordered_sessions:
         if s == "dream_daq":
-            statuses[s] = get_dream_daq_status()
+            info = get_dream_daq_status()
         elif s == "hv_control":
-            statuses[s] = get_hv_control_status()
+            info = get_hv_control_status()
         elif s == "daq_control":
-            statuses[s] = get_daq_control_status()
+            info = get_daq_control_status()
         elif s == "trigger_veto_control":
-            statuses[s] = get_trigger_veto_control_status()
+            info = get_trigger_veto_control_status()
         elif s == "trigger_gen_control":
-            statuses[s] = get_trigger_gen_control_status()
-        elif s == "decoder":
-            statuses[s] = get_decoder_status()
+            info = get_trigger_gen_control_status()
         elif s == "banco_tracker":
-            statuses[s] = get_banco_tracker_status()
+            info = get_banco_tracker_status()
         elif s == "desync_monitor":
-            statuses[s] = get_desync_monitor_status()
+            info = get_desync_monitor_status()
         else:
-            statuses[s] = {
-                "status": "READY",
-                "color": "secondary",
-                "fields": []
-            }
+            info = {"status": "READY", "color": "secondary", "fields": []}
+
+        statuses.append({"name": s, **info})
+
     return jsonify(statuses)
 
 
@@ -432,12 +432,12 @@ def serve_png():
 
 
 # Generic input handler for all sessions
-for s in TMUX_SESSIONS:
-    @socketio.on(f"input-{s}")
-    def make_input(session_name=s):
-        def handle_input(data):
-            os.write(sessions[session_name], data.encode())
-        return handle_input
+# for s in TMUX_SESSIONS:
+#     @socketio.on(f"input-{s}")
+#     def make_input(session_name=s):
+#         def handle_input(data):
+#             os.write(sessions[session_name], data.encode())
+#         return handle_input
 
 # def get_tmux_output(session_name):
 #     """Return recent lines from a tmux session."""

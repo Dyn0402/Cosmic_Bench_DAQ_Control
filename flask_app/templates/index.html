@@ -37,19 +37,19 @@
 
 </div>
 
-<!-- Live Screens Tab -->
-<div class="tab-pane fade" id="screens">
-    <h2>Live Screen Sessions (tmux)</h2>
-    <div class="grid">
-    {% for name in screens %}
-        <div class="term-container">
-            <h2>{{name}}</h2>
-            <div id="terminal-{{name}}" class="terminal"></div>
-            <small class="text-muted">Connected to tmux session: {{name}}</small>
-        </div>
-    {% endfor %}
-    </div>
-</div>
+<!--&lt;!&ndash; Live Screens Tab &ndash;&gt;-->
+<!--<div class="tab-pane fade" id="screens">-->
+<!--    <h2>Live Screen Sessions (tmux)</h2>-->
+<!--    <div class="grid">-->
+<!--    {% for name in screens %}-->
+<!--        <div class="term-container">-->
+<!--            <h2>{{name}}</h2>-->
+<!--            <div id="terminal-{{name}}" class="terminal"></div>-->
+<!--            <small class="text-muted">Connected to tmux session: {{name}}</small>-->
+<!--        </div>-->
+<!--    {% endfor %}-->
+<!--    </div>-->
+<!--</div>-->
 
 <!-- Run Config Tab -->
 <div class="tab-pane fade" id="json-templates">
@@ -180,20 +180,20 @@
 {% block scripts %}
 <script>
 // --- Live Screens JS ---
-{% for name in screens %}
-(function() {
-    var term = new Terminal();
-    term.open(document.getElementById("terminal-{{name}}"));
-    var socket = io();
-    socket.on("output-{{name}}", function(data) {
-        term.write(data);
-    });
-    term.onData(function(data) {
-        socket.emit("input-{{name}}", data);
-    });
-    socket.emit("start", {name: "{{name}}"});
-})();
-{% endfor %}
+// {% for name in screens %}
+// (function() {
+//     var term = new Terminal();
+//     term.open(document.getElementById("terminal-{{name}}"));
+//     var socket = io();
+//     socket.on("output-{{name}}", function(data) {
+//         term.write(data);
+//     });
+//     term.onData(function(data) {
+//         socket.emit("input-{{name}}", data);
+//     });
+//     socket.emit("start", {name: "{{name}}"});
+// })();
+// {% endfor %}
 
 let run = null;
 let lastSubrun = null;
@@ -892,7 +892,7 @@ document.getElementById("load-pngs").addEventListener("click", async () => {
     if (!det_dir) return alert("Please select a detector");
 
     // Combine run/subrun/detector into a single dir path
-    const dir = `${run_dir}/${subrun_dir.split('/').pop()}/${det_dir.split('/').pop()}`;
+    const dir = osJoin(run_dir, subrun_dir.split('/').pop(), det_dir.split('/').pop());
 
     const res = await fetch(`/list_pngs?dir=${encodeURIComponent(dir)}`);
     const data = await res.json();
@@ -925,7 +925,6 @@ document.getElementById("load-pngs").addEventListener("click", async () => {
 function osJoin(...parts) {
     return parts.map(p => p.replace(/^\/+|\/+$/g, "")).join("/");
 }
-
 
 
 setInterval(updateStatus, 1000);  // update every 1s
