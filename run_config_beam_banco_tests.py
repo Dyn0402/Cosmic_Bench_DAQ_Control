@@ -15,7 +15,7 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        self.run_name = 'run_24'
+        self.run_name = 'run_banco_daq_1us_ext'
         self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -68,7 +68,8 @@ class Config:
         self.banco_info = {
             'ip': '128.141.41.199',
             'port': 1100,
-            'daq_run_command': 'cd /home/banco/CERNTestBeam/framework/bin && ./test_multi_noiseocc_int',
+            # 'daq_run_command': 'cd /home/banco/SPS_Test_Beam_25/framework/bin && ./test_multi_noiseocc_int',
+            'daq_run_command': 'cd /home/banco/CERNTestBeam/framework/bin && ./test_multi_noiseocc_ext',
             'data_temp_dir': '/home/banco/SPS_Test_Beam_25/data',
             'data_out_dir': f'/mnt/data/beam_sps_25/Run/{self.run_name}',
             'data_inner_dir': 'banco_data'
@@ -130,55 +131,55 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'resist_hv_-0',
-                'run_time': 20,  # Minutes
+                'sub_run_name': 'banco_test',
+                'run_time': 3 * 60,  # Minutes
                 'hvs': {
                     '2': {
-                        '0': 670,
-                        '1': 490,
-                        '2': 550,
-                        '3': 570,
-                        '4': 530,
-                        '5': 670,
-                        '6': 540,
-                        '7': 530,
-                        '8': 530,
-                        '9': 545,
-                        '10': 530,
+                        '0': 300,
+                        '1': 300,
+                        '2': 300,
+                        '3': 300,
+                        '4': 300,
+                        '5': 300,
+                        '6': 300,
+                        '7': 300,
+                        '8': 300,
+                        '9': 300,
+                        '10': 300,
                     },
                     '5': {
                         '0': 500,
                         '1': 500,
-                        '6': 640,
-                        '7': 440,
-                        '8': 700,
-                        '9': 500,
-                        '10': 700,
-                        '11': 500,
+                        '6': 400,
+                        '7': 200,
+                        '8': 400,
+                        '9': 200,
+                        '10': 400,
+                        '11': 200,
                     }
                 }
             },
         ]
 
         # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
-        template = self.sub_runs[0]
-        resist_diffs = [-10, -20]
-        for resist_diff in resist_diffs:
-            sub_run = copy.deepcopy(template)
-            sub_run['sub_run_name'] = f'resist_hv_{resist_diff}'
-
-            card = '2'
-            channels = ['0', '1', '2', '3', '4', '7', '8', '9', '10']  # Resist channels
-            for channel in sub_run['hvs'][card]:
-                if channel in channels:
-                    sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
-
-            card = '5'
-            channels = ['6', '7', '8', '9', '10', '11']  # Resist channels
-            for channel in sub_run['hvs'][card]:
-                if channel in channels:
-                    sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
-            self.sub_runs.append(sub_run)
+        # template = self.sub_runs[0]
+        # resist_diffs = [-10, -20]
+        # for resist_diff in resist_diffs:
+        #     sub_run = copy.deepcopy(template)
+        #     sub_run['sub_run_name'] = f'resist_hv_{resist_diff}'
+        #
+        #     card = '2'
+        #     channels = ['0', '1', '2', '3', '4', '7', '8', '9', '10']  # Resist channels
+        #     for channel in sub_run['hvs'][card]:
+        #         if channel in channels:
+        #             sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
+        #
+        #     card = '5'
+        #     channels = ['6', '7', '8', '9', '10', '11']  # Resist channels
+        #     for channel in sub_run['hvs'][card]:
+        #         if channel in channels:
+        #             sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
+        #     self.sub_runs.append(sub_run)
 
         # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
         # template = self.sub_runs[0]
