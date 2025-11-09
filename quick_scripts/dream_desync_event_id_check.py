@@ -15,7 +15,8 @@ import uproot
 
 
 def main():
-    base_dir = '/mnt/data/beam_sps_25/Bad_Runs_Repo/run_23/resist_hv_-10'
+    # base_dir = '/mnt/data/beam_sps_25/Bad_Runs_Repo/run_23/resist_hv_-10'
+    base_dir = '/mnt/data/beam_sps_25/Runs/run_24/resist_hv_-10'
 
     banco_dir = f'{base_dir}/banco_data/'
     dream_dir = f'{base_dir}/filtered_root/'
