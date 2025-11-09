@@ -74,6 +74,7 @@ def main():
                 prev_snapshot = new_snapshot
 
                 # Run online QA scripts for each detector
+                print(f"Running online QA plots for sub-run {sub_run_name}...")
                 for detector in included_detectors:
                     cmd = [
                         "python",
@@ -85,6 +86,9 @@ def main():
                     ]
                     print(f"Running: {' '.join(cmd)}")
                     subprocess.run(cmd, check=True)  # waits for completion
+                    print("Sleeping for debug...")
+                    time.sleep(5)  # Debug sleep
+                    print("Continuing after debug sleep...")
             first_look = False
 
             # Timeout check
