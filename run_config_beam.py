@@ -180,8 +180,8 @@ class Config:
                     sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
             self.sub_runs.append(sub_run)
 
-        # Remove the first two sub_runs to keep only the modified ones
-        self.sub_runs = self.sub_runs[1:]
+        # # Remove the first two sub_runs to keep only the modified ones
+        # self.sub_runs = self.sub_runs[1:]
 
         # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
         # template = self.sub_runs[0]
