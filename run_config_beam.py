@@ -132,7 +132,7 @@ class Config:
         self.sub_runs = [
             {
                 'sub_run_name': 'banco_test',
-                'run_time': 0.25,  # Minutes
+                'run_time': 3 * 60,  # Minutes
                 'hvs': {
                     '2': {
                         '0': 300,
