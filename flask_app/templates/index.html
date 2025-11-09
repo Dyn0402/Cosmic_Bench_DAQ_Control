@@ -15,6 +15,7 @@
         <button id="stop-run" class="btn btn-danger me-2 mb-2">Stop Run</button>
         <button id="restart-all" class="btn btn-danger me-2 mb-2">Restart All</button>
         <button id="take-pedestals" class="btn btn-secondary mb-2">Take Pedestals</button>
+        <button id="sudo-test" class ="btn btn-warning mb-2">sudo test</button>
     </div>
 
     <div class="row" id="status-cards">
@@ -144,16 +145,32 @@
 
 <!-- Online QA Viewer Tab -->
 <div class="tab-pane fade" id="png-viewer">
-    <h2>Online QA</h2>
-    <div class="mb-3">
-        <label for="png-dir" class="form-label">Enter Directory Path:</label>
-        <input type="text" id="png-dir" class="form-control" style="max-width:600px;" placeholder="/path/to/png/folder">
-        <button id="load-pngs" class="btn btn-primary mt-2">Load Images</button>
-    </div>
+  <h2>Online QA</h2>
 
-    <div id="png-gallery" class="row mt-4">
-        <!-- Images will be dynamically inserted here -->
+  <div class="row g-3">
+    <div class="col-md-4">
+      <label for="run-select" class="form-label">Run:</label>
+      <select id="run-select" class="form-select">
+        <option value="">Select run...</option>
+      </select>
     </div>
+    <div class="col-md-4">
+      <label for="subrun-select" class="form-label">Subrun:</label>
+      <select id="subrun-select" class="form-select" disabled>
+        <option value="">Select subrun...</option>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label for="detector-select" class="form-label">Detector:</label>
+      <select id="detector-select" class="form-select" disabled>
+        <option value="">Select detector...</option>
+      </select>
+    </div>
+  </div>
+
+  <button id="load-pngs" class="btn btn-primary mt-3" disabled>Load Images</button>
+
+  <div id="png-gallery" class="row mt-4"></div>
 </div>
 
 
@@ -233,6 +250,12 @@ function updateStatus() {
             });
         });
 }
+
+document.getElementById("sudo-test").addEventListener("click", async () => {)
+  const res = await fetch("/sudo_test", { method: "POST" });
+  const data = await res.json();
+  alert(data.message);
+});
 
 document.getElementById("stop-run").addEventListener("click", async () => {
   const res = await fetch("/stop_run", { method: "POST" });
@@ -782,11 +805,87 @@ document.getElementById("run-config-py").addEventListener("click", async () => {
 });
 
 // --- PNG Viewer JS ---
-document.getElementById("load-pngs").addEventListener("click", async () => {
-    const dir = document.getElementById("png-dir").value.trim();
-    if (!dir) return alert("Please enter a directory path");
+async function fetchDirs(subdir = "") {
+    const res = await fetch(`/list_dirs?subdir=${encodeURIComponent(subdir)}`);
+    return await res.json();
+}
 
-    const res = await fetch(`/list_pngs?dir=${encodeURIComponent(dir)}`);
+// Populate first-level runs on load
+document.addEventListener("DOMContentLoaded", async () => {
+    const runSelect = document.getElementById("run-select");
+    const res = await fetchDirs();
+    if (res.success) {
+        res.subdirs.forEach(d => {
+            const opt = document.createElement("option");
+            opt.value = d;
+            opt.textContent = d;
+            runSelect.appendChild(opt);
+        });
+    }
+});
+
+// Handle Run selection → populate Subruns
+document.getElementById("run-select").addEventListener("change", async (e) => {
+    const run = e.target.value;
+    const subrunSelect = document.getElementById("subrun-select");
+    const detectorSelect = document.getElementById("detector-select");
+    const loadBtn = document.getElementById("load-pngs");
+
+    subrunSelect.innerHTML = '<option value="">Select subrun...</option>';
+    detectorSelect.innerHTML = '<option value="">Select detector...</option>';
+    subrunSelect.disabled = true;
+    detectorSelect.disabled = true;
+    loadBtn.disabled = true;
+
+    if (!run) return;
+
+    const res = await fetchDirs(run);
+    if (res.success) {
+        res.subdirs.forEach(d => {
+            const opt = document.createElement("option");
+            opt.value = `${run}/${d}`;
+            opt.textContent = d;
+            subrunSelect.appendChild(opt);
+        });
+        subrunSelect.disabled = false;
+    }
+});
+
+// Handle Subrun selection → populate Detectors
+document.getElementById("subrun-select").addEventListener("change", async (e) => {
+    const subrun = e.target.value;
+    const detectorSelect = document.getElementById("detector-select");
+    const loadBtn = document.getElementById("load-pngs");
+
+    detectorSelect.innerHTML = '<option value="">Select detector...</option>';
+    detectorSelect.disabled = true;
+    loadBtn.disabled = true;
+
+    if (!subrun) return;
+
+    const res = await fetchDirs(subrun);
+    if (res.success) {
+        res.subdirs.forEach(d => {
+            const opt = document.createElement("option");
+            opt.value = `${subrun}/${d}`;
+            opt.textContent = d;
+            detectorSelect.appendChild(opt);
+        });
+        detectorSelect.disabled = false;
+    }
+});
+
+// Handle Detector selection → enable Load button
+document.getElementById("detector-select").addEventListener("change", (e) => {
+    document.getElementById("load-pngs").disabled = !e.target.value;
+});
+
+// Load PNGs
+document.getElementById("load-pngs").addEventListener("click", async () => {
+    const dir = document.getElementById("detector-select").value;
+    if (!dir) return alert("Please select a detector");
+
+    const res = await fetch(`/list_pngs?dir=${encodeURIComponent(osJoin(BASE_PNG_DIR, dir))}`);
     const data = await res.json();
     const gallery = document.getElementById("png-gallery");
     gallery.innerHTML = "";
@@ -795,7 +894,6 @@ document.getElementById("load-pngs").addEventListener("click", async () => {
         gallery.innerHTML = `<p class="text-danger">Error: ${data.message}</p>`;
         return;
     }
-
     if (data.images.length === 0) {
         gallery.innerHTML = "<p>No PNGs found in this directory.</p>";
         return;
@@ -807,14 +905,18 @@ document.getElementById("load-pngs").addEventListener("click", async () => {
         col.innerHTML = `
             <div class="card bg-dark text-white">
                 <img src="${imgUrl}" class="card-img-top" style="object-fit:contain;max-height:200px;">
-                <div class="card-body p-2">
-                    <small>${imgUrl.split('/').pop()}</small>
-                </div>
+                <div class="card-body p-2"><small>${imgUrl.split('/').pop()}</small></div>
             </div>
         `;
         gallery.appendChild(col);
     });
 });
+
+// Helper for joining paths safely
+function osJoin(...parts) {
+    return parts.map(p => p.replace(/^\/+|\/+$/g, "")).join("/");
+}
+
 
 
 setInterval(updateStatus, 1000);  // update every 1s

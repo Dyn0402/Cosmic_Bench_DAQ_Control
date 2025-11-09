@@ -25,6 +25,7 @@ BASE_DIR = "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control"
 CONFIG_TEMPLATE_DIR = f"{BASE_DIR}/config/json_templates"
 CONFIG_RUN_DIR = f"{BASE_DIR}/config/json_run_configs"
 BASH_DIR = f"{BASE_DIR}/bash_scripts"
+ANALYSIS_DIR = "/mnt/data/beam_sps_25/Analysis"
 HV_TAIL = 1000  # number of most recent rows to show
 
 
@@ -364,6 +365,36 @@ def start(data):
 
         threading.Thread(target=read_fd, args=(fd, name), daemon=True).start()
 
+
+@app.route("/list_analysis_dirs")
+def list_analysis_dirs():
+    subdir = request.args.get("subdir", "")
+    target_dir = os.path.join(BASE_DIR, subdir)
+
+    if not os.path.isdir(target_dir):
+        return jsonify(success=False, message=f"Invalid directory: {target_dir}")
+
+    dirs = [d for d in os.listdir(target_dir)
+            if os.path.isdir(os.path.join(target_dir, d))]
+    dirs.sort()
+
+    return jsonify(success=True, subdirs=dirs)
+
+
+@app.route("/sudo_test")
+def sudo_test():
+    try:
+        result = subprocess.run(
+            ["sudo", "-n", "true"],
+            capture_output=True,
+            text=True
+        )
+        if result.returncode == 0:
+            return jsonify(success=True, message="Sudo access available without password")
+        else:
+            return jsonify(success=False, message="Sudo access requires password")
+    except Exception as e:
+        return jsonify(success=False, message=str(e)), 500
 
 @app.route("/list_pngs")
 def list_pngs():
