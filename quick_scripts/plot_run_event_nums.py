@@ -21,6 +21,7 @@ def main():
 
     sub_run_names = []
     sub_run_events = []
+    sub_run_times = []
 
     for sub_run in os.listdir(run_dir):
         sub_run_path = os.path.join(run_dir, sub_run)
@@ -30,11 +31,19 @@ def main():
         if not os.path.exists(csv_path):
             print(f'CSV file not found: {csv_path}')
             continue
+        # get file modification time as a POSIX timestamp (float seconds)
+        mtime = os.path.getmtime(csv_path)
         df = pd.read_csv(csv_path)
         max_events = df[event_col_name].max()
 
         sub_run_names.append(sub_run)
         sub_run_events.append(max_events)
+        sub_run_times.append(mtime)
+
+    # Sort by modification time
+    sorted_indices = np.argsort(sub_run_times)
+    sub_run_names = [sub_run_names[i] for i in sorted_indices]
+    sub_run_events = [sub_run_events[i] for i in sorted_indices]
 
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.bar(sub_run_names, sub_run_events, color='skyblue')
