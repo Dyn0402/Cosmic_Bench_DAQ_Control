@@ -384,17 +384,17 @@ def list_analysis_dirs():
 @app.route("/sudo_test", methods=["POST"])
 def sudo_test():
     try:
-        # result = subprocess.run(
-        #     ["sudo", "-n", "true"],
-        #     capture_output=True,
-        #     text=True
-        # )
-        # Do non-sudo check first
         result = subprocess.run(
-            ["true"],
+            ["sudo", "-n", "true"],
             capture_output=True,
             text=True
         )
+        # Do non-sudo check first
+        # result = subprocess.run(
+        #     ["true"],
+        #     capture_output=True,
+        #     text=True
+        # )
         if result.returncode == 0:
             return jsonify(success=True, message="Sudo access available without password")
         else:
