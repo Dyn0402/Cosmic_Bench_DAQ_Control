@@ -15,11 +15,7 @@ import uproot
 
 
 def main():
-    # base_dir = '/mnt/data/beam_sps_25/Bad_Runs_Repo/run_21/resist_hv_-10/'
-    # banco_root_path = f'{base_dir}/banco_data/multinoiseScan_251109_110345-B0-ladder157.root'
-    # dream_root_path = f'{base_dir}/filtered_root/TbSPS25_resist_hv_-10_datrun_251109_11H03_000_05_decoded_array_filtered.root'
-
-    base_dir = '/mnt/data/beam_sps_25/Bad_Runs_Repo/run_23/resist_hv_-0/'
+    base_dir = '/mnt/data/beam_sps_25/Bad_Runs_Repo/run_23/resist_hv_-10'
 
     banco_dir = f'{base_dir}/banco_data/'
     dream_dir = f'{base_dir}/filtered_root/'
@@ -31,7 +27,7 @@ def main():
 
     print('banco files found:')
     for path in banco_file_paths:
-        print(' ', path)
+        print(' ', path.split('/')[-1])
 
     dream_file_paths = []
     for file in os.listdir(dream_dir):
@@ -40,7 +36,7 @@ def main():
 
     print('dream files found:')
     for path in dream_file_paths:
-        print(' ', path)
+        print(' ', path.split('/')[-1])
 
     # Get all max trgNum and eventId from all files
     dream_max_event_ids = []
@@ -60,6 +56,7 @@ def main():
         trg_nums = banco_data['trgNum']
         banco_max_event_ids.append(np.max(trg_nums))
 
+    print()
     print('Dream max event IDs per file:', dream_max_event_ids)
     print('Banco max trgNums per file:', banco_max_event_ids)
 
