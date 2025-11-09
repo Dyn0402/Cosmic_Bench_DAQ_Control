@@ -230,9 +230,7 @@ function updateStatus() {
                 lastSubrun = subrun;
             }
 
-            let container = document.getElementById("status-cards");
-            container.innerHTML = "";
-            Object.entries(data).forEach(([name, info]) => {
+            data.forEach(info => {
                 let details = info.fields.map(
                     f => `<p>${f.label}: ${f.value}</p>`
                 ).join("");
@@ -241,13 +239,32 @@ function updateStatus() {
                   <div class="col-md-4 mb-3">
                     <div class="card text-white bg-${info.color}">
                       <div class="card-body">
-                        <h5 class="card-title">${name}</h5>
+                        <h5 class="card-title">${info.name}</h5>
                         <p class="card-text">Status: ${info.status}</p>
                         ${details}
                       </div>
                     </div>
                   </div>`;
             });
+
+            // let container = document.getElementById("status-cards");
+            // container.innerHTML = "";
+            // Object.entries(data).forEach(([name, info]) => {
+            //     let details = info.fields.map(
+            //         f => `<p>${f.label}: ${f.value}</p>`
+            //     ).join("");
+            //
+            //     container.innerHTML += `
+            //       <div class="col-md-4 mb-3">
+            //         <div class="card text-white bg-${info.color}">
+            //           <div class="card-body">
+            //             <h5 class="card-title">${name}</h5>
+            //             <p class="card-text">Status: ${info.status}</p>
+            //             ${details}
+            //           </div>
+            //         </div>
+            //       </div>`;
+            // });
         });
 }
 
@@ -881,17 +898,17 @@ document.getElementById("detector-select").addEventListener("change", (e) => {
 });
 
 // Load PNGs
-document.getElementById("load-pngs").addEventListener("click", async () => {
+// Common function to load PNGs
+async function loadPNGs() {
     const run_dir = document.getElementById("run-select-qa").value;
-    if (!run_dir) return alert("Please select a run");
+    if (!run_dir) return; // no alert, just wait until selected
 
     const subrun_dir = document.getElementById("subrun-select").value;
-    if (!subrun_dir) return alert("Please select a subrun");
+    if (!subrun_dir) return;
 
     const det_dir = document.getElementById("detector-select").value;
-    if (!det_dir) return alert("Please select a detector");
+    if (!det_dir) return;
 
-    // Combine run/subrun/detector into a single dir path
     const dir = osJoin(run_dir, subrun_dir.split('/').pop(), det_dir.split('/').pop());
 
     const res = await fetch(`/list_pngs?dir=${encodeURIComponent(dir)}`);
@@ -912,14 +929,54 @@ document.getElementById("load-pngs").addEventListener("click", async () => {
         const col = document.createElement("div");
         col.className = "col-md-3 mb-3";
         col.innerHTML = `
-            <div class="card bg-dark text-white">
-                <img src="${imgUrl}" class="card-img-top" style="object-fit:contain;max-height:200px;">
-                <div class="card-body p-2"><small>${imgUrl.split('/').pop()}</small></div>
+            <div class="card bg-dark text-white border-0">
+                <img src="${imgUrl}" class="card-img-top"
+                     style="object-fit:contain;max-height:200px;cursor:pointer;"
+                     alt="PNG image">
             </div>
         `;
         gallery.appendChild(col);
+
+        // Add click-to-enlarge behavior
+        const img = col.querySelector("img");
+        img.addEventListener("click", () => openFullscreenImage(imgUrl));
     });
-});
+}
+
+// Helper: fullscreen modal for image
+function openFullscreenImage(imgUrl) {
+    const overlay = document.createElement("div");
+    overlay.style.position = "fixed";
+    overlay.style.top = 0;
+    overlay.style.left = 0;
+    overlay.style.width = "100vw";
+    overlay.style.height = "100vh";
+    overlay.style.background = "rgba(0, 0, 0, 0.9)";
+    overlay.style.display = "flex";
+    overlay.style.alignItems = "center";
+    overlay.style.justifyContent = "center";
+    overlay.style.zIndex = 9999;
+    overlay.style.cursor = "zoom-out";
+
+    const img = document.createElement("img");
+    img.src = imgUrl;
+    img.style.maxWidth = "95%";
+    img.style.maxHeight = "95%";
+    img.style.borderRadius = "8px";
+    img.style.boxShadow = "0 0 20px rgba(255,255,255,0.3)";
+    img.alt = "Enlarged image";
+
+    overlay.appendChild(img);
+    document.body.appendChild(overlay);
+    overlay.addEventListener("click", () => overlay.remove());
+}
+
+// Option 1: Keep button (optional, for manual refresh)
+document.getElementById("load-pngs").addEventListener("click", loadPNGs);
+
+// ✅ Option 2: Auto-load when detector changes
+document.getElementById("detector-select").addEventListener("change", loadPNGs);
+
 
 // Helper for joining paths safely
 function osJoin(...parts) {
