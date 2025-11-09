@@ -369,7 +369,7 @@ def start(data):
 @app.route("/list_analysis_dirs")
 def list_analysis_dirs():
     subdir = request.args.get("subdir", "")
-    target_dir = os.path.join(BASE_DIR, subdir)
+    target_dir = os.path.join(ANALYSIS_DIR, subdir)
 
     if not os.path.isdir(target_dir):
         return jsonify(success=False, message=f"Invalid directory: {target_dir}")
