@@ -13,7 +13,7 @@ ssh -t "$PI_USER@$PI_HOST" "
 cd '$REMOTE_DIR'
 # Start screen session (detached) and run Python
 screen -S "$SCREEN_NAME" -X quit 2>/dev/null  # optional: kill existing session
-screen -dmS '$SCREEN_NAME' bash -c 'python3 $SCRIPT $PORT $GPIO_PIN; exec bash'
+screen -dmS '$SCREEN_NAME' bash -c 'sleep 1.0; python3 $SCRIPT $PORT $GPIO_PIN; exec bash'
 # Attach to the screen to see output
 screen -r '$SCREEN_NAME'
 "
