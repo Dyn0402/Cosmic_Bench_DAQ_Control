@@ -30,6 +30,12 @@ def main():
     print('banco branches:', banco_tree.keys())
     print('dream branches:', dream_tree.keys())
 
+    banco_data_branch = banco_tree['fData']
+    dream_event_id_branch = dream_tree['eventId']
+
+    print('banco data shape:', banco_data_branch.array(library='np').shape)
+    print('dream eventId shape:', dream_event_id_branch.array(library='np').shape)
+
     print('donzo')
 
 
