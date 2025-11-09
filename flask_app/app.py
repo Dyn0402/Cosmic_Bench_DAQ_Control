@@ -384,8 +384,14 @@ def list_analysis_dirs():
 @app.route("/sudo_test")
 def sudo_test():
     try:
+        # result = subprocess.run(
+        #     ["sudo", "-n", "true"],
+        #     capture_output=True,
+        #     text=True
+        # )
+        # Do non-sudo check first
         result = subprocess.run(
-            ["sudo", "-n", "true"],
+            ["true"],
             capture_output=True,
             text=True
         )
