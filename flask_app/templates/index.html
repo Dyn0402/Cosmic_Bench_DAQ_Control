@@ -231,6 +231,7 @@ function updateStatus() {
             }
 
             let container = document.getElementById("status-cards");
+            container.innerHTML = "";
             data.forEach(info => {
                 let details = info.fields.map(
                     f => `<p>${f.label}: ${f.value}</p>`
