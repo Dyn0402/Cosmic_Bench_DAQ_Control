@@ -230,26 +230,8 @@ function updateStatus() {
                 lastSubrun = subrun;
             }
 
-            // data.forEach(info => {
-            //     let details = info.fields.map(
-            //         f => `<p>${f.label}: ${f.value}</p>`
-            //     ).join("");
-            //
-            //     container.innerHTML += `
-            //       <div class="col-md-4 mb-3">
-            //         <div class="card text-white bg-${info.color}">
-            //           <div class="card-body">
-            //             <h5 class="card-title">${info.name}</h5>
-            //             <p class="card-text">Status: ${info.status}</p>
-            //             ${details}
-            //           </div>
-            //         </div>
-            //       </div>`;
-            // });
-
             let container = document.getElementById("status-cards");
-            container.innerHTML = "";
-            Object.entries(data).forEach(([name, info]) => {
+            data.forEach(info => {
                 let details = info.fields.map(
                     f => `<p>${f.label}: ${f.value}</p>`
                 ).join("");
@@ -258,13 +240,32 @@ function updateStatus() {
                   <div class="col-md-4 mb-3">
                     <div class="card text-white bg-${info.color}">
                       <div class="card-body">
-                        <h5 class="card-title">${name}</h5>
+                        <h5 class="card-title">${info.name}</h5>
                         <p class="card-text">Status: ${info.status}</p>
                         ${details}
                       </div>
                     </div>
                   </div>`;
             });
+
+            // let container = document.getElementById("status-cards");
+            // container.innerHTML = "";
+            // Object.entries(data).forEach(([name, info]) => {
+            //     let details = info.fields.map(
+            //         f => `<p>${f.label}: ${f.value}</p>`
+            //     ).join("");
+            //
+            //     container.innerHTML += `
+            //       <div class="col-md-4 mb-3">
+            //         <div class="card text-white bg-${info.color}">
+            //           <div class="card-body">
+            //             <h5 class="card-title">${name}</h5>
+            //             <p class="card-text">Status: ${info.status}</p>
+            //             ${details}
+            //           </div>
+            //         </div>
+            //       </div>`;
+            // });
         });
 }
 
