@@ -76,14 +76,18 @@ def main():
                 # Run online QA scripts for each detector
                 print(f"Running online QA plots for sub-run {sub_run_name}...")
                 for detector in included_detectors:
-                    cmd = [
-                        "python",
-                        "/local/home/banco/dylan/saclay_micromegas/online_qa_plots.py",
-                        daq_type,
-                        run_name,
-                        sub_run_name,
-                        detector,
-                    ]
+                    try:
+                        cmd = [
+                            "python",
+                            "/local/home/banco/dylan/saclay_micromegas/online_qa_plots.py",
+                            daq_type,
+                            run_name,
+                            sub_run_name,
+                            detector,
+                        ]
+                    except Exception as e:
+                        print(f"Error preparing command for detector {detector}: {e}")
+                        continue
                     print(f"Running: {' '.join(cmd)}")
                     subprocess.run(cmd, check=True)  # waits for completion
                     print("Sleeping for debug...")
