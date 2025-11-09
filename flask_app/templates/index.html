@@ -882,10 +882,19 @@ document.getElementById("detector-select").addEventListener("change", (e) => {
 
 // Load PNGs
 document.getElementById("load-pngs").addEventListener("click", async () => {
-    const dir = document.getElementById("detector-select").value;
-    if (!dir) return alert("Please select a detector");
+    const run_dir = document.getElementById("run-select-qa").value;
+    if (!run_dir) return alert("Please select a run");
 
-    const res = await fetch(`/list_pngs?dir=${encodeURIComponent(osJoin(BASE_PNG_DIR, dir))}`);
+    const subrun_dir = document.getElementById("subrun-select").value;
+    if (!subrun_dir) return alert("Please select a subrun");
+
+    const det_dir = document.getElementById("detector-select").value;
+    if (!det_dir) return alert("Please select a detector");
+
+    // Combine run/subrun/detector into a single dir path
+    const dir = `${run_dir}/${subrun_dir.split('/').pop()}/${det_dir.split('/').pop()}`;
+
+    const res = await fetch(`/list_pngs?dir=${encodeURIComponent(dir)}`);
     const data = await res.json();
     const gallery = document.getElementById("png-gallery");
     gallery.innerHTML = "";

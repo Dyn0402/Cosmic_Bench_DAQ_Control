@@ -405,6 +405,7 @@ def sudo_test():
 @app.route("/list_pngs")
 def list_pngs():
     directory = request.args.get("dir")
+    directory = os.path.join(ANALYSIS_DIR, directory)
     if not directory:
         return jsonify(success=False, message="No directory specified")
     if not os.path.isdir(directory):
