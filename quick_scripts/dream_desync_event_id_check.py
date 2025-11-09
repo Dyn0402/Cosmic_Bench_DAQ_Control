@@ -18,7 +18,7 @@ def main():
     # banco_root_path = f'{base_dir}/banco_data/multinoiseScan_251109_110345-B0-ladder157.root'
     # dream_root_path = f'{base_dir}/filtered_root/TbSPS25_resist_hv_-10_datrun_251109_11H03_000_05_decoded_array_filtered.root'
 
-    base_dir = '/mnt/data/beam_sps_25/Bad_Runs_Repo/run_23/resist_hv_-10/'
+    base_dir = '/mnt/data/beam_sps_25/Bad_Runs_Repo/run_23/resist_hv_-0/'
     banco_root_path = f'{base_dir}/banco_data/multinoiseScan_251109_131422-B0-ladder157.root'
     dream_root_path = f'{base_dir}/filtered_root/TbSPS25_resist_hv_-0_datrun_251109_13H14_000_05_decoded_array_filtered.root'
 
