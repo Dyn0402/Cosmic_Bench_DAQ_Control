@@ -381,7 +381,7 @@ def list_analysis_dirs():
     return jsonify(success=True, subdirs=dirs)
 
 
-@app.route("/sudo_test")
+@app.route("/sudo_test", methods=["POST"])
 def sudo_test():
     try:
         # result = subprocess.run(
