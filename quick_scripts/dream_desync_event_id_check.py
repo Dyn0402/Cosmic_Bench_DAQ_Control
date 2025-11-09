@@ -8,6 +8,7 @@ Created as Cosmic_Bench_DAQ_Control/dream_desync_event_id_check
 @author: Dylan Neff, dn277127
 """
 
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 import uproot
@@ -19,31 +20,73 @@ def main():
     # dream_root_path = f'{base_dir}/filtered_root/TbSPS25_resist_hv_-10_datrun_251109_11H03_000_05_decoded_array_filtered.root'
 
     base_dir = '/mnt/data/beam_sps_25/Bad_Runs_Repo/run_23/resist_hv_-0/'
-    banco_root_path = f'{base_dir}/banco_data/multinoiseScan_251109_131422-B0-ladder157.root'
-    dream_root_path = f'{base_dir}/filtered_root/TbSPS25_resist_hv_-0_datrun_251109_13H14_000_05_decoded_array_filtered.root'
 
-    banco_file = uproot.open(banco_root_path)
-    dream_file = uproot.open(dream_root_path)
+    banco_dir = f'{base_dir}/banco_data/'
+    dream_dir = f'{base_dir}/filtered_root/'
 
-    print('banco keys:', banco_file.keys())
-    print('dream keys:', dream_file.keys())
+    banco_file_paths = []
+    for file in os.listdir(banco_dir):
+        if file.endswith('.root'):
+            banco_file_paths.append(os.path.join(banco_dir, file))
 
-    banco_tree = banco_file['pixTree']
-    dream_tree = dream_file['nt']
+    print('banco files found:')
+    for path in banco_file_paths:
+        print(' ', path)
 
-    print('banco branches:', banco_tree.keys())
-    print('dream branches:', dream_tree.keys())
+    dream_file_paths = []
+    for file in os.listdir(dream_dir):
+        if file.endswith('_array_filtered.root'):
+            dream_file_paths.append(os.path.join(dream_dir, file))
 
-    banco_data_branch = banco_tree['fData']
-    dream_event_id_branch = dream_tree['eventId']
+    print('dream files found:')
+    for path in dream_file_paths:
+        print(' ', path)
 
-    banco_data = banco_data_branch.array(library='np')
-    dream_event_ids = dream_event_id_branch.array(library='np')
+    # Get all max trgNum and eventId from all files
+    dream_max_event_ids = []
+    for dream_root_path in dream_file_paths:
+        dream_file = uproot.open(dream_root_path)
+        dream_tree = dream_file['nt']
+        dream_event_id_branch = dream_tree['eventId']
+        dream_event_ids = dream_event_id_branch.array(library='np')
+        dream_max_event_ids.append(np.max(dream_event_ids))
 
-    trg_nums, chip_nums, col_nums, row_nums = banco_data['trgNum'], banco_data['chipId'], banco_data['col'], banco_data['row']
+    banco_max_event_ids = []
+    for banco_root_path in banco_file_paths:
+        banco_file = uproot.open(banco_root_path)
+        banco_tree = banco_file['pixTree']
+        banco_data_branch = banco_tree['fData']
+        banco_data = banco_data_branch.array(library='np')
+        trg_nums = banco_data['trgNum']
+        banco_max_event_ids.append(np.max(trg_nums))
 
-    print(f'Max trgNum in banco: {np.max(trg_nums)}')
-    print(f'Max eventId in dream: {np.max(dream_event_ids)}')
+    print('Dream max event IDs per file:', dream_max_event_ids)
+    print('Banco max trgNums per file:', banco_max_event_ids)
+
+    # Check if all dreams match within themselves
+    all_dreams_match = all(x == dream_max_event_ids[0] for x in dream_max_event_ids)
+    if all_dreams_match:
+        print('All Dream files have matching max event IDs:', dream_max_event_ids[0])
+    else:
+        print('Dream files have differing max event IDs:', dream_max_event_ids)
+
+    # Check if all bancos match within themselves
+    all_bancos_match = all(x == banco_max_event_ids[0] for x in banco_max_event_ids)
+    if all_bancos_match:
+        print('All Banco files have matching max trgNums:', banco_max_event_ids[0])
+    else:
+        print('Banco files have differing max trgNums:', banco_max_event_ids)
+
+    # Compare dream and banco max event IDs
+    if all_dreams_match and all_bancos_match:
+        if dream_max_event_ids[0] == banco_max_event_ids[0]:
+            print('Dream and Banco max event IDs match:', dream_max_event_ids[0])
+        else:
+            print('Mismatch between Dream and Banco max event IDs:')
+            print('  Dream max event ID:', dream_max_event_ids[0])
+            print('  Banco max trgNum:', banco_max_event_ids[0])
+    else:
+        print('Cannot compare Dream and Banco max event IDs due to internal mismatches.')
 
     print('donzo')
 
