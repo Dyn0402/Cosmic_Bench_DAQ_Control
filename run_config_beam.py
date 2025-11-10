@@ -15,7 +15,7 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        self.run_name = 'run_34'
+        self.run_name = 'run_35'
         self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -34,6 +34,7 @@ class Config:
         self.generate_external_triggers = False  # If true, use raspberry pi to generate external triggers for DAQ
         self.watch_for_desync = True  # If true, run desync watcher during run
         self.gas = 'Ar/CO2/Iso 93/5/2'  # Gas type for run
+        self.beam_type = 'muons'
 
         self.weiner_ps_info = {  # If this exists, check for Weiner LV before applying any HV
             'ip': '192.168.10.222',
@@ -131,7 +132,7 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'timing_hv_nominal_check',
+                'sub_run_name': 'p2_3_test',
                 'run_time': 5,  # Minutes
                 'hvs': {
                     '2': {
@@ -150,6 +151,8 @@ class Config:
                     '5': {
                         '0': 500,
                         '1': 500,
+                        '2': 750,
+                        '3': 500,
                         '6': 640,
                         '7': 440,
                         '8': 700,
@@ -192,20 +195,20 @@ class Config:
         # resist_diffs = [-5, -10, -15, -20, -25, -30, -35, -40, -45]
         # for resist_diff in resist_diffs:
         #     sub_run = copy.deepcopy(template)
-        #     sub_run['sub_run_name'] = f'resist_hv_{resist_diff}'
+        #     sub_run['sub_run_name'] = f'resist_mesh_hv_{resist_diff}'
         #
         #     card = '2'
-        #     # channels = ['0', '1', '2', '3', '4', '7', '8', '9', '10']  # Resist channels
-        #     channels = ['3']  # Resist channels
+        #     channels = ['0', '1', '2', '3', '4', '7', '8', '9', '10']  # Resist channels
+        #     # channels = ['3']  # Resist channels
         #     for channel in sub_run['hvs'][card]:
         #         if channel in channels:
         #             sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
         #
-        #     # card = '5'
-        #     # channels = ['6', '7', '8', '9', '10', '11']  # Drift + resist channels
-        #     # for channel in sub_run['hvs'][card]:
-        #     #     if channel in channels:
-        #     #         sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
+        #     card = '5'
+        #     channels = ['2', '3', '6', '7', '8', '9', '10', '11']  # Drift + resist channels
+        #     for channel in sub_run['hvs'][card]:
+        #         if channel in channels:
+        #             sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
         #     self.sub_runs.append(sub_run)
 
         # drift_diffs_eic = [-50, -100, -150, -200, -250, -300, -350, -400, -450]
@@ -243,7 +246,7 @@ class Config:
             'banco_arm_separation_z': 172 - 41,  # mm from bottom of lower banco arm to bottom of upper banco arm
             'banco_arm_right_y': 34 + 100,  # mm from center of banco to right edge of banco arm
             'banco_arm_length_y': 230,  # mm from left edge of banco arm to right edge of banco arm
-            'banco_moveable_y_position': 0.0,  # mm  Offset from moving table. Positive moves banco up.
+            'banco_moveable_y_position': 500.0,  # mm  Offset from moving table. Positive moves banco up.
         }
 
         self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
@@ -700,7 +703,7 @@ class Config:
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
-                    'z': 1510,  # mm
+                    'z': 1490,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -727,7 +730,7 @@ class Config:
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
-                    'z': 1635,  # mm
+                    'z': 1620,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -737,6 +740,33 @@ class Config:
                 'hv_channels': {
                     'drift': (5, 10),
                     'mesh_1': (5, 11)
+                },
+                'dream_feus': {
+                    # 'x_1': (5, 7),
+                    # 'x_2': (5, 8),
+                },
+                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
+                    'x_1': True,
+                    'x_2': True,
+                }
+            },
+
+            {
+                'name': 'p2_small_3',
+                'det_type': 'p2',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': 1560,  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': {
+                    'drift': (5, 2),
+                    'mesh_1': (5, 3)
                 },
                 'dream_feus': {
                     'x_1': (5, 7),

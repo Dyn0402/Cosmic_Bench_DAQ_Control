@@ -31,7 +31,7 @@ def main():
     print(run_id)
 
     attributes_dict = {
-        'Title': run_config['run_name'] + "_test_entry",
+        'Title': run_config['run_name'],
         'RunID': int(run_config['run_name'].split('_')[1]),
         'Type': 'Run',
         'Author': 'DAQ',
@@ -105,7 +105,7 @@ def generate_elog_hv_table(run_config, html=False):
         hvs = sub["hvs"]
 
         if html:
-            out.append(f"<h3 style='margin-bottom: 6px;'>Sub-run: {sub_name}</h3>")
+            out.append(f"<h3 style='margin-bottom: 6px;'>Sub-run name: {sub_name}</h3>")
             out.append("""
             <table style="
                 border-collapse: collapse;
