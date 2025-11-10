@@ -15,7 +15,7 @@ import pandas as pd
 
 
 def main():
-    run_dir = '/mnt/data/beam_sps_25/Run/run_19/'
+    run_dir = '/mnt/data/beam_sps_25/Run/run_29/'
     csv_name = 'daq_status_log.csv'
     event_col_name = 'dream_events'
 

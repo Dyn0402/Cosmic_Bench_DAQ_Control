@@ -15,7 +15,7 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        self.run_name = 'run_29'
+        self.run_name = 'run_30'
         self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -137,7 +137,7 @@ class Config:
                         '0': 670,
                         '1': 490,
                         '2': 550,
-                        '3': 570,
+                        '3': 600,
                         '4': 530,
                         '5': 670,
                         '6': 540,
@@ -192,7 +192,7 @@ class Config:
 
             card = '2'
             # channels = ['0', '1', '2', '3', '4', '7', '8', '9', '10']  # Resist channels
-            channels = ['0']  # Resist channels
+            channels = ['3']  # Resist channels
             for channel in sub_run['hvs'][card]:
                 if channel in channels:
                     sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
@@ -202,7 +202,7 @@ class Config:
             # for channel in sub_run['hvs'][card]:
             #     if channel in channels:
             #         sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
-            # self.sub_runs.append(sub_run)
+            self.sub_runs.append(sub_run)
 
         # drift_diffs_eic = [-50, -100, -150, -200, -250, -300, -350, -400, -450]
         # drift_diffs_p2 = [-20, -40, -60, -80, -100, -120, -140, -160, -180]
