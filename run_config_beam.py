@@ -15,7 +15,7 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        self.run_name = 'run_33'
+        self.run_name = 'run_34'
         self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -135,10 +135,10 @@ class Config:
                 'run_time': 5,  # Minutes
                 'hvs': {
                     '2': {
-                        '0': 780,
+                        '0': 800,
                         '1': 490,
                         '2': 550,
-                        '3': 760,
+                        '3': 800,
                         '4': 530,
                         '5': 670,
                         '6': 540,
@@ -158,7 +158,7 @@ class Config:
                         '11': 500,
                     },
                     '12': {
-                        '0': 780
+                        '0': 800
                     }
                 }
             },
@@ -248,7 +248,8 @@ class Config:
 
         self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
                                    'rd5_plein_esl_1', 'rd5_plein_saral_2', 'rd5_plein_vfp_1', 'urw_strip',
-                                   'urw_inter', 'rd5_grid_saral_1', 'rd5_strip_saral_1', 'rd5_strip_esl_1']
+                                   'urw_inter', 'rd5_grid_saral_1', 'rd5_strip_saral_1', 'rd5_strip_esl_1',
+                                   'p2_small_1', 'p2_small_2', 'p2_large_1']
 
         self.detectors = [
             {
