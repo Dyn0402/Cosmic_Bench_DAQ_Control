@@ -15,7 +15,7 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        self.run_name = 'run_32'
+        self.run_name = 'run_33'
         self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -135,10 +135,10 @@ class Config:
                 'run_time': 5,  # Minutes
                 'hvs': {
                     '2': {
-                        '0': 730,
+                        '0': 780,
                         '1': 490,
                         '2': 550,
-                        '3': 730,
+                        '3': 760,
                         '4': 530,
                         '5': 670,
                         '6': 540,
@@ -158,7 +158,7 @@ class Config:
                         '11': 500,
                     },
                     '12': {
-                        '0': 730
+                        '0': 780
                     }
                 }
             },
