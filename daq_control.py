@@ -97,11 +97,6 @@ def main():
         if config.generate_external_triggers:
             trigger_gen.send('Connected to daq_control')
             trigger_gen.receive()
-            n_triggers = config.trigger_gen_info['n_triggers']
-            trig_rate = config.trigger_gen_info['trigger_rate']
-            pulse_freq_ratio = config.trigger_gen_info['pulse_freq_ratio']
-            trigger_gen.send(f'send triggers {n_triggers} {trig_rate} {pulse_freq_ratio}')
-            trigger_gen.receive()
 
         if banco:
             trigger_switch.send('Connected to daq_control')
@@ -174,6 +169,13 @@ def main():
                     desync_watcher.send_json(sub_run)
                     desync_watcher.receive()
 
+                if config.generate_external_triggers:
+                    n_triggers = config.trigger_gen_info['n_triggers']
+                    trig_rate = config.trigger_gen_info['trigger_rate']
+                    pulse_freq_ratio = config.trigger_gen_info['pulse_freq_ratio']
+                    trigger_gen.send(f'send triggers {n_triggers} {trig_rate} {pulse_freq_ratio}')
+                    trigger_gen.receive()
+
                 daq_trigger_switch = trigger_switch if banco else None
                 daq_control_args = (config.dream_daq_info['daq_config_template_path'], sub_run_name, sub_run['run_time'],
                                     sub_out_dir, daq_trigger_switch, dream_daq)
@@ -201,6 +203,10 @@ def main():
                         desync_watcher.send('End Monitoring')
                         desync_watcher.receive()  # Stopping monitoring
                         desync_watcher.receive()  # Finished monitoring
+
+                    if config.generate_external_triggers:
+                        trigger_gen.send('stop triggers')
+                        trigger_gen.receive()
 
                     print(f'Finished with sub run {sub_run_name}, waiting 10 seconds before next run')
                     sleep(10)

@@ -15,7 +15,7 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        self.run_name = 'run_30'
+        self.run_name = 'run_31'
         self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -63,6 +63,7 @@ class Config:
             'zero_suppress': True,  # True to run in zero suppression mode, False to run in full readout mode
             'pedestals_dir': f'{self.base_out_dir}pedestals_noise/',  # None to ignore, else top directory for pedestal runs
             'pedestals': 'latest',  # 'latest' for most recent, otherwise specify directory name, eg "pedestals_10-22-25_13-43-34"
+            'latency': 22,  # Latency setting for DAQ in clock cycles
         }
 
         self.banco_info = {
@@ -130,14 +131,14 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'resist_hv_-0',
-                'run_time': 20,  # Minutes
+                'sub_run_name': 'timing_hv_nominal_check',
+                'run_time': 5,  # Minutes
                 'hvs': {
                     '2': {
                         '0': 670,
                         '1': 490,
                         '2': 550,
-                        '3': 600,
+                        '3': 670,
                         '4': 530,
                         '5': 670,
                         '6': 540,
@@ -157,7 +158,7 @@ class Config:
                         '11': 500,
                     },
                     '12': {
-                        '0': 500
+                        '0': 670
                     }
                 }
             },
@@ -242,7 +243,7 @@ class Config:
             'banco_arm_separation_z': 172 - 41,  # mm from bottom of lower banco arm to bottom of upper banco arm
             'banco_arm_right_y': 34 + 100,  # mm from center of banco to right edge of banco arm
             'banco_arm_length_y': 230,  # mm from left edge of banco arm to right edge of banco arm
-            'banco_moveable_y_position': 40.0,  # mm  Offset from moving table. Positive moves banco up.
+            'banco_moveable_y_position': 0.0,  # mm  Offset from moving table. Positive moves banco up.
         }
 
         self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
