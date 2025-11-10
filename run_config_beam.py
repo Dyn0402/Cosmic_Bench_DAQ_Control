@@ -155,6 +155,9 @@ class Config:
                         '9': 500,
                         '10': 700,
                         '11': 500,
+                    },
+                    '12': {
+                        '0': 500
                     }
                 }
             },
@@ -609,6 +612,7 @@ class Config:
                 },
                 'hv_channels': {
                     'drift': (5, 0),
+                    'resist_1': (12, 0),
                     'resist_2': (2, 0)
                 },
                 'dream_feus': {

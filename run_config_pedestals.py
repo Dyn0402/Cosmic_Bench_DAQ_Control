@@ -116,6 +116,9 @@ class Config:
                         '9': 200,
                         '10': 400,
                         '11': 200,
+                    },
+                    '12': {
+                        '0': 300
                     }
                 }
             },
@@ -169,7 +172,7 @@ class Config:
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
                     'x': -13.54,  # mm  Guess from previous alignment plus shift measurement
-                    'y': 10.0,  # mm
+                    'y': self.bench_geometry['banco_moveable_y_position'],  # mm
                     'z': 842.20 - 842.20 + 500,  # mm
                 },
                 'det_orientation': {
@@ -185,7 +188,7 @@ class Config:
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
                     'x': -15.41,  # mm  Guess from previous alignment plus shift measurement
-                    'y': 10.0,  # mm
+                    'y': self.bench_geometry['banco_moveable_y_position'],  # mm
                     # 'z': 853.26 - 842.20 + 500,  # mm
                     'z': 500 + self.bench_geometry['banco_ladder_separation_z'],  # mm
                 },
@@ -202,7 +205,7 @@ class Config:
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
                     'x': -13.21,  # mm  Guess from previous alignment plus shift measurement
-                    'y': 10.0,  # mm
+                    'y': self.bench_geometry['banco_moveable_y_position'],  # mm
                     'z': 600,  # mm
                 },
                 'det_orientation': {
@@ -218,7 +221,7 @@ class Config:
                 'det_type': 'banco',
                 'det_center_coords': {  # Center of detector
                     'x': -15.03,  # mm  Guess from previous alignment plus shift measurement
-                    'y': 10.0,  # mm
+                    'y': self.bench_geometry['banco_moveable_y_position'],  # mm
                     'z': 600 + self.bench_geometry['banco_ladder_separation_z'],  # mm
                 },
                 'det_orientation': {
@@ -236,7 +239,7 @@ class Config:
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
-                    'z': 80,  # mm
+                    'z': 400,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -526,6 +529,7 @@ class Config:
                 },
                 'hv_channels': {
                     'drift': (5, 0),
+                    'resist_1': (12, 0),
                     'resist_2': (2, 0)
                 },
                 'dream_feus': {
@@ -683,6 +687,7 @@ class Config:
                     '12': (5, 4),
                 },
             },
+
         ]
 
         if not self.write_all_dectors_to_json:
