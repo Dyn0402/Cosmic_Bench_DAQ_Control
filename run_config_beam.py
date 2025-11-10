@@ -15,7 +15,7 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        self.run_name = 'run_35'
+        self.run_name = 'run_36'
         self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -34,7 +34,7 @@ class Config:
         self.generate_external_triggers = False  # If true, use raspberry pi to generate external triggers for DAQ
         self.watch_for_desync = True  # If true, run desync watcher during run
         self.gas = 'Ar/CO2/Iso 93/5/2'  # Gas type for run
-        self.beam_type = 'muons'
+        self.beam_type = 'pions'
 
         self.weiner_ps_info = {  # If this exists, check for Weiner LV before applying any HV
             'ip': '192.168.10.222',
@@ -132,39 +132,73 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'p2_3_test',
+                'sub_run_name': 'pions_high_rate',
                 'run_time': 5,  # Minutes
                 'hvs': {
                     '2': {
-                        '0': 800,
-                        '1': 490,
-                        '2': 550,
-                        '3': 800,
-                        '4': 530,
-                        '5': 670,
-                        '6': 540,
-                        '7': 530,
-                        '8': 530,
-                        '9': 545,
-                        '10': 530,
+                        '0': 800 - 30,
+                        '1': 490 - 30,
+                        '2': 550 - 30,
+                        '3': 800 - 30,
+                        '4': 530 - 30,
+                        '5': 670 - 30,
+                        '6': 540 - 30,
+                        '7': 530 - 30,
+                        '8': 530 - 30,
+                        '9': 545 - 30,
+                        '10': 530 - 30,
                     },
                     '5': {
-                        '0': 500,
-                        '1': 500,
-                        '2': 750,
-                        '3': 500,
-                        '6': 640,
-                        '7': 440,
-                        '8': 700,
-                        '9': 500,
-                        '10': 700,
-                        '11': 500,
+                        '0': 300,
+                        '1': 300,
+                        '2': 600,
+                        '3': 400,
+                        '6': 550,
+                        '7': 350,
+                        '8': 600,
+                        '9': 420,
+                        '10': 600,
+                        '11': 400,
                     },
                     '12': {
-                        '0': 800
+                        '0': 800 - 30
                     }
                 }
             },
+            # {
+            #     'sub_run_name': 'resist_mesh_hv_-0',
+            #     'run_time': 7,  # Minutes
+            #     'hvs': {
+            #         '2': {
+            #             '0': 800,
+            #             '1': 490,
+            #             '2': 550,
+            #             '3': 800,
+            #             '4': 530,
+            #             '5': 670,
+            #             '6': 540,
+            #             '7': 530,
+            #             '8': 530,
+            #             '9': 545,
+            #             '10': 530,
+            #         },
+            #         '5': {
+            #             '0': 500,
+            #             '1': 500,
+            #             '2': 750,
+            #             '3': 500,
+            #             '6': 640,
+            #             '7': 440,
+            #             '8': 700,
+            #             '9': 500,
+            #             '10': 700,
+            #             '11': 500,
+            #         },
+            #         '12': {
+            #             '0': 800
+            #         }
+            #     }
+            # },
         ]
 
         # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
@@ -181,7 +215,7 @@ class Config:
         #             sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
         #
         #     card = '5'
-        #     channels = ['6', '7', '8', '9', '10', '11']  # Resist channels
+        #     channels = ['2', '3', '6', '7', '8', '9', '10', '11']  # Resist channels
         #     for channel in sub_run['hvs'][card]:
         #         if channel in channels:
         #             sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
@@ -252,7 +286,7 @@ class Config:
         self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
                                    'rd5_plein_esl_1', 'rd5_plein_saral_2', 'rd5_plein_vfp_1', 'urw_strip',
                                    'urw_inter', 'rd5_grid_saral_1', 'rd5_strip_saral_1', 'rd5_strip_esl_1',
-                                   'p2_small_1', 'p2_small_2', 'p2_small_3', 'p2_large_1']
+                                   'p2_small_1', 'p2_small_3', 'p2_large_1']
 
         self.detectors = [
             {
