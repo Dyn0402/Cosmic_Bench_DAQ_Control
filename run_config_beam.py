@@ -15,7 +15,7 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        self.run_name = 'run_31'
+        self.run_name = 'run_32'
         self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -135,10 +135,10 @@ class Config:
                 'run_time': 5,  # Minutes
                 'hvs': {
                     '2': {
-                        '0': 670,
+                        '0': 730,
                         '1': 490,
                         '2': 550,
-                        '3': 670,
+                        '3': 730,
                         '4': 530,
                         '5': 670,
                         '6': 540,
@@ -158,7 +158,7 @@ class Config:
                         '11': 500,
                     },
                     '12': {
-                        '0': 670
+                        '0': 730
                     }
                 }
             },
@@ -188,25 +188,25 @@ class Config:
         # self.sub_runs = self.sub_runs[1:]
 
         # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
-        template = self.sub_runs[0]
-        resist_diffs = [-5, -10, -15, -20, -25, -30, -35, -40, -45]
-        for resist_diff in resist_diffs:
-            sub_run = copy.deepcopy(template)
-            sub_run['sub_run_name'] = f'resist_hv_{resist_diff}'
-
-            card = '2'
-            # channels = ['0', '1', '2', '3', '4', '7', '8', '9', '10']  # Resist channels
-            channels = ['3']  # Resist channels
-            for channel in sub_run['hvs'][card]:
-                if channel in channels:
-                    sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
-
-            # card = '5'
-            # channels = ['6', '7', '8', '9', '10', '11']  # Drift + resist channels
-            # for channel in sub_run['hvs'][card]:
-            #     if channel in channels:
-            #         sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
-            self.sub_runs.append(sub_run)
+        # template = self.sub_runs[0]
+        # resist_diffs = [-5, -10, -15, -20, -25, -30, -35, -40, -45]
+        # for resist_diff in resist_diffs:
+        #     sub_run = copy.deepcopy(template)
+        #     sub_run['sub_run_name'] = f'resist_hv_{resist_diff}'
+        #
+        #     card = '2'
+        #     # channels = ['0', '1', '2', '3', '4', '7', '8', '9', '10']  # Resist channels
+        #     channels = ['3']  # Resist channels
+        #     for channel in sub_run['hvs'][card]:
+        #         if channel in channels:
+        #             sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
+        #
+        #     # card = '5'
+        #     # channels = ['6', '7', '8', '9', '10', '11']  # Drift + resist channels
+        #     # for channel in sub_run['hvs'][card]:
+        #     #     if channel in channels:
+        #     #         sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
+        #     self.sub_runs.append(sub_run)
 
         # drift_diffs_eic = [-50, -100, -150, -200, -250, -300, -350, -400, -450]
         # drift_diffs_p2 = [-20, -40, -60, -80, -100, -120, -140, -160, -180]
@@ -229,12 +229,12 @@ class Config:
         #     self.sub_runs.append(sub_run)
 
         # Append copies of sub_runs with same voltages but different run names
-        template = self.sub_runs[0]
-        for i in range(1, 6):
-            sub_run = copy.deepcopy(template)
-            sub_run['sub_run_name'] = f'subrun_{i+1}'
-            sub_run['run_time'] = 6 * 60  # Minutes
-            self.sub_runs.append(sub_run)
+        # template = self.sub_runs[0]
+        # for i in range(1, 6):
+        #     sub_run = copy.deepcopy(template)
+        #     sub_run['sub_run_name'] = f'subrun_{i+1}'
+        #     sub_run['run_time'] = 6 * 60  # Minutes
+        #     self.sub_runs.append(sub_run)
 
         self.bench_geometry = {
             'board_thickness': 5,  # mm  Thickness of PCB for test boards  Guess!
