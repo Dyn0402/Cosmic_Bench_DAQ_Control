@@ -95,7 +95,7 @@ def main():
             # Timeout check
             if time.time() - last_activity_time > timeout_seconds:
                 print(f"No new data for {INACTIVITY_TIMEOUT_HOURS} hours. Exiting gracefully.")
-                sys.exit(0)
+                break
 
     print("All sub-runs processed. Exiting normally.")
 
