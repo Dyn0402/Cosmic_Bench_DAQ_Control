@@ -110,6 +110,8 @@ class Config:
                     '5': {
                         '0': 500,
                         '1': 500,
+                        '2': 400,
+                        '3': 200,
                         '6': 400,
                         '7': 200,
                         '8': 400,
@@ -165,7 +167,8 @@ class Config:
 
         self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
                                    'rd5_plein_esl_1', 'rd5_plein_saral_2', 'rd5_plein_vfp_1', 'urw_strip',
-                                   'urw_inter', 'rd5_grid_saral_1', 'rd5_strip_saral_1', 'rd5_strip_esl_1']
+                                   'urw_inter', 'rd5_grid_saral_1', 'rd5_strip_saral_1', 'rd5_strip_esl_1',
+                                   'p2_small_1', 'p2_small_2', 'p2_small_3', 'p2_large_1']
 
         self.detectors = [
             {
@@ -653,6 +656,33 @@ class Config:
                 'hv_channels': {
                     'drift': (5, 10),
                     'mesh_1': (5, 11)
+                },
+                'dream_feus': {
+                    'x_1': (5, 7),
+                    'x_2': (5, 8),
+                },
+                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
+                    'x_1': True,
+                    'x_2': True,
+                }
+            },
+
+            {
+                'name': 'p2_small_3',
+                'det_type': 'p2',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': 1560,  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': {
+                    'drift': (5, 2),
+                    'mesh_1': (5, 3)
                 },
                 'dream_feus': {
                     'x_1': (5, 7),

@@ -252,7 +252,7 @@ class Config:
         self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
                                    'rd5_plein_esl_1', 'rd5_plein_saral_2', 'rd5_plein_vfp_1', 'urw_strip',
                                    'urw_inter', 'rd5_grid_saral_1', 'rd5_strip_saral_1', 'rd5_strip_esl_1',
-                                   'p2_small_1', 'p2_small_2', 'p2_large_1']
+                                   'p2_small_1', 'p2_small_2', 'p2_small_3', 'p2_large_1']
 
         self.detectors = [
             {
