@@ -132,8 +132,8 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'resist_mesh_scan_-0',
-                'run_time': 8,  # Minutes
+                'sub_run_name': 'rotation_30_test_0',
+                'run_time': 10,  # Minutes
                 'hvs': {
                     '2': {
                         '0': 830,
@@ -151,8 +151,8 @@ class Config:
                     '5': {
                         '0': 500,
                         '1': 500,
-                        '2': 750,
-                        '3': 440,
+                        '2': 700,
+                        '3': 450,
                         '6': 640,
                         '7': 440,
                         '8': 750,
@@ -235,7 +235,7 @@ class Config:
         template = self.sub_runs[0]
         for i in range(1, 5):
             sub_run = copy.deepcopy(template)
-            sub_run['sub_run_name'] = f'rotation_45_test_{i}'
+            sub_run['sub_run_name'] = f'rotation_30_test_{i}'
             sub_run['run_time'] = 10  # Minutes
             self.sub_runs.append(sub_run)
 
@@ -331,8 +331,8 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 45,  # deg  Rotation about z axis
+                    'y': 30,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
                     'drift': (5, 0),
@@ -362,8 +362,8 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 45,  # deg  Rotation about z axis
+                    'y': 30,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
                     'drift': (5, 1),
@@ -424,8 +424,8 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 45,  # deg  Rotation about z axis
+                    'y': 30,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
                     'drift': (5, 0),
@@ -455,7 +455,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
+                    'y': 30,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -487,8 +487,8 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 45,  # deg  Rotation about z axis
+                    'y': 30,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
                     'drift': (5, 1),
@@ -519,8 +519,8 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 45,  # deg  Rotation about z axis
+                    'y': 30,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
                     'drift': (5, 0),
@@ -612,8 +612,8 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 45,  # deg  Rotation about z axis
+                    'y': 30,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
                     'drift': (5, 0),
@@ -644,7 +644,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
+                    'y': 30,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
