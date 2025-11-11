@@ -28,6 +28,8 @@ def main():
         'resist_mesh_hv_-25': -25,
         'resist_mesh_hv_-30': -30,
     }
+
+    fig, ax = plt.subplots(figsize=(8, 6))
     for detector_name in detector_names:
         efficiencies = []
         total_events = []
@@ -44,13 +46,14 @@ def main():
             efficiencies.append(efficiency)
             total_events.append(total_event)
             voltages.append(voltage)
-        fig, ax = plt.subplots(figsize=(8, 6))
-        ax.plot(voltages, efficiencies, marker='o', linestyle='-')
-        ax.set_xlabel('Mesh Voltage (V)')
-        ax.set_ylabel('Efficiency')
-        ax.set_title(f'Efficiency vs Mesh Voltage for {detector_name} in {run_name}')
-        ax.grid(True)
-        plt.tight_layout()
+        ax.plot(voltages, efficiencies, marker='o', linestyle='-', label=detector_name)
+    ax.set_xlabel('Mesh Voltage (V)')
+    ax.set_ylabel('Efficiency')
+    ax.set_title(f'Efficiency vs Resist Voltage in {run_name}')
+    ax.grid(True)
+    ax.set_ylim(0, 1)
+    ax.legend()
+    plt.tight_layout()
 
         # fig, ax = plt.subplots(figsize=(8, 6))
         # ax.plot(voltages, total_events, marker='o', linestyle='-')
