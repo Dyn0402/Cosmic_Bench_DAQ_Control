@@ -23,6 +23,10 @@ def main():
     input_run_json_path = sys.argv[1]
     # input_run_json_path = '/local/home/dn277127/PycharmProjects/Cosmic_Bench_DAQ_Control/config/json_run_configs/run_config_beam.json'
 
+    log_id = None
+    if len(sys.argv) == 3:
+        log_id = sys.argv[2]
+
     with open(input_run_json_path, 'r') as f:
         run_config = json.load(f)
 
@@ -67,6 +71,9 @@ def main():
         "-p", "8080",
         "-l", "SPS H4 2025",
     ]
+
+    if log_id is not None:
+        elog_cmd.extend(["-e", str(log_id)])
 
     # Add attributes (-a)
     for key, value in attributes_dict.items():
