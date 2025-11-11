@@ -15,7 +15,7 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        self.run_name = 'run_38'
+        self.run_name = 'run_turn_off_hvs_delete_me'
         self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -132,36 +132,36 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'pions_rate_scan_0',
-                'run_time': 30,  # Minutes
+                'sub_run_name': 'turn_off_hvs',
+                'run_time': 1,  # Minutes
                 'hvs': {
                     '2': {
-                        '0': 800 - 30,
-                        '1': 490 - 30,
-                        '2': 550 - 30,
-                        '3': 800 - 30,
-                        '4': 530 - 30,
-                        '5': 670 - 30,
-                        '6': 540 - 30,
-                        '7': 530 - 30,
-                        '8': 530 - 30,
-                        '9': 545 - 30,
-                        '10': 530 - 30,
+                        '0': 0,
+                        '1': 0,
+                        '2': 0,
+                        '3': 0,
+                        '4': 0,
+                        '5': 0,
+                        '6': 0,
+                        '7': 0,
+                        '8': 0,
+                        '9': 0,
+                        '10': 0,
                     },
                     '5': {
-                        '0': 300,
-                        '1': 300,
-                        '2': 600,
-                        '3': 400,
-                        '6': 550,
-                        '7': 350,
-                        '8': 600,
-                        '9': 420,
-                        '10': 600,
-                        '11': 400,
+                        '0': 0,
+                        '1': 0,
+                        '2': 0,
+                        '3': 0,
+                        '6': 0,
+                        '7': 0,
+                        '8': 0,
+                        '9': 0,
+                        '10': 0,
+                        '11': 0,
                     },
                     '12': {
-                        '0': 800 - 30
+                        '0': 0
                     }
                 }
             },
