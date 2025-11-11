@@ -15,7 +15,7 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        self.run_name = 'run_39'
+        self.run_name = 'run_40'
         self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -133,20 +133,20 @@ class Config:
         self.sub_runs = [
             {
                 'sub_run_name': 'rotation_45_test',
-                'run_time': 5,  # Minutes
+                'run_time': 60,  # Minutes
                 'hvs': {
                     '2': {
-                        '0': 800,
-                        '1': 490,
+                        '0': 830,
+                        '1': 495,
                         '2': 550,
-                        '3': 800,
+                        '3': 840,
                         '4': 530,
-                        '5': 670,
-                        '6': 540,
-                        '7': 530,
-                        '8': 530,
-                        '9': 545,
-                        '10': 530,
+                        '5': 700,
+                        '6': 545,
+                        '7': 535,
+                        '8': 535,
+                        '9': 535,
+                        '10': 535,
                     },
                     '5': {
                         '0': 500,
@@ -161,7 +161,7 @@ class Config:
                         # '11': 500,
                     },
                     '12': {
-                        '0': 800
+                        '0': 830
                     }
                 }
             },
@@ -246,7 +246,7 @@ class Config:
             'banco_arm_separation_z': 172 - 41,  # mm from bottom of lower banco arm to bottom of upper banco arm
             'banco_arm_right_y': 34 + 100,  # mm from center of banco to right edge of banco arm
             'banco_arm_length_y': 230,  # mm from left edge of banco arm to right edge of banco arm
-            'banco_moveable_y_position': 500.0,  # mm  Offset from moving table. Positive moves banco up.
+            'banco_moveable_y_position': 0.0,  # mm  Offset from moving table. Positive moves banco up.
         }
 
         self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
