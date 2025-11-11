@@ -21,6 +21,7 @@ def main():
                         'rd5_grid_saral_1', 'rd5_strip_saral_1', 'rd5_strip_esl_1',]
     sub_runs = {
         'resist_mesh_scan_-0': 0,
+        'resist_mesh_hv_-5': -5,
         'resist_mesh_hv_-10': -10,
         'resist_mesh_hv_-15': -15,
         'resist_mesh_hv_-20': -20,
@@ -51,10 +52,10 @@ def main():
         ax.grid(True)
         plt.tight_layout()
 
-        fig, ax = plt.subplots(figsize=(8, 6))
-        ax.plot(voltages, total_events, marker='o', linestyle='-')
-        ax.set_xlabel('Mesh Voltage (V)')
-        ax.set_ylabel('Total Events')
+        # fig, ax = plt.subplots(figsize=(8, 6))
+        # ax.plot(voltages, total_events, marker='o', linestyle='-')
+        # ax.set_xlabel('Mesh Voltage (V)')
+        # ax.set_ylabel('Total Events')
     plt.show()
     print('donzo')
 
