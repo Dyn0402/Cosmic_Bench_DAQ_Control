@@ -15,7 +15,7 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        self.run_name = 'run_44'
+        self.run_name = 'run_45'
         self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -246,7 +246,7 @@ class Config:
             'banco_arm_separation_z': 172 - 41,  # mm from bottom of lower banco arm to bottom of upper banco arm
             'banco_arm_right_y': 34 + 100,  # mm from center of banco to right edge of banco arm
             'banco_arm_length_y': 230,  # mm from left edge of banco arm to right edge of banco arm
-            'banco_moveable_y_position': 600.0,  # mm  Offset from moving table. Positive moves banco up.
+            'banco_moveable_y_position': 800.0,  # mm  Offset from moving table. Positive moves banco up.
         }
 
         self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
@@ -332,7 +332,7 @@ class Config:
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
                     'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
+                    'z': 45,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
                     'drift': (5, 0),
@@ -363,7 +363,7 @@ class Config:
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
                     'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
+                    'z': 45,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
                     'drift': (5, 1),
@@ -425,7 +425,7 @@ class Config:
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
                     'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
+                    'z': 45,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
                     'drift': (5, 0),
@@ -483,12 +483,12 @@ class Config:
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
-                    'z': 0,  # mm
+                    'z': 900,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
                     'y': 0,  # deg  Rotation about y axis
-                    'z': 900,  # deg  Rotation about z axis
+                    'z': 45,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
                     'drift': (5, 1),
@@ -520,7 +520,7 @@ class Config:
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
                     'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
+                    'z': 45,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
                     'drift': (5, 0),
@@ -613,7 +613,7 @@ class Config:
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
                     'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
+                    'z': 45,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
                     'drift': (5, 0),
