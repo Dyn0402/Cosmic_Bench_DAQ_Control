@@ -15,7 +15,7 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        self.run_name = 'run_37'
+        self.run_name = 'run_38'
         self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -132,7 +132,7 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'pions_high_rate_0',
+                'sub_run_name': 'pions_rate_scan_0',
                 'run_time': 30,  # Minutes
                 'hvs': {
                     '2': {
@@ -267,7 +267,7 @@ class Config:
 
         # Append copies of sub_runs with same voltages but different run names
         template = self.sub_runs[0]
-        for i in range(1, 6):
+        for i in range(1, 16):
             sub_run = copy.deepcopy(template)
             sub_run['sub_run_name'] = f'pions_high_rate_{i+1}'
             sub_run['run_time'] = 30  # Minutes
