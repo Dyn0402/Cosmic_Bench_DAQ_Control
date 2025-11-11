@@ -15,7 +15,7 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        self.run_name = 'run_41'
+        self.run_name = 'run_42'
         self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -132,8 +132,8 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'rotation_45_test',
-                'run_time': 60,  # Minutes
+                'sub_run_name': 'rotation_45_test_0',
+                'run_time': 10,  # Minutes
                 'hvs': {
                     '2': {
                         '0': 830,
@@ -151,14 +151,14 @@ class Config:
                     '5': {
                         '0': 500,
                         '1': 500,
-                        # '2': 750,
-                        # '3': 500,
-                        # '6': 640,
-                        # '7': 440,
-                        # '8': 700,
-                        # '9': 500,
-                        # '10': 700,
-                        # '11': 500,
+                        '2': 750,
+                        '3': 460,
+                        '6': 640,
+                        '7': 440,
+                        '8': 750,
+                        '9': 500,
+                        '10': 750,
+                        '11': 500,
                     },
                     '12': {
                         '0': 830
@@ -233,10 +233,10 @@ class Config:
 
         # Append copies of sub_runs with same voltages but different run names
         template = self.sub_runs[0]
-        for i in range(1, 16):
+        for i in range(1, 5):
             sub_run = copy.deepcopy(template)
-            sub_run['sub_run_name'] = f'pions_high_rate_{i+1}'
-            sub_run['run_time'] = 30  # Minutes
+            sub_run['sub_run_name'] = f'rotation_45_test_{i}'
+            sub_run['run_time'] = 10  # Minutes
             self.sub_runs.append(sub_run)
 
         self.bench_geometry = {
