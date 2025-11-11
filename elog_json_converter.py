@@ -52,7 +52,7 @@ def main():
 
     # Make list of subrun names
     message_str += '\nSub-runs and HV Settings:\n'
-    hv_table_str = generate_elog_hv_table(run_config, html=False)
+    hv_table_str = generate_elog_hv_table(run_config, html=True)
     message_str += hv_table_str + '\n'
 
     # --- Write message to a temp file ---
