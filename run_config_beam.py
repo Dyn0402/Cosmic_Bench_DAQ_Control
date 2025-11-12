@@ -15,7 +15,7 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        self.run_name = 'run_61'
+        self.run_name = 'run_62'
         self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -133,7 +133,7 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'rotation_15_test_0',
+                'sub_run_name': 'rotation_-60_test_0',
                 'run_time': 10,  # Minutes
                 'hvs': {
                     '2': {
@@ -236,7 +236,7 @@ class Config:
         template = self.sub_runs[0]
         for i in range(1, 5):
             sub_run = copy.deepcopy(template)
-            sub_run['sub_run_name'] = f'rotation_15_test_{i}'
+            sub_run['sub_run_name'] = f'rotation_-60_test_{i}'
             # sub_run['run_time'] = 10  # Minutes
             self.sub_runs.append(sub_run)
 
@@ -251,8 +251,8 @@ class Config:
         }
 
         self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
-                                   'rd5_plein_saral_2', 'rd5_plein_vfp_1',
-                                   'urw_inter', 'rd5_grid_saral_1', 'rd5_strip_saral_1', 'rd5_strip_esl_1']
+                                   'urw_inter', 'rd5_plein_saral_2', 'rd5_plein_vfp_1',
+                                   'rd5_grid_saral_1', 'rd5_strip_saral_1', 'rd5_strip_esl_1']
 
         self.detectors = [
             {
