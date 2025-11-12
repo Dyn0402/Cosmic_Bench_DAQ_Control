@@ -10,6 +10,7 @@ Created as Cosmic_Bench_DAQ_Control/daq_control.py
 
 import os
 import sys
+import signal
 import shutil
 from time import sleep
 from datetime import datetime
@@ -24,6 +25,7 @@ from common_functions import *
 from weiner_ps_monitor import get_pl512_status
 
 RUNCONFIG_REL_PATH = "config/json_run_configs/"
+stop_all = False  # flag for double Ctrl-C
 
 
 def main():
@@ -126,9 +128,13 @@ def main():
             desync_watcher.receive()
             desync_watcher.send_json(config.desync_watcher_info)
 
+        signal.signal(signal.SIGINT, double_interrupt_handler)
         sleep(2)  # Wait for all clients to do what they need to do (specifically, create directories)
 
         for sub_run in config.sub_runs:
+            if stop_all:
+                print('Stopping run...')
+                break
             sub_run_name = sub_run['sub_run_name']
             # sub_run_dir = f'{config.dream_daq_info["run_directory"]}{sub_run_name}/'
             # create_dir_if_not_exist(sub_run_dir)  # Means DAQ runs on Dream CPU! Can fix, need config template in dream_daq control!
@@ -185,7 +191,7 @@ def main():
                     run_daq_controller(*daq_control_args)
 
                 except KeyboardInterrupt:
-                    print('Keyboard Interrupt, stopping run')
+                    print('Keyboard Interrupt, stopping sub-run')
                 finally:
                     if banco:
                         banco_daq.send('Stop')
@@ -401,6 +407,16 @@ def check_weiner_lv_status(weiner_ps_info):
             return False
     print('Weiner Power Supply status OK, continuing with sub-run')
     return True
+
+
+def double_interrupt_handler(sig, frame):
+    global stop_all
+    if stop_all:
+        print("\nSecond Ctrl-C detected, exiting immediately.")
+        sys.exit(1)
+    else:
+        print("\nCtrl-C detected. Finishing current sub-run gracefully. Press again to exit entirely.")
+        stop_all = True
 
 
 if __name__ == '__main__':
