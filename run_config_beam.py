@@ -15,7 +15,7 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        self.run_name = 'urw_inter_test'
+        self.run_name = 'urw_inter_test_2'
         self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -496,10 +496,10 @@ class Config:
                     'resist_2': (2, 6)
                 },
                 'dream_feus': {
-                    'x_1': (3, 5),  # Runs along x direction, indicates y hit location
-                    'x_2': (3, 6),
-                    'y_1': (3, 7),  # Runs along y direction, indicates x hit location
-                    'y_2': (3, 8),
+                    'x_1': (2, 5),  # Runs along x direction, indicates y hit location
+                    'x_2': (2, 6),
+                    'y_1': (2, 7),  # Runs along y direction, indicates x hit location
+                    'y_2': (2, 8),
                 },
                 'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
                     'x_1': True,

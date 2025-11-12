@@ -412,10 +412,10 @@ class Config:
                     'resist_2': (2, 6)
                 },
                 'dream_feus': {
-                    'x_1': (3, 5),  # Runs along x direction, indicates y hit location
-                    'x_2': (3, 6),
-                    'y_1': (3, 7),  # Runs along y direction, indicates x hit location
-                    'y_2': (3, 8),
+                    'x_1': (2, 5),  # Runs along x direction, indicates y hit location
+                    'x_2': (2, 6),
+                    'y_1': (2, 7),  # Runs along y direction, indicates x hit location
+                    'y_2': (2, 8),
                 },
                 'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
                     'x_1': True,
