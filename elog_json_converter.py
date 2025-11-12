@@ -44,16 +44,24 @@ def main():
         'BeamInfo': run_config.get('beam_type', ''),
     }
 
-    message_str = ''
-    message_str += 'Output Directory: ' + run_config['run_out_dir'] + '\n'
-    message_str += 'Detectors Included:\n'
-    for det in run_config['included_detectors']:
-        message_str += f" - {det}\n"
+    message_str = f"""
+    <div style='font-family: sans-serif; font-size: 14px;'>
+      <p><b>Output Directory:</b> {run_config['run_out_dir']}</p>
 
-    # Make list of subrun names
-    message_str += '\nSub-runs and HV Settings:\n'
+      <p><b>Detectors Included:</b></p>
+      <ul style='margin-top: 4px; margin-bottom: 10px;'>
+    """
+    for det in run_config["included_detectors"]:
+        message_str += f"    <li>{det}</li>\n"
+
+    message_str += """
+      </ul>
+      <p><b>Sub-runs and HV Settings:</b></p>
+    </div>
+    """
+
     hv_table_str = generate_elog_hv_table(run_config, html=True)
-    message_str += hv_table_str + '\n'
+    message_str += hv_table_str + "\n"
 
     # --- Write message to a temp file ---
     with tempfile.NamedTemporaryFile(delete=False, suffix=".txt", mode="w") as tmp_msg:
@@ -69,6 +77,7 @@ def main():
         "elog",
         "-h", "localhost",
         "-p", "8080",
+        "-n", "2",
         "-l", "SPS H4 2025",
     ]
 
@@ -112,20 +121,26 @@ def generate_elog_hv_table(run_config, html=False):
         hvs = sub["hvs"]
 
         if html:
-            out.append(f"<h3 style='margin-bottom: 6px;'>Sub-run name: {sub_name}</h3>")
+            out.append(f"<h3 style='margin-bottom: 6px; font-family: sans-serif;'>Sub-run: {sub_name}</h3>")
             out.append("""
             <table style="
                 border-collapse: collapse;
-                width: 100%;
-                margin-bottom: 12px;
+                margin-bottom: 16px;
                 text-align: center;
                 font-family: sans-serif;
-                font-size: 14px;">
+                font-size: 13px;
+                min-width: 300px;
+            ">
+                <colgroup>
+                    <col style="width: auto;">
+                    <col style="width: auto;">
+                    <col style="width: auto;">
+                </colgroup>
                 <thead>
                     <tr style='background-color: #f2f2f2;'>
-                        <th style='border: 1px solid #ddd; padding: 6px;'>Detector</th>
-                        <th style='border: 1px solid #ddd; padding: 6px;'>HV Channel</th>
-                        <th style='border: 1px solid #ddd; padding: 6px;'>Voltage (V)</th>
+                        <th style='border: 1px solid #ddd; padding: 4px 8px;'>Detector</th>
+                        <th style='border: 1px solid #ddd; padding: 4px 8px;'>HV Channel</th>
+                        <th style='border: 1px solid #ddd; padding: 4px 8px;'>Voltage (V)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -142,8 +157,8 @@ def generate_elog_hv_table(run_config, html=False):
                 continue
 
             hv_channels = det["hv_channels"]
-            if isinstance(hv_channels, str):  # e.g. "banco"
-                continue  # skip those using a named mapping rather than explicit channels
+            if isinstance(hv_channels, str):  # skip shorthand mappings
+                continue
 
             for hv_name, (card, channel) in hv_channels.items():
                 voltage = hvs.get(str(card), {}).get(str(channel), "—")
@@ -152,9 +167,9 @@ def generate_elog_hv_table(run_config, html=False):
                     row_color = "#ffffff" if row_num % 2 == 0 else "#fafafa"
                     out.append(
                         f"<tr style='background-color: {row_color};'>"
-                        f"<td style='border: 1px solid #ddd; padding: 6px;'>{det_name}</td>"
-                        f"<td style='border: 1px solid #ddd; padding: 6px;'>{hv_name}</td>"
-                        f"<td style='border: 1px solid #ddd; padding: 6px;'>{voltage}</td>"
+                        f"<td style='border: 1px solid #ddd; padding: 4px 8px;'>{det_name}</td>"
+                        f"<td style='border: 1px solid #ddd; padding: 4px 8px;'>{hv_name}</td>"
+                        f"<td style='border: 1px solid #ddd; padding: 4px 8px;'>{voltage}</td>"
                         f"</tr>"
                     )
                     row_num += 1
@@ -167,6 +182,7 @@ def generate_elog_hv_table(run_config, html=False):
             out.append("")
 
     return "\n".join(out)
+
 
 
 
