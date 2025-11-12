@@ -15,7 +15,7 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        self.run_name = 'urw_inter_test_2'
+        self.run_name = 'run_63'
         self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -133,8 +133,8 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'rotation_-60_test_0',
-                'run_time': 10,  # Minutes
+                'sub_run_name': 'resist_drift_hv_-0',
+                'run_time': 8,  # Minutes
                 'hvs': {
                     '2': {
                         '0': 455,
@@ -191,46 +191,49 @@ class Config:
         # # Remove the first two sub_runs to keep only the modified ones
         # self.sub_runs = self.sub_runs[1:]
 
-        # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
-        # template = self.sub_runs[0]
-        # resist_diffs = [-5, -10, -15, -20, -25, -30, -35, -40, -45, -50]
-        # for resist_diff in resist_diffs:
-        #     sub_run = copy.deepcopy(template)
-        #     sub_run['sub_run_name'] = f'resist_mesh_hv_{resist_diff}'
-        #
-        #     card = '2'
-        #     channels = ['0', '1', '2', '3', '4', '7', '8', '9', '10']  # Resist channels
-        #     # channels = ['3']  # Resist channels
-        #     for channel in sub_run['hvs'][card]:
-        #         if channel in channels:
-        #             sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
-        #
-        #     card = '5'
-        #     channels = ['2', '3', '6', '7', '8', '9', '10', '11']  # Drift + resist channels
-        #     for channel in sub_run['hvs'][card]:
-        #         if channel in channels:
-        #             sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
-        #     self.sub_runs.append(sub_run)
-
-        # drift_diffs_eic = [-50, -100, -150, -200, -250, -300, -350, -400, -450]
+        template = self.sub_runs[0]
+        drift_diffs_eic = [-25, -50, -75, -100, -125, -150, -175, -200, -225, -250, -275, -300, -325, -350,
+                           -275, -400, -425, -450, -475]
         # drift_diffs_p2 = [-20, -40, -60, -80, -100, -120, -140, -160, -180]
         # for drift_diff_eic, drift_diff_p2 in zip(drift_diffs_eic, drift_diffs_p2):
-        #     sub_run = copy.deepcopy(template)
-        #     sub_run['sub_run_name'] = f'drift_hv_{drift_diff_eic}'
-        #
-        #     card = '5'
-        #     channels = ['0', '1']  # Drift channels
-        #     for channel in sub_run['hvs'][card]:
-        #         if channel in channels:
-        #             sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + drift_diff_eic
-        #
-        #     card = '5'
-        #     channels = ['6', '8', '10']
-        #     for channel in sub_run['hvs'][card]:
-        #         if channel in channels:
-        #             sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + drift_diff_p2
-        #
-        #     self.sub_runs.append(sub_run)
+        for drift_diff_eic in drift_diffs_eic:
+            sub_run = copy.deepcopy(template)
+            sub_run['sub_run_name'] = f'drift_hv_{drift_diff_eic}'
+
+            card = '5'
+            channels = ['0', '1']  # Drift channels
+            for channel in sub_run['hvs'][card]:
+                if channel in channels:
+                    sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + drift_diff_eic
+
+            # card = '5'
+            # channels = ['6', '8', '10']
+            # for channel in sub_run['hvs'][card]:
+            #     if channel in channels:
+            #         sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + drift_diff_p2
+
+            self.sub_runs.append(sub_run)
+
+        # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
+        template = self.sub_runs[0]
+        resist_diffs = [-5, -10, -15, -20, -25, -30, -35, -40, -45, -50, -55, -60, -65, -70, -75 -80, -85, -90, -95, -100]
+        for resist_diff in resist_diffs:
+            sub_run = copy.deepcopy(template)
+            sub_run['sub_run_name'] = f'resist_hv_{resist_diff}'
+
+            card = '2'
+            channels = ['0', '1', '2', '3', '4', '7', '8', '9', '10']  # Resist channels
+            # channels = ['3']  # Resist channels
+            for channel in sub_run['hvs'][card]:
+                if channel in channels:
+                    sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
+
+            card = '5'
+            channels = ['2', '3', '6', '7', '8', '9', '10', '11']  # Drift + resist channels
+            for channel in sub_run['hvs'][card]:
+                if channel in channels:
+                    sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
+            self.sub_runs.append(sub_run)
 
         # Append copies of sub_runs with same voltages but different run names
         template = self.sub_runs[0]
