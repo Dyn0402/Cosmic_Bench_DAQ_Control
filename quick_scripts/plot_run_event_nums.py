@@ -24,7 +24,7 @@ def main():
         print('Usage: python plot_run_event_nums.py <run_number>')
         sys.exit(1)
     run_num = sys.argv[1]
-    run_dir = os.path.join('/mnt/data/beam_sps_25/Run/', run_num)
+    run_dir = os.path.join(run_dir, run_num)
 
     # desync_csv_log = ''
 
