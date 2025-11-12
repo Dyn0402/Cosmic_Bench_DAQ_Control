@@ -15,7 +15,7 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        self.run_name = 'run_60'
+        self.run_name = 'run_61'
         self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -65,6 +65,7 @@ class Config:
             'pedestals_dir': f'{self.base_out_dir}pedestals_noise/',  # None to ignore, else top directory for pedestal runs
             'pedestals': 'latest',  # 'latest' for most recent, otherwise specify directory name, eg "pedestals_10-22-25_13-43-34"
             'latency': 22,  # Latency setting for DAQ in clock cycles
+            'sample_period': 60,  # ns, sampling period
         }
 
         self.banco_info = {
@@ -139,8 +140,8 @@ class Config:
                         '0': 830,
                         '1': 495,
                         '2': 550,
-                        '3': 840,
-                        '4': 530,
+                        # '3': 840,
+                        # '4': 530,
                         '5': 700,
                         '6': 545,
                         '7': 535,
@@ -151,17 +152,17 @@ class Config:
                     '5': {
                         '0': 500,
                         '1': 500,
-                        '2': 700,
-                        '3': 450,
-                        '6': 640,
-                        '7': 440,
-                        '8': 750,
-                        '9': 500,
-                        '10': 750,
-                        '11': 500,
+                        # '2': 700,
+                        # '3': 450,
+                        # '6': 640,
+                        # '7': 440,
+                        # '8': 750,
+                        # '9': 500,
+                        # '10': 750,
+                        # '11': 500,
                     },
                     '12': {
-                        '0': 830
+                        # '0': 830
                     }
                 }
             },
@@ -246,13 +247,12 @@ class Config:
             'banco_arm_separation_z': 172 - 41,  # mm from bottom of lower banco arm to bottom of upper banco arm
             'banco_arm_right_y': 34 + 100,  # mm from center of banco to right edge of banco arm
             'banco_arm_length_y': 230,  # mm from left edge of banco arm to right edge of banco arm
-            'banco_moveable_y_position': 1000.0,  # mm  Offset from moving table. Positive moves banco up.
+            'banco_moveable_y_position': 0.0,  # mm  Offset from moving table. Positive moves banco up.
         }
 
         self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
-                                   'rd5_plein_esl_1', 'rd5_plein_saral_2', 'rd5_plein_vfp_1', 'urw_strip',
-                                   'urw_inter', 'rd5_grid_saral_1', 'rd5_strip_saral_1', 'rd5_strip_esl_1',
-                                   'p2_small_1', 'p2_small_3', 'p2_large_1']
+                                   'rd5_plein_saral_2', 'rd5_plein_vfp_1',
+                                   'urw_inter', 'rd5_grid_saral_1', 'rd5_strip_saral_1', 'rd5_strip_esl_1']
 
         self.detectors = [
             {
@@ -358,22 +358,22 @@ class Config:
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
-                    'z': 800,  # mm
+                    'z': 100,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 30,  # deg  Rotation about y axis
+                    'y': -60,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
-                    'drift': (5, 1),
-                    'resist_1': (2, 4)
+                    'drift': (5, 0),
+                    'resist_1': (2, 0)
                 },
                 'dream_feus': {
-                    'x_1': (3, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (3, 2),
-                    'y_1': (3, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (3, 4),
+                    'x_1': (1, 1),  # Runs along x direction, indicates y hit location
+                    'x_2': (1, 2),
+                    'y_1': (1, 3),  # Runs along y direction, indicates x hit location
+                    'y_2': (1, 4),
                 },
                 'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
                     'x_1': True,
@@ -424,7 +424,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 30,  # deg  Rotation about y axis
+                    'y': -60,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -455,7 +455,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 30,  # deg  Rotation about y axis
+                    'y': -60,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -487,7 +487,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 30,  # deg  Rotation about y axis
+                    'y': -60,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -519,7 +519,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 30,  # deg  Rotation about y axis
+                    'y': -60,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -644,7 +644,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 30,  # deg  Rotation about y axis
+                    'y': -60,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {

@@ -98,8 +98,8 @@ class Config:
                         '0': 300,
                         '1': 300,
                         '2': 300,
-                        '3': 300,
-                        '4': 300,
+                        # '3': 300,
+                        # '4': 300,
                         '5': 300,
                         '6': 300,
                         '7': 300,
@@ -110,17 +110,17 @@ class Config:
                     '5': {
                         '0': 500,
                         '1': 500,
-                        '2': 400,
-                        '3': 200,
-                        '6': 400,
-                        '7': 200,
-                        '8': 400,
-                        '9': 200,
-                        '10': 400,
-                        '11': 200,
+                        # '2': 400,
+                        # '3': 200,
+                        # '6': 400,
+                        # '7': 200,
+                        # '8': 400,
+                        # '9': 200,
+                        # '10': 400,
+                        # '11': 200,
                     },
                     '12': {
-                        '0': 300
+                        # '0': 300
                     }
                 }
             },
@@ -247,7 +247,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
+                    'y': 30,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -274,22 +274,22 @@ class Config:
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
-                    'z': 800,  # mm
+                    'z': 100,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
+                    'y': -60,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
-                    'drift': (5, 1),
-                    'resist_1': (2, 4)
+                    'drift': (5, 0),
+                    'resist_1': (2, 0)
                 },
                 'dream_feus': {
-                    'x_1': (3, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (3, 2),
-                    'y_1': (3, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (3, 4),
+                    'x_1': (1, 1),  # Runs along x direction, indicates y hit location
+                    'x_2': (1, 2),
+                    'y_1': (1, 3),  # Runs along y direction, indicates x hit location
+                    'y_2': (1, 4),
                 },
                 'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
                     'x_1': True,
@@ -340,7 +340,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
+                    'y': -60,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -371,7 +371,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
+                    'y': -60,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -399,12 +399,12 @@ class Config:
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
-                    'z': 0,  # mm
+                    'z': 900,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 900,  # deg  Rotation about z axis
+                    'y': -60,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
                     'drift': (5, 1),
@@ -435,7 +435,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
+                    'y': -60,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -528,7 +528,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
+                    'y': 30,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -560,7 +560,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
+                    'y': -60,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -619,7 +619,7 @@ class Config:
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
-                    'z': 1510,  # mm
+                    'z': 1490,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -646,7 +646,7 @@ class Config:
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
-                    'z': 1635,  # mm
+                    'z': 1620,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -658,8 +658,8 @@ class Config:
                     'mesh_1': (5, 11)
                 },
                 'dream_feus': {
-                    'x_1': (5, 7),
-                    'x_2': (5, 8),
+                    # 'x_1': (5, 7),
+                    # 'x_2': (5, 8),
                 },
                 'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
                     'x_1': True,
