@@ -9,15 +9,24 @@ Created as Cosmic_Bench_DAQ_Control/plot_run_event_nums
 """
 
 import os
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
 
 def main():
-    run_dir = '/mnt/data/beam_sps_25/Run/run_29/'
+    run_dir = '/mnt/data/beam_sps_25/Run/'
     csv_name = 'daq_status_log.csv'
     event_col_name = 'dream_events'
+
+    if len(sys.argv) != 2:
+        print('Usage: python plot_run_event_nums.py <run_number>')
+        sys.exit(1)
+    run_num = sys.argv[1]
+    run_dir = os.path.join('/mnt/data/beam_sps_25/Run/', run_num)
+
+    # desync_csv_log = ''
 
     sub_run_names = []
     sub_run_events = []
