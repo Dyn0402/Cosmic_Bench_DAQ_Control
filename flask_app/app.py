@@ -100,6 +100,14 @@ def start_run():
     else:
         return jsonify({"message": f"Error: {result.stderr}"}), 500
 
+@app.route("/stop_sub_run", methods=["POST"])
+def stop_run():
+    try:
+        subprocess.Popen([f"{BASH_DIR}/stop_sub_run.sh"])
+        return jsonify({"success": True, "message": "Run stopped"})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
 @app.route("/stop_run", methods=["POST"])
 def stop_run():
     try:

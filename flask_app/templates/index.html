@@ -26,6 +26,7 @@
   <div class="mb-4 d-flex flex-wrap align-items-center gap-2">
     <select id="run-select" class="form-select me-3" style="width:auto;"></select>
     <button id="run-config-py" class="btn btn-success me-2 mb-2">Start Run</button>
+    <button id="stop-sub-run" class="btn btn-warning me-2 mb-2">Stop Sub-Run</button>
     <button id="stop-run" class="btn btn-danger me-2 mb-2">Stop Run</button>
     <button id="restart-all" class="btn btn-danger me-2 mb-2">Restart All</button>
     <button id="take-pedestals" class="btn btn-secondary mb-2">Take Pedestals</button>
@@ -282,6 +283,37 @@ function updateStatus() {
             // });
         });
 }
+
+document.getElementById("stop-sub-run").addEventListener("click", async () => {
+  const res = await fetch("/stop_sub_run", { method: "POST" });
+  const data = await res.json();
+
+  // Create a fading popup
+  const popup = document.createElement("div");
+  popup.textContent = data.message;
+  popup.style.position = "fixed";
+  popup.style.top = "80px";
+  popup.style.left = "50%";
+  popup.style.transform = "translateX(-50%)";
+  popup.style.background = "#dc7b35";
+  popup.style.color = "#fff";
+  popup.style.padding = "1em 2em";
+  popup.style.borderRadius = "8px";
+  popup.style.boxShadow = "0 2px 8px rgba(0,0,0,0.2)";
+  popup.style.zIndex = "9999";
+  popup.style.opacity = "1";
+  popup.style.transition = "opacity 1s";
+
+  document.body.appendChild(popup);
+
+  run = null;
+
+  setTimeout(() => {
+    popup.style.opacity = "0";
+    setTimeout(() => popup.remove(), 1000);
+  }, 2500);
+});
+
 
 document.getElementById("stop-run").addEventListener("click", async () => {
   const res = await fetch("/stop_run", { method: "POST" });
@@ -882,7 +914,7 @@ async function updateRunAndBancoDisplay() {
 }
 
 // Update every 5 seconds
-// setInterval(updateRunAndBancoDisplay, 5000);
+setInterval(updateRunAndBancoDisplay, 5000);
 
 // Also load immediately on page load
 updateRunAndBancoDisplay();
