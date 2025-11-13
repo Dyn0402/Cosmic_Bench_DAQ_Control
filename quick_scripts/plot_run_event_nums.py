@@ -71,24 +71,25 @@ def main():
 
     # --- Compute desync positions ---
     x_positions = np.arange(len(sub_run_names))
-    y_positions = sub_run_events
+    y_positions = np.array(sub_run_events) / 2  # center of bars
 
     # --- Plot symbols for desyncs ---
-    symbol_offset = max(sub_run_events) * 0.02  # small spacing above bars
+    # symbol_offset = max(sub_run_events) * 0.02  # small spacing above bars
+    symbol_offset = 0
 
     # Banco not synced (red X)
     for i in np.where(np.logical_not(sub_run_banco_synced))[0]:
         ax.text(x_positions[i], y_positions[i] + symbol_offset, '✗',
-                color='red', fontsize=14, ha='center', va='bottom')
+                color='red', fontsize=30, ha='center', va='bottom')
 
     # Dream-Banco not synced (green ●)
     for i in np.where(np.logical_not(sub_run_dream_banco_synced))[0]:
         ax.text(x_positions[i], y_positions[i] + symbol_offset, '●',
-                color='green', fontsize=14, ha='center', va='bottom')
+                color='green', fontsize=30, ha='center', va='bottom')
 
     # --- Legend ---
-    ax.scatter([], [], color='red', marker='x', label='Banco Not Synced', s=80)
-    ax.scatter([], [], color='green', marker='o', label='Dream–Banco Not Synced', s=80)
+    ax.scatter([], [], color='red', marker='x', label='Banco De-Synced', s=80)
+    ax.scatter([], [], color='green', marker='o', label='Dream–Banco De-Synced', s=80)
     ax.legend(frameon=False, loc='upper right')
 
     # --- Labels & formatting ---
