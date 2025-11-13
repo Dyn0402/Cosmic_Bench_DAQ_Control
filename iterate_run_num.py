@@ -73,6 +73,8 @@ def update_run_number(file_path, new_run_number):
     with open(file_path, "r", encoding="utf-8") as f:
         content = f.read()
 
+    print(f"Original content:\n{content}\n")
+
     # Regex to match: self.run_name = 'run_63' (single or double quotes)
     new_run_name = f"run_{new_run_number}"
     new_line = f"self.run_name = '{new_run_name}'"
