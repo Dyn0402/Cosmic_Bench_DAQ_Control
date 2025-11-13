@@ -10,6 +10,7 @@ Created as Cosmic_Bench_DAQ_Control/iterate_run_num.py
 
 import os
 import re
+import path
 
 from run_config_beam import Config
 BASE_DIR = '/local/home/banco/dylan/Cosmic_Bench_DAQ_Control'
@@ -26,7 +27,7 @@ def main():
     run_name = config.run_name
 
     # Split the last directory off of the run_out_dir to get the parent directory
-    run_base_dir = os.path.dirname(run_out_dir)
+    run_base_dir = remove_last_dir(run_out_dir)
 
     if os.path.exists(run_out_dir):
         print(f"Run output directory {run_out_dir} already exists. Incrementing run_name...")
@@ -81,6 +82,13 @@ def update_run_number(file_path, new_run_number):
         f.write(updated_content)
 
     print(f"Updated run_name to '{new_run_name}' in {file_path}")
+
+
+def remove_last_dir(path_str: str) -> str:
+    p = Path(path_str)
+    # Path('/') has parent '/', but Path('') becomes '.'
+    parent = p.parent
+    return str(parent)
 
 
 if __name__ == '__main__':
