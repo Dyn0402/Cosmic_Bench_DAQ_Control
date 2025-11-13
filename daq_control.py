@@ -25,7 +25,7 @@ from common_functions import *
 from weiner_ps_monitor import get_pl512_status
 
 RUNCONFIG_REL_PATH = "config/json_run_configs/"
-stop_all = False  # flag for double Ctrl-C
+# stop_all = False  # flag for double Ctrl-C
 
 
 def main():
@@ -128,94 +128,98 @@ def main():
             desync_watcher.receive()
             desync_watcher.send_json(config.desync_watcher_info)
 
-        signal.signal(signal.SIGINT, double_interrupt_handler)
+        # signal.signal(signal.SIGINT, double_interrupt_handler)
         sleep(2)  # Wait for all clients to do what they need to do (specifically, create directories)
-
-        for sub_run in config.sub_runs:
-            if stop_all:
-                print('Stopping run...')
-                break
-            sub_run_name = sub_run['sub_run_name']
-            # sub_run_dir = f'{config.dream_daq_info["run_directory"]}{sub_run_name}/'
-            # create_dir_if_not_exist(sub_run_dir)  # Means DAQ runs on Dream CPU! Can fix, need config template in dream_daq control!
-            sub_top_out_dir = f'{config.run_out_dir}{sub_run_name}/'
-            create_dir_if_not_exist(sub_top_out_dir)
-            sub_out_dir = f'{sub_top_out_dir}{config.raw_daq_inner_dir}/'
-            create_dir_if_not_exist(sub_out_dir)
-            if banco:
-                trigger_switch.send('off')  # Turn off trigger to make sure daqs are synced
-                trigger_switch.receive()
-
-            if getattr(config, 'weiner_ps_info', None):  # Ensure ps is on before starting run
-                weiner_ok = check_weiner_lv_status(config.weiner_ps_info)
-                if not weiner_ok:
-                    print(f'Weiner Power Supply check failed, skipping sub run {sub_run_name}')
-                    continue
-
-            print(f'Ramping HVs for {sub_run_name}')
-            if config.hv_info['hv_monitoring']:  # Monitor hv and write to file
-                hv.send('Begin Monitoring')
-                hv.receive()  # Starting monitoring
-                hv.send_json(sub_run)
-                hv.receive()  # Monitoring started
-
-            hv.send('Start')
-            hv.receive()
-            hv.send_json(sub_run)
-            res = hv.receive()
-            if 'HV Set' in res:
-                print(f'Prepping DAQs for {sub_run_name}')
+        try:
+            for sub_run in config.sub_runs:
+                # if stop_all:
+                #     print('Stopping run...')
+                #     break
+                sub_run_name = sub_run['sub_run_name']
+                # sub_run_dir = f'{config.dream_daq_info["run_directory"]}{sub_run_name}/'
+                # create_dir_if_not_exist(sub_run_dir)  # Means DAQ runs on Dream CPU! Can fix, need config template in dream_daq control!
+                sub_top_out_dir = f'{config.run_out_dir}{sub_run_name}/'
+                create_dir_if_not_exist(sub_top_out_dir)
+                sub_out_dir = f'{sub_top_out_dir}{config.raw_daq_inner_dir}/'
+                create_dir_if_not_exist(sub_out_dir)
                 if banco:
-                    banco_daq.send(f'Start {sub_run_name}')
-                    banco_daq.receive()
+                    trigger_switch.send('off')  # Turn off trigger to make sure daqs are synced
+                    trigger_switch.receive()
 
-                if watch_for_desync:
-                    desync_watcher.send('Start Monitoring')
-                    desync_watcher.receive()
-                    desync_watcher.send_json(sub_run)
-                    desync_watcher.receive()
+                if getattr(config, 'weiner_ps_info', None):  # Ensure ps is on before starting run
+                    weiner_ok = check_weiner_lv_status(config.weiner_ps_info)
+                    if not weiner_ok:
+                        print(f'Weiner Power Supply check failed, skipping sub run {sub_run_name}')
+                        continue
 
-                if config.generate_external_triggers:
-                    n_triggers = config.trigger_gen_info['n_triggers']
-                    trig_rate = config.trigger_gen_info['trigger_rate']
-                    pulse_freq_ratio = config.trigger_gen_info['pulse_freq_ratio']
-                    trigger_gen.send(f'send triggers {n_triggers} {trig_rate} {pulse_freq_ratio}')
-                    trigger_gen.receive()
+                print(f'Ramping HVs for {sub_run_name}')
+                if config.hv_info['hv_monitoring']:  # Monitor hv and write to file
+                    hv.send('Begin Monitoring')
+                    hv.receive()  # Starting monitoring
+                    hv.send_json(sub_run)
+                    hv.receive()  # Monitoring started
 
-                daq_trigger_switch = trigger_switch if banco else None
-                daq_control_args = (config.dream_daq_info['daq_config_template_path'], sub_run_name, sub_run['run_time'],
-                                    sub_out_dir, daq_trigger_switch, dream_daq)
-
-                print(f'Starting run for sub run {sub_run_name}')
-                try:
-                    run_daq_controller(*daq_control_args)
-
-                except KeyboardInterrupt:
-                    print('Keyboard Interrupt, stopping sub-run')
-                finally:
+                hv.send('Start')
+                hv.receive()
+                hv.send_json(sub_run)
+                res = hv.receive()
+                if 'HV Set' in res:
+                    print(f'Prepping DAQs for {sub_run_name}')
                     if banco:
-                        banco_daq.send('Stop')
+                        banco_daq.send(f'Start {sub_run_name}')
                         banco_daq.receive()
 
-                    if banco:
-                        pass  # Process banco data
-
-                    if config.hv_info['hv_monitoring']:
-                        hv.send('End Monitoring')
-                        hv.receive()  # Stopping monitoring
-                        hv.receive()  # Finished monitoring
-
                     if watch_for_desync:
-                        desync_watcher.send('End Monitoring')
-                        desync_watcher.receive()  # Stopping monitoring
-                        desync_watcher.receive()  # Finished monitoring
+                        desync_watcher.send('Start Monitoring')
+                        desync_watcher.receive()
+                        desync_watcher.send_json(sub_run)
+                        desync_watcher.receive()
 
                     if config.generate_external_triggers:
-                        trigger_gen.send('stop triggers')
+                        n_triggers = config.trigger_gen_info['n_triggers']
+                        trig_rate = config.trigger_gen_info['trigger_rate']
+                        pulse_freq_ratio = config.trigger_gen_info['pulse_freq_ratio']
+                        trigger_gen.send(f'send triggers {n_triggers} {trig_rate} {pulse_freq_ratio}')
                         trigger_gen.receive()
 
-                    print(f'Finished with sub run {sub_run_name}, waiting 10 seconds before next run')
-                    sleep(10)
+                    daq_trigger_switch = trigger_switch if banco else None
+                    daq_control_args = (config.dream_daq_info['daq_config_template_path'], sub_run_name, sub_run['run_time'],
+                                        sub_out_dir, daq_trigger_switch, dream_daq)
+
+                    print(f'Starting run for sub run {sub_run_name}')
+                    try:
+                        run_daq_controller(*daq_control_args)
+
+                    except KeyboardInterrupt:
+                        print('Keyboard Interrupt, stopping sub-run')
+                    finally:
+                        if banco:
+                            banco_daq.send('Stop')
+                            banco_daq.receive()
+
+                        if banco:
+                            pass  # Process banco data
+
+                        if config.hv_info['hv_monitoring']:
+                            hv.send('End Monitoring')
+                            hv.receive()  # Stopping monitoring
+                            hv.receive()  # Finished monitoring
+
+                        if watch_for_desync:
+                            desync_watcher.send('End Monitoring')
+                            desync_watcher.receive()  # Stopping monitoring
+                            desync_watcher.receive()  # Finished monitoring
+
+                        if config.generate_external_triggers:
+                            trigger_gen.send('stop triggers')
+                            trigger_gen.receive()
+
+                        print(f'Finished with sub run {sub_run_name}, waiting 10 seconds before next run')
+                        sleep(10)
+        except KeyboardInterrupt as e:
+            print(f'Run stoppping.')
+        finally:
+            pass  # Maybe clean up here later
         print('Run complete, closing down subsystems')
         if config.power_off_hv_at_end:
             hv.send('Power Off')
@@ -409,14 +413,14 @@ def check_weiner_lv_status(weiner_ps_info):
     return True
 
 
-def double_interrupt_handler(sig, frame):
-    global stop_all
-    if stop_all:
-        print("\nSecond Ctrl-C detected, exiting immediately.")
-        sys.exit(1)
-    else:
-        print("\nCtrl-C detected. Finishing current sub-run gracefully. Press again to exit entirely.")
-        stop_all = True
+# def double_interrupt_handler(sig, frame):
+#     global stop_all
+#     if stop_all:
+#         print("\nSecond Ctrl-C detected, exiting immediately.")
+#         sys.exit(1)
+#     else:
+#         print("\nCtrl-C detected. Finishing current sub-run gracefully. Press again to exit entirely.")
+#         stop_all = True
 
 
 if __name__ == '__main__':

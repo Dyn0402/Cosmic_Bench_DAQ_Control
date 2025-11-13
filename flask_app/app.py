@@ -104,7 +104,7 @@ def start_run():
 def stop_sub_run():
     try:
         subprocess.Popen([f"{BASH_DIR}/stop_sub_run.sh"])
-        return jsonify({"success": True, "message": "Run stopped"})
+        return jsonify({"success": True, "message": "Stopping Sub-Run"})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
 
@@ -112,7 +112,7 @@ def stop_sub_run():
 def stop_run():
     try:
         subprocess.Popen([f"{BASH_DIR}/stop_run.sh"])
-        return jsonify({"success": True, "message": "Run stopped"})
+        return jsonify({"success": True, "message": "Stopping Run"})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
 
