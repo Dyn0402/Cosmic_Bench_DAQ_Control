@@ -10,7 +10,7 @@ Created as Cosmic_Bench_DAQ_Control/iterate_run_num.py
 
 import os
 import re
-import path
+from pathlib import Path
 
 from run_config_beam import Config
 BASE_DIR = '/local/home/banco/dylan/Cosmic_Bench_DAQ_Control'
