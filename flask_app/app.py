@@ -470,9 +470,21 @@ def serve_png():
 @app.route("/get_config_py", methods=['GET'])
 def get_config_py():
     try:
-        config = Config()
-        run_name = config.run_name
-        banco_position = config.bench_geometry['banco_moveable_y_position']
+        # config = Config()
+        # run_name = config.run_name
+        # banco_position = config.bench_geometry['banco_moveable_y_position']
+        # Call get_config function from run_config_beam.py
+        result = subprocess.run(
+            ["python", f"{BASE_DIR}/get_config_py.py"],
+            capture_output=True,
+            text=True
+        )
+        if result.returncode != 0:
+            return jsonify({"success": False, "message": f"Error: {result.stderr}"}), 500
+        output = result.stdout.strip()
+        config_data = json.loads(output)
+        run_name = config_data.get("run_name", "Unknown")
+        banco_position = config_data.get("banco_position", "Unknown")
 
         return jsonify({
             "success": True,
