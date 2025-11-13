@@ -8,22 +8,15 @@ Created as Cosmic_Bench_DAQ_Control/iterate_run_num.py
 @author: Dylan Neff, Dylan
 """
 
-import sys
 import os
 import re
 
-# RUNCONFIG_REL_PATH = "config/json_run_configs/"
 from run_config_beam import Config
 BASE_DIR = '/local/home/banco/dylan/Cosmic_Bench_DAQ_Control'
 RUNCONFIG_PY_PATH = 'run_config_beam.py'
 
 
 def main():
-    # if len(sys.argv) != 2:
-    #     print('No run config path given')
-    #     return
-    # config_path = os.path.join(RUNCONFIG_REL_PATH, sys.argv[1]) if not os.path.isabs(sys.argv[1]) else sys.argv[1]
-    # config = Config(config_path)
     config = Config()
 
     # Check run_out_dir. If it exists, check if run_name has a _<number> suffix.
@@ -47,14 +40,6 @@ def main():
             new_run_name = f"{base_run_name}_{suffix_num}"
             new_full_run_path = os.path.join(run_out_dir, new_run_name)
 
-        # Open the original json config path file and update the run_name
-        # with open(config_path, 'r') as f:
-        #     config_json = f.read()
-        # config_json = config_json.replace(run_name, new_run_name)  # Not very robust but works for now
-        # with open(config_path, 'w') as f:
-        #     f.write(config_json)
-        # print(f"Updated run name to {new_run_name} in config.")
-
         # Open the original python config file and update the run_name
         py_path = os.path.join(BASE_DIR, RUNCONFIG_PY_PATH)
         update_run_number(py_path, suffix_num)
@@ -72,8 +57,6 @@ def update_run_number(file_path, new_run_number):
     """
     with open(file_path, "r", encoding="utf-8") as f:
         content = f.read()
-
-    print(f"Original content:\n{content}\n")
 
     # Regex to match: self.run_name = 'run_63' (single or double quotes)
     new_run_name = f"run_{new_run_number}"

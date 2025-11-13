@@ -187,35 +187,35 @@ def main():
                                         sub_out_dir, daq_trigger_switch, dream_daq)
 
                     print(f'Starting run for sub run {sub_run_name}')
-                    try:
-                        run_daq_controller(*daq_control_args)
+                    run_daq_controller(*daq_control_args)
+                    # try:
+                    #     run_daq_controller(*daq_control_args)
+                    # except KeyboardInterrupt:
+                    #     print('Keyboard Interrupt, stopping sub-run')
+                    # finally:
+                    if banco:
+                        banco_daq.send('Stop')
+                        banco_daq.receive()
 
-                    except KeyboardInterrupt:
-                        print('Keyboard Interrupt, stopping sub-run')
-                    finally:
-                        if banco:
-                            banco_daq.send('Stop')
-                            banco_daq.receive()
+                    if banco:
+                        pass  # Process banco data
 
-                        if banco:
-                            pass  # Process banco data
+                    if config.hv_info['hv_monitoring']:
+                        hv.send('End Monitoring')
+                        hv.receive()  # Stopping monitoring
+                        hv.receive()  # Finished monitoring
 
-                        if config.hv_info['hv_monitoring']:
-                            hv.send('End Monitoring')
-                            hv.receive()  # Stopping monitoring
-                            hv.receive()  # Finished monitoring
+                    if watch_for_desync:
+                        desync_watcher.send('End Monitoring')
+                        desync_watcher.receive()  # Stopping monitoring
+                        desync_watcher.receive()  # Finished monitoring
 
-                        if watch_for_desync:
-                            desync_watcher.send('End Monitoring')
-                            desync_watcher.receive()  # Stopping monitoring
-                            desync_watcher.receive()  # Finished monitoring
+                    if config.generate_external_triggers:
+                        trigger_gen.send('stop triggers')
+                        trigger_gen.receive()
 
-                        if config.generate_external_triggers:
-                            trigger_gen.send('stop triggers')
-                            trigger_gen.receive()
-
-                        print(f'Finished with sub run {sub_run_name}, waiting 10 seconds before next run')
-                        sleep(10)
+                    print(f'Finished with sub run {sub_run_name}, waiting 10 seconds before next run')
+                    sleep(10)
         except KeyboardInterrupt as e:
             print(f'Run stoppping.')
         finally:
