@@ -809,7 +809,7 @@ document.getElementById("run-config-py").addEventListener("click", async () => {
   console.log(updateData.message);
 
   // Step 2: Fetch the run config (run_name + banco_position)
-  const configRes = await fetch("/get_config_py");
+  const configRes = await fetch("/get_config_py", { method: "GET" });
   const configData = await configRes.json();
 
   if (!configData.success) {
@@ -869,7 +869,7 @@ document.getElementById("run-config-py").addEventListener("click", async () => {
 
 async function updateRunAndBancoDisplay() {
   try {
-    const res = await fetch("/get_config_py");
+    const res = await fetch("/get_config_py", { method: "GET" });
     const data = await res.json();
 
     if (!data.success) return;

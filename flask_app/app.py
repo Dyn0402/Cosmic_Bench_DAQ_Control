@@ -22,8 +22,8 @@ from flask_socketio import SocketIO, emit
 
 from daq_status import *
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # Add parent dir to path
-from run_config_beam import Config
+# sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # Add parent dir to path
+# from run_config_beam import Config
 
 BASE_DIR = "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control"
 CONFIG_TEMPLATE_DIR = f"{BASE_DIR}/config/json_templates"
@@ -462,17 +462,46 @@ def serve_png():
 @app.route("/get_config_py", methods=['GET'])
 def get_config_py():
     try:
-        config = Config()
-        # run_name = config.run_name
-        # banco_position = config.bench_geometry['banco_moveable_y_position']
+        get_config_path = os.path.join(BASE_DIR, "get_config.py")
+
+        # Run the external script and capture its output
+        result = subprocess.run(
+            ["python", get_config_path],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+
+        # Parse JSON output from the script
+        output = result.stdout.strip()
+        data = json.loads(output)
+
+        run_name = data.get("run_name", "Unknown")
+        banco_position = data.get("banco_position", "Unknown")
 
         return jsonify({
             "success": True,
-            "run_name": 'test',
-            "banco_position": 20
+            "run_name": run_name,
+            "banco_position": banco_position
         })
+
+    except subprocess.CalledProcessError as e:
+        return jsonify({
+            "success": False,
+            "message": f"Error running get_config.py: {e.stderr}"
+        }), 500
+
+    except json.JSONDecodeError as e:
+        return jsonify({
+            "success": False,
+            "message": f"Invalid JSON output from get_config.py: {e}"
+        }), 500
+
     except Exception as e:
-        return jsonify({"success": False, "message": str(e)}), 500
+        return jsonify({
+            "success": False,
+            "message": str(e)
+        }), 500
 
 # Generic input handler for all sessions
 # for s in TMUX_SESSIONS:
