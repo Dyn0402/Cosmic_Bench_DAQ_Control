@@ -20,10 +20,12 @@ from flask import Flask, render_template, jsonify, request, send_from_directory,
 from flask_socketio import SocketIO, emit
 
 from daq_status import *
+from run_config_beam import Config
 
 BASE_DIR = "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control"
 CONFIG_TEMPLATE_DIR = f"{BASE_DIR}/config/json_templates"
 CONFIG_RUN_DIR = f"{BASE_DIR}/config/json_run_configs"
+CONFIG_PY_PATH = f"{BASE_DIR}/run_config_beam.py"
 BASH_DIR = f"{BASE_DIR}/bash_scripts"
 ANALYSIS_DIR = "/mnt/data/beam_sps_25/Analysis"
 HV_TAIL = 1000  # number of most recent rows to show
@@ -112,6 +114,51 @@ def restart_all():
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
 
+
+@app.route("/update_run_config_py", methods=['POST'])
+def update_run_config_py():
+    try:
+        subprocess.Popen(["python", f"{BASE_DIR}/iterate_run_number.py"])
+        # time.sleep(1)
+
+        data = request.get_json()
+        new_position = data.get("banco_position")
+
+        if new_position is None:
+            return jsonify({"success": False, "message": "Missing banco_position"}), 400
+
+        config_file = CONFIG_PY_PATH
+
+        # Read file lines
+        with open(config_file, "r") as f:
+            lines = f.readlines()
+
+        # Replace banco_moveable_y_position value
+        updated = False
+        for i, line in enumerate(lines):
+            if "'banco_moveable_y_position'" in line:
+                # Replace the value in this line (handle comments cleanly)
+                prefix = line.split(":")[0]
+                comment = ""
+                if "#" in line:
+                    parts = line.split("#", 1)
+                    prefix = parts[0]
+                    comment = "#" + parts[1].rstrip("\n")
+                lines[i] = f"            'banco_moveable_y_position': {float(new_position)},  {comment}\n"
+                updated = True
+                break
+
+        if not updated:
+            return jsonify({"success": False, "message": "banco_moveable_y_position not found"}), 404
+
+        # Write updated file
+        with open(config_file, "w") as f:
+            f.writelines(lines)
+
+        return jsonify({"success": True, "message": f"Banco position updated to {new_position}"})
+
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
 
 @app.route("/run_config_py", methods=['POST'])
 def run_config_py():
@@ -430,6 +477,18 @@ def serve_png():
         abort(404, "File not found")
     return send_from_directory(directory, filename)
 
+
+@app.route("/get_config_py", methods=['GET'])
+def get_config_py():
+    config = Config()
+    run_name = config.run_name
+    banco_position = config.bench_geometry['banco_moveable_y_position']
+
+    return jsonify({
+        "success": True,
+        "run_name": run_name,
+        "banco_position": banco_position
+    })
 
 # Generic input handler for all sessions
 # for s in TMUX_SESSIONS:

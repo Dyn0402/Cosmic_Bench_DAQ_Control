@@ -3,20 +3,33 @@
 {% block content %}
 <!-- DAQ Overview Tab -->
 <div class="tab-pane fade show active" id="overview">
-    <h2>DAQ Overview</h2>
-    <div class="mt-3 mb-3">
-        <h6 class="text-white mb-0" style="font-size:1.1rem; font-weight:600;">
-            Current run:&nbsp;<span id="run-display" style="color:#fff; font-weight:700;">None</span>
-        </h6>
-    </div>
-    <div class="mb-4 d-flex flex-wrap align-items-center gap-2">
-          <select id="run-select" class="form-select me-3" style="width:auto;"></select>
-        <button id="run-config-py" class="btn btn-success me-2 mb-2">Start Run</button>
-        <button id="stop-run" class="btn btn-danger me-2 mb-2">Stop Run</button>
-        <button id="restart-all" class="btn btn-danger me-2 mb-2">Restart All</button>
-        <button id="take-pedestals" class="btn btn-secondary mb-2">Take Pedestals</button>
-        <button id="sudo-test" class ="btn btn-warning mb-2">sudo test</button>
-    </div>
+  <h2>DAQ Overview</h2>
+
+  <!-- Current run and banco display -->
+  <div class="mt-3 mb-3">
+    <h6 class="text-white mb-1" style="font-size:1.1rem; font-weight:600;">
+      Current run:&nbsp;<span id="run-display" style="color:#fff; font-weight:700;">None</span>
+    </h6>
+    <h6 class="text-white mb-0" style="font-size:1.1rem; font-weight:600;">
+      Banco position:&nbsp;<span id="banco-display" style="color:#fff; font-weight:700;">--</span>
+    </h6>
+  </div>
+
+  <!-- Banco control -->
+  <div class="mb-3 d-flex align-items-center gap-2">
+    <label for="banco-input" class="text-white me-2">Set banco position:</label>
+    <input id="banco-input" type="number" step="0.1" class="form-control" style="width:120px;">
+    <button id="update-banco" class="btn btn-primary">Update</button>
+  </div>
+
+  <!-- Control buttons -->
+  <div class="mb-4 d-flex flex-wrap align-items-center gap-2">
+    <select id="run-select" class="form-select me-3" style="width:auto;"></select>
+    <button id="run-config-py" class="btn btn-success me-2 mb-2">Start Run</button>
+    <button id="stop-run" class="btn btn-danger me-2 mb-2">Stop Run</button>
+    <button id="restart-all" class="btn btn-danger me-2 mb-2">Restart All</button>
+    <button id="take-pedestals" class="btn btn-secondary mb-2">Take Pedestals</button>
+  </div>
 
     <div class="row" id="status-cards">
         <!-- Status cards populated dynamically -->
@@ -780,18 +793,60 @@ document.getElementById("take-pedestals").addEventListener("click", async () => 
 
 // Run run_config_beam.py config button handler
 document.getElementById("run-config-py").addEventListener("click", async () => {
+  // Get banco position from input
+  const bancoInput = document.getElementById("banco-input").value;
+  if (bancoInput === "") {
+    alert("Please enter a banco position before starting the run.");
+    return;
+  }
+
+  // Step 1: Update banco position and iterate run number in run_config_beam.py
+  const updateRes = await fetch("/update_run_config_py", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ banco_position: bancoInput }),
+  });
+
+  const updateData = await updateRes.json();
+  if (!updateData.success) {
+    alert("Error updating banco position: " + updateData.message);
+    return;
+  }
+  console.log(updateData.message);
+
+  // Step 2: Fetch the run config (run_name + banco_position)
+  const configRes = await fetch("/get_config_py");
+  const configData = await configRes.json();
+
+  if (!configData.success) {
+    alert("Could not load config: " + configData.message);
+    return;
+  }
+
+  const runName = configData.run_name;
+  const bancoPosition = configData.banco_position;
+
+  // Step 3: Ask user for confirmation
+  const confirmMsg = `Start run?\n\n` +
+                     `Run name: ${runName}\n` +
+                     `Banco position: ${bancoPosition}\n\n` +
+                     `Are you sure you want to continue?`;
+
+  const confirmRun = confirm(confirmMsg);
+  if (!confirmRun) return;
+
+  // Step 4: Start the run as before
   const res = await fetch("/run_config_py", { method: "POST" });
   const data = await res.json();
-  
-  // Create a fading popup
+
+  // Step 5: Popup feedback
   const popup = document.createElement("div");
   popup.textContent = data.message;
   popup.style.position = "fixed";
   popup.style.top = "80px";
   popup.style.left = "50%";
   popup.style.transform = "translateX(-50%)";
-  popup.style.right = "auto";
-  popup.style.background = "#28a745";
+  popup.style.background = data.success ? "#28a745" : "#dc3545";
   popup.style.color = "#fff";
   popup.style.padding = "1em 2em";
   popup.style.borderRadius = "8px";
@@ -799,22 +854,16 @@ document.getElementById("run-config-py").addEventListener("click", async () => {
   popup.style.zIndex = "9999";
   popup.style.opacity = "1";
   popup.style.transition = "opacity 1s";
-
   document.body.appendChild(popup);
-
   setTimeout(() => {
     popup.style.opacity = "0";
     setTimeout(() => popup.remove(), 1000);
-  }, 2500);  
-    
+  }, 2500);
+
+  // Step 6: Update displayed info if success
   if (data.success) {
     const run = data.run_name;
-    console.log("Setting run to:", run);
-
-    // **Update the display field**
-    const runDisplay = document.getElementById("run-display");
-    runDisplay.textContent = run;
-
+    document.getElementById("run-display").textContent = run;
     await loadRuns();
     const runSelect = document.getElementById("run-select");
     runSelect.value = "run_config_beam.json";
@@ -822,6 +871,27 @@ document.getElementById("run-config-py").addEventListener("click", async () => {
     updateHVPlots();
   }
 });
+
+
+async function updateRunAndBancoDisplay() {
+  try {
+    const res = await fetch("/get_config_py");
+    const data = await res.json();
+
+    if (!data.success) return;
+
+    document.getElementById("run-display").textContent = data.run_name;
+    document.getElementById("banco-display").textContent = data.banco_position;
+  } catch (err) {
+    console.error("Error updating run/banco display:", err);
+  }
+}
+
+// Update every 5 seconds
+// setInterval(updateRunAndBancoDisplay, 5000);
+
+// Also load immediately on page load
+updateRunAndBancoDisplay();
 
 // --- PNG Viewer JS ---
 async function fetchDirs(subdir = "") {
