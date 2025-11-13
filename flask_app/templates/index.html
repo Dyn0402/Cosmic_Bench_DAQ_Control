@@ -24,7 +24,7 @@
 
   <!-- Control buttons -->
   <div class="mb-4 d-flex flex-wrap align-items-center gap-2">
-    <select id="run-select" class="form-select me-3" style="width:auto;"></select>
+    <select id="run-select" class="form-select me-3 d-none" style="width:auto;"></select>
     <button id="run-config-py" class="btn btn-success me-2 mb-2">Start Run</button>
     <button id="stop-sub-run" class="btn btn-warning me-2 mb-2">Stop Sub-Run</button>
     <button id="stop-run" class="btn btn-danger me-2 mb-2">Stop Run</button>
@@ -908,6 +908,11 @@ async function updateRunAndBancoDisplay() {
 
     document.getElementById("run-display").textContent = data.run_name;
     document.getElementById("banco-display").textContent = data.banco_position;
+
+    const bancoInput = document.getElementById("banco-input");
+    if (bancoInput && (bancoInput.value === "" || bancoInput.value == null)) {
+      bancoInput.value = data.banco_position;
+    }
   } catch (err) {
     console.error("Error updating run/banco display:", err);
   }
