@@ -15,7 +15,7 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        self.run_name = 'run_69'
+        self.run_name = 'run_70'
         self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -71,7 +71,7 @@ class Config:
         self.banco_info = {
             'ip': '128.141.41.199',
             'port': 1100,
-            'daq_run_command': 'cd /home/banco/SPS_Test_Beam_25/framework/bin && ./test_multi_noiseocc_int',
+            'daq_run_command': 'cd /home/banco/SPS_Test_Beam_25/framework/bin && ./test_multi_noiseocc_ext',
             'data_temp_dir': '/home/banco/SPS_Test_Beam_25/data',
             'data_out_dir': f'/mnt/data/beam_sps_25/Run/{self.run_name}',
             'data_inner_dir': 'banco_data'
@@ -251,7 +251,7 @@ class Config:
             'banco_arm_separation_z': 172 - 41,  # mm from bottom of lower banco arm to bottom of upper banco arm
             'banco_arm_right_y': 34 + 100,  # mm from center of banco to right edge of banco arm
             'banco_arm_length_y': 230,  # mm from left edge of banco arm to right edge of banco arm
-            'banco_moveable_y_position': 800.0,  # mm  Offset from moving table. Positive moves banco up.
+            'banco_moveable_y_position': 1000.0,  # mm  Offset from moving table. Positive moves banco up.
         }
 
         self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
