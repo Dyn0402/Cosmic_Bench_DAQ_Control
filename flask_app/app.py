@@ -462,13 +462,13 @@ def serve_png():
 @app.route("/get_config_py", methods=['GET'])
 def get_config_py():
     try:
-        config = Config()
-        run_name = config.run_name
+        # config = Config()
+        # run_name = config.run_name
         # banco_position = config.bench_geometry['banco_moveable_y_position']
 
         return jsonify({
             "success": True,
-            "run_name": run_name,
+            "run_name": 'test',
             "banco_position": 20
         })
     except Exception as e:
