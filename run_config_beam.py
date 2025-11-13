@@ -137,17 +137,17 @@ class Config:
                 'run_time': 10,  # Minutes
                 'hvs': {
                     '2': {
-                        '0': 455,
-                        '1': 495,
-                        '2': 550,
+                        '0': 450,
+                        '1': 490,
+                        '2': 380,
                         # '3': 840,
                         # '4': 530,
-                        '5': 700,
+                        '5': 690,
                         '6': 300,
-                        '7': 535,
-                        '8': 535,
-                        '9': 535,
-                        '10': 535,
+                        '7': 530,
+                        '8': 530,
+                        '9': 530,
+                        '10': 530,
                     },
                     '5': {
                         '0': 500,
@@ -218,7 +218,7 @@ class Config:
         # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
         template = self.sub_runs[0]
         resist_diffs = [-100, -95, -90, -85, -80, -75, -70, -65, -60, -55, -50, -45, -40, -35, -30, -25, -20, -15,
-                        -10, -5]
+                        -10, -5, +5]
         for resist_diff in resist_diffs:
             sub_run = copy.deepcopy(template)
             sub_run['sub_run_name'] = f'rotation_-60_drift_resist_scan_{resist_diff}'
