@@ -15,7 +15,7 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        self.run_name = 'testrun_0'
+        self.run_name = 'run_64'
         self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -133,37 +133,37 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'resist_drift_hv_-0',
-                'run_time': 8,  # Minutes
+                'sub_run_name': 'rotation_-60_banco_scan_0',
+                'run_time': 10,  # Minutes
                 'hvs': {
-                    # '2': {
-                    #     '0': 455,
-                    #     '1': 495,
-                    #     '2': 550,
-                    #     # '3': 840,
-                    #     # '4': 530,
-                    #     '5': 700,
-                    #     '6': 545,
-                    #     '7': 535,
-                    #     '8': 535,
-                    #     '9': 535,
-                    #     '10': 535,
-                    # },
-                    # '5': {
-                    #     '0': 500,
-                    #     '1': 500,
-                    #     # '2': 700,
-                    #     # '3': 450,
-                    #     # '6': 640,
-                    #     # '7': 440,
-                    #     # '8': 750,
-                    #     # '9': 500,
-                    #     # '10': 750,
-                    #     # '11': 500,
-                    # },
-                    # '12': {
-                    #     # '0': 830
-                    # }
+                    '2': {
+                        '0': 455,
+                        '1': 495,
+                        '2': 550,
+                        # '3': 840,
+                        # '4': 530,
+                        '5': 700,
+                        '6': 545,
+                        '7': 535,
+                        '8': 535,
+                        '9': 535,
+                        '10': 535,
+                    },
+                    '5': {
+                        '0': 500,
+                        '1': 500,
+                        # '2': 700,
+                        # '3': 450,
+                        # '6': 640,
+                        # '7': 440,
+                        # '8': 750,
+                        # '9': 500,
+                        # '10': 750,
+                        # '11': 500,
+                    },
+                    '12': {
+                        # '0': 830
+                    }
                 }
             },
         ]
@@ -236,12 +236,12 @@ class Config:
         #     self.sub_runs.append(sub_run)
         #
         # # Append copies of sub_runs with same voltages but different run names
-        # template = self.sub_runs[0]
-        # for i in range(1, 5):
-        #     sub_run = copy.deepcopy(template)
-        #     sub_run['sub_run_name'] = f'rotation_-60_test_{i}'
-        #     # sub_run['run_time'] = 10  # Minutes
-        #     self.sub_runs.append(sub_run)
+        template = self.sub_runs[0]
+        for i in range(1, 5):
+            sub_run = copy.deepcopy(template)
+            sub_run['sub_run_name'] = f'rotation_-60_test_{i}'
+            # sub_run['run_time'] = 10  # Minutes
+            self.sub_runs.append(sub_run)
 
         self.bench_geometry = {
             'board_thickness': 5,  # mm  Thickness of PCB for test boards  Guess!
