@@ -56,21 +56,35 @@ def main():
 
     message_str += """
       </ul>
-      <p><b>Sub-runs and HV Settings:</b></p>
+      <p><b>Sub-runs:</b></p>
     </div>
     """
 
-    hv_table_str = generate_elog_hv_table(run_config, html=True)
-    message_str += hv_table_str + "\n"
+    # Insert just sub_run_name and run_time for each sub-run
+    for sub in run_config["sub_runs"]:
+        sub_run_name = sub["sub_run_name"]
+        run_time = sub["run_time"]
+        message_str += dedent(f"""
+        <div style='font-family: sans-serif; font-size: 13px; margin-bottom: 16px;'>
+          <h3 style='margin-bottom: 6px;'>Sub-run: {sub_run_name}</h3>
+          <p><b>Run Time:</b> {run_time} seconds</p>
+        </div>
+        """)
 
     # --- Write message to a temp file ---
     with tempfile.NamedTemporaryFile(delete=False, suffix=".txt", mode="w") as tmp_msg:
         tmp_msg.write(message_str)
         tmp_msg_path = tmp_msg.name
 
-    with open(tmp_msg_path, 'r') as f:
-        print('Elog message content:')
-        print(f.read())
+    # with open(tmp_msg_path, 'r') as f:
+    #     print('Elog message content:')
+    #     print(f.read())
+
+    # Make a text file for HV table HTML in the input run directory and attach this file to elog
+    hv_table_html = generate_elog_hv_table(run_config, html=False)
+    hv_table_path = os.path.join(os.path.dirname(input_run_json_path), f"run_{run_id}_hv_table.txt")
+    with open(hv_table_path, 'w') as f:
+        f.write(hv_table_html)
 
     # --- Build elog command ---
     elog_cmd = [
@@ -78,6 +92,7 @@ def main():
         "-h", "localhost",
         "-p", "8080",
         "-n", "2",
+        "-f", hv_table_path,
         "-l", "SPS H4 2025",
     ]
 
