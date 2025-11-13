@@ -8,15 +8,17 @@ Created as Cosmic_Bench_DAQ_Control/get_config_py
 @author: Dylan Neff, dn277127
 """
 
+import importlib
 import json
-from run_config_beam import Config
+import run_config_beam
 
 def main():
-    config = Config()
+    importlib.reload(run_config_beam)   # FORCE fresh read from disk
+
+    config = run_config_beam.Config()
     run_name = config.run_name
     banco_position = config.bench_geometry['banco_moveable_y_position']
 
-    # Print as JSON so the Flask app can easily parse it
     print(json.dumps({
         "run_name": run_name,
         "banco_position": banco_position

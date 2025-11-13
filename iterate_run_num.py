@@ -25,6 +25,9 @@ def main():
     run_out_dir = config.run_out_dir
     run_name = config.run_name
 
+    # Split the last directory off of the run_out_dir to get the parent directory
+    run_base_dir = os.path.dirname(run_out_dir)
+
     if os.path.exists(run_out_dir):
         base_run_name = run_name
         suffix_num = 1
@@ -33,12 +36,12 @@ def main():
             suffix_num = int(run_name.split('_')[-1]) + 1
 
         new_run_name = f"{base_run_name}_{suffix_num}"
-        new_full_run_path = os.path.join(run_out_dir, new_run_name)
+        new_full_run_path = os.path.join(run_base_dir, new_run_name)
 
         while os.path.exists(new_full_run_path):
             suffix_num += 1
             new_run_name = f"{base_run_name}_{suffix_num}"
-            new_full_run_path = os.path.join(run_out_dir, new_run_name)
+            new_full_run_path = os.path.join(run_base_dir, new_run_name)
 
         # Open the original python config file and update the run_name
         py_path = os.path.join(BASE_DIR, RUNCONFIG_PY_PATH)

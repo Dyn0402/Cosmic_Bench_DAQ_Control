@@ -130,7 +130,6 @@ def restart_all():
 def update_run_config_py():
     try:
         subprocess.Popen(["python", f"{BASE_DIR}/iterate_run_num.py"])
-        time.sleep(0.1)
 
         data = request.get_json()
         new_position = data.get("banco_position")
