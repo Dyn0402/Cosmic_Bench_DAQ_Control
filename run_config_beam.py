@@ -239,7 +239,7 @@ class Config:
         template = self.sub_runs[0]
         for i in range(1, 5):
             sub_run = copy.deepcopy(template)
-            sub_run['sub_run_name'] = f'rotation_-60_test_{i}'
+            sub_run['sub_run_name'] = f'rotation_-60_banco_scan_{i}'
             # sub_run['run_time'] = 10  # Minutes
             self.sub_runs.append(sub_run)
 
