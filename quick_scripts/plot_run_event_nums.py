@@ -65,31 +65,68 @@ def main():
     sub_run_dream_banco_synced = [sub_run_dream_banco_synced[i] for i in sorted_indices]
 
     fig, ax = plt.subplots(figsize=(10, 6))
-    ax.bar(sub_run_names, sub_run_events, color='skyblue')
-    # Plot sync status as text above bars. Use green circles for dream_banco not synced, red X for banco not synced
-    banco_desync_subruns = [i for i, synced in enumerate(sub_run_banco_synced) if synced is False]
-    dream_banco_desync_subruns = [i for i, synced in enumerate(sub_run_dream_banco_synced) if synced is False]
-    banco_desync_label = False
-    for i in banco_desync_subruns:
-        if not banco_desync_label:
-            ax.text(i, sub_run_events[i] + 5, 'X', color='red', fontsize=14, ha='center', va='bottom', label='Banco Not Synced')
-            banco_desync_label = True
-        else:
-            ax.text(i, sub_run_events[i] + 5, 'X', color='red', fontsize=14, ha='center', va='bottom')
-    dream_desync_label = False
-    for i in dream_banco_desync_subruns:
-        if not dream_desync_label:
-            ax.text(i, sub_run_events[i] + 5, '●', color='green', fontsize=14, ha='center', va='bottom', label='Dream-Banco Not Synced')
-            dream_desync_label = True
-        else:
-            ax.text(i, sub_run_events[i] + 5, '●', color='green', fontsize=14, ha='center', va='bottom')
 
-    ax.set_xlabel('Sub-run Name')
-    ax.set_ylabel('Number of Dream Events')
-    ax.set_title('Number of Dream Events per Sub-run')
+    # --- Base bar plot ---
+    bars = ax.bar(sub_run_names, sub_run_events, color='skyblue', edgecolor='black')
+
+    # --- Compute desync positions ---
+    x_positions = np.arange(len(sub_run_names))
+    y_positions = sub_run_events
+
+    # --- Plot symbols for desyncs ---
+    symbol_offset = max(sub_run_events) * 0.02  # small spacing above bars
+
+    # Banco not synced (red X)
+    for i in np.where(np.logical_not(sub_run_banco_synced))[0]:
+        ax.text(x_positions[i], y_positions[i] + symbol_offset, '✗',
+                color='red', fontsize=14, ha='center', va='bottom')
+
+    # Dream-Banco not synced (green ●)
+    for i in np.where(np.logical_not(sub_run_dream_banco_synced))[0]:
+        ax.text(x_positions[i], y_positions[i] + symbol_offset, '●',
+                color='green', fontsize=14, ha='center', va='bottom')
+
+    # --- Legend ---
+    ax.scatter([], [], color='red', marker='x', label='Banco Not Synced', s=80)
+    ax.scatter([], [], color='green', marker='o', label='Dream–Banco Not Synced', s=80)
+    ax.legend(frameon=False, loc='upper right')
+
+    # --- Labels & formatting ---
+    ax.set_xlabel('Sub-run Name', fontsize=12)
+    ax.set_ylabel('Number of Dream Events', fontsize=12)
+    ax.set_title('Dream Event Counts per Sub-run', fontsize=14, weight='bold')
+    ax.set_xticks(x_positions)
     ax.set_xticklabels(sub_run_names, rotation=45, ha='right')
+    ax.margins(y=0.15)
     plt.tight_layout()
     plt.show()
+
+    # fig, ax = plt.subplots(figsize=(10, 6))
+    # ax.bar(sub_run_names, sub_run_events, color='skyblue')
+    # # Plot sync status as text above bars. Use green circles for dream_banco not synced, red X for banco not synced
+    # banco_desync_subruns = [i for i, synced in enumerate(sub_run_banco_synced) if synced is False]
+    # dream_banco_desync_subruns = [i for i, synced in enumerate(sub_run_dream_banco_synced) if synced is False]
+    # banco_desync_label = False
+    # for i in banco_desync_subruns:
+    #     if not banco_desync_label:
+    #         ax.text(i, sub_run_events[i] + 5, 'X', color='red', fontsize=14, ha='center', va='bottom', label='Banco Not Synced')
+    #         banco_desync_label = True
+    #     else:
+    #         ax.text(i, sub_run_events[i] + 5, 'X', color='red', fontsize=14, ha='center', va='bottom')
+    # dream_desync_label = False
+    # for i in dream_banco_desync_subruns:
+    #     if not dream_desync_label:
+    #         ax.text(i, sub_run_events[i] + 5, '●', color='green', fontsize=14, ha='center', va='bottom', label='Dream-Banco Not Synced')
+    #         dream_desync_label = True
+    #     else:
+    #         ax.text(i, sub_run_events[i] + 5, '●', color='green', fontsize=14, ha='center', va='bottom')
+    #
+    # ax.set_xlabel('Sub-run Name')
+    # ax.set_ylabel('Number of Dream Events')
+    # ax.set_title('Number of Dream Events per Sub-run')
+    # ax.set_xticklabels(sub_run_names, rotation=45, ha='right')
+    # plt.tight_layout()
+    # plt.show()
 
     print('donzo')
 
