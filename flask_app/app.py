@@ -121,7 +121,7 @@ def restart_all():
 @app.route("/update_run_config_py", methods=['POST'])
 def update_run_config_py():
     try:
-        subprocess.Popen(["python", f"{BASE_DIR}/iterate_run_number.py"])
+        subprocess.Popen(["python", f"{BASE_DIR}/iterate_run_num.py"])
         # time.sleep(1)
 
         data = request.get_json()
