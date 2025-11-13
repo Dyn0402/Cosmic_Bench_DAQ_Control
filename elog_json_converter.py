@@ -65,9 +65,9 @@ def main():
         sub_run_name = sub["sub_run_name"]
         run_time = sub["run_time"]
         message_str += dedent(f"""
-        <div style='font-family: sans-serif; font-size: 13px; margin-bottom: 16px;'>
-          <h3 style='margin-bottom: 6px;'>Sub-run: {sub_run_name}</h3>
-          <p><b>Run Time:</b> {run_time} seconds</p>
+        <div style='font-family: sans-serif; font-size: 13px; margin-bottom: 8px;'>
+          <span style='font-size: 18px; font-weight: bold;'>{sub_run_name}</span>
+          <span style='margin-left: 12px;'><b>Run Time:</b> {run_time} minutes</span>
         </div>
         """)
 
