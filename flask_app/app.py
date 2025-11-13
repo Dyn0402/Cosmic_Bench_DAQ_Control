@@ -20,7 +20,10 @@ from flask import Flask, render_template, jsonify, request, send_from_directory,
 from flask_socketio import SocketIO, emit
 
 from daq_status import *
-from run_config_beam import Config
+
+# sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # Add parent dir to path
+# from run_config_beam import Config
+from Cosmic_Bench_DAQ_Control.run_config_beam import Config
 
 BASE_DIR = "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control"
 CONFIG_TEMPLATE_DIR = f"{BASE_DIR}/config/json_templates"
