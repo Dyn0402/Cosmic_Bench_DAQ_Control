@@ -39,6 +39,7 @@ def main():
         new_run_name = f"{base_run_name}_{suffix_num}"
         new_full_run_path = os.path.join(run_base_dir, new_run_name)
         print(f"Trying new run_name: {new_run_name}")
+        print(f"New run output directory: {new_full_run_path}")
 
         while os.path.exists(new_full_run_path):
             print(f'Run output directory {new_full_run_path} also exists. Incrementing suffix...')
