@@ -29,6 +29,7 @@ def main():
     run_base_dir = os.path.dirname(run_out_dir)
 
     if os.path.exists(run_out_dir):
+        print(f"Run output directory {run_out_dir} already exists. Incrementing run_name...")
         base_run_name = run_name
         suffix_num = 1
         if '_' in run_name and run_name.split('_')[-1].isdigit():
@@ -37,8 +38,10 @@ def main():
 
         new_run_name = f"{base_run_name}_{suffix_num}"
         new_full_run_path = os.path.join(run_base_dir, new_run_name)
+        print(f"Trying new run_name: {new_run_name}")
 
         while os.path.exists(new_full_run_path):
+            print(f'Run output directory {new_full_run_path} also exists. Incrementing suffix...')
             suffix_num += 1
             new_run_name = f"{base_run_name}_{suffix_num}"
             new_full_run_path = os.path.join(run_base_dir, new_run_name)
