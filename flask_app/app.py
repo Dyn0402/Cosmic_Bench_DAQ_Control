@@ -9,6 +9,7 @@ Created as Cosmic_Bench_DAQ_Control/app.py
 """
 
 import os
+import sys
 import subprocess
 import pty
 import select
