@@ -197,9 +197,6 @@ def main():
                         banco_daq.send('Stop')
                         banco_daq.receive()
 
-                    if banco:
-                        pass  # Process banco data
-
                     if config.hv_info['hv_monitoring']:
                         hv.send('End Monitoring')
                         hv.receive()  # Stopping monitoring
@@ -218,8 +215,25 @@ def main():
                     sleep(10)
         except KeyboardInterrupt as e:
             print(f'Run stoppping.')
+            if banco:
+                banco_daq.send('Stop')
+                banco_daq.receive()
+
+            if config.hv_info['hv_monitoring']:
+                hv.send('End Monitoring')
+                hv.receive()  # Stopping monitoring
+                hv.receive()  # Finished monitoring
+
+            if watch_for_desync:
+                desync_watcher.send('End Monitoring')
+                desync_watcher.receive()  # Stopping monitoring
+                desync_watcher.receive()  # Finished monitoring
+
+            if config.generate_external_triggers:
+                trigger_gen.send('stop triggers')
+                trigger_gen.receive()
         finally:
-            pass  # Maybe clean up here later
+            pass
         print('Run complete, closing down subsystems')
         if config.power_off_hv_at_end:
             hv.send('Power Off')
