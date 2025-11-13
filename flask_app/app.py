@@ -461,15 +461,18 @@ def serve_png():
 
 @app.route("/get_config_py", methods=['GET'])
 def get_config_py():
-    config = Config()
-    run_name = config.run_name
-    banco_position = config.bench_geometry['banco_moveable_y_position']
+    try:
+        config = Config()
+        run_name = config.run_name
+        banco_position = config.bench_geometry['banco_moveable_y_position']
 
-    return jsonify({
-        "success": True,
-        "run_name": run_name,
-        "banco_position": banco_position
-    })
+        return jsonify({
+            "success": True,
+            "run_name": run_name,
+            "banco_position": banco_position
+        })
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
 
 # Generic input handler for all sessions
 # for s in TMUX_SESSIONS:
