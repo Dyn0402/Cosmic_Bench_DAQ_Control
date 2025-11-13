@@ -14,13 +14,14 @@ import re
 
 # RUNCONFIG_REL_PATH = "config/json_run_configs/"
 from run_config_beam import Config
+BASE_DIR = '/local/home/banco/dylan/Cosmic_Bench_DAQ_Control'
 RUNCONFIG_PY_PATH = 'run_config_beam.py'
 
 
 def main():
-    if len(sys.argv) != 2:
-        print('No run config path given')
-        return
+    # if len(sys.argv) != 2:
+    #     print('No run config path given')
+    #     return
     # config_path = os.path.join(RUNCONFIG_REL_PATH, sys.argv[1]) if not os.path.isabs(sys.argv[1]) else sys.argv[1]
     # config = Config(config_path)
     config = Config()
@@ -55,7 +56,8 @@ def main():
         # print(f"Updated run name to {new_run_name} in config.")
 
         # Open the original python config file and update the run_name
-        update_run_number(RUNCONFIG_PY_PATH, suffix_num)
+        py_path = os.path.join(BASE_DIR, RUNCONFIG_PY_PATH)
+        update_run_number(py_path, suffix_num)
 
     print('donzo')
 
