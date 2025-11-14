@@ -226,7 +226,7 @@ class DeSyncMonitor:
         return row
 
     def check_desync(self, diff, banco_sync):
-        """Track differences and trigger stop_run.sh if persistent desync detected."""
+        """Track differences and trigger stop_sub_run.sh if persistent desync detected."""
         now = time.time()
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -279,15 +279,15 @@ class DeSyncMonitor:
                         try:
                             self.sent_run_stop = True
                             subprocess.run(
-                                ["/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/bash_scripts/stop_run.sh"],
+                                ["/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/bash_scripts/stop_sub_run.sh"],
                                 check=True,
                                 stdout=subprocess.PIPE,
                                 stderr=subprocess.PIPE,
                                 text=True
                             )
-                            print("✅ stop_run.sh executed successfully.")
+                            print("✅ stop_sub_run.sh executed successfully.")
                         except subprocess.CalledProcessError as e:
-                            print(f"❌ Error executing stop_run.sh: {e}")
+                            print(f"❌ Error executing stop_sub_run.sh: {e}")
                 return True
         else:
             if self.desync_triggered:
@@ -331,15 +331,15 @@ class DeSyncMonitor:
                         self.sent_run_stop = True
                         try:
                             subprocess.run(
-                                ["/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/bash_scripts/stop_run.sh"],
+                                ["/local/home/banco/dylan/Cosmic_Bench_DAQ_Control/bash_scripts/stop_sub_run.sh"],
                                 check=True,
                                 stdout=subprocess.PIPE,
                                 stderr=subprocess.PIPE,
                                 text=True
                             )
-                            print("✅ stop_run.sh executed successfully.")
+                            print("✅ stop_sub_run.sh executed successfully.")
                         except subprocess.CalledProcessError as e:
-                            print(f"❌ Error executing stop_run.sh: {e}")
+                            print(f"❌ Error executing stop_sub_run.sh: {e}")
                 return True
         else:
             if self.desync_triggered:
@@ -474,7 +474,7 @@ class DeSyncMonitor:
 #         return row
 #
 #     def check_desync(self, diff):
-#         """Track differences and trigger stop_run.sh if persistent desync detected."""
+#         """Track differences and trigger stop_sub_run.sh if persistent desync detected."""
 #         now = time.time()
 #         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 #
@@ -509,15 +509,15 @@ class DeSyncMonitor:
 #                     print(f"⚠️  Persistent desync detected (Δ={current_diff} for {duration:.1f}s). Stopping run.")
 #                     try:
 #                         subprocess.run(
-#                             ["/bash_scripts/stop_run.sh"],
+#                             ["/bash_scripts/stop_sub_run.sh"],
 #                             check=True,
 #                             stdout=subprocess.PIPE,
 #                             stderr=subprocess.PIPE,
 #                             text=True
 #                         )
-#                         print("✅ stop_run.sh executed successfully.")
+#                         print("✅ stop_sub_run.sh executed successfully.")
 #                     except subprocess.CalledProcessError as e:
-#                         print(f"❌ Error executing stop_run.sh: {e}")
+#                         print(f"❌ Error executing stop_sub_run.sh: {e}")
 #                 return True
 #         else:
 #             # If difference changed or returned to zero, reset trigger
