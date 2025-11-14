@@ -95,23 +95,25 @@ class Config:
                 'run_time': 0.25,  # Minutes
                     'hvs': {
                     '2': {
-                        '0': 300,
-                        '1': 300,
-                        '2': 300,
-                        # '3': 300,
-                        # '4': 300,
-                        '5': 300,
-                        # '6': 300,
-                        '7': 300,
-                        '8': 300,
-                        '9': 300,
-                        '10': 300,
+                        '0': 200,
+                        '1': 200,
+                        '2': 200,
+                        '3': 200,
+                        '4': 200,
+                        '5': 200,
+                        '6': 200,
+                        '7': 200,
+                        '8': 200,
+                        '9': 200,
+                        '10': 200,
                     },
                     '5': {
                         '0': 500,
                         '1': 500,
                         # '2': 400,
                         # '3': 200,
+                        '4': 100,
+                        '5': 100,
                         # '6': 400,
                         # '7': 200,
                         # '8': 400,
@@ -166,9 +168,8 @@ class Config:
         }
 
         self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
-                                   'rd5_plein_esl_1', 'rd5_plein_saral_2', 'rd5_plein_vfp_1', 'urw_strip',
-                                   'urw_inter', 'rd5_grid_saral_1', 'rd5_strip_saral_1', 'rd5_strip_esl_1',
-                                   'p2_small_1', 'p2_small_2', 'p2_small_3', 'p2_large_1']
+                                   'urw_inter', 'rd5_plein_saral_2', 'rd5_plein_esl_1', 'urw_strip', 'rd5_grid_vfp_1',
+                                   'rd5_plein_saral_1', 'rd5_strip_saral_1', 'rd5_strip_esl_1']
 
         self.detectors = [
             {
