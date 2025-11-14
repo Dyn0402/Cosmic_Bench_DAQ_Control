@@ -15,7 +15,7 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        self.run_name = 'run_83'
+        self.run_name = 'run_84'
         self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -133,15 +133,15 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'rotation_-30_resist_scan_0',
+                'sub_run_name': 'test_0',
                 'run_time': 5,  # Minutes
                 'hvs': {
                     '2': {
                         '0': 440,
                         '1': 480,
-                        '2': 450,
+                        '2': 530,
                         '3': 440,
-                        '4': 450,
+                        '4': 400,
                         '5': 700,
                         '6': 550,
                         '7': 530,
@@ -171,30 +171,30 @@ class Config:
         ]
 
         # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
-        template = self.sub_runs[0]
-        resist_diffs = [-10, -20, -30, -40, -50, -60, -70, -80, -90, -100]
-        for resist_diff in resist_diffs:
-            sub_run = copy.deepcopy(template)
-            sub_run['sub_run_name'] = f'rotation_-30_resist_scan_{resist_diff}'
-
-            card = '2'
-            channels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']  # Resist channels
-            for channel in sub_run['hvs'][card]:
-                if channel in channels:
-                    sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
-
-            card = '12'
-            channels = ['0']  # Resist channels
-            for channel in sub_run['hvs'][card]:
-                if channel in channels:
-                    sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
-
-            # card = '5'
-            # channels = ['2', '3', '6', '7', '8', '9', '10', '11']  # Resist channels
-            # for channel in sub_run['hvs'][card]:
-            #     if channel in channels:
-            #         sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
-            self.sub_runs.append(sub_run)
+        # template = self.sub_runs[0]
+        # resist_diffs = [-10, -20, -30, -40, -50, -60, -70, -80, -90, -100]
+        # for resist_diff in resist_diffs:
+        #     sub_run = copy.deepcopy(template)
+        #     sub_run['sub_run_name'] = f'rotation_-30_resist_scan_{resist_diff}'
+        #
+        #     card = '2'
+        #     channels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']  # Resist channels
+        #     for channel in sub_run['hvs'][card]:
+        #         if channel in channels:
+        #             sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
+        #
+        #     card = '12'
+        #     channels = ['0']  # Resist channels
+        #     for channel in sub_run['hvs'][card]:
+        #         if channel in channels:
+        #             sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
+        #
+        #     # card = '5'
+        #     # channels = ['2', '3', '6', '7', '8', '9', '10', '11']  # Resist channels
+        #     # for channel in sub_run['hvs'][card]:
+        #     #     if channel in channels:
+        #     #         sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
+        #     self.sub_runs.append(sub_run)
 
         # # Remove the first two sub_runs to keep only the modified ones
         # self.sub_runs = self.sub_runs[1:]
@@ -246,12 +246,12 @@ class Config:
         #     self.sub_runs.append(sub_run)
 
         # Append copies of sub_runs with same voltages but different run names
-        # template = self.sub_runs[0]
-        # for i in range(1, 5):
-        #     sub_run = copy.deepcopy(template)
-        #     sub_run['sub_run_name'] = f'rotation_-30_banco_scan_{i}'
-        #     # sub_run['run_time'] = 10  # Minutes
-        #     self.sub_runs.append(sub_run)
+        template = self.sub_runs[0]
+        for i in range(1, 5):
+            sub_run = copy.deepcopy(template)
+            sub_run['sub_run_name'] = f'test_{i}'
+            # sub_run['run_time'] = 10  # Minutes
+            self.sub_runs.append(sub_run)
 
         self.bench_geometry = {
             'board_thickness': 5,  # mm  Thickness of PCB for test boards  Guess!
@@ -267,7 +267,7 @@ class Config:
         #                            'urw_inter', 'rd5_plein_saral_2', 'rd5_plein_vfp_1',
         #                            'rd5_grid_saral_1', 'rd5_strip_saral_1', 'rd5_strip_esl_1']
         self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
-                                   'urw_inter', 'rd5_plein_saral_2', 'rd5_plein_esl_1', 'urw_strip', 'rd5_grid_vfp_1',
+                                   'urw_inter', 'rd5_plein_saral_2', 'rd5_grid_saral_1', 'urw_strip', 'rd5_grid_vfp_1',
                                    'rd5_plein_saral_1', 'rd5_strip_saral_1', 'rd5_strip_esl_1']
 
         self.detectors = [
@@ -531,7 +531,7 @@ class Config:
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
-                    'z': 900,  # mm
+                    'z': 300,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -539,15 +539,15 @@ class Config:
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
-                    'drift': (5, 1),
-                    'resist_1': (2, 5),
-                    'resist_2': (2, 6)
+                    'drift': (5, 4),
+                    'resist_1': (2, 2),
+                    'resist_2': (2, 4)
                 },
                 'dream_feus': {
-                    'x_1': (2, 5),  # Runs along x direction, indicates y hit location
-                    'x_2': (2, 6),
-                    'y_1': (2, 7),  # Runs along y direction, indicates x hit location
-                    'y_2': (2, 8),
+                    'x_1': (2, 1),  # Runs along x direction, indicates y hit location
+                    'x_2': (2, 2),
+                    'y_1': (2, 3),  # Runs along y direction, indicates x hit location
+                    'y_2': (2, 4),
                 },
                 'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
                     'x_1': True,
