@@ -15,7 +15,7 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        self.run_name = 'run_70'
+        self.run_name = 'run_77'
         self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -25,7 +25,7 @@ class Config:
         self.m3_tracking_inner_dir = 'm3_tracking_root'
         self.detector_info_dir = f'{self.base_out_dir}config/detectors/'
         self.m3_feu_num = None
-        self.power_off_hv_at_end = True  # True to power off HV at end of run
+        self.power_off_hv_at_end = False  # True to power off HV at end of run
         self.filtering_by_m3 = False  # True to filter by m3 tracking, False to do no filtering
         self.process_on_fly = False  # True to process data on fly, False to process after run
         self.save_fdfs = True  # True to save FDF files, False to delete after decoding
@@ -134,7 +134,7 @@ class Config:
         self.sub_runs = [
             {
                 'sub_run_name': 'rotation_-60_drift_resist_scan_0',
-                'run_time': 10,  # Minutes
+                'run_time': 7,  # Minutes
                 'hvs': {
                     '2': {
                         '0': 450,
@@ -218,7 +218,7 @@ class Config:
         # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
         template = self.sub_runs[0]
         resist_diffs = [-100, -95, -90, -85, -80, -75, -70, -65, -60, -55, -50, -45, -40, -35, -30, -25, -20, -15,
-                        -10, -5, +5]
+                        -10, -5, +5, -105]
         for resist_diff in resist_diffs:
             sub_run = copy.deepcopy(template)
             sub_run['sub_run_name'] = f'rotation_-60_drift_resist_scan_{resist_diff}'
@@ -252,7 +252,7 @@ class Config:
             'banco_arm_separation_z': 172 - 41,  # mm from bottom of lower banco arm to bottom of upper banco arm
             'banco_arm_right_y': 34 + 100,  # mm from center of banco to right edge of banco arm
             'banco_arm_length_y': 230,  # mm from left edge of banco arm to right edge of banco arm
-            'banco_moveable_y_position': 500.0,  # mm  Offset from moving table. Positive moves banco up.
+            'banco_moveable_y_position': 450.0,  # mm  Offset from moving table. Positive moves banco up.
         }
 
         self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
