@@ -626,7 +626,7 @@ class Config:
                 },
                 'hv_channels': {
                     'drift': (5, 0),
-                    'resist_1': (2, 9)
+                    'resist_1': (2, 9),
                     'resist_2': (2, 10)
                 },
                 'dream_feus': {
