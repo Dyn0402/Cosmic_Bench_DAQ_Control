@@ -15,7 +15,7 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        self.run_name = 'run_77'
+        self.run_name = 'run_79'
         self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -133,8 +133,8 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'rotation_-60_drift_resist_scan_0',
-                'run_time': 7,  # Minutes
+                'sub_run_name': 'rotation_-30_banco_scan_0',
+                'run_time': 10,  # Minutes
                 'hvs': {
                     '2': {
                         '0': 450,
@@ -142,12 +142,12 @@ class Config:
                         '2': 380,
                         # '3': 840,
                         # '4': 530,
-                        '5': 690,
-                        '6': 300,
+                        '5': 700,
+                        # '6': 300,
                         '7': 530,
                         '8': 530,
-                        '9': 530,
-                        '10': 530,
+                        '9': 700,
+                        '10': 590,
                     },
                     '5': {
                         '0': 500,
@@ -191,59 +191,59 @@ class Config:
         # # Remove the first two sub_runs to keep only the modified ones
         # self.sub_runs = self.sub_runs[1:]
 
-        template = self.sub_runs[0]
-        drift_diffs_eic = [-475, -450, -425, -400, -275, -350, -325, -300, -275, -250, -225, -200, -175, -150, -125,
-                           -100, -75, -50, -25]
-        # drift_diffs_eic = [-50, -100, -150, -200, -250, -300, -350, -400, -450]
-        # drift_diffs_p2 = [-20, -40, -60, -80, -100, -120, -140, -160, -180]
-        # for drift_diff_eic, drift_diff_p2 in zip(drift_diffs_eic, drift_diffs_p2):
-        for drift_diff_eic in drift_diffs_eic:
-            sub_run = copy.deepcopy(template)
-            sub_run['sub_run_name'] = f'rotation_-60_drift_resist_scan_{drift_diff_eic}'
-
-            card = '5'
-            channels = ['0', '1']  # Drift channels
-            for channel in sub_run['hvs'][card]:
-                if channel in channels:
-                    sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + drift_diff_eic
-
-            # card = '5'
-            # channels = ['6', '8', '10']
-            # for channel in sub_run['hvs'][card]:
-            #     if channel in channels:
-            #         sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + drift_diff_p2
-
-            self.sub_runs.append(sub_run)
-
-        # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
-        template = self.sub_runs[0]
-        resist_diffs = [-100, -95, -90, -85, -80, -75, -70, -65, -60, -55, -50, -45, -40, -35, -30, -25, -20, -15,
-                        -10, -5, +5, -105]
-        for resist_diff in resist_diffs:
-            sub_run = copy.deepcopy(template)
-            sub_run['sub_run_name'] = f'rotation_-60_drift_resist_scan_{resist_diff}'
-
-            card = '2'
-            channels = ['0', '1', '2', '3', '4', '7', '8', '9', '10']  # Resist channels
-            # channels = ['3']  # Resist channels
-            for channel in sub_run['hvs'][card]:
-                if channel in channels:
-                    sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
-
-            card = '5'
-            channels = ['2', '3', '6', '7', '8', '9', '10', '11']  # Drift + resist channels
-            for channel in sub_run['hvs'][card]:
-                if channel in channels:
-                    sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
-            self.sub_runs.append(sub_run)
-
-        # # Append copies of sub_runs with same voltages but different run names
         # template = self.sub_runs[0]
-        # for i in range(1, 5):
+        # drift_diffs_eic = [-475, -450, -425, -400, -275, -350, -325, -300, -275, -250, -225, -200, -175, -150, -125,
+        #                    -100, -75, -50, -25]
+        # # drift_diffs_eic = [-50, -100, -150, -200, -250, -300, -350, -400, -450]
+        # # drift_diffs_p2 = [-20, -40, -60, -80, -100, -120, -140, -160, -180]
+        # # for drift_diff_eic, drift_diff_p2 in zip(drift_diffs_eic, drift_diffs_p2):
+        # for drift_diff_eic in drift_diffs_eic:
         #     sub_run = copy.deepcopy(template)
-        #     sub_run['sub_run_name'] = f'rotation_-60_banco_scan_{i}'
-        #     # sub_run['run_time'] = 10  # Minutes
+        #     sub_run['sub_run_name'] = f'rotation_-60_drift_resist_scan_{drift_diff_eic}'
+        #
+        #     card = '5'
+        #     channels = ['0', '1']  # Drift channels
+        #     for channel in sub_run['hvs'][card]:
+        #         if channel in channels:
+        #             sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + drift_diff_eic
+        #
+        #     # card = '5'
+        #     # channels = ['6', '8', '10']
+        #     # for channel in sub_run['hvs'][card]:
+        #     #     if channel in channels:
+        #     #         sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + drift_diff_p2
+        #
         #     self.sub_runs.append(sub_run)
+        #
+        # # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
+        # template = self.sub_runs[0]
+        # resist_diffs = [-100, -95, -90, -85, -80, -75, -70, -65, -60, -55, -50, -45, -40, -35, -30, -25, -20, -15,
+        #                 -10, -5, +5, -105]
+        # for resist_diff in resist_diffs:
+        #     sub_run = copy.deepcopy(template)
+        #     sub_run['sub_run_name'] = f'rotation_-60_drift_resist_scan_{resist_diff}'
+        #
+        #     card = '2'
+        #     channels = ['0', '1', '2', '3', '4', '7', '8', '9', '10']  # Resist channels
+        #     # channels = ['3']  # Resist channels
+        #     for channel in sub_run['hvs'][card]:
+        #         if channel in channels:
+        #             sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
+        #
+        #     card = '5'
+        #     channels = ['2', '3', '6', '7', '8', '9', '10', '11']  # Drift + resist channels
+        #     for channel in sub_run['hvs'][card]:
+        #         if channel in channels:
+        #             sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
+        #     self.sub_runs.append(sub_run)
+
+        # Append copies of sub_runs with same voltages but different run names
+        template = self.sub_runs[0]
+        for i in range(1, 5):
+            sub_run = copy.deepcopy(template)
+            sub_run['sub_run_name'] = f'rotation_-30_banco_scan_{i}'
+            # sub_run['run_time'] = 10  # Minutes
+            self.sub_runs.append(sub_run)
 
         self.bench_geometry = {
             'board_thickness': 5,  # mm  Thickness of PCB for test boards  Guess!
@@ -252,12 +252,15 @@ class Config:
             'banco_arm_separation_z': 172 - 41,  # mm from bottom of lower banco arm to bottom of upper banco arm
             'banco_arm_right_y': 34 + 100,  # mm from center of banco to right edge of banco arm
             'banco_arm_length_y': 230,  # mm from left edge of banco arm to right edge of banco arm
-            'banco_moveable_y_position': 450.0,  # mm  Offset from moving table. Positive moves banco up.
+            'banco_moveable_y_position': 0.0,  # mm  Offset from moving table. Positive moves banco up.
         }
 
+        # self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
+        #                            'urw_inter', 'rd5_plein_saral_2', 'rd5_plein_vfp_1',
+        #                            'rd5_grid_saral_1', 'rd5_strip_saral_1', 'rd5_strip_esl_1']
         self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
-                                   'urw_inter', 'rd5_plein_saral_2', 'rd5_plein_vfp_1',
-                                   'rd5_grid_saral_1', 'rd5_strip_saral_1', 'rd5_strip_esl_1']
+                                   'urw_inter', 'rd5_plein_saral_2', 'rd5_plein_vfp_1', 'rd5_grid_vfp_1'
+                                   'rd5_plein_saral_1', 'rd5_strip_saral_1']
 
         self.detectors = [
             {
@@ -367,7 +370,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': -60,  # deg  Rotation about y axis
+                    'y': -30,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -420,6 +423,38 @@ class Config:
             },
 
             {
+                'name': 'rd5_plein_saral_1',
+                'det_type': 'rd5_plein_saral',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': 900,  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': -30,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': {
+                    'drift': (5, 1),
+                    'resist_1': (2, 5),
+                    'resist_2': (2, 6)
+                },
+                'dream_feus': {
+                    'x_1': (3, 5),  # Runs along x direction, indicates y hit location
+                    'x_2': (3, 6),
+                    'y_1': (3, 7),  # Runs along y direction, indicates x hit location
+                    'y_2': (3, 8),
+                },
+                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
+                    'x_1': True,
+                    'x_2': True,
+                    'y_1': False,
+                    'y_2': False,
+                }
+            },
+
+            {
                 'name': 'rd5_plein_saral_2',
                 'det_type': 'rd5_plein_saral',
                 'det_center_coords': {  # Center of detector
@@ -429,7 +464,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': -60,  # deg  Rotation about y axis
+                    'y': -30,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -460,7 +495,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': -60,  # deg  Rotation about y axis
+                    'y': -30,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -524,7 +559,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': -60,  # deg  Rotation about y axis
+                    'y': -30,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -582,22 +617,23 @@ class Config:
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
-                    'z': 0,  # mm
+                    'z': 800,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
+                    'y': -30,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
-                    'drift': (0, 0),
-                    'resist_1': (3, 1)
+                    'drift': (5, 0),
+                    'resist_1': (2, 9)
+                    'resist_2': (2, 10)
                 },
                 'dream_feus': {
-                    'x_1': (6, 5),  # Runs along x direction, indicates y hit location
-                    'x_2': (6, 6),
-                    'y_1': (6, 7),  # Runs along y direction, indicates x hit location
-                    'y_2': (6, 8),
+                    'x_1': (3, 1),  # Runs along x direction, indicates y hit location
+                    'x_2': (3, 2),
+                    'y_1': (3, 3),  # Runs along y direction, indicates x hit location
+                    'y_2': (3, 4),
                 },
                 'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
                     'x_1': True,
@@ -642,10 +678,11 @@ class Config:
             {
                 'name': 'rd5_strip_esl_1',
                 'det_type': 'rd5_strip_esl',
+                'drift_gap': 1.0,  # mm. Default is 3 mm
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
-                    'z': 1100,  # mm
+                    'z': 400,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
