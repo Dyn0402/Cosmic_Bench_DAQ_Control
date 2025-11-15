@@ -65,7 +65,7 @@ class Config:
             'pedestals_dir': f'{self.base_out_dir}pedestals_noise/',  # None to ignore, else top directory for pedestal runs
             'pedestals': 'latest',  # 'latest' for most recent, otherwise specify directory name, eg "pedestals_10-22-25_13-43-34"
             'latency': 22,  # Latency setting for DAQ in clock cycles
-            'sample_period': 60,  # ns, sampling period
+            'sample_period': 40,  # ns, sampling period
         }
 
         self.banco_info = {
