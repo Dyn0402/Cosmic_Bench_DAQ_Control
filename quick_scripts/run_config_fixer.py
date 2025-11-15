@@ -70,6 +70,22 @@ def main():
                 }
             }
 
+    grid_vfp1['dream_feus'] = {
+        'x_1': (4, 1),  # Runs along x direction, indicates y hit location
+        'x_2': (4, 2),
+        'y_1': (4, 3),  # Runs along y direction, indicates x hit location
+        'y_2': (4, 4),
+    }
+
+    # Ask if user wants to update the config
+    response = input('Do you want to update the run_config.json with these changes? (y/n): ')
+    if response.lower() == 'y':
+        config.detectors.append(plein_saral_1)
+        config.write_to_file(run_config_path)
+        print(f'Updated run_config.json saved to {run_config_path}')
+    else:
+        print('No changes made to run_config.json')
+
     print('donzo')
 
 
