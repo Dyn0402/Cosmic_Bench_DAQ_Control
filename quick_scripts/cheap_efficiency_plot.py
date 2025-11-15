@@ -16,17 +16,29 @@ import pandas as pd
 
 def main():
     base_dir = '/mnt/data/beam_sps_25/Analysis/'
-    run_name = 'run_47'
-    detector_names = ['rd5_plein_esl_1', 'rd5_plein_saral_2', 'rd5_plein_vfp_1',
-                        'rd5_grid_saral_1', 'rd5_strip_saral_1', 'rd5_strip_esl_1',]
+    run_name = 'run_77'
+    detector_names = [
+        'urw_inter', 'rd5_plein_saral_2', 'rd5_plein_vfp_1',
+        'rd5_grid_saral_1', 'rd5_strip_saral_1', 'rd5_strip_esl_1',
+    ]
     sub_runs = {
-        'resist_mesh_scan_-0': 0,
-        'resist_mesh_hv_-5': -5,
-        'resist_mesh_hv_-10': -10,
-        'resist_mesh_hv_-15': -15,
-        'resist_mesh_hv_-20': -20,
-        'resist_mesh_hv_-25': -25,
-        'resist_mesh_hv_-30': -30,
+        'rotation_-60_drift_resist_scan_-95': -95,
+        'rotation_-60_drift_resist_scan_-90': -90,
+        'rotation_-60_drift_resist_scan_-85': -85,
+        'rotation_-60_drift_resist_scan_-80': -80,
+        'rotation_-60_drift_resist_scan_-70': -70,
+        'rotation_-60_drift_resist_scan_-65': -65,
+        'rotation_-60_drift_resist_scan_-60': -60,
+        'rotation_-60_drift_resist_scan_-55': -55,
+        'rotation_-60_drift_resist_scan_-45': -45,
+        'rotation_-60_drift_resist_scan_-40': -40,
+        'rotation_-60_drift_resist_scan_-35': -35,
+        'rotation_-60_drift_resist_scan_-30': -30,
+        'rotation_-60_drift_resist_scan_-20': -20,
+        'rotation_-60_drift_resist_scan_-15': -15,
+        'rotation_-60_drift_resist_scan_-10': -10,
+        'rotation_-60_drift_resist_scan_-5': -5,
+        'rotation_-60_drift_resist_scan_0': 0,
     }
 
     fig, ax = plt.subplots(figsize=(8, 6))

@@ -18,7 +18,7 @@ def main():
     base_dir = '/mnt/data/beam_sps_25/Analysis/'
     run_name = 'run_77'
     detector_names = [
-        'rd5_plein_esl_1', 'rd5_plein_saral_2', 'rd5_plein_vfp_1',
+        'urw_inter', 'rd5_plein_saral_2', 'rd5_plein_vfp_1',
         'rd5_grid_saral_1', 'rd5_strip_saral_1', 'rd5_strip_esl_1',
     ]
 
