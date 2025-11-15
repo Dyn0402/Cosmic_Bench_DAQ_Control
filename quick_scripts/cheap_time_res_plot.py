@@ -39,7 +39,7 @@ def main():
 
         for sub_run_name, voltage in sub_runs.items():
             analysis_dir = f'{base_dir}{run_name}/{sub_run_name}/'
-            timing_file = f'{analysis_dir}/{detector_name}/time_resolution.csv'
+            timing_file = f'{analysis_dir}/{detector_name}/timing_resolution.csv'
 
             if not os.path.exists(timing_file):
                 print(f'Time resolution file not found: {timing_file}')
