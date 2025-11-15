@@ -22,27 +22,28 @@ def main():
         'rd5_grid_saral_1', 'rd5_strip_saral_1', 'rd5_strip_esl_1',
     ]
 
+    nominal_drift_voltage = 500  # volts
     sub_runs = {
-        'rotation_-60_drift_resist_scan_-475': -475,
-        'rotation_-60_drift_resist_scan_-450': -450,
-        'rotation_-60_drift_resist_scan_-425': -425,
-        'rotation_-60_drift_resist_scan_-400': -400,
-        'rotation_-60_drift_resist_scan_-375': -375,
-        'rotation_-60_drift_resist_scan_-350': -350,
-        'rotation_-60_drift_resist_scan_-325': -325,
-        'rotation_-60_drift_resist_scan_-300': -300,
-        'rotation_-60_drift_resist_scan_-275': -275,
-        'rotation_-60_drift_resist_scan_-250': -250,
-        'rotation_-60_drift_resist_scan_-225': -225,
-        'rotation_-60_drift_resist_scan_-200': -200,
-        'rotation_-60_drift_resist_scan_-175': -175,
-        'rotation_-60_drift_resist_scan_-150': -150,
-        'rotation_-60_drift_resist_scan_-125': -125,
-        'rotation_-60_drift_resist_scan_-100': -100,
-        'rotation_-60_drift_resist_scan_-75': -75,
-        'rotation_-60_drift_resist_scan_-50': -50,
-        'rotation_-60_drift_resist_scan_-25': -25,
-        'rotation_-60_drift_resist_scan_0': 0,
+        'rotation_-60_drift_resist_scan_-475': nominal_drift_voltage - 475,
+        'rotation_-60_drift_resist_scan_-450': nominal_drift_voltage-450,
+        'rotation_-60_drift_resist_scan_-425': nominal_drift_voltage-425,
+        'rotation_-60_drift_resist_scan_-400': nominal_drift_voltage-400,
+        'rotation_-60_drift_resist_scan_-375': nominal_drift_voltage-375,
+        'rotation_-60_drift_resist_scan_-350': nominal_drift_voltage-350,
+        'rotation_-60_drift_resist_scan_-325': nominal_drift_voltage-325,
+        'rotation_-60_drift_resist_scan_-300': nominal_drift_voltage-300,
+        'rotation_-60_drift_resist_scan_-275': nominal_drift_voltage-275,
+        'rotation_-60_drift_resist_scan_-250': nominal_drift_voltage-250,
+        'rotation_-60_drift_resist_scan_-225': nominal_drift_voltage-225,
+        'rotation_-60_drift_resist_scan_-200': nominal_drift_voltage-200,
+        'rotation_-60_drift_resist_scan_-175': nominal_drift_voltage-175,
+        'rotation_-60_drift_resist_scan_-150': nominal_drift_voltage-150,
+        'rotation_-60_drift_resist_scan_-125': nominal_drift_voltage-125,
+        'rotation_-60_drift_resist_scan_-100': nominal_drift_voltage-100,
+        'rotation_-60_drift_resist_scan_-75': nominal_drift_voltage-75,
+        'rotation_-60_drift_resist_scan_-50': nominal_drift_voltage-50,
+        'rotation_-60_drift_resist_scan_-25': nominal_drift_voltage-25,
+        'rotation_-60_drift_resist_scan_0': nominal_drift_voltage - 0,
     }
 
     fig, ax = plt.subplots(figsize=(8, 6))
@@ -81,7 +82,7 @@ def main():
             marker='o', linestyle='-', capsize=4, label=detector_name
         )
 
-    ax.set_xlabel("Mesh Voltage (V)")
+    ax.set_xlabel("Drift Voltage (V)")
     ax.set_ylabel("Time Resolution (ns)")
     ax.set_title(f"Time Resolution vs Voltage — {run_name}")
     ax.grid(True)
