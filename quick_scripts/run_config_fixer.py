@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on November 15 12:54 2025
+Created in PyCharm
+Created as Cosmic_Bench_DAQ_Control/run_config_fixer
+
+@author: Dylan Neff, dn277127
+"""
+
+import numpy as np
+import matplotlib.pyplot as plt
+from run_config_beam import Config
+
+
+def main():
+    base_path = '/mnt/data/beam_sps_25/Run/run_79'
+    run_config_path = f'{base_path}/run_config_beam.py'
+    config = Config(run_config_path)
+    print(config['included_detectors'])
+    print('donzo')
+
+
+if __name__ == '__main__':
+    main()
