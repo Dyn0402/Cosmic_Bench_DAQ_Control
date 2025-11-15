@@ -311,7 +311,7 @@ function showPopup(message, color) {
 
 // STOP SUB-RUN button
 document.getElementById("stop-sub-run").addEventListener("click", async () => {
-  const ok = confirm("Are you sure you want to stop the *sub-run*?\n(Default is Cancel)");
+  const ok = confirm("Are you sure you want to stop the *sub-run*?");
   if (!ok) return;   // <-- Cancel → do nothing
 
   const res = await fetch("/stop_sub_run", { method: "POST" });
@@ -325,7 +325,7 @@ document.getElementById("stop-sub-run").addEventListener("click", async () => {
 
 // STOP RUN button
 document.getElementById("stop-run").addEventListener("click", async () => {
-  const ok = confirm("Are you sure you want to STOP the run?\n(Default is Cancel)");
+  const ok = confirm("Are you sure you want to STOP the run?");
   if (!ok) return;   // <-- Cancel → do nothing
 
   const res = await fetch("/stop_run", { method: "POST" });
