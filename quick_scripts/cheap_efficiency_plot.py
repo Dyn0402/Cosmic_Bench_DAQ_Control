@@ -59,7 +59,7 @@ def main():
             total_events.append(total_event)
             voltages.append(voltage)
         ax.plot(voltages, efficiencies, marker='o', linestyle='-', label=detector_name)
-    ax.set_xlabel('Mesh Voltage (V)')
+    ax.set_xlabel('Resist Voltage (V)')
     ax.set_ylabel('Efficiency')
     ax.set_title(f'Efficiency vs Resist Voltage in {run_name}')
     ax.grid(True)
