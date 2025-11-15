@@ -8,8 +8,14 @@ Created as Cosmic_Bench_DAQ_Control/run_config_fixer
 @author: Dylan Neff, dn277127
 """
 
+# Add parent directory to sys.path to import run_config_beam
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import numpy as np
 import matplotlib.pyplot as plt
+
 from run_config_beam import Config
 
 
