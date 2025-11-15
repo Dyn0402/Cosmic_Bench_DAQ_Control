@@ -21,9 +21,17 @@ from run_config_beam import Config
 
 def main():
     base_path = '/mnt/data/beam_sps_25/Run/run_79'
-    run_config_path = f'{base_path}/run_config.json'
+
+    if len(sys.argv) != 2:
+        print('Usage: python run_config_fixer.py <run_num>')
+        sys.exit(1)
+    run_num = sys.argv[1]
+
+    run_config_path = f'{base_path}/run_{run_num}/run_config.json'
     config = Config(run_config_path)
     print(config.included_detectors)
+    print(config.detectors['rd5_grid_vfp_1'])
+    print(config.detectors['rd5_plein_saral_1'])
     print('donzo')
 
 
