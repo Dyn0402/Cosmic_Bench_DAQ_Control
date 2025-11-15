@@ -141,8 +141,8 @@ class Config:
                         '1': 480,
                         '2': 550,
                         '3': 440,
-                        '4': 530,
-                        '5': 640,
+                        '4': 500,
+                        '5': 540,
                         '6': 530,
                         '7': 530,
                         '8': 530,
@@ -545,15 +545,15 @@ class Config:
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
-                    'drift': (5, 4),
-                    'resist_1': (2, 2),
-                    'resist_2': (2, 4)
+                    'drift': (5, 5),
+                    'resist_1': (2, 6),
+                    'resist_2': (12, 0)
                 },
                 'dream_feus': {
-                    'x_1': (2, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (2, 2),
-                    'y_1': (2, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (2, 4),
+                    'x_1': (4, 5),  # Runs along x direction, indicates y hit location
+                    'x_2': (4, 6),
+                    'y_1': (4, 7),  # Runs along y direction, indicates x hit location
+                    'y_2': (4, 8),
                 },
                 'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
                     'x_1': True,
@@ -705,15 +705,15 @@ class Config:
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
-                    'drift': (5, 5),
-                    'resist_1': (2, 6),
-                    'resist_2': (12, 0)
+                    'drift': (5, 4),
+                    'resist_1': (2, 2),
+                    'resist_2': (2, 4)
                 },
                 'dream_feus': {
-                    'x_1': (4, 5),  # Runs along x direction, indicates y hit location
-                    'x_2': (4, 6),
-                    'y_1': (4, 7),  # Runs along y direction, indicates x hit location
-                    'y_2': (4, 8),
+                    'x_1': (2, 1),  # Runs along x direction, indicates y hit location
+                    'x_2': (2, 2),
+                    'y_1': (2, 3),  # Runs along y direction, indicates x hit location
+                    'y_2': (2, 4),
                 },
                 'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
                     'x_1': True,
