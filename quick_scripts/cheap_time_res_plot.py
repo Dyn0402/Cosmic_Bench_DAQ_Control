@@ -23,11 +23,26 @@ def main():
     ]
 
     sub_runs = {
-        'rotation_-60_drift_resist_scan_0': 0,
         'rotation_-60_drift_resist_scan_-475': -475,
         'rotation_-60_drift_resist_scan_-450': -450,
         'rotation_-60_drift_resist_scan_-425': -425,
         'rotation_-60_drift_resist_scan_-400': -400,
+        'rotation_-60_drift_resist_scan_-375': -375,
+        'rotation_-60_drift_resist_scan_-350': -350,
+        'rotation_-60_drift_resist_scan_-325': -325,
+        'rotation_-60_drift_resist_scan_-300': -300,
+        'rotation_-60_drift_resist_scan_-275': -275,
+        'rotation_-60_drift_resist_scan_-250': -250,
+        'rotation_-60_drift_resist_scan_-225': -225,
+        'rotation_-60_drift_resist_scan_-200': -200,
+        'rotation_-60_drift_resist_scan_-175': -175,
+        'rotation_-60_drift_resist_scan_-150': -150,
+        'rotation_-60_drift_resist_scan_-125': -125,
+        'rotation_-60_drift_resist_scan_-100': -100,
+        'rotation_-60_drift_resist_scan_-75': -75,
+        'rotation_-60_drift_resist_scan_-50': -50,
+        'rotation_-60_drift_resist_scan_-25': -25,
+        'rotation_-60_drift_resist_scan_0': 0,
     }
 
     fig, ax = plt.subplots(figsize=(8, 6))
