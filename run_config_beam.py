@@ -245,6 +245,12 @@ class Config:
 
             self.sub_runs.append(sub_run)
 
+        # Append to start of sub_runs a duplicate of the last sub_run with 0 minute run time
+        template = copy.deepcopy(self.sub_runs[0])
+        template['sub_run_name'] = 'long_wait_for_beam'
+        template['run_time'] = 120  # Minutes
+        self.sub_runs.insert(0, template)
+
         # Append copies of sub_runs with same voltages but different run names
         # template = self.sub_runs[0]
         # for i in range(1, 5):
