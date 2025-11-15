@@ -21,7 +21,7 @@ from run_config_beam import Config
 
 def main():
     base_path = '/mnt/data/beam_sps_25/Run/run_79'
-    run_config_path = f'{base_path}/run_config.py'
+    run_config_path = f'{base_path}/run_config.json'
     config = Config(run_config_path)
     print(config['included_detectors'])
     print('donzo')
