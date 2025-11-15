@@ -20,7 +20,7 @@ from run_config_beam import Config
 
 
 def main():
-    base_path = '/mnt/data/beam_sps_25/Run/run_79'
+    base_path = '/mnt/data/beam_sps_25/Run'
 
     if len(sys.argv) != 2:
         print('Usage: python run_config_fixer.py <run_num>')
