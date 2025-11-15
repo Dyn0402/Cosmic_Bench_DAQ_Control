@@ -32,9 +32,9 @@ def main():
     print(config.included_detectors)
     print(config.detectors)
     grid_vfp1 = [det for det in config.detectors if det['name'] == 'rd5_grid_vfp_1'][0]
-    plein_saral1 = [det for det in config.detectors if det['name'] == 'rd5_plein_saral_1'][0]
+    # plein_saral1 = [det for det in config.detectors if det['name'] == 'rd5_plein_saral_1'][0]
     print(grid_vfp1)
-    print(plein_saral1)
+    # print(plein_saral1)
     print('donzo')
 
 
