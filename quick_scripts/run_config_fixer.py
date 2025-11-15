@@ -30,11 +30,46 @@ def main():
     run_config_path = f'{base_path}/run_{run_num}/run_config.json'
     config = Config(run_config_path)
     print(config.included_detectors)
-    print(config.detectors)
     grid_vfp1 = [det for det in config.detectors if det['name'] == 'rd5_grid_vfp_1'][0]
     # plein_saral1 = [det for det in config.detectors if det['name'] == 'rd5_plein_saral_1'][0]
-    print(grid_vfp1)
+    print(f'grid_vfp1 dream feus: {grid_vfp1["dream_feus"]}')
+    # Check if plein_saral_1 exists in detectors and print yes or no
+    print(f'plein_saral_1 exists: {"rd5_plein_saral_1" in [det["name"] for det in config.detectors]}')
     # print(plein_saral1)
+
+    # Add plein_saral_1 to detectors
+    plein_saral_1 = {
+                'name': 'rd5_plein_saral_1',
+                'det_type': 'rd5_plein_saral',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': 900,  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': {
+                    'drift': (5, 1),
+                    'resist_1': (2, 5),
+                    'resist_2': (2, 6)
+                },
+                'dream_feus': {
+                    'x_1': (4, 5),  # Runs along x direction, indicates y hit location
+                    'x_2': (4, 6),
+                    'y_1': (4, 7),  # Runs along y direction, indicates x hit location
+                    'y_2': (4, 8),
+                },
+                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
+                    'x_1': True,
+                    'x_2': True,
+                    'y_1': False,
+                    'y_2': False,
+                }
+            }
+
     print('donzo')
 
 
