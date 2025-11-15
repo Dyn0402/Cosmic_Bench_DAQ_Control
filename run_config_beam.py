@@ -64,7 +64,7 @@ class Config:
             'zero_suppress': True,  # True to run in zero suppression mode, False to run in full readout mode
             'pedestals_dir': f'{self.base_out_dir}pedestals_noise/',  # None to ignore, else top directory for pedestal runs
             'pedestals': 'latest',  # 'latest' for most recent, otherwise specify directory name, eg "pedestals_10-22-25_13-43-34"
-            'latency': 36,  # Latency setting for DAQ in clock cycles
+            'latency': 33,  # Latency setting for DAQ in clock cycles
             # 'latency': 22,  # Latency setting for DAQ in clock cycles
             'sample_period': 40,  # ns, sampling period
             # 'samples_beyond_threshold': 1,  # Number of samples to read out beyond threshold crossing
