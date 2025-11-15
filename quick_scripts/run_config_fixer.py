@@ -30,8 +30,10 @@ def main():
     run_config_path = f'{base_path}/run_{run_num}/run_config.json'
     config = Config(run_config_path)
     print(config.included_detectors)
-    print(config.detectors['rd5_grid_vfp_1'])
-    print(config.detectors['rd5_plein_saral_1'])
+    grid_vfp1 = [det for det in config.included_detectors if det['detector_name'] == 'rd5_grid_vfp_1'][0]
+    plein_saral1 = [det for det in config.included_detectors if det['detector_name'] == 'rd5_plein_saral_1'][0]
+    print(grid_vfp1)
+    print(plein_saral1)
     print('donzo')
 
 
