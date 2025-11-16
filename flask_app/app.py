@@ -120,7 +120,7 @@ def stop_run():
 @app.route("/restart_all", methods=["POST"])
 def restart_all():
     try:
-        subprocess.Popen([f"{BASH_DIR}/restart_all_tmux_processes.sh"])
+        subprocess.Popen([f"{BASH_DIR}/restart_daq_tmux_processes.sh"])
         return jsonify({"success": True, "message": "All processes restarted"})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
