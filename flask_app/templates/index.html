@@ -870,30 +870,36 @@ document.getElementById("take-pedestals").addEventListener("click", async () => 
     }, 2500);
 });
 
-// Run run_config_beam.py config button handler
-document.getElementById("run-config-py").addEventListener("click", async () => {
-  // Get banco position from input
-  const bancoInput = document.getElementById("banco-input").value;
-  if (bancoInput === "") {
-    alert("Please enter a banco position before starting the run.");
-    return;
+let retryingRunConfig = false;
+
+document.getElementById("run-config-py").addEventListener("click", async function runConfigHandler() {
+
+  // ----- STEP 0: On first click, read user input -----
+  let bancoInput = document.getElementById("banco-input").value;
+
+  if (!retryingRunConfig) {
+    if (bancoInput === "") {
+      alert("Please enter a banco position before starting the run.");
+      return;
+    }
+
+    // ----- STEP 1: Update banco position -----
+    const updateRes = await fetch("/update_run_config_py", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ banco_position: bancoInput }),
+    });
+
+    const updateData = await updateRes.json();
+    if (!updateData.success) {
+      alert("Error updating banco position: " + updateData.message);
+      return;
+    }
+
+    console.log(updateData.message);
   }
 
-  // Step 1: Update banco position and iterate run number in run_config_beam.py
-  const updateRes = await fetch("/update_run_config_py", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ banco_position: bancoInput }),
-  });
-
-  const updateData = await updateRes.json();
-  if (!updateData.success) {
-    alert("Error updating banco position: " + updateData.message);
-    return;
-  }
-  console.log(updateData.message);
-
-  // Step 2: Fetch the run config (run_name + banco_position)
+  // ----- STEP 2: Fetch updated config -----
   const configRes = await fetch("/get_config_py", { method: "GET" });
   const configData = await configRes.json();
 
@@ -905,20 +911,35 @@ document.getElementById("run-config-py").addEventListener("click", async () => {
   const runName = configData.run_name;
   const bancoPosition = configData.banco_position;
 
-  // Step 3: Ask user for confirmation
-  const confirmMsg = `Start run?\n\n` +
-                     `Run name: ${runName}\n` +
-                     `Banco position: ${bancoPosition}\n\n` +
-                     `Are you sure you want to continue?`;
+  // Refresh input value (in case user changed it before second click)
+  bancoInput = document.getElementById("banco-input").value;
+
+  // ----- STEP 2b: Detect stale config → auto retry once -----
+  if (!retryingRunConfig && bancoPosition != bancoInput) {
+    console.warn("Config mismatch (stale import). Retrying...");
+    retryingRunConfig = true;
+    this.click();   // Run the handler again
+    return;
+  }
+
+  // If we made it here, config is correct → reset retry flag
+  retryingRunConfig = false;
+
+  // ----- STEP 3: Ask user for confirmation -----
+  const confirmMsg =
+    `Start run?\n\n` +
+    `Run name: ${runName}\n` +
+    `Banco position: ${bancoPosition}\n\n` +
+    `Are you sure you want to continue?`;
 
   const confirmRun = confirm(confirmMsg);
   if (!confirmRun) return;
 
-  // Step 4: Start the run as before
+  // ----- STEP 4: Start the run -----
   const res = await fetch("/run_config_py", { method: "POST" });
   const data = await res.json();
 
-  // Step 5: Popup feedback
+  // ----- STEP 5: Popup status -----
   const popup = document.createElement("div");
   popup.textContent = data.message;
   popup.style.position = "fixed";
@@ -939,17 +960,20 @@ document.getElementById("run-config-py").addEventListener("click", async () => {
     setTimeout(() => popup.remove(), 1000);
   }, 2500);
 
-  // Step 6: Update displayed info if success
+  // ----- STEP 6: Update displayed info -----
   if (data.success) {
-    const run = data.run_name;
-    document.getElementById("run-display").textContent = run;
+    document.getElementById("run-display").textContent = data.run_name;
+
     await loadRuns();
+
     const runSelect = document.getElementById("run-select");
     runSelect.value = "run_config_beam.json";
+
     await loadSubruns();
     updateHVPlots();
   }
 });
+
 
 
 async function updateRunAndBancoDisplay() {
