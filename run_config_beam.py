@@ -15,7 +15,7 @@ import copy
 
 class Config:
     def __init__(self, config_path=None):
-        self.run_name = 'run_84'
+        self.run_name = 'run_103'
         self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -136,7 +136,7 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'rotation_0_drift_resist_scan_0',
+                'sub_run_name': 'rotation_45_banco_scan_0',
                 'run_time': 10,  # Minutes
                 'hvs': {
                     '2': {
@@ -203,50 +203,50 @@ class Config:
         # self.sub_runs = self.sub_runs[1:]
 
         # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
-        template = self.sub_runs[0]
-        resist_diffs = [-100, -95, -90, -85, -80, -75, -70, -65, -60, -55, -50, -45, -40, -35, -30, -25, -20, -15,
-                        -10, -5, -105]
-        for resist_diff in resist_diffs:
-            sub_run = copy.deepcopy(template)
-            sub_run['sub_run_name'] = f'rotation_0_resist_scan_{resist_diff}'
-
-            card = '2'
-            channels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']  # Resist channels
-            # channels = ['3']  # Resist channels
-            for channel in sub_run['hvs'][card]:
-                if channel in channels:
-                    sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
-
-            # card = '5'
-            # channels = ['2', '3', '6', '7', '8', '9', '10', '11']  # Drift + resist channels
-            # for channel in sub_run['hvs'][card]:
-            #     if channel in channels:
-            #         sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
-            self.sub_runs.append(sub_run)
-
-        template = self.sub_runs[0]
-        drift_diffs_eic = [-475, -450, -425, -400, -275, -350, -325, -300, -275, -250, -225, -200, -175, -150, -125,
-                           -100, -75, -50, -25]
-        # drift_diffs_eic = [-50, -100, -150, -200, -250, -300, -350, -400, -450]
-        # drift_diffs_p2 = [-20, -40, -60, -80, -100, -120, -140, -160, -180]
-        # for drift_diff_eic, drift_diff_p2 in zip(drift_diffs_eic, drift_diffs_p2):
-        for drift_diff_eic in drift_diffs_eic:
-            sub_run = copy.deepcopy(template)
-            sub_run['sub_run_name'] = f'rotation_0_drift_scan_{drift_diff_eic}'
-
-            card = '5'
-            channels = ['0', '1', '4', '5']  # Drift channels
-            for channel in sub_run['hvs'][card]:
-                if channel in channels:
-                    sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + drift_diff_eic
-
-            # card = '5'
-            # channels = ['6', '8', '10']
-            # for channel in sub_run['hvs'][card]:
-            #     if channel in channels:
-            #         sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + drift_diff_p2
-
-            self.sub_runs.append(sub_run)
+        # template = self.sub_runs[0]
+        # resist_diffs = [-100, -95, -90, -85, -80, -75, -70, -65, -60, -55, -50, -45, -40, -35, -30, -25, -20, -15,
+        #                 -10, -5, -105]
+        # for resist_diff in resist_diffs:
+        #     sub_run = copy.deepcopy(template)
+        #     sub_run['sub_run_name'] = f'rotation_0_resist_scan_{resist_diff}'
+        #
+        #     card = '2'
+        #     channels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']  # Resist channels
+        #     # channels = ['3']  # Resist channels
+        #     for channel in sub_run['hvs'][card]:
+        #         if channel in channels:
+        #             sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
+        #
+        #     # card = '5'
+        #     # channels = ['2', '3', '6', '7', '8', '9', '10', '11']  # Drift + resist channels
+        #     # for channel in sub_run['hvs'][card]:
+        #     #     if channel in channels:
+        #     #         sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + resist_diff
+        #     self.sub_runs.append(sub_run)
+        #
+        # template = self.sub_runs[0]
+        # drift_diffs_eic = [-475, -450, -425, -400, -275, -350, -325, -300, -275, -250, -225, -200, -175, -150, -125,
+        #                    -100, -75, -50, -25]
+        # # drift_diffs_eic = [-50, -100, -150, -200, -250, -300, -350, -400, -450]
+        # # drift_diffs_p2 = [-20, -40, -60, -80, -100, -120, -140, -160, -180]
+        # # for drift_diff_eic, drift_diff_p2 in zip(drift_diffs_eic, drift_diffs_p2):
+        # for drift_diff_eic in drift_diffs_eic:
+        #     sub_run = copy.deepcopy(template)
+        #     sub_run['sub_run_name'] = f'rotation_0_drift_scan_{drift_diff_eic}'
+        #
+        #     card = '5'
+        #     channels = ['0', '1', '4', '5']  # Drift channels
+        #     for channel in sub_run['hvs'][card]:
+        #         if channel in channels:
+        #             sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + drift_diff_eic
+        #
+        #     # card = '5'
+        #     # channels = ['6', '8', '10']
+        #     # for channel in sub_run['hvs'][card]:
+        #     #     if channel in channels:
+        #     #         sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + drift_diff_p2
+        #
+        #     self.sub_runs.append(sub_run)
         #
         # # Append to start of sub_runs a duplicate of the last sub_run with 0 minute run time
         # template = copy.deepcopy(self.sub_runs[0])
@@ -258,7 +258,7 @@ class Config:
         template = self.sub_runs[0]
         for i in range(1, 5):
             sub_run = copy.deepcopy(template)
-            sub_run['sub_run_name'] = f'rotation_0_banco_scan_{i}'
+            sub_run['sub_run_name'] = f'rotation_45_banco_scan_{i}'
             # sub_run['run_time'] = 10  # Minutes
             self.sub_runs.append(sub_run)
 
@@ -269,7 +269,7 @@ class Config:
             'banco_arm_separation_z': 172 - 41,  # mm from bottom of lower banco arm to bottom of upper banco arm
             'banco_arm_right_y': 34 + 100,  # mm from center of banco to right edge of banco arm
             'banco_arm_length_y': 230,  # mm from left edge of banco arm to right edge of banco arm
-            'banco_moveable_y_position': 450.0,  # mm  Offset from moving table. Positive moves banco up.
+            'banco_moveable_y_position': 0.0,  # mm  Offset from moving table. Positive moves banco up.
         }
 
         # self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
