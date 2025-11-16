@@ -97,7 +97,7 @@ class Config:
         self.sub_runs = [
             {
                 'sub_run_name': 'pedestals_noise',
-                'run_time': 0.25,  # Minutes
+                'run_time': 1.0,  # Minutes
                     'hvs': {
                     '2': {
                         '0': 200,
