@@ -404,21 +404,35 @@ def get_desync_monitor_status():
             "fields": [{"label": "Details", "value": "desync_monitor tmux not running"}]
         }
 
+    lines = [l for l in output.splitlines() if l.strip()]
+    last_line = lines[-1] if lines else ""
+
     fields = []
-    last_line = ""
-    for line in reversed(output.splitlines()):
+
+    # --- PRIORITY OVERRIDE: WAITING ---
+    if "Listening on " in last_line or "Listening..." in last_line:
+        return {
+            "status": "WAITING",
+            "color": "secondary",
+            "fields": [{"label": "Details", "value": last_line.strip()}]
+        }
+    # -----------------------------------
+
+    # find Δ line
+    delta_line = ""
+    for line in reversed(lines):
         if "Δ=" in line:
-            last_line = line.strip()
+            delta_line = line.strip()
             break
 
-    m = re.search(r"Δ=(-?\d+)", last_line)
+    m = re.search(r"Δ=(-?\d+)", delta_line)
     diff_val = int(m.group(1)) if m else None
-    m_time = re.search(r"([0-9.]+)s until stop", last_line)
+    m_time = re.search(r"([0-9.]+)s until stop", delta_line)
     time_left = float(m_time.group(1)) if m_time else None
 
-    # Look for Banco internal sync messages
+    # Banco sync messages
     banco_sync = None
-    for line in reversed(output.splitlines()):
+    for line in reversed(lines):
         if "Banco internal desync" in line:
             banco_sync = False
             break
@@ -426,14 +440,14 @@ def get_desync_monitor_status():
             banco_sync = True
             break
 
-    # Determine main status
+    # Main status logic
     if "Persistent desync detected" in output or "⚠️" in output:
         status = "DESYNC DETECTED"
         color = "danger"
     elif diff_val is not None and diff_val != 0:
         if time_left is not None:
             if time_left < 10:
-                status = "IMMINENT DESYNC"
+                status = "DESYNC"
                 color = "warning"
             else:
                 status = "MONITORING (DESYNC TREND)"
@@ -445,7 +459,7 @@ def get_desync_monitor_status():
         status = "SYNCED"
         color = "success"
 
-    # Add Banco sync info
+    # Banco sync field
     if banco_sync is False:
         status = "BANCO DESYNCED"
         color = "warning"
@@ -453,17 +467,11 @@ def get_desync_monitor_status():
     elif banco_sync is True:
         fields.append({"label": "Banco Sync", "value": "✅ All ladders aligned"})
 
-    # Add diff/time details
+    # Δ + time-left fields
     if diff_val is not None:
         fields.append({"label": "Δ (banco - dream)", "value": str(diff_val)})
     if time_left is not None:
         fields.append({"label": "Seconds until stop", "value": f"{time_left:.1f}"})
-
-    # Detect waiting state
-    last_lines = output.splitlines()[-3:]
-    if len(last_lines) >= 2 and any("Listening on " in line for line in last_lines):
-        status = "WAITING"
-        color = "secondary"
 
     return {
         "status": status,

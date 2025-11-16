@@ -39,7 +39,7 @@ class Config:
         self.dream_daq_info = {
             'ip': '192.168.10.8',
             'port': 1101,
-            'daq_config_template_path': '/local/home/banco/dylan/Run/config/TbSPS25_ped.cfg',
+            'daq_config_template_path': '/mnt/data/beam_sps_25/dream_run/config/TbSPS25_ped.cfg',
             'run_directory': self.run_out_dir,
             'data_out_dir': self.run_out_dir,
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
