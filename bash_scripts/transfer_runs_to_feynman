@@ -1,0 +1,59 @@
+#!/bin/bash
+
+# Usage:
+#   ./transfer_all_runs.sh /data/base_path /dest/on/feynman
+
+BASE_PATH="$1"
+DEST_BASE="$2"
+
+if [[ -z "$BASE_PATH" || -z "$DEST_BASE" ]]; then
+    echo "Usage: $0 <source_base_path> <dest_base_path>"
+    exit 1
+fi
+
+USER="dn277127"
+JUMP1="dn277127@daplxa.extra.cea.fr"
+TARGET="dn277127@feynman"
+
+LOG="transfer_runs.log"
+
+echo "=== Transfer started at $(date) ===" | tee -a "$LOG"
+echo "Base path: $BASE_PATH" | tee -a "$LOG"
+
+# Rsync options:
+# --partial        : keep partial files for resume
+# --inplace        : directly write into destination (good for large files)
+# --append-verify  : resume appending safely
+# --progress       : show progress
+# --ignore-existing: don't overwrite files that already exist
+RSYNC_OPTS="-av --partial --inplace --append-verify --progress"
+
+# SSH command for multi-hop
+SSH_CMD="ssh -o ProxyJump=$JUMP1"
+
+for RUN_DIR in "$BASE_PATH"/run_*; do
+    if [[ ! -d "$RUN_DIR" ]]; then
+        continue
+    fi
+
+    RUN_NAME=$(basename "$RUN_DIR")
+    DEST="$TARGET:$DEST_BASE/$RUN_NAME"
+
+    echo "----- Transferring $RUN_NAME -----" | tee -a "$LOG"
+
+    # Retry loop (in case SSH dies mid-transfer)
+    while true; do
+        rsync $RSYNC_OPTS -e "$SSH_CMD" "$RUN_DIR/" "$DEST/"
+        STATUS=$?
+
+        if [[ $STATUS -eq 0 ]]; then
+            echo "Completed: $RUN_NAME" | tee -a "$LOG"
+            break
+        else
+            echo "Rsync interrupted (status $STATUS). Retrying in 10 seconds..." | tee -a "$LOG"
+            sleep 10
+        fi
+    done
+done
+
+echo "=== Transfer finished at $(date) ===" | tee -a "$LOG"
