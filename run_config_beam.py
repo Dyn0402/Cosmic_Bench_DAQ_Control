@@ -134,23 +134,24 @@ class Config:
             'min_duration': 6,  # Seconds minimum duration of desync to flag desync
         }
 
+        hv_adjust = -10
         self.sub_runs = [
             {
                 'sub_run_name': 'rotation_0_pions_-30V_0',
                 'run_time': 10,  # Minutes
                 'hvs': {
                     '2': {
-                        '0': 440 - 30,
-                        '1': 480 - 30,
-                        '2': 550 - 30,
-                        '3': 440 - 30,
-                        '4': 480 - 30,
-                        '5': 540 - 30,
-                        '6': 530 - 30,
-                        '7': 530 - 30,
-                        '8': 530 - 30,
-                        '9': 530 - 30,
-                        '10': 530 - 30,
+                        '0': 440 + hv_adjust,
+                        '1': 480 + hv_adjust,
+                        '2': 550 + hv_adjust,
+                        '3': 440 + hv_adjust,
+                        '4': 480 + hv_adjust,
+                        '5': 540 + hv_adjust,
+                        '6': 530 + hv_adjust,
+                        '7': 530 + hv_adjust,
+                        '8': 530 + hv_adjust,
+                        '9': 530 + hv_adjust,
+                        '10': 530 + hv_adjust,
                     },
                     '5': {
                         '0': 500,
@@ -167,7 +168,7 @@ class Config:
                         # '11': 500,
                     },
                     '12': {
-                        '0': 460 - 30
+                        '0': 460 + hv_adjust
                     }
                 }
             },
