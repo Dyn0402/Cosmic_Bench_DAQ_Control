@@ -8,14 +8,17 @@ Created as Cosmic_Bench_DAQ_Control/get_config_py
 @author: Dylan Neff, dn277127
 """
 
-import importlib
 import json
-import run_config_beam
+import runpy
 
 def main():
-    importlib.reload(run_config_beam)   # FORCE fresh read from disk
+    # load run_config_beam.py AS A SCRIPT, not a module
+    config_namespace = runpy.run_path("run_config_beam.py")
 
-    config = run_config_beam.Config()
+    # the file now acts like a dict namespace
+    Config = config_namespace["Config"]
+
+    config = Config()
     run_name = config.run_name
     banco_position = config.bench_geometry['banco_moveable_y_position']
 
