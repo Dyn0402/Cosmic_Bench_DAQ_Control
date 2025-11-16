@@ -37,7 +37,10 @@ def get_dream_daq_status():
         }
 
     fields = []
-    if "_TakePedThr" in output:
+    if "Moving data files." in output:
+        status = "Copying fdfs"
+        color = "info"
+    elif "_TakePedThr" in output:
         status = "Taking Pedestals"
         color = "warning"
     elif "Scan trigger thresholds in process" in output:
@@ -65,9 +68,6 @@ def get_dream_daq_status():
         #     m = m or "0"
         #     s = s or "0"
         #     fields.append({"label": "Wait For", "value": f"{h}h {m}m {s}s"})
-    elif "Moving data files." in output:
-        status = "Copying fdfs"
-        color = "info"
     elif "Listening on " in output:
         status = "WAITING"
         color = "secondary"
@@ -294,6 +294,7 @@ def get_banco_tracker_status():
         }
 
     rules = [
+        ('Moving data files...', "COPYING FDFS", "info"),
         ('boost/v1.72.0-alice1-54(31):ERROR:105: Unable to locate a modulefile for ', "NOT READY YET", "danger"),
         ("Waiting for trigger...", "RUNNING", "success"),
         ("Triggers to the MOSAIC (trgCount)", "RUNNING", "success"),

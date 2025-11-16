@@ -109,7 +109,7 @@ class Config:
             'n_channels_per_card': 12,
             'run_out_dir': self.run_out_dir,
             'hv_monitoring': True,  # True to monitor HV during run, False to not monitor
-            'monitor_interval': 5,  # Seconds between HV monitoring
+            'monitor_interval': 1,  # Seconds between HV monitoring
         }
 
         self.trigger_switch_info = {
@@ -131,13 +131,13 @@ class Config:
             'run_out_dir': f'{self.base_out_dir}Run/{self.run_name}',
             'check_interval': 0.2,  # Seconds between checking for desync
             'min_points': 10,  # Minimum number of desynced points to flag desync
-            'min_duration': 6,  # Seconds minimum duration of desync to flag desync
+            'min_duration': 8,  # Seconds minimum duration of desync to flag desync
         }
 
-        hv_adjust = -10
+        hv_adjust = -5
         self.sub_runs = [
             {
-                'sub_run_name': 'rotation_0_pions_-30V_0',
+                'sub_run_name': f'rotation_0_pions_{hv_adjust}V_0',
                 'run_time': 10,  # Minutes
                 'hvs': {
                     '2': {
