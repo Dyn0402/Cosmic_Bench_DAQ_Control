@@ -103,16 +103,23 @@ def start_run():
 @app.route("/stop_sub_run", methods=["POST"])
 def stop_sub_run():
     try:
-        subprocess.Popen([f"{BASH_DIR}/stop_sub_run.sh"])
-        return jsonify({"success": True, "message": "Stopping Sub-Run"})
+        if is_dream_daq_running():
+            subprocess.Popen([f"{BASH_DIR}/stop_sub_run.sh"])
+            return jsonify({"success": True, "message": "Stopping Sub-Run"})
+        else:
+            return jsonify({"success": False, "message": "Dream DAQ is not running"}), 400
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
 
 @app.route("/stop_run", methods=["POST"])
 def stop_run():
     try:
-        subprocess.Popen([f"{BASH_DIR}/stop_run.sh"])
-        return jsonify({"success": True, "message": "Stopping Run"})
+        if is_dream_daq_running():
+            subprocess.Popen([f"{BASH_DIR}/stop_run.sh"])
+            return jsonify({"success": True, "message": "Stopping Run"})
+        else:
+            subprocess.Popen([f"{BASH_DIR}/stop_sub_run.sh"])  # Only 1 ctrl-c needed if not running
+            return jsonify({"success": True, "message": "Stopping Run"})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
 
@@ -493,47 +500,34 @@ def get_config_py():
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
 
-# Generic input handler for all sessions
-# for s in TMUX_SESSIONS:
-#     @socketio.on(f"input-{s}")
-#     def make_input(session_name=s):
-#         def handle_input(data):
-#             os.write(sessions[session_name], data.encode())
-#         return handle_input
 
-# def get_tmux_output(session_name):
-#     """Return recent lines from a tmux session."""
-#     try:
-#         result = subprocess.run(
-#             ["tmux", "capture-pane", "-pt", session_name, "-S", "-1000"],
-#             stdout=subprocess.PIPE,
-#             stderr=subprocess.PIPE,
-#             text=True,
-#         )
-#         return result.stdout
-#     except Exception as e:
-#         return f"[Error reading {session_name}: {e}]"
-#
-#
-# def monitor_session(session_name, interval=1):
-#     """Poll tmux session periodically and send updates only when changed."""
-#     last_output = ""
-#     while True:
-#         output = get_tmux_output(session_name)
-#         if output != last_output:
-#             socketio.emit(f"output-{session_name}", output)
-#             last_output = output
-#         time.sleep(interval)
-#
-#
-# @socketio.on("start")
-# def start(data):
-#     """Begin monitoring the given tmux session (read-only)."""
-#     name = data.get("name")
-#     if not name or name in sessions:
-#         return
-#     sessions[name] = True  # track active sessions
-#     threading.Thread(target=monitor_session, args=(name,), daemon=True).start()
+def is_dream_daq_running():
+    """
+    Checks tmux session 'daq_control' and returns True if Dream DAQ is running.
+
+    Running = "Received: Dream DAQ starting" appears in recent output
+              AND
+              "Dream Subrun complete." has NOT appeared.
+    """
+    try:
+        # Grab last ~20 lines of the pane
+        output = subprocess.check_output(
+            ["tmux", "capture-pane", "-pS", "-20", "-t", "daq_control:0.0"],
+            text=True
+        )
+    except subprocess.CalledProcessError:
+        # If tmux session doesn't exist or some error occurs
+        return False
+
+    # Normalize
+    lines = output.splitlines()
+
+    # State checks
+    saw_start = any("Received: Dream DAQ starting" in line for line in lines)
+    saw_complete = any("Dream Subrun complete." in line for line in lines)
+
+    # Running only if started AND not complete
+    return saw_start and not saw_complete
 
 
 if __name__ == "__main__":

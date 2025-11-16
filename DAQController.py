@@ -99,6 +99,7 @@ class DAQController:
             if self.trigger_switch_client is None:  # Run time dictated by DREAM DAQ if no trigger switch
                 self.measured_run_time = time() - self.run_start_time
 
+
         except KeyboardInterrupt:
             print('Keyboard interrupt. Stopping DAQ process.')
             if self.trigger_switch_client is not None:
@@ -115,6 +116,7 @@ class DAQController:
             if res != 'Dream DAQ stopped':
                 print('Error stopping Dream DAQ')
         finally:
+            print('Dream Subrun complete.')
             if self.trigger_switch_client is not None:
                 self.trigger_switch_client.silent = False
 

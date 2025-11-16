@@ -37,10 +37,7 @@ def get_dream_daq_status():
         }
 
     fields = []
-    if "Moving data files." in output:
-        status = "Copying fdfs"
-        color = "info"
-    elif "_TakePedThr" in output:
+    if "_TakePedThr" in output:
         status = "Taking Pedestals"
         color = "warning"
     elif "Scan trigger thresholds in process" in output:
@@ -71,6 +68,9 @@ def get_dream_daq_status():
     elif "Listening on " in output:
         status = "WAITING"
         color = "secondary"
+    elif "Moving data files." in output:
+        status = "Copying fdfs"
+        color = "info"
     else:
         status = "UNKNOWN STATE"
         color = "danger"
@@ -294,7 +294,7 @@ def get_banco_tracker_status():
         }
 
     rules = [
-        ('Moving data files...', "COPYING FDFS", "info"),
+        ('Moving data files...', "COPYING FILES", "info"),
         ('boost/v1.72.0-alice1-54(31):ERROR:105: Unable to locate a modulefile for ', "NOT READY YET", "danger"),
         ("Waiting for trigger...", "RUNNING", "success"),
         ("Triggers to the MOSAIC (trgCount)", "RUNNING", "success"),
@@ -324,16 +324,6 @@ def get_banco_tracker_status():
         for flag, status, color in rules:
             if flag in line:
                 return {"status": status, "color": color, "fields": fields}
-
-    # fields = []
-    # trg_count_match = re.search(r"Triggers to the MOSAIC \(trgCount\)\s*:\s*(\d+)", output)
-    # if trg_count_match:
-    #     fields.append({"label": "Trigger Count", "value": trg_count_match.group(1)})
-    #
-    # for line in reversed(output.splitlines()):
-    #     for flag, status, color in rules:
-    #         if flag in line:
-    #             return {"status": status, "color": color, "fields": fields}
 
     return {"status": "UNKNOWN STATE", "color": "danger", "fields": fields}
 
