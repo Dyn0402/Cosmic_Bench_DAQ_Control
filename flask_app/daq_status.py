@@ -414,7 +414,7 @@ def get_desync_monitor_status():
         return {
             "status": "WAITING",
             "color": "secondary",
-            "fields": [{"label": "Details", "value": last_line.strip()}]
+            "fields": []
         }
     # -----------------------------------
 
