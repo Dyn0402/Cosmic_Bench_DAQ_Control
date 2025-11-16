@@ -31,6 +31,7 @@ def main():
     config = Config(run_config_path)
     print(config.included_detectors)
 
+    fix_angles(config, run_config_path)
 
     print('donzo')
 
