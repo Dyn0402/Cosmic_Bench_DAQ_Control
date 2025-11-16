@@ -1,13 +1,28 @@
 #!/bin/bash
 
 # Usage:
-#   ./transfer_all_runs.sh /data/base_path /dest/on/feynman
+#   ./transfer_all_runs.sh /source/base /dest/base
+#   ./transfer_all_runs.sh --range 15 50 /source/base /dest/base
+#
+# Range only works with directories named run_<number>
+
+# --- Parse optional range arguments ---
+RANGE_START=""
+RANGE_END=""
+
+if [[ "$1" == "--range" ]]; then
+    RANGE_START="$2"
+    RANGE_END="$3"
+    shift 3
+fi
 
 BASE_PATH="$1"
 DEST_BASE="$2"
 
 if [[ -z "$BASE_PATH" || -z "$DEST_BASE" ]]; then
-    echo "Usage: $0 <source_base_path> <dest_base_path>"
+    echo "Usage:"
+    echo "  $0 /source/base /dest/base"
+    echo "  $0 --range 15 50 /source/base /dest/base"
     exit 1
 fi
 
@@ -20,28 +35,38 @@ LOG="transfer_runs.log"
 echo "=== Transfer started at $(date) ===" | tee -a "$LOG"
 echo "Base path: $BASE_PATH" | tee -a "$LOG"
 
-# Rsync options:
-# --partial        : keep partial files for resume
-# --inplace        : directly write into destination (good for large files)
-# --append-verify  : resume appending safely
-# --progress       : show progress
-# --ignore-existing: don't overwrite files that already exist
 RSYNC_OPTS="-av --partial --inplace --append-verify --progress"
 
-# SSH command for multi-hop
 SSH_CMD="ssh -o ProxyJump=$JUMP1"
 
-for RUN_DIR in "$BASE_PATH"/run_*; do
-    if [[ ! -d "$RUN_DIR" ]]; then
-        continue
-    fi
+# --- Select directories ---
+RUN_DIRS=()
 
+if [[ -n "$RANGE_START" ]]; then
+    # Range mode
+    echo "Using range: $RANGE_START to $RANGE_END" | tee -a "$LOG"
+
+    for ((i=RANGE_START; i<=RANGE_END; i++)); do
+        DIR="$BASE_PATH/run_$i"
+        if [[ -d "$DIR" ]]; then
+            RUN_DIRS+=("$DIR")
+        else
+            echo "Skipping missing directory: $DIR" | tee -a "$LOG"
+        fi
+    done
+else
+    # Default: all run_* directories
+    RUN_DIRS=( "$BASE_PATH"/run_* )
+fi
+
+# --- Transfer each directory ---
+for RUN_DIR in "${RUN_DIRS[@]}"; do
     RUN_NAME=$(basename "$RUN_DIR")
     DEST="$TARGET:$DEST_BASE/$RUN_NAME"
 
     echo "----- Transferring $RUN_NAME -----" | tee -a "$LOG"
 
-    # Retry loop (in case SSH dies mid-transfer)
+    # Retry loop
     while true; do
         rsync $RSYNC_OPTS -e "$SSH_CMD" "$RUN_DIR/" "$DEST/"
         STATUS=$?
