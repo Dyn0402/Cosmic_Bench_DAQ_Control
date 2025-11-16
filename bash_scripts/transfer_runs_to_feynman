@@ -3,10 +3,8 @@
 # Usage:
 #   ./transfer_all_runs.sh /source/base /dest/base
 #   ./transfer_all_runs.sh --range 15 50 /source/base /dest/base
-#
-# Range only works with directories named run_<number>
 
-# --- Parse optional range arguments ---
+# Parse optional range
 RANGE_START=""
 RANGE_END=""
 
@@ -28,23 +26,24 @@ fi
 
 USER="dn277127"
 JUMP1="dn277127@daplxa.extra.cea.fr"
-TARGET="dn277127@feynman"
+TARGET="dn277127@feynman:$DEST_BASE"
 
 LOG="transfer_runs.log"
 
+echo
 echo "=== Transfer started at $(date) ===" | tee -a "$LOG"
 echo "Base path: $BASE_PATH" | tee -a "$LOG"
 
-RSYNC_OPTS="-av --partial --inplace --append-verify --progress"
-
 SSH_CMD="ssh -o ProxyJump=$JUMP1"
 
-# --- Select directories ---
+# Robust rsync options
+RSYNC_OPTS="-av --partial --inplace --append-verify --progress"
+
+# Build the list of directories for ONE big rsync
 RUN_DIRS=()
 
 if [[ -n "$RANGE_START" ]]; then
-    # Range mode
-    echo "Using range: $RANGE_START to $RANGE_END" | tee -a "$LOG"
+    echo "Using run range: $RANGE_START to $RANGE_END" | tee -a "$LOG"
 
     for ((i=RANGE_START; i<=RANGE_END; i++)); do
         DIR="$BASE_PATH/run_$i"
@@ -55,30 +54,27 @@ if [[ -n "$RANGE_START" ]]; then
         fi
     done
 else
-    # Default: all run_* directories
-    RUN_DIRS=( "$BASE_PATH"/run_* )
+    # All directories
+    for DIR in "$BASE_PATH"/run_*; do
+        [[ -d "$DIR" ]] && RUN_DIRS+=("$DIR")
+    done
 fi
 
-# --- Transfer each directory ---
-for RUN_DIR in "${RUN_DIRS[@]}"; do
-    RUN_NAME=$(basename "$RUN_DIR")
-    DEST="$TARGET:$DEST_BASE/$RUN_NAME"
+if [[ ${#RUN_DIRS[@]} -eq 0 ]]; then
+    echo "No run directories found!"
+    exit 1
+fi
 
-    echo "----- Transferring $RUN_NAME -----" | tee -a "$LOG"
+echo "Transferring ${#RUN_DIRS[@]} directories in one rsync..." | tee -a "$LOG"
+printf '  %s\n' "${RUN_DIRS[@]}" | tee -a "$LOG"
 
-    # Retry loop
-    while true; do
-        rsync $RSYNC_OPTS -e "$SSH_CMD" "$RUN_DIR/" "$DEST/"
-        STATUS=$?
+# Single rsync → only one password prompt
+rsync $RSYNC_OPTS -e "$SSH_CMD" "${RUN_DIRS[@]}" "$TARGET"
 
-        if [[ $STATUS -eq 0 ]]; then
-            echo "Completed: $RUN_NAME" | tee -a "$LOG"
-            break
-        else
-            echo "Rsync interrupted (status $STATUS). Retrying in 10 seconds..." | tee -a "$LOG"
-            sleep 10
-        fi
-    done
-done
+STATUS=$?
 
-echo "=== Transfer finished at $(date) ===" | tee -a "$LOG"
+if [[ $STATUS -eq 0 ]]; then
+    echo "=== Transfer finished successfully at $(date) ===" | tee -a "$LOG"
+else
+    echo "=== Transfer ended with error status $STATUS at $(date) ===" | tee -a "$LOG"
+fi
