@@ -30,6 +30,53 @@ def main():
     run_config_path = f'{base_path}/run_{run_num}/run_config.json'
     config = Config(run_config_path)
     print(config.included_detectors)
+
+
+    print('donzo')
+
+
+def fix_angles(config, run_config_path):
+    """
+    Fix the angles of the detectors in the config.
+    :param config:
+    :param run_config_path:
+    :return:
+    """
+
+    # For subrun in subruns, in sub_run_name change _30_ to _-30_
+    for sub_run in config.sub_runs:
+        sub_run_name = sub_run['sub_run_name']
+        if '_30_' in sub_run_name:
+            new_sub_run_name = sub_run_name.replace('_30_', '_-30_')
+            print(f'Changing sub_run_name from {sub_run_name} to {new_sub_run_name}')
+            sub_run['sub_run_name'] = new_sub_run_name
+
+    # For detector in detectors, if 'det_orientation' 'y' is -300, change to -30
+    for detector in config.detectors:
+        if 'det_orientation' in detector:
+            if detector['det_orientation']['y'] == -300:
+                print(f'Changing det_orientation y from -300 to -30 for detector {detector["name"]}')
+                detector['det_orientation']['y'] = -30
+
+    # Print the updated sub_run_names and detector orientations
+    print('Updated sub_run_names:')
+    for sub_run in config.sub_runs:
+        print(' ', sub_run['sub_run_name'])
+    print('Updated detector orientations:')
+    for detector in config.detectors:
+        if 'det_orientation' in detector:
+            print(' ', detector['name'], detector['det_orientation'])
+
+    # Ask if user wants to update the config
+    response = input('\nDo you want to update the run_config.json with these changes? (y/n): ')
+    if response.lower() == 'y':
+        config.write_to_file(run_config_path)
+        print(f'Updated run_config.json saved to {run_config_path}')
+    else:
+        print('No changes made to run_config.json')
+
+
+def fix_dream_feus(config, run_config_path):
     grid_vfp1 = [det for det in config.detectors if det['name'] == 'rd5_grid_vfp_1'][0]
     plein_saral1 = [det for det in config.detectors if det['name'] == 'rd5_plein_saral_1'][0]
     print(f'grid_vfp1 dream feus: {grid_vfp1["dream_feus"]}')
@@ -56,8 +103,6 @@ def main():
         print(f'Updated run_config.json saved to {run_config_path}')
     else:
         print('No changes made to run_config.json')
-
-    print('donzo')
 
 
 if __name__ == '__main__':
