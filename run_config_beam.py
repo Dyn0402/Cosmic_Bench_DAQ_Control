@@ -34,7 +34,7 @@ class Config:
         self.generate_external_triggers = False  # If true, use raspberry pi to generate external triggers for DAQ
         self.watch_for_desync = True  # If true, run desync watcher during run
         self.gas = 'Ar/CO2/Iso 93/5/2'  # Gas type for run
-        self.beam_type = 'muons'
+        self.beam_type = 'pions'
 
         self.weiner_ps_info = {  # If this exists, check for Weiner LV before applying any HV
             'ip': '192.168.10.222',
@@ -136,7 +136,7 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'rotation_30_banco_scan_0',
+                'sub_run_name': 'rotation_0_pions_0',
                 'run_time': 10,  # Minutes
                 'hvs': {
                     '2': {
@@ -258,7 +258,7 @@ class Config:
         template = self.sub_runs[0]
         for i in range(1, 8):
             sub_run = copy.deepcopy(template)
-            sub_run['sub_run_name'] = f'rotation_30_banco_scan_{i}'
+            sub_run['sub_run_name'] = f'rotation_0_pions_{i}'
             # sub_run['run_time'] = 10  # Minutes
             self.sub_runs.append(sub_run)
 
@@ -356,7 +356,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': -300,  # deg  Rotation about y axis
+                    'y': 0,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -387,7 +387,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': -300,  # deg  Rotation about y axis
+                    'y': 0,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -418,7 +418,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': -300,  # deg  Rotation about y axis
+                    'y': 0,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -449,7 +449,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': -300,  # deg  Rotation about y axis
+                    'y': 0,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -481,7 +481,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': -300,  # deg  Rotation about y axis
+                    'y': 0,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -512,7 +512,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': -300,  # deg  Rotation about y axis
+                    'y': 0,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -544,7 +544,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': -300,  # deg  Rotation about y axis
+                    'y': 0,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -576,7 +576,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': -300,  # deg  Rotation about y axis
+                    'y': 0,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -607,7 +607,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': -300,  # deg  Rotation about y axis
+                    'y': 0,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -638,7 +638,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': -300,  # deg  Rotation about y axis
+                    'y': 0,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -671,7 +671,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': -300,  # deg  Rotation about y axis
+                    'y': 0,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -704,7 +704,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': -300,  # deg  Rotation about y axis
+                    'y': 0,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -736,7 +736,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': -300,  # deg  Rotation about y axis
+                    'y': 0,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
