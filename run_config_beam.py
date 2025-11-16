@@ -136,21 +136,21 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'rotation_0_pions_0',
+                'sub_run_name': 'rotation_0_pions_-30V_0',
                 'run_time': 10,  # Minutes
                 'hvs': {
                     '2': {
-                        '0': 440,
-                        '1': 480,
-                        '2': 550,
-                        '3': 440,
-                        '4': 480,
-                        '5': 540,
-                        '6': 530,
-                        '7': 530,
-                        '8': 530,
-                        '9': 530,
-                        '10': 530,
+                        '0': 440 - 30,
+                        '1': 480 - 30,
+                        '2': 550 - 30,
+                        '3': 440 - 30,
+                        '4': 480 - 30,
+                        '5': 540 - 30,
+                        '6': 530 - 30,
+                        '7': 530 - 30,
+                        '8': 530 - 30,
+                        '9': 530 - 30,
+                        '10': 530 - 30,
                     },
                     '5': {
                         '0': 500,
@@ -167,7 +167,7 @@ class Config:
                         # '11': 500,
                     },
                     '12': {
-                        '0': 460
+                        '0': 460 - 30
                     }
                 }
             },
@@ -258,7 +258,9 @@ class Config:
         template = self.sub_runs[0]
         for i in range(1, 8):
             sub_run = copy.deepcopy(template)
-            sub_run['sub_run_name'] = f'rotation_0_pions_{i}'
+            # Get sub_run name and just strip off everything after last underscore
+            sub_run_name_base = sub_run['sub_run_name'].rsplit('_', 1)[0]
+            sub_run['sub_run_name'] = f'{sub_run_name_base}_{i}'
             # sub_run['run_time'] = 10  # Minutes
             self.sub_runs.append(sub_run)
 
