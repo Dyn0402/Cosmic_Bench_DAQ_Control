@@ -187,9 +187,9 @@ def main():
 
                         os.chdir(original_working_directory)
 
-                        if run_successful:
-                            print('Moving data files.')
-                            move_data_files(sub_run_dir, sub_run_out_raw_inner_dir)
+                        # if run_successful:
+                        #     print('Moving data files.')
+                        #     move_data_files(sub_run_dir, sub_run_out_raw_inner_dir)
 
                         server.send('Dream DAQ stopped')
                     else:
