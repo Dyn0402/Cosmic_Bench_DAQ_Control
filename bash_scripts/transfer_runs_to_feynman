@@ -1,5 +1,18 @@
 #!/bin/bash
 
+###############################
+# CONFIGURABLE PARAMETERS
+###############################
+
+# Rate limit for rsync (examples: "10m", "50m", "100m", "500k")
+# Set empty ("") for unlimited
+MAX_RATE="20m"  # 20 MB/s
+
+
+###############################
+# SCRIPT STARTS HERE
+###############################
+
 # Usage:
 #   ./transfer_all_runs.sh /source/base /dest/base
 #   ./transfer_all_runs.sh --range 15 50 /source/base /dest/base
@@ -36,8 +49,17 @@ echo "Base path: $BASE_PATH" | tee -a "$LOG"
 
 SSH_CMD="ssh -o ProxyJump=$JUMP1"
 
-# Robust rsync options
+# Base rsync options
 RSYNC_OPTS="-av --partial --inplace --append-verify --progress"
+
+# Add rate limit if set
+if [[ -n "$MAX_RATE" ]]; then
+    RSYNC_OPTS="$RSYNC_OPTS --bwlimit=$MAX_RATE"
+    echo "Rate limit: $MAX_RATE" | tee -a "$LOG"
+else
+    echo "Rate limit: NONE" | tee -a "$LOG"
+fi
+
 
 # Build the list of directories for ONE big rsync
 RUN_DIRS=()
@@ -54,7 +76,6 @@ if [[ -n "$RANGE_START" ]]; then
         fi
     done
 else
-    # All directories
     for DIR in "$BASE_PATH"/run_*; do
         [[ -d "$DIR" ]] && RUN_DIRS+=("$DIR")
     done
