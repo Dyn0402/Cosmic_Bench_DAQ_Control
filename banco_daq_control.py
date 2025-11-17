@@ -11,6 +11,7 @@ Created as Cosmic_Bench_DAQ_Control/banco_daq_control.py
 import shutil
 from subprocess import Popen, TimeoutExpired
 import signal
+import threading
 import psutil
 from datetime import datetime, timedelta
 
@@ -73,7 +74,10 @@ def main():
                         end_time = datetime.now()
                         print(f'Start Time: {start_time}\nEnd Time: {end_time}')
                         print('Moving data files...')
-                        move_data_files(temp_dir, sub_run_raw_out_dir, start_time, end_time)
+                        # move_data_files(temp_dir, sub_run_raw_out_dir, start_time, end_time)
+                        threading.Thread(target=move_data_files,
+                                         args=(temp_dir, sub_run_raw_out_dir, start_time, end_time),
+                                         daemon=True).start()
 
                         server.send('Banco DAQ stopped')
                     else:

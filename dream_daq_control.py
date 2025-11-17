@@ -87,11 +87,20 @@ def main():
                         server.send('Dream DAQ starting')
                         max_run_time = run_time + max_run_time_addition
 
+                        # if copy_on_fly:
+                        #     daq_finished = threading.Event()
+                        #     copy_files_args = (sub_run_dir, sub_run_out_raw_inner_dir, daq_finished)
+                        #     copy_files_on_the_fly_thread = threading.Thread(target=copy_files_on_the_fly,
+                        #                                                        args=copy_files_args)
+                        #     copy_files_on_the_fly_thread.start()
                         if copy_on_fly:
                             daq_finished = threading.Event()
                             copy_files_args = (sub_run_dir, sub_run_out_raw_inner_dir, daq_finished)
-                            copy_files_on_the_fly_thread = threading.Thread(target=copy_files_on_the_fly,
-                                                                               args=copy_files_args)
+                            copy_files_on_the_fly_thread = threading.Thread(
+                                target=copy_files_on_the_fly,
+                                args=copy_files_args,
+                                daemon=True,  # <- important: thread lives independently
+                            )
                             copy_files_on_the_fly_thread.start()
 
                         while True:
@@ -168,10 +177,13 @@ def main():
                             server.set_timeout(None)
 
                         # DAQ finished
+                        # if copy_on_fly:
+                        #     print('Waiting for on-the-fly copy thread to finish.')
+                        #     daq_finished.set()
+                        #     copy_files_on_the_fly_thread.join()
                         if copy_on_fly:
-                            print('Waiting for on-the-fly copy thread to finish.')
-                            daq_finished.set()
-                            copy_files_on_the_fly_thread.join()
+                            print('Signaling on-the-fly copier to finish soon (but not waiting).')
+                            daq_finished.set()  # thread continues running in background
 
                         os.chdir(original_working_directory)
 
@@ -210,28 +222,75 @@ def listen_for_stop(server, stop_event):
 
 
 
-def copy_files_on_the_fly(sub_run_dir, sub_out_dir, daq_finished_event, check_interval=5):
+# def copy_files_on_the_fly(sub_run_dir, sub_out_dir, daq_finished_event, check_interval=5):
+#     """
+#     Continuously copy .fdf files from sub_run_dir to sud_out_dir while DAQ is running.
+#     :param sub_run_dir: Sub-run directory to monitor for new files.
+#     :param sub_out_dir: Sub-run output directory to copy files to.
+#     :param daq_finished_event: threading.Event() that is set when DAQ is finished.
+#     :param check_interval: Time in seconds between checks for new files.
+#     :return:
+#     """
+#
+#     create_dir_if_not_exist(sub_out_dir)
+#     sleep(60 * 1)  # Wait on start for daq to start running
+#     file_num = 0
+#     while not daq_finished_event.is_set():  # Running
+#         if not file_num_still_running(sub_run_dir, file_num, silent=True):
+#             for file_name in os.listdir(sub_run_dir):
+#                 if file_name.endswith('.fdf') and get_file_num_from_fdf_file_name(file_name, -2) == file_num:
+#                     # shutil.move(f'{sub_run_dir}{file_name}', f'{sub_out_dir}{file_name}')
+#                     # Copy instead of move to keep a redundant copy of the fdfs.
+#                     shutil.copy(f'{sub_run_dir}{file_name}', f'{sub_out_dir}{file_name}')
+#             file_num += 1
+#         sleep(check_interval)  # Check every 5 seconds
+
+def copy_files_on_the_fly(sub_run_dir, sub_out_dir, daq_finished_event, check_interval=5, extra_minutes_after_finish=3):
     """
-    Continuously copy .fdf files from sub_run_dir to sud_out_dir while DAQ is running.
-    :param sub_run_dir: Sub-run directory to monitor for new files.
-    :param sub_out_dir: Sub-run output directory to copy files to.
-    :param daq_finished_event: threading.Event() that is set when DAQ is finished.
-    :param check_interval: Time in seconds between checks for new files.
-    :return:
+    Copies new .fdf files during the run, and continues for extra_minutes_after_finish
+    after DAQ finishes, then exits cleanly without blocking the main thread.
     """
 
     create_dir_if_not_exist(sub_out_dir)
-    sleep(60 * 1)  # Wait on start for daq to start running
+    sleep(60)  # Give DAQ time to start writing before first scan
+
     file_num = 0
-    while not daq_finished_event.is_set():  # Running
+
+    # Phase 1: DAQ running
+    while not daq_finished_event.is_set():
         if not file_num_still_running(sub_run_dir, file_num, silent=True):
             for file_name in os.listdir(sub_run_dir):
-                if file_name.endswith('.fdf') and get_file_num_from_fdf_file_name(file_name, -2) == file_num:
-                    # shutil.move(f'{sub_run_dir}{file_name}', f'{sub_out_dir}{file_name}')
-                    # Copy instead of move to keep a redundant copy of the fdfs.
-                    shutil.copy(f'{sub_run_dir}{file_name}', f'{sub_out_dir}{file_name}')
+                if (
+                    file_name.endswith('.fdf') and
+                    get_file_num_from_fdf_file_name(file_name, -2) == file_num
+                ):
+                    shutil.copy(
+                        os.path.join(sub_run_dir, file_name),
+                        os.path.join(sub_out_dir, file_name),
+                    )
             file_num += 1
-        sleep(check_interval)  # Check every 5 seconds
+        sleep(check_interval)
+
+    # Phase 2: DAQ has ended — keep copying “stragglers”
+    print("DAQ finished — continuing file copy for cleanup window.")
+
+    end_time = time.time() + extra_minutes_after_finish * 60
+    already_seen = set()
+
+    while time.time() < end_time:
+        for file_name in os.listdir(sub_run_dir):
+            if file_name.endswith('.fdf') and file_name not in already_seen:
+                src = os.path.join(sub_run_dir, file_name)
+                dst = os.path.join(sub_out_dir, file_name)
+                try:
+                    shutil.copy(src, dst)
+                    already_seen.add(file_name)
+                except Exception:
+                    pass  # ignore transient errors (file still being written)
+        sleep(check_interval)
+
+    print("On-the-fly copy thread exiting.")
+
 
 
 def file_num_still_running(fdf_dir, file_num, wait_time=30, silent=False):

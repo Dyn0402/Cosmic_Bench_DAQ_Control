@@ -68,7 +68,7 @@ def get_dream_daq_status():
     elif "Listening on " in output:
         status = "WAITING"
         color = "secondary"
-    elif "Moving data files." in output:
+    elif "Moving data files." in output or "Waiting for on-the-fly copy thread to finish" in output:
         status = "Copying fdfs"
         color = "info"
     else:
