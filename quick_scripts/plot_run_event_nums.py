@@ -244,6 +244,7 @@ def main():
 
     # --- Base bar plot ---
     bars = ax.bar(sub_run_names, sub_run_events, color='skyblue', edgecolor='black')
+    total_events = sum(sub_run_events)
 
     # --- Compute desync positions ---
     x_positions = np.arange(len(sub_run_names))
@@ -271,7 +272,7 @@ def main():
     # --- Labels & formatting ---
     ax.set_xlabel('Sub-run Name', fontsize=12)
     ax.set_ylabel('Number of Dream Events', fontsize=12)
-    ax.set_title('Dream Event Counts per Sub-run', fontsize=14, weight='bold')
+    ax.set_title(f'Run {run_num} Dream Event Counts per Sub-run - Total Events: {total_events}', fontsize=14, weight='bold')
     ax.set_xticks(x_positions)
     ax.set_xticklabels(sub_run_names, rotation=45, ha='right')
     ax.margins(y=0.15)
