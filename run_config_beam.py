@@ -52,8 +52,8 @@ class Config:
             'ip': '192.168.10.8',
             'port': 1101,
             'daq_config_template_path': '/mnt/data/beam_sps_25/dream_run/config/TbSPS25.cfg',
-            'run_directory': f'/mnt/data/beam_sps_25/dream_run/{self.run_name}/',
-            # 'run_directory': f'/local/home/banco/beam_test_2025/Run/{self.run_name}/',
+            # 'run_directory': f'/mnt/data/beam_sps_25/dream_run/{self.run_name}/',
+            'run_directory': f'/local/home/banco/beam_test_2025/Run/{self.run_name}/',
             'data_out_dir': f'{self.base_out_dir}Run/{self.run_name}',
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
             'n_samples_per_waveform': 24,  # Number of samples per waveform to configure in DAQ
