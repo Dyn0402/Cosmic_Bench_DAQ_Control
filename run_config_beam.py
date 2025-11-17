@@ -144,7 +144,7 @@ class Config:
                     '2': {
                         '0': 440 + hv_adjust,
                         '1': 480 + hv_adjust,
-                        '2': 550 + hv_adjust,
+                        '2': 560 + hv_adjust,
                         '3': 540 + hv_adjust,
                         '4': 460 + hv_adjust,
                         '5': 440 + hv_adjust,

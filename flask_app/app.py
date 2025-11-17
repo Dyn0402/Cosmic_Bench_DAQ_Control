@@ -116,10 +116,10 @@ def stop_run():
     try:
         if is_dream_daq_running():
             subprocess.Popen([f"{BASH_DIR}/stop_run.sh"])
-            return jsonify({"success": True, "message": "Stopping Run"})
+            return jsonify({"success": True, "message": "DAQ Running, Stopping Run"})
         else:
             subprocess.Popen([f"{BASH_DIR}/stop_sub_run.sh"])  # Only 1 ctrl-c needed if not running
-            return jsonify({"success": True, "message": "Stopping Run"})
+            return jsonify({"success": True, "message": "No DAQ Running, Stopping Run"})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
 
@@ -511,9 +511,9 @@ def is_dream_daq_running():
               "Dream Subrun complete." has NOT appeared.
     """
     try:
-        # Grab last ~20 lines of the pane
+        # Grab last ~10 lines of the pane
         output = subprocess.check_output(
-            ["tmux", "capture-pane", "-pS", "-20", "-t", "daq_control:0.0"],
+            ["tmux", "capture-pane", "-pS", "-10", "-t", "daq_control:0.0"],
             text=True
         )
     except subprocess.CalledProcessError:
