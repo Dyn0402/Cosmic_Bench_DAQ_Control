@@ -286,7 +286,7 @@ class Config:
             'banco_arm_separation_z': 172 - 41,  # mm from bottom of lower banco arm to bottom of upper banco arm
             'banco_arm_right_y': 34 + 100,  # mm from center of banco to right edge of banco arm
             'banco_arm_length_y': 230,  # mm from left edge of banco arm to right edge of banco arm
-            'banco_moveable_y_position': 500.0,  # mm  Offset from moving table. Positive moves banco up.
+            'banco_moveable_y_position': 0.0,  # mm  Offset from moving table. Positive moves banco up.
         }
 
         # self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
@@ -294,7 +294,7 @@ class Config:
         #                            'rd5_grid_saral_1', 'rd5_strip_saral_1', 'rd5_strip_esl_1']
         self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
                                    'urw_inter', 'rd5_plein_saral_2', 'rd5_strip_esl_1', 'urw_strip',
-                                   'rd5_strip_saral_1']
+                                   'rd5_strip_saral_1', 'rd5_grid_esl_1']
 
         self.detectors = [
             {
@@ -718,7 +718,7 @@ class Config:
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
-                    'z': 340,  # mm
+                    'z': 400,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -750,7 +750,7 @@ class Config:
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
-                    'z': 0,  # mm
+                    'z': 1100,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -758,20 +758,21 @@ class Config:
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
-                    'drift': (0, 0),
-                    'resist_1': (3, 1)
+                    'drift': (5, 1),
+                    'resist_1': (2, 4),
+                    'resist_2': (2, 6),
                 },
                 'dream_feus': {
-                    'x_1': (6, 5),  # Runs along x direction, indicates y hit location
-                    'x_2': (6, 6),
-                    'y_1': (6, 7),  # Runs along y direction, indicates x hit location
-                    'y_2': (6, 8),
+                    'x_1': (4, 5),  # Runs along x direction, indicates y hit location
+                    'x_2': (4, 6),
+                    'y_1': (4, 7),  # Runs along y direction, indicates x hit location
+                    'y_2': (4, 8),
                 },
                 'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
                     'x_1': True,
                     'x_2': True,
-                    'y_1': False,
-                    'y_2': False,
+                    'y_1': True,
+                    'y_2': True,
                 }
             },
 
