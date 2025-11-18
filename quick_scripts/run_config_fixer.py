@@ -32,7 +32,7 @@ def main():
     print(config.included_detectors)
 
     # fix_angles(config, run_config_path)
-    fix_strip_esl_angles()
+    fix_strip_esl_angles(config, run_config_path)
 
     print('donzo')
 
