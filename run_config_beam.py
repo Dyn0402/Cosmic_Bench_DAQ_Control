@@ -723,7 +723,7 @@ class Config:
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
                     'y': -60,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
+                    'z': -90,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
                     'drift': (5, 4),
