@@ -139,14 +139,14 @@ class Config:
             {
                 # 'sub_run_name': f'rotation_-15_banco_scan_0',
                 'sub_run_name': f'rotation_-60_test_0',
-                'run_time': 5,  # Minutes
+                'run_time': 10,  # Minutes
                 'hvs': {
                     '2': {
                         '0': 440 + hv_adjust,
                         '1': 490 + hv_adjust,
                         '2': 585 + hv_adjust,
                         '3': 550 + hv_adjust,
-                        '4': 455 + hv_adjust,
+                        '4': 350 + hv_adjust,
                         '5': 440 + hv_adjust,
                         '6': 470 + hv_adjust,
                         '7': 530 + hv_adjust,
