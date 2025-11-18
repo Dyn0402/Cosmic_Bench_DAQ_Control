@@ -162,7 +162,7 @@ def update_run_config_py():
                     parts = line.split("#", 1)
                     prefix = parts[0]
                     comment = "#" + parts[1].rstrip("\n")
-                lines[i] = f"            'banco_moveable_y_position': {float(new_position)},  {comment}\n"
+                lines[i] = f"            'banco_moveable_y_position': {float(new_position) / 10},  {comment}\n"
                 updated = True
                 break
 

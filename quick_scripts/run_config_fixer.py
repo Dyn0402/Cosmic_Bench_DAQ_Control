@@ -22,19 +22,46 @@ from run_config_beam import Config
 def main():
     base_path = '/mnt/data/beam_sps_25/Run'
 
-    if len(sys.argv) != 2:
-        print('Usage: python run_config_fixer.py <run_num>')
-        sys.exit(1)
-    run_num = sys.argv[1]
+    if len(sys.argv) == 2:
+        run_nums = [sys.argv[1]]
+    elif len(sys.argv) == 3:
+        run_nums = [str(i) for i in range(int(sys.argv[1]), int(sys.argv[2]) + 1)]
+    else:
+        print('Usage: python run_config_fixer.py <run_num> OR python run_config_fixer.py <start_run_num> <end_run_num>')
+        return
 
-    run_config_path = f'{base_path}/run_{run_num}/run_config.json'
-    config = Config(run_config_path)
-    print(config.included_detectors)
+    for run_num in run_nums:
+        run_config_path = f'{base_path}/run_{run_num}/run_config.json'
+        config = Config(run_config_path)
+        print(config.included_detectors)
 
-    # fix_angles(config, run_config_path)
-    fix_strip_esl_angles(config, run_config_path)
+        # fix_angles(config, run_config_path)
+        # fix_strip_esl_angles(config, run_config_path)
+        fix_banco_heights(config, run_config_path)
 
     print('donzo')
+
+
+def fix_banco_heights(config, run_config_path):
+    """
+    Fix the heights of the banco detectors in the config. Should be in mm but we were using
+    the units of the motor which are hundreds of um.
+    :param config:
+    :param run_config_path:
+    :return:
+    """
+    config.bench_geometry['banco_moveable_y_position'] /= 10.0
+
+    print(f'Updated banco_moveable_y_position to {config.bench_geometry["banco_moveable_y_position"]} mm')
+    # Ask if user wants to update the config
+    response = input('\nDo you want to update the run_config.json with these changes? (y/n): ')
+
+    if response.lower() == 'y':
+        config.write_to_file(run_config_path)
+        print(f'Updated run_config.json saved to {run_config_path}')
+    else:
+        print('No changes made to run_config.json')
+
 
 
 def fix_strip_esl_angles(config, run_config_path):
