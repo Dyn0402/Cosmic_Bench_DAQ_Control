@@ -36,6 +36,38 @@ def main():
     print('donzo')
 
 
+def fix_strip_esl_angles(config, run_config_path):
+    """
+    Fix the angles of the detectors in the config.
+    :param config:
+    :param run_config_path:
+    :return:
+    """
+
+    # For detector in detectors, if 'det_orientation' 'y' is -300, change to -30
+    for detector in config.detectors:
+        if detector['name'] != 'rd5_strip_esl_1':
+            continue
+        if 'det_orientation' in detector:
+                detector['det_orientation']['z'] = -90
+
+    # Print the updated detector orientations
+    print('Updated detector orientations:')
+    for detector in config.detectors:
+        if detector['name'] != 'rd5_strip_esl_1':
+            continue
+        if 'det_orientation' in detector:
+            print(' ', detector['name'], detector['det_orientation'])
+
+    # Ask if user wants to update the config
+    response = input('\nDo you want to update the run_config.json with these changes? (y/n): ')
+    if response.lower() == 'y':
+        config.write_to_file(run_config_path)
+        print(f'Updated run_config.json saved to {run_config_path}')
+    else:
+        print('No changes made to run_config.json')
+
+
 def fix_angles(config, run_config_path):
     """
     Fix the angles of the detectors in the config.
