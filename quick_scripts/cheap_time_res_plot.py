@@ -109,7 +109,8 @@ def main():
     # ax.set_title(f"Time Resolution vs Voltage — {run_name}")
     # ax.grid(True)
     # ax.legend()
-    plt.tight_layout()
+    fig_x.tight_layout()
+    fig_y.tight_layout()
     plt.show()
 
     print('donzo')
