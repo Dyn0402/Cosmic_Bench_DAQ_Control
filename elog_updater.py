@@ -22,6 +22,7 @@ import json
 import subprocess
 import tempfile
 import os
+import re
 import numpy as np
 import pandas as pd
 from statistics import mode
@@ -92,54 +93,206 @@ def load_run_config(config_path):
 #     return ids[0]
 
 
-def find_elog_id_for_run(run_id):
+# def find_elog_id_for_run(run_id):
+#     """
+#     Search the local ELOG for entries with the attribute RunID=<run_id>
+#     using the old-style elog search (no --search).
+#     """
+#
+#     search_cmd = [
+#         "elog",
+#         "-h", "localhost",
+#         "-p", "8080",
+#         "-n", "2",
+#         "-l", "SPS H4 2025",
+#         "-a", f"RunID={run_id}",
+#         "-m", ""    # empty text → search mode
+#     ]
+#
+#     try:
+#         result = subprocess.run(search_cmd, check=True, capture_output=True, text=True)
+#         output = result.stdout.strip()
+#
+#     except subprocess.CalledProcessError as e:
+#         print("Error running elog search!")
+#         print("stdout:", e.stdout)
+#         print("stderr:", e.stderr)
+#         return None
+#
+#     if not output:
+#         print(f"No elog entry found with RunID={run_id}")
+#         return None
+#
+#     # Parse lines like: "12345: Title="Run_0138" RunID="138" ..."
+#     ids = []
+#     for line in output.splitlines():
+#         line = line.strip()
+#         if ":" in line:
+#             possible_id = line.split(":", 1)[0].strip()
+#             if possible_id.isdigit():
+#                 ids.append(possible_id)
+#
+#     if not ids:
+#         print(f"No valid elog entry IDs found for RunID={run_id}")
+#         return None
+#
+#     if len(ids) > 1:
+#         print(f"Warning: Multiple ELOG entries match RunID={run_id}: {ids}")
+#         print("Using the first one.")
+#
+#     return ids[0]
+
+
+def find_elog_id_for_run(run_id, logbook="SPS H4 2025", host="localhost", port="8080",
+                         encoding_flag="-n", encoding_val="2", max_lookback=5000):
     """
-    Search the local ELOG for entries with the attribute RunID=<run_id>
-    using the old-style elog search (no --search).
+    Find an elog entry id corresponding to RunID=<run_id>.
+
+    Strategy (tries in order):
+      1. New-style search (--search) if available.
+      2. Old-style attribute-search: `-a RunID=<run_id> -m ""` (may fail on some elog clients).
+      3. Sequential scan: download the "last" entry to discover the latest id,
+         then iterate backward and `-w <id>` each entry looking for RunID or a Title run_<N>.
+
+    Returns:
+      string elog id (e.g. "12345") or None if not found.
     """
 
-    search_cmd = [
-        "elog",
-        "-h", "localhost",
-        "-p", "8080",
-        "-n", "2",
-        "-l", "SPS H4 2025",
-        "-a", f"RunID={run_id}",
-        "-m", ""    # empty text → search mode
+    base_common = ["elog", "-h", host, "-p", port, encoding_flag, encoding_val, "-l", logbook]
+
+    # --- Helper: run a command and return (success, stdout, stderr) ---
+    def run_cmd(cmd):
+        try:
+            r = subprocess.run(cmd, check=True, capture_output=True, text=True)
+            return True, r.stdout, r.stderr
+        except subprocess.CalledProcessError as e:
+            return False, e.stdout or "", e.stderr or ""
+
+    # --- 1) Try new-style --search if available ---
+    try_search_cmd = base_common + ["--search", f"RunID={run_id}"]
+    ok, out, err = run_cmd(try_search_cmd)
+    if ok and out.strip():
+        ids = _parse_ids_from_elog_search_output(out)
+        if ids:
+            if len(ids) > 1:
+                print(f"Warning: multiple matches for RunID={run_id}: {ids}; using first.")
+            return ids[0]
+
+    # --- 2) Try old-style attribute search with empty message (some elog versions use this) ---
+    old_style_cmd = base_common + ["-a", f"RunID={run_id}", "-m", ""]
+    ok, out, err = run_cmd(old_style_cmd)
+    # If successful and produced output, try to parse it.
+    if ok and out.strip():
+        ids = _parse_ids_from_elog_search_output(out)
+        if ids:
+            if len(ids) > 1:
+                print(f"Warning: multiple matches for RunID={run_id}: {ids}; using first.")
+            return ids[0]
+    # If it failed and stderr indicated missing Title, fall through to scan.
+    if not ok and ("Missing required attribute" in (err or "") or "Missing required attribute" in (out or "")):
+        # fall through to sequential scan
+        pass
+    else:
+        # If it failed for some other reason (eg. --search not recognized), keep going to fallback
+        pass
+
+    # --- 3) Sequential scan fallback ---
+    # Get the latest entry via "-w last"
+    ok, out, err = run_cmd(base_common + ["-w", "last"])
+    if not ok:
+        # Could not retrieve last entry; give up
+        print("Could not fetch 'last' entry from elog; aborting search fallback.")
+        if out or err:
+            print("elog stdout/stderr:", out, err)
+        return None
+
+    # Try to parse an id number from the 'last' output
+    last_id = _parse_id_from_elog_download(out)
+    if last_id is None:
+        # If we couldn't parse id from output, attempt a few heuristic patterns in stderr too
+        last_id = _parse_id_from_elog_download(err)
+    if last_id is None:
+        print("Unable to determine the latest elog entry ID from 'elog -w last' output.")
+        # Optionally print sample output for debugging
+        # print("Sample output:\n", out)
+        return None
+
+    last_id = int(last_id)
+    lower_bound = max(1, last_id - int(max_lookback))
+
+    # iterate from last_id downwards
+    # We look for either:
+    #   - RunID=<run_id> somewhere in the entry text (RunID="138", RunID=138)
+    #   - Title containing run_<run_id> (Title="run_138" or similar)
+    runid_regexes = [
+        re.compile(r'\bRunID\s*=\s*"?{}"?\b'.format(re.escape(str(run_id)))),
+        re.compile(r'\bRunID\s*[:=]\s*"?{}"?\b'.format(re.escape(str(run_id)))),
+        re.compile(r'Title\s*=\s*"?run_{}"?'.format(re.escape(str(run_id))), re.IGNORECASE),
+        re.compile(r'\brun[_-]?{}[\b"_]'.format(re.escape(str(run_id))), re.IGNORECASE),
     ]
 
-    try:
-        result = subprocess.run(search_cmd, check=True, capture_output=True, text=True)
-        output = result.stdout.strip()
+    for candidate in range(last_id, lower_bound - 1, -1):
+        ok, out, err = run_cmd(base_common + ["-w", str(candidate)])
+        if not ok:
+            # skip missing/forbidden ids
+            continue
 
-    except subprocess.CalledProcessError as e:
-        print("Error running elog search!")
-        print("stdout:", e.stdout)
-        print("stderr:", e.stderr)
-        return None
+        combined_text = (out or "") + "\n" + (err or "")
 
-    if not output:
-        print(f"No elog entry found with RunID={run_id}")
-        return None
+        # quick check for run id
+        for rx in runid_regexes:
+            if rx.search(combined_text):
+                return str(candidate)
 
-    # Parse lines like: "12345: Title="Run_0138" RunID="138" ..."
+    # nothing found
+    print(f"No ELOG entry found with RunID={run_id} in last {max_lookback} entries (scanned {last_id}-{lower_bound}).")
+    return None
+
+
+# -------------------------
+# Helper parsing functions
+# -------------------------
+def _parse_ids_from_elog_search_output(output_text):
+    """
+    Parse lines like:
+      12345: Title="Run_0138" RunID="138" ...
+    or other similar formats; return list of numeric ids as strings.
+    """
     ids = []
-    for line in output.splitlines():
+    for line in output_text.splitlines():
         line = line.strip()
-        if ":" in line:
-            possible_id = line.split(":", 1)[0].strip()
-            if possible_id.isdigit():
-                ids.append(possible_id)
+        if not line:
+            continue
+        # If line begins with digits followed by colon, take that as id
+        m = re.match(r'^(\d+)\s*:', line)
+        if m:
+            ids.append(m.group(1))
+            continue
+        # Sometimes the output contains 'Entry <id>' or 'Message <id>'
+        m = re.search(r'\b(?:Entry|Message|ID)\s*[:=]?\s*(\d{3,})\b', line, re.IGNORECASE)
+        if m:
+            ids.append(m.group(1))
+    return ids
 
-    if not ids:
-        print(f"No valid elog entry IDs found for RunID={run_id}")
+def _parse_id_from_elog_download(text):
+    """
+    Try to parse a numeric id from the textual output of `elog -w last`.
+    Tries a few heuristics.
+    """
+    if not text:
         return None
-
-    if len(ids) > 1:
-        print(f"Warning: Multiple ELOG entries match RunID={run_id}: {ids}")
-        print("Using the first one.")
-
-    return ids[0]
+    # look for header "Message 12345" or "Entry 12345" or a leading "12345:"
+    m = re.search(r'^(?:Message|Entry)\s+(\d+)', text, re.IGNORECASE | re.MULTILINE)
+    if m:
+        return m.group(1)
+    m = re.search(r'^(\d+)\s*:', text, re.MULTILINE)
+    if m:
+        return m.group(1)
+    # sometimes there's a line like "ID: 12345"
+    m = re.search(r'\bID\s*[:=]\s*(\d+)\b', text)
+    if m:
+        return m.group(1)
+    return None
 
 
 
