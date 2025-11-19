@@ -498,28 +498,22 @@ def main():
 
     run_num = sys.argv[1]
 
-    print(f"Processing run number: {run_num}")
-    elog_entry = find_elog_id_for_run(run_num)
-    if elog_entry is None:
-        print("Error: ELOG ID lookup failed.")
+    config_path = os.path.join(out_run_dir, f'run_{run_num}', 'run_config.json')
+
+    # Load JSON
+    run_config = load_run_config(config_path)
+    run_id = int(run_config['run_name'].split('_')[1])
+
+    log_id = find_elog_id_for_run(run_id)
+    if log_id is None:
+        print("Error: elog ID lookup failed.")
         sys.exit(1)
-    print(f"Found ELOG entry ID: {elog_entry}")
-    # config_path = os.path.join(out_run_dir, f'run_{run_num}', 'run_config.json')
-    #
-    # # Load JSON
-    # run_config = load_run_config(config_path)
-    # run_id = int(run_config['run_name'].split('_')[1])
-    #
-    # log_id = find_elog_id_for_run(run_id)
-    # if log_id is None:
-    #     print("Error: elog ID lookup failed.")
-    #     sys.exit(1)
-    #
-    # # Build updates
-    # attributes = build_attribute_updates(run_config)
-    #
-    # # Submit update
-    # submit_elog_update(log_id, attributes)
+
+    # Build updates
+    attributes = build_attribute_updates(run_config)
+
+    # Submit update
+    submit_elog_update(log_id, attributes)
 
 
 if __name__ == "__main__":
