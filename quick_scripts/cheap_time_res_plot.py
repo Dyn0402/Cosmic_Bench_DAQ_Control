@@ -16,34 +16,33 @@ import pandas as pd
 
 def main():
     base_dir = '/mnt/data/beam_sps_25/Analysis/'
-    run_name = 'run_77'
+    run_name = 'run_160'
     detector_names = [
         'urw_inter', 'rd5_plein_saral_2', 'rd5_plein_vfp_1',
         'rd5_grid_saral_1', 'rd5_strip_saral_1', 'rd5_strip_esl_1',
     ]
 
-    nominal_drift_voltage = 500  # volts
+    nominal_drift_voltage = 400  # volts
+    sub_run_name = 'rotation_-45_resist_scan_'
+    sub_run_zero = 'rotation_-45_drift_resist_scan_'
     sub_runs = {
-        'rotation_-60_drift_resist_scan_-475': nominal_drift_voltage - 475,
-        'rotation_-60_drift_resist_scan_-450': nominal_drift_voltage-450,
-        'rotation_-60_drift_resist_scan_-425': nominal_drift_voltage-425,
-        'rotation_-60_drift_resist_scan_-400': nominal_drift_voltage-400,
-        'rotation_-60_drift_resist_scan_-375': nominal_drift_voltage-375,
-        'rotation_-60_drift_resist_scan_-350': nominal_drift_voltage-350,
-        'rotation_-60_drift_resist_scan_-325': nominal_drift_voltage-325,
-        'rotation_-60_drift_resist_scan_-300': nominal_drift_voltage-300,
-        'rotation_-60_drift_resist_scan_-275': nominal_drift_voltage-275,
-        'rotation_-60_drift_resist_scan_-250': nominal_drift_voltage-250,
-        'rotation_-60_drift_resist_scan_-225': nominal_drift_voltage-225,
-        'rotation_-60_drift_resist_scan_-200': nominal_drift_voltage-200,
-        'rotation_-60_drift_resist_scan_-175': nominal_drift_voltage-175,
-        'rotation_-60_drift_resist_scan_-150': nominal_drift_voltage-150,
-        'rotation_-60_drift_resist_scan_-125': nominal_drift_voltage-125,
-        'rotation_-60_drift_resist_scan_-100': nominal_drift_voltage-100,
-        'rotation_-60_drift_resist_scan_-75': nominal_drift_voltage-75,
-        'rotation_-60_drift_resist_scan_-50': nominal_drift_voltage-50,
-        'rotation_-60_drift_resist_scan_-25': nominal_drift_voltage-25,
-        'rotation_-60_drift_resist_scan_0': nominal_drift_voltage - 0,
+        f'{sub_run_name}-400': nominal_drift_voltage-400,
+        f'{sub_run_name}-375': nominal_drift_voltage-375,
+        f'{sub_run_name}-350': nominal_drift_voltage-350,
+        f'{sub_run_name}-325': nominal_drift_voltage-325,
+        f'{sub_run_name}-300': nominal_drift_voltage-300,
+        f'{sub_run_name}-275': nominal_drift_voltage-275,
+        f'{sub_run_name}-250': nominal_drift_voltage-250,
+        f'{sub_run_name}-225': nominal_drift_voltage-225,
+        f'{sub_run_name}-200': nominal_drift_voltage-200,
+        f'{sub_run_name}-175': nominal_drift_voltage-175,
+        f'{sub_run_name}-150': nominal_drift_voltage-150,
+        f'{sub_run_name}-125': nominal_drift_voltage-125,
+        f'{sub_run_name}-100': nominal_drift_voltage-100,
+        f'{sub_run_name}-75': nominal_drift_voltage-75,
+        f'{sub_run_name}-50': nominal_drift_voltage-50,
+        f'{sub_run_name}-25': nominal_drift_voltage-25,
+        f'{sub_run_zero}0': nominal_drift_voltage - 0,
     }
 
     fig, ax = plt.subplots(figsize=(8, 6))
