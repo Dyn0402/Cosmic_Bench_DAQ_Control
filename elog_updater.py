@@ -402,9 +402,10 @@ def submit_elog_update(log_id, attributes, message_text=None):
 # -------------------------------------------------------
 def main():
     out_run_dir = '/mnt/data/beam_sps_25/Run/'
-    if len(sys.argv) == 2:
+    run_nums = []
+    if len(sys.argv) >= 2:
         run_nums = [sys.argv[1]]
-    if len(sys.argv) == 3:
+    if len(sys.argv) >= 3:
         run_nums.append(sys.argv[2])
     else:
         print("Usage: python elog_update_from_config.py <run_num> [end_run_num]")
