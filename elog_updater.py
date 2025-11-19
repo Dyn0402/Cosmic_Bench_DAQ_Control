@@ -36,113 +36,6 @@ def load_run_config(config_path):
         return json.load(f)
 
 
-# # -------------------------------------------------------
-# # Determine the elog ID corresponding to a run
-# # -------------------------------------------------------
-# def find_elog_id_for_run(run_id):
-#     """
-#     Search the local ELOG for entries with the attribute RunID=<run_id>.
-#     Returns the elog entry ID (string).
-#     """
-#
-#     search_cmd = [
-#         "elog",
-#         "-h", "localhost",
-#         "-p", "8080",
-#         "-n", "2",
-#         "-l", "SPS H4 2025",
-#         "--search", f"RunID={run_id}",
-#     ]
-#
-#     try:
-#         result = subprocess.run(search_cmd, check=True, capture_output=True, text=True)
-#         output = result.stdout.strip()
-#
-#     except subprocess.CalledProcessError as e:
-#         print("Error running elog search!")
-#         print("stdout:", e.stdout)
-#         print("stderr:", e.stderr)
-#         return None
-#
-#     if not output:
-#         print(f"No elog entry found with RunID={run_id}")
-#         return None
-#
-#     # ELOG search results look like:
-#     #   12345: Title="Run_0253" RunID="253" ...
-#     #   12346: Title="Run_0254" RunID="254" ...
-#     #
-#     # Extract IDs (before the colon)
-#     ids = []
-#     for line in output.splitlines():
-#         line = line.strip()
-#         if ":" in line:
-#             entry_id = line.split(":", 1)[0].strip()
-#             if entry_id.isdigit():
-#                 ids.append(entry_id)
-#
-#     if len(ids) == 0:
-#         print(f"No valid elog IDs found in search results for RunID={run_id}.")
-#         return None
-#
-#     if len(ids) > 1:
-#         print(f"Warning: Multiple elog entries found for RunID={run_id}: {ids}")
-#         print("Returning the first one.")
-#         return ids[0]
-#
-#     return ids[0]
-
-
-# def find_elog_id_for_run(run_id):
-#     """
-#     Search the local ELOG for entries with the attribute RunID=<run_id>
-#     using the old-style elog search (no --search).
-#     """
-#
-#     search_cmd = [
-#         "elog",
-#         "-h", "localhost",
-#         "-p", "8080",
-#         "-n", "2",
-#         "-l", "SPS H4 2025",
-#         "-a", f"RunID={run_id}",
-#         "-m", ""    # empty text → search mode
-#     ]
-#
-#     try:
-#         result = subprocess.run(search_cmd, check=True, capture_output=True, text=True)
-#         output = result.stdout.strip()
-#
-#     except subprocess.CalledProcessError as e:
-#         print("Error running elog search!")
-#         print("stdout:", e.stdout)
-#         print("stderr:", e.stderr)
-#         return None
-#
-#     if not output:
-#         print(f"No elog entry found with RunID={run_id}")
-#         return None
-#
-#     # Parse lines like: "12345: Title="Run_0138" RunID="138" ..."
-#     ids = []
-#     for line in output.splitlines():
-#         line = line.strip()
-#         if ":" in line:
-#             possible_id = line.split(":", 1)[0].strip()
-#             if possible_id.isdigit():
-#                 ids.append(possible_id)
-#
-#     if not ids:
-#         print(f"No valid elog entry IDs found for RunID={run_id}")
-#         return None
-#
-#     if len(ids) > 1:
-#         print(f"Warning: Multiple ELOG entries match RunID={run_id}: {ids}")
-#         print("Using the first one.")
-#
-#     return ids[0]
-
-
 def find_elog_id_for_run(run_id, logbook="SPS H4 2025", host="localhost", port="8080",
                          encoding_flag="-n", encoding_val="2", max_lookback=5000):
     """
@@ -509,28 +402,35 @@ def submit_elog_update(log_id, attributes, message_text=None):
 # -------------------------------------------------------
 def main():
     out_run_dir = '/mnt/data/beam_sps_25/Run/'
-    if len(sys.argv) != 2:
-        print("Usage: python elog_update_from_config.py <run_num>")
+    if len(sys.argv) == 2:
+        run_nums = [sys.argv[1]]
+    if len(sys.argv) == 3:
+        run_nums.append(sys.argv[2])
+    else:
+        print("Usage: python elog_update_from_config.py <run_num> [end_run_num]")
         sys.exit(1)
 
-    run_num = sys.argv[1]
+    for run_num in run_nums:
+        try:
+            config_path = os.path.join(out_run_dir, f'run_{run_num}', 'run_config.json')
 
-    config_path = os.path.join(out_run_dir, f'run_{run_num}', 'run_config.json')
+            # Load JSON
+            run_config = load_run_config(config_path)
+            run_id = int(run_config['run_name'].split('_')[1])
 
-    # Load JSON
-    run_config = load_run_config(config_path)
-    run_id = int(run_config['run_name'].split('_')[1])
+            log_id = find_elog_id_for_run(run_id)
+            if log_id is None:
+                print("Error: elog ID lookup failed.")
+                sys.exit(1)
 
-    log_id = find_elog_id_for_run(run_id)
-    if log_id is None:
-        print("Error: elog ID lookup failed.")
-        sys.exit(1)
+            # Build updates
+            attributes = build_attribute_updates(run_config)
 
-    # Build updates
-    attributes = build_attribute_updates(run_config)
-
-    # Submit update
-    submit_elog_update(log_id, attributes)
+            # Submit update
+            submit_elog_update(log_id, attributes)
+        except Exception as e:
+            print(f"Error processing run {run_num}: {e}")
+            continue
 
 
 if __name__ == "__main__":
