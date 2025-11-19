@@ -450,32 +450,48 @@ def get_n_triggers(run_config):
 # Send ELOG update
 # -------------------------------------------------------
 def submit_elog_update(log_id, attributes, message_text=None):
+    # Base command
     elog_cmd = [
         "elog",
         "-h", "localhost",
         "-p", "8080",
         "-n", "2",
         "-l", "SPS H4 2025",
-        "-e", str(log_id),  # Edit mode
+        "-e", str(log_id),
     ]
 
-    # Add all -a key=value attributes
+    # Add attribute arguments
     for key, value in attributes.items():
-        elog_cmd.extend(["-a", f"{key}={value}"])
+        value_str = str(value)
+        elog_cmd.extend(["-a", f"{key}={value_str}"])
 
     tmp_msg_path = None
 
-    # Optional message update
+    # Optional message
     if message_text:
         with tempfile.NamedTemporaryFile(delete=False, suffix=".txt", mode="w") as tmp:
             tmp.write(message_text)
             tmp_msg_path = tmp.name
         elog_cmd.extend(["-m", tmp_msg_path])
 
-    print("Running:", " ".join(elog_cmd))
+    # Pretty-print command for debugging
+    printable_cmd = []
+    for arg in elog_cmd:
+        if " " in arg:
+            printable_cmd.append(f'"{arg}"')
+        else:
+            printable_cmd.append(arg)
 
+    print("Running:", " ".join(printable_cmd))
+
+    # Run actual command (NO quoting here!)
     try:
-        result = subprocess.run(elog_cmd, check=True, capture_output=True, text=True)
+        result = subprocess.run(
+            elog_cmd,
+            check=True,
+            capture_output=True,
+            text=True
+        )
         print("ELOG updated successfully.")
         print(result.stdout)
     except subprocess.CalledProcessError as e:
