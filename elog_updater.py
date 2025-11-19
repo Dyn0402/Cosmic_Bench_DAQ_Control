@@ -356,7 +356,7 @@ def submit_elog_update(log_id, attributes, message_text=None):
     # Add attribute arguments
     for key, value in attributes.items():
         value_str = str(value)
-        elog_cmd.extend(["-a", f"{key}={value_str}"])
+        elog_cmd.extend(["-a", f'"{key}={value_str}"'])
 
     tmp_msg_path = None
 
@@ -368,9 +368,9 @@ def submit_elog_update(log_id, attributes, message_text=None):
         elog_cmd.extend(["-m", tmp_msg_path])
 
     # Pretty-print command for debugging
-    printable_cmd = []
-    for arg in elog_cmd:
-        printable_cmd.append(f'"{arg}"')
+    # printable_cmd = []
+    # for arg in elog_cmd:
+    #     printable_cmd.append(f'"{arg}"')
         # if " " in arg:
         #     printable_cmd.append(f'"{arg}"')
         # else:
