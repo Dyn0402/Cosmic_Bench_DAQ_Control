@@ -276,24 +276,29 @@ def _parse_ids_from_elog_search_output(output_text):
 
 def _parse_id_from_elog_download(text):
     """
-    Try to parse a numeric id from the textual output of `elog -w last`.
-    Tries a few heuristics.
+    Parse elog entry ID from the output of `elog -w <id>` or `elog -w last`
+    for elog installations that print the ID using the format:
+        $@MID@$: 231
     """
     if not text:
         return None
-    # look for header "Message 12345" or "Entry 12345" or a leading "12345:"
-    m = re.search(r'^(?:Message|Entry)\s+(\d+)', text, re.IGNORECASE | re.MULTILINE)
-    if m:
-        return m.group(1)
-    m = re.search(r'^(\d+)\s*:', text, re.MULTILINE)
-    if m:
-        return m.group(1)
-    # sometimes there's a line like "ID: 12345"
-    m = re.search(r'\bID\s*[:=]\s*(\d+)\b', text)
-    if m:
-        return m.group(1)
-    return None
 
+    # Preferred pattern: $@MID@$: <number>
+    m = re.search(r'\$@MID@\$\s*:\s*(\d+)', text)
+    if m:
+        return m.group(1)
+
+    # Fallback pattern: a line beginning with digits + colon (rare on your system)
+    m = re.search(r'^(\d+)\s*:', text, flags=re.MULTILINE)
+    if m:
+        return m.group(1)
+
+    # Fallback: "ID: 123"
+    m = re.search(r'\bID\s*:\s*(\d+)\b', text)
+    if m:
+        return m.group(1)
+
+    return None
 
 
 def get_total_dream_events_for_run(run_number,
