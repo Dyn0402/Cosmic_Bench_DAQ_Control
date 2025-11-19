@@ -477,10 +477,11 @@ def submit_elog_update(log_id, attributes, message_text=None):
     # Pretty-print command for debugging
     printable_cmd = []
     for arg in elog_cmd:
-        if " " in arg:
-            printable_cmd.append(f'"{arg}"')
-        else:
-            printable_cmd.append(arg)
+        printable_cmd.append(f'"{arg}"')
+        # if " " in arg:
+        #     printable_cmd.append(f'"{arg}"')
+        # else:
+        #     printable_cmd.append(arg)
 
     print("Running:", " ".join(printable_cmd))
 
