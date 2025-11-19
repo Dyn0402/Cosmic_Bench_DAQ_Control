@@ -16,29 +16,33 @@ import pandas as pd
 
 def main():
     base_dir = '/mnt/data/beam_sps_25/Analysis/'
-    run_name = 'run_77'
+    run_name = 'run_160'
     detector_names = [
         'urw_inter', 'rd5_plein_saral_2', 'rd5_plein_vfp_1',
         'rd5_grid_saral_1', 'rd5_strip_saral_1', 'rd5_strip_esl_1',
     ]
+    sub_run_name = 'rotation_-45_resist_scan_'
+    sub_run_zero = 'rotation_-45_drift_resist_scan_'
     sub_runs = {
-        'rotation_-60_drift_resist_scan_-95': -95,
-        'rotation_-60_drift_resist_scan_-90': -90,
-        'rotation_-60_drift_resist_scan_-85': -85,
-        'rotation_-60_drift_resist_scan_-80': -80,
-        'rotation_-60_drift_resist_scan_-70': -70,
-        'rotation_-60_drift_resist_scan_-65': -65,
-        'rotation_-60_drift_resist_scan_-60': -60,
-        'rotation_-60_drift_resist_scan_-55': -55,
-        'rotation_-60_drift_resist_scan_-45': -45,
-        'rotation_-60_drift_resist_scan_-40': -40,
-        'rotation_-60_drift_resist_scan_-35': -35,
-        'rotation_-60_drift_resist_scan_-30': -30,
-        'rotation_-60_drift_resist_scan_-20': -20,
-        'rotation_-60_drift_resist_scan_-15': -15,
-        'rotation_-60_drift_resist_scan_-10': -10,
-        'rotation_-60_drift_resist_scan_-5': -5,
-        'rotation_-60_drift_resist_scan_0': 0,
+        f'{sub_run_name}-105': -105,
+        f'{sub_run_name}-100': -100,
+        f'{sub_run_name}-95': -95,
+        f'{sub_run_name}-90': -90,
+        f'{sub_run_name}-85': -85,
+        f'{sub_run_name}-80': -80,
+        f'{sub_run_name}-70': -70,
+        f'{sub_run_name}-65': -65,
+        f'{sub_run_name}-60': -60,
+        f'{sub_run_name}-55': -55,
+        f'{sub_run_name}-45': -45,
+        f'{sub_run_name}-40': -40,
+        f'{sub_run_name}-35': -35,
+        f'{sub_run_name}-30': -30,
+        f'{sub_run_name}-20': -20,
+        f'{sub_run_name}-15': -15,
+        f'{sub_run_name}-10': -10,
+        f'{sub_run_name}-5': -5,
+        f'{sub_run_zero}0': 0,
     }
 
     fig, ax = plt.subplots(figsize=(8, 6))
