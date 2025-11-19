@@ -406,7 +406,7 @@ def main():
     if len(sys.argv) >= 2:
         run_nums = [sys.argv[1]]
     if len(sys.argv) >= 3:
-        run_nums.append(sys.argv[2])
+        run_nums = list(range(int(sys.argv[1]), int(sys.argv[2]) + 1))
     else:
         print("Usage: python elog_update_from_config.py <run_num> [end_run_num]")
         sys.exit(1)
