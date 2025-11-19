@@ -143,17 +143,17 @@ class Config:
                 'run_time': 4,  # Minutes
                 'hvs': {
                     '2': {
-                        '0': 620 + hv_adjust,
-                        '1': 780 + hv_adjust,
-                        '2': 800 + hv_adjust,
-                        '3': 800 + hv_adjust,
+                        '0': 635 + hv_adjust,
+                        '1': 785 + hv_adjust,
+                        '2': 805 + hv_adjust,
+                        '3': 805 + hv_adjust,
                         '4': 461 + hv_adjust,
-                        '5': 660 + hv_adjust,
+                        '5': 680 + hv_adjust,
                         '6': 800 + hv_adjust,
                         '7': 800 + hv_adjust,
                         '8': 800 + hv_adjust,
-                        '9': 860 + hv_adjust,
-                        '10': 860 + hv_adjust,
+                        '9': 880 + hv_adjust,
+                        '10': 880 + hv_adjust,
                     },
                     '5': {
                         '0': 500,
@@ -170,11 +170,42 @@ class Config:
                         # '11': 500,
                     },
                     '12': {
-                        '0': 800 + hv_adjust
+                        '0': 890 + hv_adjust
                     }
                 }
             },
         ]
+
+        # template = self.sub_runs[0]
+        # # drift_diffs_eic = [-400, -375, -350, -325, -300, -275, -250, -225, -200, -175, -150, -125,
+        # #                    -100, -75, -50, -25]
+        #
+        # drift_diffs_eic = [-375, -300, -225, -150, -75, -25, -100, -175, -250, -325, -350, -275, -225, -200, -125,
+        #                    -50, -400]
+        # # drift_diffs_eic = [-50, -100, -150, -200, -250, -300, -350, -400, -450]
+        # # drift_diffs_p2 = [-20, -40, -60, -80, -100, -120, -140, -160, -180]
+        # # for drift_diff_eic, drift_diff_p2 in zip(drift_diffs_eic, drift_diffs_p2):
+        # for drift_diff_eic in drift_diffs_eic:
+        #     sub_run = copy.deepcopy(template)
+        #     # Get sub_run name and just strip off everything after last underscore
+        #     sub_run['sub_run_name'] = f'rotation_0_drift_scan_{drift_diff_eic}'
+        #
+        #     card = '5'
+        #     channels = ['0', '1', '4', '5']  # Drift channels
+        #     for channel in sub_run['hvs'][card]:
+        #         if channel in channels:
+        #             drift_diff = drift_diff_eic
+        #             if channels in ['0', '1']:
+        #                 drift_diff = int(drift_diff_eic * 45 / 25)
+        #             sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + drift_diff
+        #
+        #     # card = '5'
+        #     # channels = ['6', '8', '10']
+        #     # for channel in sub_run['hvs'][card]:
+        #     #     if channel in channels:
+        #     #         sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + drift_diff_p2
+        #
+        #     self.sub_runs.append(sub_run)
 
         # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
         # template = self.sub_runs[0]
@@ -205,38 +236,6 @@ class Config:
         # # Remove the first two sub_runs to keep only the modified ones
         # self.sub_runs = self.sub_runs[1:]
 
-
-        # template = self.sub_runs[0]
-        # # drift_diffs_eic = [-400, -375, -350, -325, -300, -275, -250, -225, -200, -175, -150, -125,
-        # #                    -100, -75, -50, -25]
-        #
-        # drift_diffs_eic = [-375, -300, -225, -150, -75, -25, -100, -175, -250, -325, -350, -275, -225, -200, -125,
-        #                    -50, -400]
-        # # drift_diffs_eic = [-50, -100, -150, -200, -250, -300, -350, -400, -450]
-        # # drift_diffs_p2 = [-20, -40, -60, -80, -100, -120, -140, -160, -180]
-        # # for drift_diff_eic, drift_diff_p2 in zip(drift_diffs_eic, drift_diffs_p2):
-        # for drift_diff_eic in drift_diffs_eic:
-        #     sub_run = copy.deepcopy(template)
-        #     # Get sub_run name and just strip off everything after last underscore
-        #     sub_run['sub_run_name'] = f'rotation_-45_drift_scan_{drift_diff_eic}'
-        #
-        #     card = '5'
-        #     channels = ['0', '1', '4', '5']  # Drift channels
-        #     for channel in sub_run['hvs'][card]:
-        #         if channel in channels:
-        #             if channels in ['0', '1']:
-        #                 drift_diff = int(drift_diff_eic * 45 / 25)
-        #             else:
-        #                 drift_diff = drift_diff_eic
-        #             sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + drift_diff
-        #
-        #     # card = '5'
-        #     # channels = ['6', '8', '10']
-        #     # for channel in sub_run['hvs'][card]:
-        #     #     if channel in channels:
-        #     #         sub_run['hvs'][card][channel] = sub_run['hvs'][card][channel] + drift_diff_p2
-        #
-        #     self.sub_runs.append(sub_run)
 
         # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
         # template = self.sub_runs[0]
