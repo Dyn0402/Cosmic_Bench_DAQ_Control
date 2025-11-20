@@ -385,34 +385,22 @@ def build_attribute_updates(run_config):
 # -------------------------------------------------------
 # Send ELOG update
 # -------------------------------------------------------
-def submit_elog_update(log_id, attributes, message_text=None):
-    # Base command
+
+def submit_elog_update(log_id, attributes):
     elog_cmd = [
         "elog",
         "-h", "localhost",
         "-p", "8080",
         "-n", "2",
-        "-l", '"SPS H4 2025"',
+        "-l", "SPS H4 2025",
         "-e", str(log_id),
     ]
 
-    # Add attribute arguments
     for key, value in attributes.items():
-        value_str = str(value)
-        elog_cmd.extend(["-a", f'"{key}={value_str}"'])
-
-    tmp_msg_path = None
-
-    # Optional message
-    # if message_text:
-    #     with tempfile.NamedTemporaryFile(delete=False, suffix=".txt", mode="w") as tmp:
-    #         tmp.write(message_text)
-    #         tmp_msg_path = tmp.name
-    #     elog_cmd.extend(["-m", tmp_msg_path])
+        elog_cmd.extend(["-a", f"{key}={value}"])
 
     print("Running:", " ".join(elog_cmd))
 
-    # Run actual command (NO quoting here!)
     try:
         result = subprocess.run(
             elog_cmd,
@@ -426,9 +414,38 @@ def submit_elog_update(log_id, attributes, message_text=None):
         print("Error updating ELOG entry!")
         print("Stdout:", e.stdout)
         print("Stderr:", e.stderr)
-    # finally:
-        # if tmp_msg_path and os.path.exists(tmp_msg_path):
-        #     os.remove(tmp_msg_path)
+# def submit_elog_update(log_id, attributes):
+#     # Base command
+#     elog_cmd = [
+#         "elog",
+#         "-h", "localhost",
+#         "-p", "8080",
+#         "-n", "2",
+#         "-l", '"SPS H4 2025"',
+#         "-e", str(log_id),
+#     ]
+#
+#     # Add attribute arguments
+#     for key, value in attributes.items():
+#         value_str = str(value)
+#         elog_cmd.extend(["-a", f'"{key}={value_str}"'])
+#
+#     print("Running:", " ".join(elog_cmd))
+#
+#     # Run actual command (NO quoting here!)
+#     try:
+#         result = subprocess.run(
+#             elog_cmd,
+#             check=True,
+#             capture_output=True,
+#             text=True
+#         )
+#         print("ELOG updated successfully.")
+#         print(result.stdout)
+#     except subprocess.CalledProcessError as e:
+#         print("Error updating ELOG entry!")
+#         print("Stdout:", e.stdout)
+#         print("Stderr:", e.stderr)
 
 
 # -------------------------------------------------------
