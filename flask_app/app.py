@@ -24,6 +24,7 @@ from daq_status import *
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # Add parent dir to path
 from run_config_beam import Config
+from get_run_events import get_total_events_for_run
 
 BASE_DIR = "/local/home/banco/dylan/Cosmic_Bench_DAQ_Control"
 CONFIG_TEMPLATE_DIR = f"{BASE_DIR}/config/json_templates"
@@ -31,6 +32,7 @@ CONFIG_RUN_DIR = f"{BASE_DIR}/config/json_run_configs"
 CONFIG_PY_PATH = f"{BASE_DIR}/run_config_beam.py"
 BASH_DIR = f"{BASE_DIR}/bash_scripts"
 ANALYSIS_DIR = "/mnt/data/beam_sps_25/Analysis"
+RUN_DIR = "/mnt/data/beam_sps_25/Run"
 HV_TAIL = 1000  # number of most recent rows to show
 
 
@@ -493,6 +495,12 @@ def get_config_py():
         run_name = config_data.get("run_name", "Unknown")
         banco_position = config_data.get("banco_position", "Unknown")
 
+        # If banco_possition is a number, multiply by 10 to convert back to motor units
+        try:
+            banco_position = float(banco_position) * 10
+        except ValueError:
+            pass
+
         return jsonify({
             "success": True,
             "run_name": run_name,
@@ -500,6 +508,33 @@ def get_config_py():
         })
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
+
+
+@app.route("/get_run_events", methods=['GET'])
+def get_run_events():
+    try:
+        result = subprocess.run(
+            ["python", f"{BASE_DIR}/get_config_py.py"],
+            capture_output=True,
+            text=True
+        )
+        if result.returncode != 0:
+            return jsonify({"success": False, "message": f"Error: {result.stderr}"}), 500
+        output = result.stdout.strip()
+        config_data = json.loads(output)
+        run_name = config_data.get("run_name", "Unknown")
+        run_number = int(run_name.replace("run_", ""))
+        total_events, subrun_details = get_total_events_for_run(
+            run_dir=RUN_DIR,
+            run_number=run_number
+        )
+        return jsonify({
+            "success": True,
+            "total_events": total_events,
+            "subrun_details": subrun_details
+        })
+    except Exception as e:
+        return jsonify({"success": False, "message": f"Error getting run name: {str(e)}"}), 500
 
 
 def is_dream_daq_running():

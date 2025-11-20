@@ -13,6 +13,9 @@
     <h6 class="text-white mb-0" style="font-size:1.1rem; font-weight:600;">
       Banco position:&nbsp;<span id="banco-display" style="color:#fff; font-weight:700;">--</span>
     </h6>
+    <h6 class="text-white mb-0" style="font-size:1.1rem; font-weight:600;">
+      Events this Run:&nbsp;<span id="events-display" style="color:#fff; font-weight:700;">0</span>
+    </h6>
   </div>
 
   <!-- Banco control -->
@@ -1000,6 +1003,20 @@ setInterval(updateRunAndBancoDisplay, 5000);
 
 // Also load immediately on page load
 updateRunAndBancoDisplay();
+
+
+async function updateRunEventsDisplay() {
+    try {
+        const res = await fetch("/get_run_events", { method: "GET" });
+        const data = await res.json();
+
+        if (!data.success) return;
+
+        document.getElementById("events-display").textContent = data.total_events;
+    } catch (err) {
+        console.error("Error updating run events display:", err);
+    }
+}
 
 // --- PNG Viewer JS ---
 async function fetchDirs(subdir = "") {
