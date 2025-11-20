@@ -148,12 +148,12 @@ class Config:
                         '2': 810 + hv_adjust,
                         '3': 810 + hv_adjust,
                         '4': 461 + hv_adjust,
-                        '5': 740 + hv_adjust,
+                        '5': 790 + hv_adjust,
                         '6': 880 + hv_adjust,
                         '7': 830 + hv_adjust,
                         '8': 830 + hv_adjust,
-                        '9': 880 + hv_adjust,
-                        '10': 880 + hv_adjust,
+                        '9': 940 + hv_adjust,
+                        '10': 940 + hv_adjust,
                     },
                     '5': {
                         '0': 500,
@@ -170,7 +170,7 @@ class Config:
                         # '11': 500,
                     },
                     '12': {
-                        '0': 910 + hv_adjust
+                        '0': 1050 + hv_adjust
                     }
                 }
             },
@@ -276,7 +276,7 @@ class Config:
 
         # Append copies of sub_runs with same voltages but different run names
         template = self.sub_runs[0]
-        for i in range(1, 8):
+        for i in range(1, 12):
             sub_run = copy.deepcopy(template)
             # Get sub_run name and just strip off everything after last underscore
             sub_run_name_base = sub_run['sub_run_name'].rsplit('_', 1)[0]
