@@ -331,7 +331,7 @@ def build_attribute_updates(run_config):
         'StartTime': run_config.get('start_time', ''),
         'Sampling': run_config['dream_daq_info'].get('sampling_period', '60'),
         'Angle': infer_rotation_angle(run_config) or 0,
-        'Ntrigger': get_total_dream_events_for_run(run_config['run_out_dir'], run_id),
+        'Ntrigger': get_total_dream_events_for_run(run_id, base_run_dir=run_config['run_out_dir']),
     }
 
     return updates
@@ -410,16 +410,7 @@ def submit_elog_update(log_id, attributes, message_text=None):
             tmp_msg_path = tmp.name
         elog_cmd.extend(["-m", tmp_msg_path])
 
-    # Pretty-print command for debugging
-    printable_cmd = []
-    for arg in elog_cmd:
-        printable_cmd.append(f'"{arg}"')
-        if " " in arg:
-            printable_cmd.append(f'"{arg}"')
-        else:
-            printable_cmd.append(arg)
-
-    print("Running:", " ".join(printable_cmd))
+    print("Running:", " ".join(elog_cmd))
 
     # Run actual command (NO quoting here!)
     try:
