@@ -27,6 +27,8 @@ import numpy as np
 import pandas as pd
 from statistics import mode
 
+from get_run_events import get_total_events_for_run
+
 
 # -------------------------------------------------------
 # Utility to load config
@@ -320,23 +322,64 @@ def build_attribute_updates(run_config):
     Edit/fill this dict with the attributes you want to update.
     Keys must match ELOG attribute names.
     """
-    run_id = int(run_config['run_name'].split('_')[1])
+    run_id = run_config['run_name'].split('_')[1]
 
     updates = {
-        # EXAMPLES (delete or modify these)
         'Gas': run_config['gas'],
         'HBanco': run_config['bench_geometry']['banco_moveable_y_position'],
         'BeamInfo': run_config.get('beam_type', 'muons'),
         'StartTime': run_config.get('start_time', ''),
         'Sampling': run_config['dream_daq_info'].get('sampling_period', '60'),
         'Angle': infer_rotation_angle(run_config) or 0,
+        'Ntrigger': get_total_dream_events_for_run(run_config['run_out_dir'], run_id),
     }
 
     return updates
 
 
-def get_n_triggers(run_config):
-    pass
+# def get_total_events_for_run(run_dir, run_number, csv_name="daq_status_log.csv", event_col="dream_events"):
+#     """
+#     Given the base run directory (e.g. '/mnt/data/beam_sps_25/Run/')
+#     and the run number (e.g. 160),
+#     return the total number of Dream events across all subruns.
+#     """
+#
+#     # Format like "run_160"
+#     run_name = f"run_{run_number}"
+#     run_path = os.path.join(run_dir, run_name)
+#
+#     if not os.path.exists(run_path):
+#         raise FileNotFoundError(f"Run directory does not exist: {run_path}")
+#
+#     total_events = 0
+#     subrun_event_counts = {}  # optional: return per-subrun details if needed
+#
+#     # Loop over subruns
+#     for subrun in os.listdir(run_path):
+#         subrun_path = os.path.join(run_path, subrun)
+#
+#         if not os.path.isdir(subrun_path):
+#             continue
+#
+#         csv_path = os.path.join(subrun_path, csv_name)
+#         if not os.path.exists(csv_path):
+#             continue
+#
+#         try:
+#             df = pd.read_csv(csv_path)
+#
+#             if event_col not in df.columns:
+#                 continue
+#
+#             max_events = df[event_col].max()
+#             if pd.notna(max_events):
+#                 total_events += int(max_events)
+#                 subrun_event_counts[subrun] = int(max_events)
+#
+#         except Exception as e:
+#             print(f"Warning: failed reading {csv_path}: {e}")
+#
+#     return total_events, subrun_event_counts
 
 
 # -------------------------------------------------------
@@ -368,13 +411,13 @@ def submit_elog_update(log_id, attributes, message_text=None):
         elog_cmd.extend(["-m", tmp_msg_path])
 
     # Pretty-print command for debugging
-    # printable_cmd = []
-    # for arg in elog_cmd:
-    #     printable_cmd.append(f'"{arg}"')
-        # if " " in arg:
-        #     printable_cmd.append(f'"{arg}"')
-        # else:
-        #     printable_cmd.append(arg)
+    printable_cmd = []
+    for arg in elog_cmd:
+        printable_cmd.append(f'"{arg}"')
+        if " " in arg:
+            printable_cmd.append(f'"{arg}"')
+        else:
+            printable_cmd.append(arg)
 
     print("Running:", " ".join(printable_cmd))
 
