@@ -196,76 +196,76 @@ def _parse_id_from_elog_download(text):
     return None
 
 
-def get_total_dream_events_for_run(run_number,
-                                   base_run_dir="/mnt/data/beam_sps_25/Run/",
-                                   csv_name="daq_status_log.csv",
-                                   event_col_name="dream_events"):
-    """
-    Computes the total number of dream events for an entire run by summing
-    the max event count from each sub-run directory.
-
-    Parameters
-    ----------
-    run_number : int or str
-        The integer run number (e.g. 253) or string without the "run_" prefix.
-    base_run_dir : str
-        Base directory containing run_<N> directories.
-    csv_name : str
-        Name of the DAQ CSV file in each sub-run directory.
-    event_col_name : str
-        Column name containing the event counter.
-
-    Returns
-    -------
-    int
-        Total number of dream events from all sub-runs.
-        Returns 0 if no valid sub-runs are found.
-    """
-
-    # --- Normalize run path ---
-    run_number = str(run_number)
-    run_dir = os.path.join(base_run_dir, f"run_{run_number}")
-
-    if not os.path.isdir(run_dir):
-        print(f"[WARN] Run directory not found: {run_dir}")
-        return 0
-
-    sub_run_times = []
-    sub_run_events = []
-
-    # --- Loop over sub-run directories ---
-    for sub_run in os.listdir(run_dir):
-        sub_path = os.path.join(run_dir, sub_run)
-        if not os.path.isdir(sub_path):
-            continue
-
-        csv_path = os.path.join(sub_path, csv_name)
-        if not os.path.isfile(csv_path):
-            continue
-
-        try:
-            df = pd.read_csv(csv_path)
-        except Exception:
-            continue
-
-        if event_col_name not in df.columns:
-            continue
-
-        max_events = df[event_col_name].max()
-
-        # Track event + time so we can sort like original code
-        sub_run_events.append(max_events)
-        sub_run_times.append(os.path.getmtime(csv_path))
-
-    if not sub_run_events:
-        return 0
-
-    # Sort in the same order as your script (by mtime)
-    sorted_idx = np.argsort(sub_run_times)
-    sorted_events = [sub_run_events[i] for i in sorted_idx]
-
-    # --- Total ---
-    return int(sum(sorted_events))
+# def get_total_dream_events_for_run(run_number,
+#                                    base_run_dir="/mnt/data/beam_sps_25/Run/",
+#                                    csv_name="daq_status_log.csv",
+#                                    event_col_name="dream_events"):
+#     """
+#     Computes the total number of dream events for an entire run by summing
+#     the max event count from each sub-run directory.
+# 
+#     Parameters
+#     ----------
+#     run_number : int or str
+#         The integer run number (e.g. 253) or string without the "run_" prefix.
+#     base_run_dir : str
+#         Base directory containing run_<N> directories.
+#     csv_name : str
+#         Name of the DAQ CSV file in each sub-run directory.
+#     event_col_name : str
+#         Column name containing the event counter.
+# 
+#     Returns
+#     -------
+#     int
+#         Total number of dream events from all sub-runs.
+#         Returns 0 if no valid sub-runs are found.
+#     """
+# 
+#     # --- Normalize run path ---
+#     run_number = str(run_number)
+#     run_dir = os.path.join(base_run_dir, f"run_{run_number}")
+# 
+#     if not os.path.isdir(run_dir):
+#         print(f"[WARN] Run directory not found: {run_dir}")
+#         return 0
+# 
+#     sub_run_times = []
+#     sub_run_events = []
+# 
+#     # --- Loop over sub-run directories ---
+#     for sub_run in os.listdir(run_dir):
+#         sub_path = os.path.join(run_dir, sub_run)
+#         if not os.path.isdir(sub_path):
+#             continue
+# 
+#         csv_path = os.path.join(sub_path, csv_name)
+#         if not os.path.isfile(csv_path):
+#             continue
+# 
+#         try:
+#             df = pd.read_csv(csv_path)
+#         except Exception:
+#             continue
+# 
+#         if event_col_name not in df.columns:
+#             continue
+# 
+#         max_events = df[event_col_name].max()
+# 
+#         # Track event + time so we can sort like original code
+#         sub_run_events.append(max_events)
+#         sub_run_times.append(os.path.getmtime(csv_path))
+# 
+#     if not sub_run_events:
+#         return 0
+# 
+#     # Sort in the same order as your script (by mtime)
+#     sorted_idx = np.argsort(sub_run_times)
+#     sorted_events = [sub_run_events[i] for i in sorted_idx]
+# 
+#     # --- Total ---
+#     return int(sum(sorted_events))
 
 
 def infer_rotation_angle(run_config):
@@ -331,7 +331,7 @@ def build_attribute_updates(run_config):
         'StartTime': run_config.get('start_time', ''),
         'Sampling': run_config['dream_daq_info'].get('sampling_period', '60'),
         'Angle': infer_rotation_angle(run_config) or 0,
-        'Ntrigger': get_total_dream_events_for_run(run_id, base_run_dir=run_config['run_out_dir']),
+        'Ntrigger': get_total_events_for_run(run_config['run_out_dir'], int(run_id)),
     }
 
     return updates
