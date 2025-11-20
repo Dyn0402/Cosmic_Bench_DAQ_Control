@@ -392,7 +392,7 @@ def submit_elog_update(log_id, attributes, message_text=None):
         "-h", "localhost",
         "-p", "8080",
         "-n", "2",
-        "-l", "SPS H4 2025",
+        "-l", '"SPS H4 2025"',
         "-e", str(log_id),
     ]
 
