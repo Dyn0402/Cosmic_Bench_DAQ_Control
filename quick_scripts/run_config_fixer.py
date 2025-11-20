@@ -37,9 +37,34 @@ def main():
 
         # fix_angles(config, run_config_path)
         # fix_strip_esl_angles(config, run_config_path)
-        fix_banco_heights(config, run_config_path)
+        # fix_banco_heights(config, run_config_path)
+        fix_strip_esl_positions(config, run_config_path)
 
     print('donzo')
+
+
+def fix_strip_esl_positions(config, run_config_path):
+    """
+    Fix the positions of the strip esl detectors in the config.
+    :param config:
+    :param run_config_path:
+    :return:
+    """
+    for detector in config.detectors:
+        if detector['name'] != 'rd5_strip_esl_1':
+            continue
+        if 'det_center_coords' in detector:
+            print(f'Original det_center_coords for {detector["name"]}: {detector["det_center_coords"]}')
+            detector['det_center_coords']['z'] = 300
+            print(f'Updated det_center_coords for {detector["name"]}: {detector["det_center_coords"]}')
+
+    # Ask if user wants to update the config
+    response = input('\nDo you want to update the run_config.json with these changes? (y/n): ')
+    if response.lower() == 'y':
+        config.write_to_file(run_config_path)
+        print(f'Updated run_config.json saved to {run_config_path}')
+    else:
+        print('No changes made to run_config.json')
 
 
 def fix_banco_heights(config, run_config_path):
