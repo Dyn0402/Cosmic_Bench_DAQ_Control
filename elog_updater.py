@@ -404,11 +404,11 @@ def submit_elog_update(log_id, attributes, message_text=None):
     tmp_msg_path = None
 
     # Optional message
-    if message_text:
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".txt", mode="w") as tmp:
-            tmp.write(message_text)
-            tmp_msg_path = tmp.name
-        elog_cmd.extend(["-m", tmp_msg_path])
+    # if message_text:
+    #     with tempfile.NamedTemporaryFile(delete=False, suffix=".txt", mode="w") as tmp:
+    #         tmp.write(message_text)
+    #         tmp_msg_path = tmp.name
+    #     elog_cmd.extend(["-m", tmp_msg_path])
 
     print("Running:", " ".join(elog_cmd))
 
@@ -426,9 +426,9 @@ def submit_elog_update(log_id, attributes, message_text=None):
         print("Error updating ELOG entry!")
         print("Stdout:", e.stdout)
         print("Stderr:", e.stderr)
-    finally:
-        if tmp_msg_path and os.path.exists(tmp_msg_path):
-            os.remove(tmp_msg_path)
+    # finally:
+        # if tmp_msg_path and os.path.exists(tmp_msg_path):
+        #     os.remove(tmp_msg_path)
 
 
 # -------------------------------------------------------
