@@ -34,7 +34,7 @@ class Config:
         self.generate_external_triggers = False  # If true, use raspberry pi to generate external triggers for DAQ
         self.watch_for_desync = True  # If true, run desync watcher during run
         self.gas = 'Ar/CF4/CO2 40/45/15'  # Gas type for run
-        self.beam_type = 'muons'
+        self.beam_type = 'pions'
 
         self.weiner_ps_info = {  # If this exists, check for Weiner LV before applying any HV
             'ip': '192.168.10.222',
@@ -134,7 +134,7 @@ class Config:
             'min_duration': 12,  # Seconds minimum duration of desync to flag desync
         }
 
-        hv_adjust = 0
+        hv_adjust = -30
         self.sub_runs = [
             {
                 'sub_run_name': f'rotation_0_banco_scan_0',
@@ -147,7 +147,7 @@ class Config:
                         '1': 785 + hv_adjust,
                         '2': 810 + hv_adjust,
                         '3': 810 + hv_adjust,
-                        '4': 461 + hv_adjust,
+                        '4': 485 + hv_adjust,
                         '5': 790 + hv_adjust,
                         '6': 880 + hv_adjust,
                         '7': 830 + hv_adjust,
@@ -160,8 +160,8 @@ class Config:
                         '1': 500,
                         # '2': 700,
                         # '3': 500,
-                        '4': 500,
-                        '5': 500,
+                        # '4': 500,
+                        # '5': 500,
                         # '6': 640,
                         # '7': 440,
                         # '8': 750,
@@ -169,9 +169,9 @@ class Config:
                         # '10': 750,
                         # '11': 500,
                     },
-                    '12': {
-                        '0': 1050 + hv_adjust
-                    }
+                    # '12': {
+                    #     '0': 1050 + hv_adjust
+                    # }
                 }
             },
         ]
@@ -291,7 +291,7 @@ class Config:
             'banco_arm_separation_z': 172 - 41,  # mm from bottom of lower banco arm to bottom of upper banco arm
             'banco_arm_right_y': 34 + 100,  # mm from center of banco to right edge of banco arm
             'banco_arm_length_y': 230,  # mm from left edge of banco arm to right edge of banco arm
-            'banco_moveable_y_position': 0.0,  # mm  Offset from moving table. Positive moves banco up.
+            'banco_moveable_y_position': 800.0,  # mm  Offset from moving table. Positive moves banco up.
         }
 
         # self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
@@ -569,8 +569,8 @@ class Config:
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
-                    'drift': (5, 5),
-                    'resist_1': (2, 4),
+                    'drift': (5, 0),
+                    # 'resist_1': (2, 4),
                     'resist_2': (2, 6)
                 },
                 'dream_feus': {
@@ -722,7 +722,7 @@ class Config:
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
-                    'z': 400,  # mm
+                    'z': 300,  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -730,7 +730,7 @@ class Config:
                     'z': -90,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
-                    'drift': (5, 4),
+                    'drift': (5, 0),
                     'resist_1': (2, 2),
                     'resist_2': (2, 3)
                 },
