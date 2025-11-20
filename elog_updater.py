@@ -331,7 +331,7 @@ def build_attribute_updates(run_config):
         'StartTime': run_config.get('start_time', ''),
         'Sampling': run_config['dream_daq_info'].get('sampling_period', '60'),
         'Angle': infer_rotation_angle(run_config) or 0,
-        'Ntrigger': get_total_events_for_run(run_config['run_out_dir'], int(run_id)),
+        'Ntrigger': get_total_events_for_run(run_config['data_out_dir'], int(run_id)),
     }
 
     return updates
