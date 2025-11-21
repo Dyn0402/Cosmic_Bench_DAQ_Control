@@ -61,10 +61,16 @@ def fix_drift_gaps(config, run_config_path):
                 print(f'Removing drift_gap from {detector["name"]}: {detector["drift_gap"]} mm')
                 del detector['drift_gap']
                 change_made = True
-        if detector['name'] == 'rd5_grid_saral_1':
-            print(f'Setting drift_gap for {detector["name"]} to 1 mm (was {detector.get("drift_gap", "not set")})')
-            detector['drift_gap'] = 1.0
-            change_made = True
+                if 'rd5_grid_saral_1' in config.included_detectors:
+                    for det in config.detectors:
+                        if det['name'] == 'rd5_grid_saral_1':
+                            print(f'Setting drift_gap for {detector["name"]} to 1 mm (was {det.get("drift_gap", "not set")})')
+                            det['drift_gap'] = 1.0
+                            change_made = True
+        # if detector['name'] == 'rd5_grid_saral_1':
+        #     print(f'Setting drift_gap for {detector["name"]} to 1 mm (was {detector.get("drift_gap", "not set")})')
+        #     detector['drift_gap'] = 1.0
+        #     change_made = True
     if not change_made:
         print('No changes made to drift gaps.')
         return
