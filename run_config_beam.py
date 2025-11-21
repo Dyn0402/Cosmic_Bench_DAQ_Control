@@ -134,10 +134,11 @@ class Config:
             'min_duration': 12,  # Seconds minimum duration of desync to flag desync
         }
 
-        hv_adjust = -30
+        hv_adjust = -50
         self.sub_runs = [
             {
-                'sub_run_name': f'rotation_0_banco_scan_0',
+                'sub_run_name': f'rotation_0_pions_0',
+                # 'sub_run_name': f'rotation_0_banco_scan_0',
                 # 'sub_run_name': f'rotation_0_drift_resist_scan_0',
                 # 'sub_run_name': f'rotation_0_resist_scan_0',
                 'run_time': 10,  # Minutes
