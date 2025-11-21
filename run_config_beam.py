@@ -134,7 +134,7 @@ class Config:
             'min_duration': 12,  # Seconds minimum duration of desync to flag desync
         }
 
-        hv_adjust = -30
+        hv_adjust = -20
         self.sub_runs = [
             {
                 'sub_run_name': f'rotation_0_pions_0',
@@ -149,7 +149,7 @@ class Config:
                         '2': 810 + hv_adjust,
                         '3': 810 + hv_adjust,
                         '4': 485 + hv_adjust,
-                        '5': 790 - 135 + hv_adjust,
+                        '5': 790 - 140 + hv_adjust,
                         '6': 880 + hv_adjust,
                         '7': 830 + hv_adjust,
                         '8': 830 + hv_adjust,
