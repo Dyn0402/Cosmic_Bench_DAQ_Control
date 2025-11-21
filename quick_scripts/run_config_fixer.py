@@ -35,12 +35,47 @@ def main():
         config = Config(run_config_path)
         print(config.included_detectors)
 
-        fix_angles(config, run_config_path)
+        # fix_angles(config, run_config_path)
         # fix_strip_esl_angles(config, run_config_path)
         # fix_banco_heights(config, run_config_path)
         # fix_strip_esl_positions(config, run_config_path)
+        fix_drift_gaps(config, run_config_path)
 
     print('donzo')
+
+
+def fix_drift_gaps(config, run_config_path):
+    """
+    Fix the drift gaps of the detectors in the config.
+    :param config:
+    :param run_config_path:
+    :return:
+    """
+
+    # For detector in detectors, if 'name' is 'rd5_plein_esl_1', remove 'drift_gap'.
+    # In this case, set 'rd5_grid_saral_1' drift gap to 1 mm.
+    change_made = False
+    for detector in config.detectors:
+        if detector['name'] == 'rd5_plein_esl_1':
+            if 'drift_gap' in detector:
+                print(f'Removing drift_gap from {detector["name"]}: {detector["drift_gap"]} mm')
+                del detector['drift_gap']
+                change_made = True
+        if detector['name'] == 'rd5_grid_saral_1':
+            print(f'Setting drift_gap for {detector["name"]} to 1 mm (was {detector.get("drift_gap", "not set")})')
+            detector['drift_gap'] = 1.0
+            change_made = True
+    if not change_made:
+        print('No changes made to drift gaps.')
+        return
+
+    # Ask if user wants to update the config
+    response = input('\nDo you want to update the run_config.json with these changes? (y/n): ')
+    if response.lower() == 'y':
+        config.write_to_file(run_config_path)
+        print(f'Updated run_config.json saved to {run_config_path}')
+    else:
+        print('No changes made to run_config.json')
 
 
 def fix_strip_esl_positions(config, run_config_path):
