@@ -145,11 +145,11 @@ class Config:
                 'hvs': {
                     '2': {
                         '0': 640 + hv_adjust,
-                        '1': 785 - 50 + hv_adjust,
+                        '1': 785 - 55 + hv_adjust,
                         '2': 810 + hv_adjust,
                         '3': 810 + hv_adjust,
                         '4': 485 + hv_adjust,
-                        '5': 790 - 130 + hv_adjust,
+                        '5': 790 - 135 + hv_adjust,
                         '6': 880 + hv_adjust,
                         '7': 830 + hv_adjust,
                         '8': 830 + hv_adjust,
@@ -292,7 +292,7 @@ class Config:
             'banco_arm_separation_z': 172 - 41,  # mm from bottom of lower banco arm to bottom of upper banco arm
             'banco_arm_right_y': 34 + 100,  # mm from center of banco to right edge of banco arm
             'banco_arm_length_y': 230,  # mm from left edge of banco arm to right edge of banco arm
-            'banco_moveable_y_position': 800.0,  # mm  Offset from moving table. Positive moves banco up.
+            'banco_moveable_y_position': 45.0,  # mm  Offset from moving table. Positive moves banco up.
         }
 
         # self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
