@@ -35,10 +35,10 @@ def main():
         config = Config(run_config_path)
         print(config.included_detectors)
 
-        # fix_angles(config, run_config_path)
+        fix_angles(config, run_config_path)
         # fix_strip_esl_angles(config, run_config_path)
         # fix_banco_heights(config, run_config_path)
-        fix_strip_esl_positions(config, run_config_path)
+        # fix_strip_esl_positions(config, run_config_path)
 
     print('donzo')
 
@@ -132,17 +132,21 @@ def fix_angles(config, run_config_path):
     # For subrun in subruns, in sub_run_name change _30_ to _-30_
     for sub_run in config.sub_runs:
         sub_run_name = sub_run['sub_run_name']
-        if '_30_' in sub_run_name:
-            new_sub_run_name = sub_run_name.replace('_30_', '_-30_')
+        # if '_30_' in sub_run_name:
+        if '_0_' in sub_run_name:
+            # new_sub_run_name = sub_run_name.replace('_30_', '_-30_')
+            new_sub_run_name = sub_run_name.replace('_0_', '_45_')
             print(f'Changing sub_run_name from {sub_run_name} to {new_sub_run_name}')
             sub_run['sub_run_name'] = new_sub_run_name
 
     # For detector in detectors, if 'det_orientation' 'y' is -300, change to -30
     for detector in config.detectors:
+        if not (detector['name'].startswith('rd5_') or detector['name'].startswith('urw_')):
+            continue
         if 'det_orientation' in detector:
-            if detector['det_orientation']['y'] == -300:
-                print(f'Changing det_orientation y from -300 to -30 for detector {detector["name"]}')
-                detector['det_orientation']['y'] = -30
+            detector['det_orientation']['y'] = 45
+            if detector['name'] == 'rd5_plein_saral_1':
+                detector['det_orientation']['y'] = -40  # This one couldn't be fully rotated
 
     # Print the updated sub_run_names and detector orientations
     print('Updated sub_run_names:')

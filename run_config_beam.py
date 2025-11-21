@@ -137,7 +137,7 @@ class Config:
         hv_adjust = 0
         self.sub_runs = [
             {
-                'sub_run_name': f'rotation_0_banco_scan_0',
+                'sub_run_name': f'rotation_45_banco_scan_0',
                 # 'sub_run_name': f'rotation_0_drift_resist_scan_0',
                 # 'sub_run_name': f'rotation_0_resist_scan_0',
                 'run_time': 10,  # Minutes
@@ -293,7 +293,7 @@ class Config:
             'banco_arm_separation_z': 172 - 41,  # mm from bottom of lower banco arm to bottom of upper banco arm
             'banco_arm_right_y': 34 + 100,  # mm from center of banco to right edge of banco arm
             'banco_arm_length_y': 230,  # mm from left edge of banco arm to right edge of banco arm
-            'banco_moveable_y_position': 30.0,  # mm  Offset from moving table. Positive moves banco up.
+            'banco_moveable_y_position': 80.0,  # mm  Offset from moving table. Positive moves banco up.
         }
 
         # self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
@@ -412,7 +412,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
+                    'y': 45,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -474,7 +474,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
+                    'y': 40,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -505,7 +505,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
+                    'y': 45,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -536,7 +536,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
+                    'y': 45,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -568,7 +568,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': -36,  # deg  Rotation about y axis
+                    'y': 45,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -600,7 +600,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
+                    'y': 45,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -631,7 +631,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
+                    'y': 45,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -663,7 +663,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
+                    'y': 45,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -696,7 +696,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
+                    'y': 45,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
@@ -761,7 +761,7 @@ class Config:
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
+                    'y': 45,  # deg  Rotation about y axis
                     'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
