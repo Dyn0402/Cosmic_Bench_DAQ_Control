@@ -145,11 +145,11 @@ class Config:
                 'hvs': {
                     '2': {
                         '0': 640 + hv_adjust,
-                        '1': 785 + hv_adjust,
+                        '1': 785 - 20 + hv_adjust,
                         '2': 810 + hv_adjust,
                         '3': 810 + hv_adjust,
                         '4': 485 + hv_adjust,
-                        '5': 790 - 90 + hv_adjust,
+                        '5': 790 - 100 + hv_adjust,
                         '6': 880 + hv_adjust,
                         '7': 830 + hv_adjust,
                         '8': 830 + hv_adjust,
