@@ -300,7 +300,8 @@ class Config:
         #                            'urw_inter', 'rd5_plein_saral_2', 'rd5_plein_vfp_1',
         #                            'rd5_grid_saral_1', 'rd5_strip_saral_1', 'rd5_strip_esl_1']
         self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
-                                   'urw_inter', 'rd5_plein_saral_2', 'rd5_strip_esl_1', 'rd5_grid_saral_1',
+                                   # 'urw_inter', 'rd5_plein_saral_2', 'rd5_strip_esl_1', 'rd5_grid_saral_1',
+                                   'urw_inter', 'rd5_plein_saral_2', 'rd5_grid_saral_1',
                                    'rd5_plein_saral_1', 'urw_strip', 'rd5_strip_saral_1', 'rd5_strip_vfp_1']
 
         self.detectors = [
