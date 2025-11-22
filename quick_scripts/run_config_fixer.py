@@ -56,7 +56,8 @@ def fix_strip_esl_connector_mapping(config, run_config_path):
     for detector in config.detectors:
         if detector['name'] != 'rd5_strip_esl_1':
             continue
-        print(f'Original connector mapping for {detector["name"]}: {detector["connector_mapping"]}')
+        print(f'Original connector mapping for {detector["name"]}: '
+              f'\n{detector["dream_feus"]}\n{detector["dream_feu_inversion"]}')
         detector['dream_feus'] = {
             'x_1': (2, 7),  # Runs along x direction, indicates y hit location
             'x_2': (2, 8),
@@ -70,7 +71,8 @@ def fix_strip_esl_connector_mapping(config, run_config_path):
             'y_1': True,
             'y_2': True,
         }
-        print(f'Updated connector mapping for {detector["name"]}: {detector["connector_mapping"]}')
+        print(f'Updated connector mapping for {detector["name"]}: '
+              f'\n{detector["dream_feus"]}\n{detector["dream_feu_inversion"]}\n{detector["dream_feu_flip"]}')
 
     # Ask if user wants to update the config
     response = input('\nDo you want to update the run_config.json with these changes? (y/n): ')
