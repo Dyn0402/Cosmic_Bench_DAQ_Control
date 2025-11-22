@@ -138,7 +138,7 @@ class Config:
         self.sub_runs = [
             {
                 # 'sub_run_name': f'rotation_45_banco_scan_0',
-                'sub_run_name': f'rotation_45_drift_resist_scan_0',
+                'sub_run_name': f'rotation_30_drift_resist_scan_0',
                 # 'sub_run_name': f'rotation_0_resist_scan_0',
                 'run_time': 4,  # Minutes
                 'hvs': {
@@ -221,7 +221,7 @@ class Config:
         for drift_diff_eic in drift_diffs_eic:
             sub_run = copy.deepcopy(template)
             # Get sub_run name and just strip off everything after last underscore
-            sub_run['sub_run_name'] = f'rotation_45_drift_scan_{drift_diff_eic}'
+            sub_run['sub_run_name'] = f'rotation_30_drift_scan_{drift_diff_eic}'
 
             card = '5'
             # channels = ['0', '1', '4', '5']  # Drift channels
@@ -251,7 +251,7 @@ class Config:
         # resist_diffs = [-5, -10, -15, -20, -25, -30, -35, -40, -45, -50, -60, -70, -80, -90, -100]
         for resist_diff in resist_diffs:
             sub_run = copy.deepcopy(template)
-            sub_run['sub_run_name'] = f'rotation_45_resist_scan_{resist_diff}'
+            sub_run['sub_run_name'] = f'rotation_30_resist_scan_{resist_diff}'
 
             card = '2'
             channels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']  # Resist channels
