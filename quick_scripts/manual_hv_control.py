@@ -8,14 +8,16 @@ Created as Cosmic_Bench_DAQ_Control/manual_hv_control
 @author: Dylan Neff, dn277127
 """
 
-import numpy as np
-import matplotlib.pyplot as plt
-
+import sys
 from caen_hv_py.CAENHVController import CAENHVController
 
 
 def main():
     power_off = False
+
+    if len(sys.argv) == 2 and sys.argv[1].lower() == 'power-off':
+        power_off = True
+
     hv_info = {
         'ip': '192.168.10.199',
         'username': 'admin',
