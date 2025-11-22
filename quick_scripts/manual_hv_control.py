@@ -10,13 +10,19 @@ Created as Cosmic_Bench_DAQ_Control/manual_hv_control
 
 import sys
 from caen_hv_py.CAENHVController import CAENHVController
+from time import sleep
 
 
 def main():
     power_off = False
 
-    if len(sys.argv) == 2 and sys.argv[1].lower() == 'power-off':
+    if len(sys.argv) >= 2 and sys.argv[1].lower() == 'power-off':
         power_off = True
+
+    if len(sys.argv) >= 3:
+        wait_time = float(sys.argv[2])  # hours
+        print(f'Waiting for {wait_time} hours before powering off HV...')
+        sleep(wait_time * 3600)
 
     hv_info = {
         'ip': '192.168.10.199',
