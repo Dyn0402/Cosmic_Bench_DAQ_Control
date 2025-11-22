@@ -18,7 +18,7 @@ class Config:
     def __init__(self):
         date_time_str = datetime.now().strftime('%m-%d-%y_%H-%M-%S')
         self.run_name = f'pedestals_{date_time_str}'
-        self.base_out_dir = '/mnt/data_2/beam_sps_25/'
+        self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}pedestals_noise/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
         self.raw_daq_inner_dir = 'raw_daq_data'

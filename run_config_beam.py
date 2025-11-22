@@ -16,7 +16,7 @@ import copy
 class Config:
     def __init__(self, config_path=None):
         self.run_name = 'run_138'
-        self.base_out_dir = '/mnt/data_2/beam_sps_25/'
+        self.base_out_dir = '/mnt/data/beam_sps_25/'
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
         self.raw_daq_inner_dir = 'raw_daq_data'
