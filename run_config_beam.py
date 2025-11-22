@@ -137,10 +137,10 @@ class Config:
         hv_adjust = 0
         self.sub_runs = [
             {
-                # 'sub_run_name': f'rotation_45_banco_scan_0',
-                'sub_run_name': f'rotation_45_drift_resist_scan_0',
+                'sub_run_name': f'rotation_45_banco_scan_0',
+                # 'sub_run_name': f'rotation_45_drift_resist_scan_0',
                 # 'sub_run_name': f'rotation_0_resist_scan_0',
-                'run_time': 4,  # Minutes
+                'run_time': 10,  # Minutes
                 'hvs': {
                     '2': {
                         '0': 640 + hv_adjust,
