@@ -39,9 +39,46 @@ def main():
         # fix_strip_esl_angles(config, run_config_path)
         # fix_banco_heights(config, run_config_path)
         # fix_strip_esl_positions(config, run_config_path)
-        fix_drift_gaps(config, run_config_path)
+        # fix_drift_gaps(config, run_config_path)
+        fix_strip_esl_connector_mapping(config, run_config_path)
 
     print('donzo')
+
+
+def fix_strip_esl_connector_mapping(config, run_config_path):
+    """
+    Connectors were swapped and flipped on installation after 1mm to 3mm drift gap swap.
+    Update the connector mapping in the config.
+    :param config:
+    :param run_config_path:
+    :return:
+    """
+    for detector in config.detectors:
+        if detector['name'] != 'rd5_strip_esl_1':
+            continue
+        print(f'Original connector mapping for {detector["name"]}: {detector["connector_mapping"]}')
+        detector['dream_feus'] = {
+            'x_1': (2, 7),  # Runs along x direction, indicates y hit location
+            'x_2': (2, 8),
+            'y_1': (2, 6),  # Runs along y direction, indicates x hit location
+            'y_2': (2, 5),
+        }
+        # Add dream_feu_flip as True for each dream_feu to indicate that connectors are all flipped
+        detector['dream_feu_flip'] = {
+            'x_1': True,
+            'x_2': True,
+            'y_1': True,
+            'y_2': True,
+        }
+        print(f'Updated connector mapping for {detector["name"]}: {detector["connector_mapping"]}')
+
+    # Ask if user wants to update the config
+    response = input('\nDo you want to update the run_config.json with these changes? (y/n): ')
+    if response.lower() == 'y':
+        config.write_to_file(run_config_path)
+        print(f'Updated run_config.json saved to {run_config_path}')
+    else:
+        print('No changes made to run_config.json')
 
 
 def fix_drift_gaps(config, run_config_path):
