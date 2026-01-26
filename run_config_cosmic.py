@@ -14,9 +14,7 @@ import copy
 
 class Config:
     def __init__(self):
-        # self.run_name = 'rd5_strip_2_co2_10-27-25'
-        self.run_name = 'rd5_strip_esl_1_co2_cosmics_10-27-25'
-        # self.run_name = 'rd5_plein_esl_1_co2_fe55_zs_10-27-25'
+        self.run_name = 'mx17_det1_1-26-26'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
         self.raw_daq_inner_dir = 'raw_daq_data'
@@ -32,13 +30,15 @@ class Config:
         self.start_time = None  # '2024-06-03 15:30:00'  # 'YYYY-MM-DD HH:MM:SS' or None to start immediately
         self.write_all_dectors_to_json = False  # Only when making run config json template.
         self.generate_external_triggers = False  # If true, use raspberry pi to generate external triggers for DAQ
-        self.gas = 'Ar/CO2/Iso 93/5/2'  # Gas type for run
+        self.gas = 'Ar/Iso 95/5'  # Gas type for run
+        # self.gas = 'Ar/CO2/Iso 93/5/2'  # Gas type for run
 
         self.dream_daq_info = {
             # 'ip': '192.168.10.100',
             'ip': '192.168.10.1',
             'port': 1101,
-            'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_TPOT.cfg',
+            'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_MX17.cfg',
+            # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_TPOT.cfg',
             # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_TPOT_P2.cfg',
             # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_SelfTrigger_thresh.cfg',
             # 'run_directory': f'/local/home/usernsw/dylan/Run/{self.run_name}/',
@@ -177,10 +177,48 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
-        self.included_detectors = ['rd5_strip_esl_1',
+        self.included_detectors = ['mx17_1',
                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
 
         self.detectors = [
+            {
+                'name': 'mx17_1',
+                'det_type': 'mx17',
+                'resist_type': 'strip_with_silver_paste',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
+                         1 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': {
+                    'drift': (0, 6),
+                    'resist': (3, 7),
+                },
+                'dream_feus': {
+                    'x_1': (3, 5),  # Runs along x direction, indicates y hit location
+                    'x_2': (3, 6),
+                    'x_3': (3, 6),
+                    'x_4': (3, 6),
+                    'x_5': (3, 6),
+                    'x_6': (3, 6),
+                    'x_7': (3, 6),
+                    'x_8': (3, 6),
+                    'y_1': (3, 7),  # Runs along y direction, indicates x hit location
+                    'y_2': (3, 8),
+                    'y_3': (3, 8),
+                    'y_4': (3, 8),
+                    'y_5': (3, 8),
+                    'y_6': (3, 8),
+                    'y_7': (3, 8),
+                    'y_8': (3, 8),
+                },
+            },
             {
                 'name': 'banco_ladder157',
                 'det_type': 'banco',
