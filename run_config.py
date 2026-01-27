@@ -25,7 +25,7 @@ class Config:
         self.m3_feu_num = 1
         self.power_off_hv_at_end = False  # True to power off HV at end of run
         self.filtering_by_m3 = False  # True to filter by m3 tracking, False to do no filtering
-        self.process_on_fly = False  # True to process data on fly, False to process after run
+        self.process_on_fly = True  # True to process data on fly, False to process after run
         self.save_fdfs = True  # True to save FDF files, False to delete after decoding
         self.start_time = None  # '2024-06-03 15:30:00'  # 'YYYY-MM-DD HH:MM:SS' or None to start immediately
         self.write_all_dectors_to_json = False  # Only when making run config json template.
