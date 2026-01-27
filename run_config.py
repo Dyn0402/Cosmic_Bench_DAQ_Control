@@ -49,7 +49,7 @@ class Config:
             'max_run_time_addition': 60 * 5,  # Seconds to add to requested run time before killing run
             'copy_on_fly': True,  # True to copy raw data to out dir during run, False to copy after run
             'batch_mode': True,  # Run Dream RunCtrl in batch mode. Not implemented for cosmic bench C
-            'zero_suppress': True,  # True to run in zero suppression mode, False to run in full readout mode
+            'zero_suppress': False,  # True to run in zero suppression mode, False to run in full readout mode
         }
 
         self.banco_info = {
