@@ -14,7 +14,7 @@ import copy
 
 class Config:
     def __init__(self):
-        self.run_name = 'mx17_det1_1-27-26'
+        self.run_name = 'mx17_det1_stats_run_1-27-26'
         self.data_out_dir = '/mnt/cosmic_data/Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
         self.raw_daq_inner_dir = 'raw_daq_data'
@@ -25,7 +25,7 @@ class Config:
         self.m3_feu_num = 1
         self.power_off_hv_at_end = False  # True to power off HV at end of run
         self.filtering_by_m3 = False  # True to filter by m3 tracking, False to do no filtering
-        self.process_on_fly = False  # True to process data on fly, False to process after run
+        self.process_on_fly = True  # True to process data on fly, False to process after run
         self.save_fdfs = True  # True to save FDF files, False to delete after decoding
         self.start_time = None  # '2024-06-03 15:30:00'  # 'YYYY-MM-DD HH:MM:SS' or None to start immediately
         self.write_all_dectors_to_json = False  # Only when making run config json template.
@@ -198,8 +198,8 @@ class Config:
             #     }
             # },
             {
-                'sub_run_name': 'resist_scan_480V',
-                'run_time': 10,  # Minutes
+                'sub_run_name': 'statistics_run',
+                'run_time': 60 * 24,  # Minutes
                 'hvs': {
                     0: {
                         7: 600,
@@ -209,7 +209,7 @@ class Config:
                         11: 500,
                     },
                     3: {
-                        0: 480,
+                        0: 465,
                         8: 450,
                         9: 450,
                         10: 450,
