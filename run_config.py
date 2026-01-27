@@ -16,7 +16,7 @@ class Config:
     def __init__(self):
         self.run_name = 'mx17_det1_overnight_run_1-27-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
-        self.data_out_dir = '/data/cosmic_data/Run/'
+        self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
         self.raw_daq_inner_dir = 'raw_daq_data'
         self.decoded_root_inner_dir = 'decoded_root'
