@@ -14,8 +14,9 @@ import copy
 
 class Config:
     def __init__(self):
-        self.run_name = 'mx17_det1_stats_run_1-27-26'
-        self.data_out_dir = '/mnt/cosmic_data/Run/'
+        self.run_name = 'mx17_det1_daytime_run_1-28-26'
+        # self.data_out_dir = '/mnt/cosmic_data/Run/'
+        self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
         self.raw_daq_inner_dir = 'raw_daq_data'
         self.decoded_root_inner_dir = 'decoded_root'
@@ -43,7 +44,8 @@ class Config:
             # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_SelfTrigger_thresh.cfg',
             # 'run_directory': f'/local/home/usernsw/dylan/Run/{self.run_name}/',
             'run_directory': f'/data/cosmic_data/Run/{self.run_name}/',
-            'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
+            # 'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
+            'data_out_dir': self.run_out_dir,
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
             'go_timeout': 7 * 60,  # Seconds to wait for 'Go' response from RunCtrl before assuming failure
             'max_run_time_addition': 60 * 5,  # Seconds to add to requested run time before killing run
@@ -57,14 +59,14 @@ class Config:
             'port': 1100,
             'daq_run_command': 'cd /home/banco/dylan/Run/framework/bin && ./test_multi_noiseocc_int',
             'data_temp_dir': '/home/banco/dylan/Run/data',
-            'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
+            'data_out_dir': self.run_out_dir,
             'data_inner_dir': 'banco_data'
         }
 
         self.dedip196_processor_info = {
             'ip': '192.168.10.1',
             'port': 1201,
-            'run_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
+            'run_dir': self.run_out_dir,
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
             'decoded_root_inner_dir': self.decoded_root_inner_dir,
             'm3_tracking_inner_dir': self.m3_tracking_inner_dir,
@@ -79,7 +81,7 @@ class Config:
         self.sedip28_processor_info = {
             'ip': '192.168.10.1',
             'port': 1200,
-            'run_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
+            'run_dir': self.run_out_dir,
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
             'm3_tracking_inner_dir': self.m3_tracking_inner_dir,
             'tracking_run_dir': '/local/home/usernsw/dylan/m3_tracking/',
@@ -197,8 +199,28 @@ class Config:
             #         }
             #     }
             # },
+            # {
+            #     'sub_run_name': 'flushing_run',
+            #     'run_time': 60 * 2,  # Minutes
+            #     'hvs': {
+            #         0: {
+            #             7: 600,
+            #             8: 500,
+            #             9: 500,
+            #             10: 500,
+            #             11: 500,
+            #         },
+            #         3: {
+            #             0: 465,
+            #             8: 450,
+            #             9: 450,
+            #             10: 450,
+            #             11: 450,
+            #         }
+            #     }
+            # },
             {
-                'sub_run_name': 'statistics_run',
+                'sub_run_name': 'overnight_run',
                 'run_time': 60 * 24,  # Minutes
                 'hvs': {
                     0: {
@@ -280,22 +302,22 @@ class Config:
                     'resist': (3, 0),
                 },
                 'dream_feus': {
-                    # 'x_1': (6, 5),  # Runs along x direction, indicates y hit location
-                    # 'x_2': (6, 6),
-                    # 'x_3': (6, 6),
-                    # 'x_4': (6, 6),
-                    'x_5': (6, 1),
-                    'x_6': (6, 2),
-                    'x_7': (6, 3),
-                    'x_8': (6, 4),
-                    'y_1': (6, 5),  # Runs along y direction, indicates x hit location
-                    'y_2': (6, 6),
-                    'y_3': (6, 7),
-                    'y_4': (6, 8),
-                    # 'y_5': (6, 8),
-                    # 'y_6': (6, 8),
-                    # 'y_7': (6, 8),
-                    # 'y_8': (6, 8),
+                    'x_1': (4, 1),  # Runs along x direction, indicates y hit location
+                    'x_2': (4, 2),
+                    'x_3': (4, 3),
+                    'x_4': (4, 4),
+                    'x_5': (4, 5),
+                    'x_6': (4, 6),
+                    'x_7': (4, 7),
+                    'x_8': (4, 8),
+                    'y_1': (6, 1),  # Runs along y direction, indicates x hit location
+                    'y_2': (6, 2),
+                    'y_3': (6, 3),
+                    'y_4': (6, 4),
+                    'y_5': (6, 5),
+                    'y_6': (6, 6),
+                    'y_7': (6, 7),
+                    'y_8': (6, 8),
                 },
             },
             {
