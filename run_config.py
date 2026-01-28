@@ -14,7 +14,7 @@ import copy
 
 class Config:
     def __init__(self):
-        self.run_name = 'mx17_det1_overnight_run_1-27-26'
+        self.run_name = 'mx17_det1_daytime_run_1-28-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -44,7 +44,8 @@ class Config:
             # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_SelfTrigger_thresh.cfg',
             # 'run_directory': f'/local/home/usernsw/dylan/Run/{self.run_name}/',
             'run_directory': f'/data/cosmic_data/Run/{self.run_name}/',
-            'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
+            # 'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
+            'data_out_dir': self.run_out_dir,
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
             'go_timeout': 7 * 60,  # Seconds to wait for 'Go' response from RunCtrl before assuming failure
             'max_run_time_addition': 60 * 5,  # Seconds to add to requested run time before killing run
@@ -58,14 +59,14 @@ class Config:
             'port': 1100,
             'daq_run_command': 'cd /home/banco/dylan/Run/framework/bin && ./test_multi_noiseocc_int',
             'data_temp_dir': '/home/banco/dylan/Run/data',
-            'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
+            'data_out_dir': self.run_out_dir,
             'data_inner_dir': 'banco_data'
         }
 
         self.dedip196_processor_info = {
             'ip': '192.168.10.1',
             'port': 1201,
-            'run_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
+            'run_dir': self.run_out_dir,
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
             'decoded_root_inner_dir': self.decoded_root_inner_dir,
             'm3_tracking_inner_dir': self.m3_tracking_inner_dir,
@@ -80,7 +81,7 @@ class Config:
         self.sedip28_processor_info = {
             'ip': '192.168.10.1',
             'port': 1200,
-            'run_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
+            'run_dir': self.run_out_dir,
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
             'm3_tracking_inner_dir': self.m3_tracking_inner_dir,
             'tracking_run_dir': '/local/home/usernsw/dylan/m3_tracking/',
