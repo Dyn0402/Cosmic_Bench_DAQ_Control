@@ -14,7 +14,7 @@ import copy
 
 class Config:
     def __init__(self):
-        self.run_name = 'mx17_det1_daytime_run_1-28-26'
+        self.run_name = 'mx17_det2_overnight_run_1-28-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -278,7 +278,7 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
-        self.included_detectors = ['mx17_1',
+        self.included_detectors = ['mx17_2',
                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
 
         self.detectors = [
@@ -286,6 +286,44 @@ class Config:
                 'name': 'mx17_1',
                 'det_type': 'mx17',
                 'resist_type': 'strip_with_silver_paste',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
+                         1 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': {
+                    'drift': (0, 7),
+                    'resist': (3, 0),
+                },
+                'dream_feus': {
+                    'x_1': (4, 1),  # Runs along x direction, indicates y hit location
+                    'x_2': (4, 2),
+                    'x_3': (4, 3),
+                    'x_4': (4, 4),
+                    'x_5': (4, 5),
+                    'x_6': (4, 6),
+                    'x_7': (4, 7),
+                    'x_8': (4, 8),
+                    'y_1': (6, 1),  # Runs along y direction, indicates x hit location
+                    'y_2': (6, 2),
+                    'y_3': (6, 3),
+                    'y_4': (6, 4),
+                    'y_5': (6, 5),
+                    'y_6': (6, 6),
+                    'y_7': (6, 7),
+                    'y_8': (6, 8),
+                },
+            },
+            {
+                'name': 'mx17_2',
+                'det_type': 'mx17',
+                'resist_type': 'strip_resit_with_plein_on_top',
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
