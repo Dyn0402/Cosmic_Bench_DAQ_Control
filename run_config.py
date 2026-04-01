@@ -14,7 +14,7 @@ import copy
 
 class Config:
     def __init__(self):
-        self.run_name = 'mx17_det2_overnight_run_1-28-26'
+        self.run_name = 'mx17_det0_He_HV_Scan_4-1-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -31,8 +31,9 @@ class Config:
         self.start_time = None  # '2024-06-03 15:30:00'  # 'YYYY-MM-DD HH:MM:SS' or None to start immediately
         self.write_all_dectors_to_json = False  # Only when making run config json template.
         self.generate_external_triggers = False  # If true, use raspberry pi to generate external triggers for DAQ
-        self.gas = 'Ar/Iso 95/5'  # Gas type for run
+        # self.gas = 'Ar/Iso 95/5'  # Gas type for run
         # self.gas = 'Ar/CO2/Iso 93/5/2'  # Gas type for run
+        self.gas = 'Helium/Ethane 96.5/3.5'  # Gas type for run
 
         self.dream_daq_info = {
             # 'ip': '192.168.10.100',
@@ -43,7 +44,7 @@ class Config:
             # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_TPOT_P2.cfg',
             # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_SelfTrigger_thresh.cfg',
             # 'run_directory': f'/local/home/usernsw/dylan/Run/{self.run_name}/',
-            'run_directory': f'/data/cosmic_data/Run/{self.run_name}/',
+            'run_directory': f'/data/cosmic_data/Run_MX/{self.run_name}/',
             # 'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
             'data_out_dir': self.run_out_dir,
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
@@ -219,26 +220,26 @@ class Config:
             #         }
             #     }
             # },
-            {
-                'sub_run_name': 'overnight_run',
-                'run_time': 60 * 24,  # Minutes
-                'hvs': {
-                    0: {
-                        7: 300,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500,
-                    },
-                    3: {
-                        0: 465,
-                        8: 450,
-                        9: 450,
-                        10: 450,
-                        11: 450,
-                    }
-                }
-            },
+        #     {
+        #         'sub_run_name': 'overnight_run',
+        #         'run_time': 60 * 24,  # Minutes
+        #         'hvs': {
+        #             0: {
+        #                 7: 300,
+        #                 8: 500,
+        #                 9: 500,
+        #                 10: 500,
+        #                 11: 500,
+        #             },
+        #             3: {
+        #                 0: 465,
+        #                 8: 450,
+        #                 9: 450,
+        #                 10: 450,
+        #                 11: 450,
+        #             }
+        #         }
+        #     },
         ]
 
         # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
@@ -262,9 +263,84 @@ class Config:
         #
         #     self.sub_runs.append(sub_run)
 
+        drift, resist = 800, 505
+        new_subrun = {
+            'sub_run_name': f'resist_{resist}V_drift_{drift}V',
+            'run_time': 2 * 60,  # Minutes
+            'hvs': {
+                0: {
+                    7: drift,
+                    8: 500,
+                    9: 500,
+                    10: 500,
+                    11: 500,
+                },
+                3: {
+                    0: resist,
+                    8: 460,
+                    9: 460,
+                    10: 495,
+                    11: 460,
+                },
+            }
+        }
+        self.sub_runs.append(new_subrun)
+
+        drifts = [800]
+        for drift in drifts:
+            resists = [525, 520, 515, 510, 500, 495, 490, 485, 480, 470, 460, 450, 440, 430, 420]
+            m3_3_rs = [490, 485, 485, 480, 480, 475, 475, 475, 470, 470, 470, 465, 465, 465, 465]
+            for resist, m3_3_r in zip(resists, m3_3_rs):
+                time = 60
+                new_subrun = {
+                    'sub_run_name': f'resist_{resist}V_drift_{drift}V',
+                    'run_time': time,  # Minutes
+                    'hvs': {
+                        0: {
+                            7: drift,
+                            8: 500,
+                            9: 500,
+                            10: 500,
+                            11: 500,
+                        },
+                        3: {
+                            0: resist,
+                            8: 460,
+                            9: 460,
+                            10: m3_3_r,
+                            11: 460,
+                        },
+                    }
+                }
+                self.sub_runs.append(new_subrun)
+
+        drift, resist = 800, 505
+        new_subrun = {
+            'sub_run_name': f'final_resist_{resist}V_drift_{drift}V',
+            'run_time': 24 * 60,  # Minutes
+            'hvs': {
+                0: {
+                    7: drift,
+                    8: 500,
+                    9: 500,
+                    10: 500,
+                    11: 500,
+                },
+                3: {
+                    0: resist,
+                    8: 460,
+                    9: 460,
+                    10: 460,
+                    11: 460,
+                },
+            }
+        }
+        self.sub_runs.append(new_subrun)
+
 
         self.bench_geometry = {
             'p1_z': 227,  # mm  To the top of P1 from the top of PB
+            'p2_z': 697,  # mm  To the top of P1 from the top of PB
             'bottom_level_z': 82,  # mm  From the top of P1 to the bottom level of stand
             'level_z_spacing': 97,  # mm  Spacing between levels on stand
             'board_thickness': 5,  # mm  Thickness of PCB for test boards  Guess!
@@ -278,7 +354,7 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
-        self.included_detectors = ['mx17_2',
+        self.included_detectors = ['mx17_1',
                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
 
         self.detectors = [
@@ -289,8 +365,7 @@ class Config:
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
-                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
-                         1 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
+                    'z': self.bench_geometry['p2_z'] + self.bench_geometry['board_thickness'],  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -302,22 +377,40 @@ class Config:
                     'resist': (3, 0),
                 },
                 'dream_feus': {
-                    'x_1': (4, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (4, 2),
-                    'x_3': (4, 3),
-                    'x_4': (4, 4),
-                    'x_5': (4, 5),
-                    'x_6': (4, 6),
-                    'x_7': (4, 7),
-                    'x_8': (4, 8),
-                    'y_1': (6, 1),  # Runs along y direction, indicates x hit location
-                    'y_2': (6, 2),
-                    'y_3': (6, 3),
-                    'y_4': (6, 4),
-                    'y_5': (6, 5),
-                    'y_6': (6, 6),
-                    'y_7': (6, 7),
-                    'y_8': (6, 8),
+                    'x_1': (3, 1),  # Runs along x direction, indicates y hit location
+                    'x_2': (3, 2),
+                    'x_3': (3, 3),
+                    'x_4': (3, 4),
+                    'x_5': (3, 5),
+                    'x_6': (3, 6),
+                    'x_7': (3, 7),
+                    'x_8': (3, 8),
+                    'y_1': (4, 1),  # Runs along y direction, indicates x hit location
+                    'y_2': (4, 2),
+                    'y_3': (4, 3),
+                    'y_4': (4, 4),
+                    'y_5': (4, 5),
+                    'y_6': (4, 6),
+                    'y_7': (4, 7),
+                    'y_8': (4, 8),
+                },
+                'dream_feu_orientation': {  # If connector is normal, inverted, rotated, or rotated_inverted
+                    'x_1': 'inverted',
+                    'x_2': 'inverted',
+                    'x_3': 'inverted',
+                    'x_4': 'inverted',
+                    'x_5': 'inverted',
+                    'x_6': 'inverted',
+                    'x_7': 'inverted',
+                    'x_8': 'inverted',
+                    'y_1': 'inverted',
+                    'y_2': 'inverted',
+                    'y_3': 'inverted',
+                    'y_4': 'inverted',
+                    'y_5': 'inverted',
+                    'y_6': 'inverted',
+                    'y_7': 'inverted',
+                    'y_8': 'inverted',
                 },
             },
             {
@@ -356,6 +449,24 @@ class Config:
                     'y_6': (6, 6),
                     'y_7': (6, 7),
                     'y_8': (6, 8),
+                },
+                'dream_feu_orientation': {  # If connector is normal, inverted, rotated, or rotated_inverted
+                    'x_1': 'inverted',
+                    'x_2': 'inverted',
+                    'x_3': 'inverted',
+                    'x_4': 'inverted',
+                    'x_5': 'inverted',
+                    'x_6': 'inverted',
+                    'x_7': 'inverted',
+                    'x_8': 'inverted',
+                    'y_1': 'inverted',
+                    'y_2': 'inverted',
+                    'y_3': 'inverted',
+                    'y_4': 'inverted',
+                    'y_5': 'inverted',
+                    'y_6': 'inverted',
+                    'y_7': 'inverted',
+                    'y_8': 'inverted',
                 },
             },
             {
