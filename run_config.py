@@ -14,7 +14,7 @@ import copy
 
 class Config:
     def __init__(self):
-        self.run_name = 'mx17_det0_He_HV_Scan_4-1-26'
+        self.run_name = 'mx17_det0_He_HV_Scan_4-2-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -266,7 +266,7 @@ class Config:
         drift, resist = 800, 505
         new_subrun = {
             'sub_run_name': f'resist_{resist}V_drift_{drift}V',
-            'run_time': 2 * 60,  # Minutes
+            'run_time': 3 * 60,  # Minutes
             'hvs': {
                 0: {
                     7: drift,
@@ -277,10 +277,10 @@ class Config:
                 },
                 3: {
                     0: resist,
-                    8: 460,
-                    9: 460,
-                    10: 495,
-                    11: 460,
+                    8: 455,
+                    9: 455,
+                    10: 455,
+                    11: 455,
                 },
             }
         }
@@ -289,9 +289,8 @@ class Config:
         drifts = [800]
         for drift in drifts:
             resists = [525, 520, 515, 510, 500, 495, 490, 485, 480, 470, 460, 450, 440, 430, 420]
-            m3_3_rs = [490, 485, 485, 480, 480, 475, 475, 475, 470, 470, 470, 465, 465, 465, 465]
-            for resist, m3_3_r in zip(resists, m3_3_rs):
-                time = 60
+            for resist in resists:
+                time = 75
                 new_subrun = {
                     'sub_run_name': f'resist_{resist}V_drift_{drift}V',
                     'run_time': time,  # Minutes
@@ -305,10 +304,10 @@ class Config:
                         },
                         3: {
                             0: resist,
-                            8: 460,
-                            9: 460,
-                            10: m3_3_r,
-                            11: 460,
+                            8: 455,
+                            9: 455,
+                            10: 455,
+                            11: 455,
                         },
                     }
                 }
@@ -328,10 +327,10 @@ class Config:
                 },
                 3: {
                     0: resist,
-                    8: 460,
-                    9: 460,
-                    10: 460,
-                    11: 460,
+                    8: 455,
+                    9: 455,
+                    10: 455,
+                    11: 455,
                 },
             }
         }
