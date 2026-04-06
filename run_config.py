@@ -14,7 +14,7 @@ import copy
 
 class Config:
     def __init__(self):
-        self.run_name = 'mx17_det0_He_HV_Scan_4-2-26'
+        self.run_name = 'mx17_det0_He_stats_4-6-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -24,7 +24,7 @@ class Config:
         self.m3_tracking_inner_dir = 'm3_tracking_root'
         self.detector_info_dir = f'/mnt/cosmic_data/config/detectors/'
         self.m3_feu_num = 1
-        self.power_off_hv_at_end = False  # True to power off HV at end of run
+        self.power_off_hv_at_end = True  # True to power off HV at end of run
         self.filtering_by_m3 = False  # True to filter by m3 tracking, False to do no filtering
         self.process_on_fly = False  # True to process data on fly, False to process after run
         self.save_fdfs = True  # True to save FDF files, False to delete after decoding
@@ -220,26 +220,26 @@ class Config:
             #         }
             #     }
             # },
-        #     {
-        #         'sub_run_name': 'overnight_run',
-        #         'run_time': 60 * 24,  # Minutes
-        #         'hvs': {
-        #             0: {
-        #                 7: 300,
-        #                 8: 500,
-        #                 9: 500,
-        #                 10: 500,
-        #                 11: 500,
-        #             },
-        #             3: {
-        #                 0: 465,
-        #                 8: 450,
-        #                 9: 450,
-        #                 10: 450,
-        #                 11: 450,
-        #             }
-        #         }
-        #     },
+                {
+                    'sub_run_name': 'overnight_run',
+                    'run_time': 60 * 9,  # Minutes
+                    'hvs': {
+                        0: {
+                            7: 800,
+                            8: 500,
+                            9: 500,
+                            10: 500,
+                            11: 500,
+                        },
+                        3: {
+                            0: 505,
+                            8: 455,
+                            9: 455,
+                            10: 455,
+                            11: 455,
+                        }
+                    }
+                },
         ]
 
         # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
@@ -263,78 +263,78 @@ class Config:
         #
         #     self.sub_runs.append(sub_run)
 
-        drift, resist = 800, 505
-        new_subrun = {
-            'sub_run_name': f'resist_{resist}V_drift_{drift}V',
-            'run_time': 3 * 60,  # Minutes
-            'hvs': {
-                0: {
-                    7: drift,
-                    8: 500,
-                    9: 500,
-                    10: 500,
-                    11: 500,
-                },
-                3: {
-                    0: resist,
-                    8: 455,
-                    9: 455,
-                    10: 455,
-                    11: 455,
-                },
-            }
-        }
-        self.sub_runs.append(new_subrun)
-
-        drifts = [800]
-        for drift in drifts:
-            resists = [525, 520, 515, 510, 500, 495, 490, 485, 480, 470, 460, 450, 440, 430, 420]
-            for resist in resists:
-                time = 75
-                new_subrun = {
-                    'sub_run_name': f'resist_{resist}V_drift_{drift}V',
-                    'run_time': time,  # Minutes
-                    'hvs': {
-                        0: {
-                            7: drift,
-                            8: 500,
-                            9: 500,
-                            10: 500,
-                            11: 500,
-                        },
-                        3: {
-                            0: resist,
-                            8: 455,
-                            9: 455,
-                            10: 455,
-                            11: 455,
-                        },
-                    }
-                }
-                self.sub_runs.append(new_subrun)
-
-        drift, resist = 800, 505
-        new_subrun = {
-            'sub_run_name': f'final_resist_{resist}V_drift_{drift}V',
-            'run_time': 24 * 60,  # Minutes
-            'hvs': {
-                0: {
-                    7: drift,
-                    8: 500,
-                    9: 500,
-                    10: 500,
-                    11: 500,
-                },
-                3: {
-                    0: resist,
-                    8: 455,
-                    9: 455,
-                    10: 455,
-                    11: 455,
-                },
-            }
-        }
-        self.sub_runs.append(new_subrun)
+        # drift, resist = 800, 505
+        # new_subrun = {
+        #     'sub_run_name': f'resist_{resist}V_drift_{drift}V',
+        #     'run_time': 3 * 60,  # Minutes
+        #     'hvs': {
+        #         0: {
+        #             7: drift,
+        #             8: 500,
+        #             9: 500,
+        #             10: 500,
+        #             11: 500,
+        #         },
+        #         3: {
+        #             0: resist,
+        #             8: 455,
+        #             9: 455,
+        #             10: 455,
+        #             11: 455,
+        #         },
+        #     }
+        # }
+        # self.sub_runs.append(new_subrun)
+        #
+        # drifts = [800]
+        # for drift in drifts:
+        #     resists = [525, 520, 515, 510, 500, 495, 490, 485, 480, 470, 460, 450, 440, 430, 420]
+        #     for resist in resists:
+        #         time = 75
+        #         new_subrun = {
+        #             'sub_run_name': f'resist_{resist}V_drift_{drift}V',
+        #             'run_time': time,  # Minutes
+        #             'hvs': {
+        #                 0: {
+        #                     7: drift,
+        #                     8: 500,
+        #                     9: 500,
+        #                     10: 500,
+        #                     11: 500,
+        #                 },
+        #                 3: {
+        #                     0: resist,
+        #                     8: 455,
+        #                     9: 455,
+        #                     10: 455,
+        #                     11: 455,
+        #                 },
+        #             }
+        #         }
+        #         self.sub_runs.append(new_subrun)
+        #
+        # drift, resist = 800, 505
+        # new_subrun = {
+        #     'sub_run_name': f'final_resist_{resist}V_drift_{drift}V',
+        #     'run_time': 24 * 60,  # Minutes
+        #     'hvs': {
+        #         0: {
+        #             7: drift,
+        #             8: 500,
+        #             9: 500,
+        #             10: 500,
+        #             11: 500,
+        #         },
+        #         3: {
+        #             0: resist,
+        #             8: 455,
+        #             9: 455,
+        #             10: 455,
+        #             11: 455,
+        #         },
+        #     }
+        # }
+        # self.sub_runs.append(new_subrun)
 
 
         self.bench_geometry = {
