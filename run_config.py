@@ -14,7 +14,7 @@ import copy
 
 class Config:
     def __init__(self):
-        self.run_name = 'mx17_det0_He_stats_4-6-26'
+        self.run_name = 'mx17_det0_Ar_Iso_HV_Scan_4-7-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -31,9 +31,9 @@ class Config:
         self.start_time = None  # '2024-06-03 15:30:00'  # 'YYYY-MM-DD HH:MM:SS' or None to start immediately
         self.write_all_dectors_to_json = False  # Only when making run config json template.
         self.generate_external_triggers = False  # If true, use raspberry pi to generate external triggers for DAQ
-        # self.gas = 'Ar/Iso 95/5'  # Gas type for run
+        self.gas = 'Ar/Iso 95/5'  # Gas type for run
         # self.gas = 'Ar/CO2/Iso 93/5/2'  # Gas type for run
-        self.gas = 'Helium/Ethane 96.5/3.5'  # Gas type for run
+        # self.gas = 'Helium/Ethane 96.5/3.5'  # Gas type for run
 
         self.dream_daq_info = {
             # 'ip': '192.168.10.100',
@@ -44,7 +44,7 @@ class Config:
             # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_TPOT_P2.cfg',
             # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_SelfTrigger_thresh.cfg',
             # 'run_directory': f'/local/home/usernsw/dylan/Run/{self.run_name}/',
-            'run_directory': f'/data/cosmic_data/Run_MX/{self.run_name}/',
+            'run_directory': f'/data/cosmic_data/Run_MX_temp/{self.run_name}/',
             # 'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
             'data_out_dir': self.run_out_dir,
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
@@ -220,26 +220,26 @@ class Config:
             #         }
             #     }
             # },
-                {
-                    'sub_run_name': 'overnight_run',
-                    'run_time': 60 * 9,  # Minutes
-                    'hvs': {
-                        0: {
-                            7: 800,
-                            8: 500,
-                            9: 500,
-                            10: 500,
-                            11: 500,
-                        },
-                        3: {
-                            0: 505,
-                            8: 455,
-                            9: 455,
-                            10: 455,
-                            11: 455,
-                        }
-                    }
-                },
+            #     {
+            #         'sub_run_name': 'overnight_run',
+            #         'run_time': 60 * 9,  # Minutes
+            #         'hvs': {
+            #             0: {
+            #                 7: 800,
+            #                 8: 500,
+            #                 9: 500,
+            #                 10: 500,
+            #                 11: 500,
+            #             },
+            #             3: {
+            #                 0: 505,
+            #                 8: 455,
+            #                 9: 455,
+            #                 10: 455,
+            #                 11: 455,
+            #             }
+            #         }
+            #     },
         ]
 
         # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
@@ -263,55 +263,55 @@ class Config:
         #
         #     self.sub_runs.append(sub_run)
 
-        # drift, resist = 800, 505
-        # new_subrun = {
-        #     'sub_run_name': f'resist_{resist}V_drift_{drift}V',
-        #     'run_time': 3 * 60,  # Minutes
-        #     'hvs': {
-        #         0: {
-        #             7: drift,
-        #             8: 500,
-        #             9: 500,
-        #             10: 500,
-        #             11: 500,
-        #         },
-        #         3: {
-        #             0: resist,
-        #             8: 455,
-        #             9: 455,
-        #             10: 455,
-        #             11: 455,
-        #         },
-        #     }
-        # }
-        # self.sub_runs.append(new_subrun)
-        #
-        # drifts = [800]
-        # for drift in drifts:
-        #     resists = [525, 520, 515, 510, 500, 495, 490, 485, 480, 470, 460, 450, 440, 430, 420]
-        #     for resist in resists:
-        #         time = 75
-        #         new_subrun = {
-        #             'sub_run_name': f'resist_{resist}V_drift_{drift}V',
-        #             'run_time': time,  # Minutes
-        #             'hvs': {
-        #                 0: {
-        #                     7: drift,
-        #                     8: 500,
-        #                     9: 500,
-        #                     10: 500,
-        #                     11: 500,
-        #                 },
-        #                 3: {
-        #                     0: resist,
-        #                     8: 455,
-        #                     9: 455,
-        #                     10: 455,
-        #                     11: 455,
-        #                 },
-        #             }
-        #         }
-        #         self.sub_runs.append(new_subrun)
+        drift, resist = 800, 490
+        new_subrun = {
+            'sub_run_name': f'resist_{resist}V_drift_{drift}V',
+            'run_time': 3 * 60,  # Minutes
+            'hvs': {
+                0: {
+                    7: drift,
+                    8: 500,
+                    9: 500,
+                    10: 500,
+                    11: 500,
+                },
+                3: {
+                    0: resist,
+                    8: 465,
+                    9: 465,
+                    10: 465,
+                    11: 465,
+                },
+            }
+        }
+        self.sub_runs.append(new_subrun)
+
+        drifts = [800]
+        for drift in drifts:
+            resists = [520, 510, 500, 480, 470, 460, 450, 440, 430, 420, 410]
+            for resist in resists:
+                time = 75
+                new_subrun = {
+                    'sub_run_name': f'resist_{resist}V_drift_{drift}V',
+                    'run_time': time,  # Minutes
+                    'hvs': {
+                        0: {
+                            7: drift,
+                            8: 500,
+                            9: 500,
+                            10: 500,
+                            11: 500,
+                        },
+                        3: {
+                            0: resist,
+                            8: 455,
+                            9: 455,
+                            10: 455,
+                            11: 455,
+                        },
+                    }
+                }
+                self.sub_runs.append(new_subrun)
         #
         # drift, resist = 800, 505
         # new_subrun = {
