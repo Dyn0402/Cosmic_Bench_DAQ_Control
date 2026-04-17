@@ -1,19 +1,18 @@
 #!/bin/bash
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+START_SERVERS="$SCRIPT_DIR/../start_servers.sh"
+
 # Restart servers in detached screen
-screen -dmS restart_tmux bash -c '
+screen -dmS restart_tmux bash -c "
   sleep 2
-  /local/home/banco/dylan/Cosmic_Bench_DAQ_Control/start_servers.sh
-'
+  $START_SERVERS
+"
 # Kill tmux server
 sessions=(
   daq_control
   dream_daq
-  banco_tracker
-  desync_monitor
   hv_control
-  trigger_veto_control
-  trigger_gen_control
   flask_server
 )
 
