@@ -14,7 +14,7 @@ import copy
 
 class Config:
     def __init__(self):
-        self.run_name = 'mx17_det0_Ar_Iso_HV_Scan_4-7-26'
+        self.run_name = 'mx17_det1_Ar_CF4_HV_Scan_4-25-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -263,34 +263,34 @@ class Config:
         #
         #     self.sub_runs.append(sub_run)
 
-        drift, resist = 800, 490
-        new_subrun = {
-            'sub_run_name': f'resist_{resist}V_drift_{drift}V',
-            'run_time': 3 * 60,  # Minutes
-            'hvs': {
-                0: {
-                    7: drift,
-                    8: 500,
-                    9: 500,
-                    10: 500,
-                    11: 500,
-                },
-                3: {
-                    0: resist,
-                    8: 465,
-                    9: 465,
-                    10: 465,
-                    11: 465,
-                },
-            }
-        }
-        self.sub_runs.append(new_subrun)
+        # drift, resist = 1000, 490
+        # new_subrun = {
+        #     'sub_run_name': f'resist_{resist}V_drift_{drift}V',
+        #     'run_time': 3 * 60,  # Minutes
+        #     'hvs': {
+        #         0: {
+        #             7: drift,
+        #             8: 500,
+        #             9: 500,
+        #             10: 500,
+        #             11: 500,
+        #         },
+        #         3: {
+        #             0: resist,
+        #             8: 455,
+        #             9: 455,
+        #             10: 455,
+        #             11: 455,
+        #         },
+        #     }
+        # }
+        # self.sub_runs.append(new_subrun)
 
-        drifts = [800]
+        drifts = [1000]
         for drift in drifts:
-            resists = [520, 510, 500, 480, 470, 460, 450, 440, 430, 420, 410]
+            resists = [550, 530, 510, 500, 490, 480, 470, 460, 450, 430, 410]
             for resist in resists:
-                time = 75
+                time = 90
                 new_subrun = {
                     'sub_run_name': f'resist_{resist}V_drift_{drift}V',
                     'run_time': time,  # Minutes
@@ -359,12 +359,13 @@ class Config:
         self.detectors = [
             {
                 'name': 'mx17_1',
+                'description': 'Bulked 4-24-26. Strip resist horizontal. Waves on mesh. Resist strips broken.',
                 'det_type': 'mx17',
                 'resist_type': 'strip_with_silver_paste',
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
-                    'z': self.bench_geometry['p2_z'] + self.bench_geometry['board_thickness'],  # mm
+                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['board_thickness'],  # mm
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -392,62 +393,6 @@ class Config:
                     'y_6': (4, 6),
                     'y_7': (4, 7),
                     'y_8': (4, 8),
-                },
-                'dream_feu_orientation': {  # If connector is normal, inverted, rotated, or rotated_inverted
-                    'x_1': 'inverted',
-                    'x_2': 'inverted',
-                    'x_3': 'inverted',
-                    'x_4': 'inverted',
-                    'x_5': 'inverted',
-                    'x_6': 'inverted',
-                    'x_7': 'inverted',
-                    'x_8': 'inverted',
-                    'y_1': 'inverted',
-                    'y_2': 'inverted',
-                    'y_3': 'inverted',
-                    'y_4': 'inverted',
-                    'y_5': 'inverted',
-                    'y_6': 'inverted',
-                    'y_7': 'inverted',
-                    'y_8': 'inverted',
-                },
-            },
-            {
-                'name': 'mx17_2',
-                'det_type': 'mx17',
-                'resist_type': 'strip_resit_with_plein_on_top',
-                'det_center_coords': {  # Center of detector
-                    'x': 0,  # mm
-                    'y': 0,  # mm
-                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
-                         1 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (0, 7),
-                    'resist': (3, 0),
-                },
-                'dream_feus': {
-                    'x_1': (4, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (4, 2),
-                    'x_3': (4, 3),
-                    'x_4': (4, 4),
-                    'x_5': (4, 5),
-                    'x_6': (4, 6),
-                    'x_7': (4, 7),
-                    'x_8': (4, 8),
-                    'y_1': (6, 1),  # Runs along y direction, indicates x hit location
-                    'y_2': (6, 2),
-                    'y_3': (6, 3),
-                    'y_4': (6, 4),
-                    'y_5': (6, 5),
-                    'y_6': (6, 6),
-                    'y_7': (6, 7),
-                    'y_8': (6, 8),
                 },
                 'dream_feu_orientation': {  # If connector is normal, inverted, rotated, or rotated_inverted
                     'x_1': 'inverted',
