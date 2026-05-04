@@ -23,6 +23,8 @@
     <button id="stop-run" class="btn btn-danger me-2 mb-2">Stop Run</button>
     <button id="restart-all" class="btn btn-danger me-2 mb-2">Restart All</button>
     <button id="take-pedestals" class="btn btn-secondary mb-2">Take Pedestals</button>
+    <button id="start-processor" class="btn btn-info me-2 mb-2">Start Processor</button>
+    <button id="stop-processor" class="btn btn-secondary me-2 mb-2">Stop Processor</button>
     <button id="git-reset" class="btn btn-secondary mb-2">Git Reset</button>
   </div>
 
@@ -450,6 +452,21 @@ document.getElementById("git-reset").addEventListener("click", async () => {
     popup.style.opacity = "0";
     setTimeout(() => popup.remove(), 1000);
   }, 2500);
+});
+
+// START PROCESSOR button
+document.getElementById("start-processor").addEventListener("click", async () => {
+  const res = await fetch("/start_processor", { method: "POST" });
+  const data = await res.json();
+  showPopup(data.message, data.success ? "#17a2b8" : "#dc3545");
+});
+
+// STOP PROCESSOR button
+document.getElementById("stop-processor").addEventListener("click", async () => {
+  if (!confirm("Stop the processor watcher?")) return;
+  const res = await fetch("/stop_processor", { method: "POST" });
+  const data = await res.json();
+  showPopup(data.message, data.success ? "#6c757d" : "#dc3545");
 });
 
 document.getElementById("run-config-py").addEventListener("click", async function runConfigHandler() {
