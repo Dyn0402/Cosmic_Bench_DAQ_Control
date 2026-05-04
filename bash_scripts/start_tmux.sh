@@ -6,7 +6,7 @@ cmd=$2
 # Check if tmux session already exists
 if tmux has-session -t "$name" 2>/dev/null; then
     echo "❌ Tmux session '$name' already exists!"
-    return 1
+    exit 1
 fi
 
 if [ -z "$cmd" ]; then
