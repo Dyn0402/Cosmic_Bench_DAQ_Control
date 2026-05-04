@@ -1,5 +1,8 @@
 #!/bin/bash
 
+cd "$(dirname "${BASH_SOURCE[0]}")"
+unset TMUX
+
 # Source the venv
 source .venv/bin/activate
 
