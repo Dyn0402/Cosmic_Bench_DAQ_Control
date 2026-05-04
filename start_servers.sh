@@ -1,10 +1,9 @@
 #!/bin/bash
 
-#cd "$(dirname "${BASH_SOURCE[0]}")"
-#unset TMUX
+cd "$(dirname "${BASH_SOURCE[0]}")"
 
 # Source the venv
-#source .venv/bin/activate
+source .venv/bin/activate
 
 # Start sessions
 bash_scripts/start_tmux.sh hv_control "python hv_control.py"

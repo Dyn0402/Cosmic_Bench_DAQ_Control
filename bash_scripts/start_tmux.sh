@@ -9,6 +9,8 @@ if tmux has-session -t "$name" 2>/dev/null; then
     exit 1
 fi
 
+unset TMUX
+
 if [ -z "$cmd" ]; then
     # Start an empty interactive tmux session
     tmux new-session -d -s "$name"
