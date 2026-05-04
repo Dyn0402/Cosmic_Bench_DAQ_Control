@@ -26,13 +26,10 @@ class Config:
         self.detector_info_dir = f'{self.base_out_dir}config/detectors/'
         self.m3_feu_num = None
         self.power_off_hv_at_end = False  # True to power off HV at end of run
-        self.filtering_by_m3 = False  # True to filter by m3 tracking, False to do no filtering
-        self.process_on_fly = False  # True to process data on fly, False to process after run
-        self.save_fdfs = True  # True to save FDF files, False to delete after decoding
+        self.filtering_by_m3 = False  # True to filter by m3 tracking (handled by processor_watcher)
+        self.save_fdfs = True  # True to save FDF files after processing
         self.start_time = None
         self.write_all_dectors_to_json = True  # Only when making run config json template. Maybe do always?
-        self.generate_external_triggers = False  # If true, use raspberry pi to generate external triggers for DAQ
-        self.watch_for_desync = True  # If true, run desync watcher during run
         self.gas = 'Ar/CF4/CO2 40/45/15'  # Gas type for run
         self.beam_type = 'muons'
 
@@ -57,10 +54,7 @@ class Config:
             'data_out_dir': f'{self.base_out_dir}Run/{self.run_name}',
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
             'n_samples_per_waveform': 24,  # Number of samples per waveform to configure in DAQ
-            'go_timeout': 5 * 60,  # Seconds to wait for 'Go' response from RunCtrl before assuming failure
-            'max_run_time_addition': 60 * 5,  # Seconds to add to requested run time before killing run
             'copy_on_fly': True,  # True to copy raw data to out dir during run, False to copy after run
-            'batch_mode': True,  # Run Dream RunCtrl in batch mode. Not implemented for cosmic bench CPU.
             'zero_suppress': True,  # True to run in zero suppression mode, False to run in full readout mode
             'pedestals_dir': f'{self.base_out_dir}pedestals_noise/',  # None to ignore, else top directory for pedestal runs
             'pedestals': 'latest',  # 'latest' for most recent, otherwise specify directory name, eg "pedestals_10-22-25_13-43-34"
@@ -69,31 +63,6 @@ class Config:
             'sample_period': 40,  # ns, sampling period
             # 'samples_beyond_threshold': 1,  # Number of samples to read out beyond threshold crossing
             'samples_beyond_threshold': 4,  # Number of samples to read out beyond threshold crossing
-        }
-
-        self.banco_info = {
-            'ip': '128.141.41.199',
-            'port': 1100,
-            'daq_run_command': 'cd /home/banco/SPS_Test_Beam_25/framework/bin && ./test_multi_noiseocc_ext',
-            'data_temp_dir': '/home/banco/SPS_Test_Beam_25/data',
-            'data_out_dir': f'/mnt/data/beam_sps_25/Run/{self.run_name}',
-            'data_inner_dir': 'banco_data'
-        }
-
-        self.dedip196_processor_info = {
-            'ip': '192.168.10.8',
-            'port': 1200,
-            'run_dir': f'{self.base_out_dir}Run/{self.run_name}',
-            'raw_daq_inner_dir': self.raw_daq_inner_dir,
-            'decoded_root_inner_dir': self.decoded_root_inner_dir,
-            'm3_tracking_inner_dir': self.m3_tracking_inner_dir,
-            'decode_path': '/local/home/banco/dylan/decode/decode',
-            'convert_path': '/local/home/banco/dylan/decode/convert_vec_tree_to_array',
-            'detector_info_dir': self.detector_info_dir,
-            'filtered_root_inner_dir': self.filtered_root_inner_dir,
-            'out_type': 'both',  # 'vec', 'array', or 'both'
-            'm3_feu_num': self.m3_feu_num,
-            'on-the-fly_timeout': 2  # hours or None If running on-the-fly, time out and die after this time.
         }
 
         self.hv_control_info = {
@@ -110,28 +79,6 @@ class Config:
             'run_out_dir': self.run_out_dir,
             'hv_monitoring': True,  # True to monitor HV during run, False to not monitor
             'monitor_interval': 1,  # Seconds between HV monitoring
-        }
-
-        self.trigger_switch_info = {
-            'ip': '192.168.10.101',
-            'port': 1100,
-        }
-
-        self.trigger_gen_info = {
-            'ip': '192.168.10.101',
-            'port': 1105,
-            'n_triggers': 6000000,  # Number of triggers to send during run
-            'trigger_rate': 200,  # Hz  Trigger rate to send during run
-            'pulse_freq_ratio': 0.1,  # Ratio of pulse frequency to trigger frequency
-        }
-
-        self.desync_watcher_info = {
-            'ip': '192.168.10.8',
-            'port': 1105,
-            'run_out_dir': f'{self.base_out_dir}Run/{self.run_name}',
-            'check_interval': 0.2,  # Seconds between checking for desync
-            'min_points': 10,  # Minimum number of desynced points to flag desync
-            'min_duration': 12,  # Seconds minimum duration of desync to flag desync
         }
 
         hv_adjust = 0

@@ -68,7 +68,7 @@ def get_dream_daq_status():
     elif "Listening on " in output:
         status = "WAITING"
         color = "secondary"
-    elif "Moving data files." in output or "Waiting for on-the-fly copy thread to finish" in output:
+    elif "Signaling on-the-fly copier to finish soon" in output:
         status = "Copying fdfs"
         color = "info"
     elif "Sent: Dream DAQ stopped" in output:
@@ -137,16 +137,14 @@ def get_daq_control_status():
         }
 
     rules = [
-        ("Daq control session started", "WAITING", "secondary"),
-        ("Run complete", "Run Complete", "info"),
-        ("donzo", "Run Complete", "info"),
-        ("Finished with sub run ", "Finished Sub Run", "warning"),
-        ("Dream DAQ taking pedestals", "Prepping DAQs", "warning"),
-        ("Prepping DAQs for ", "Prepping DAQs", "warning"),
-        ("Ramping HVs for ", "Ramping HV", "warning"),
-        ("Starting DAQ Control", "STARTING", "warning"),
-        ("Dream DAQ starting", "RUNNING", "success"),
-        ("Stopping DAQ process", "Stopping DAQ", "warning"),
+        ("Daq control session started", "WAITING",        "secondary"),
+        ("Run complete",                "Run Complete",    "info"),
+        ("donzo",                       "Run Complete",    "info"),
+        ("Finished with sub run ",      "Finished Sub Run","warning"),
+        ("Ramping HVs for ",            "Ramping HV",     "warning"),
+        ("Starting DAQ Control",        "STARTING",       "warning"),
+        ("Dream DAQ starting",          "RUNNING",        "success"),
+        ("Stopping DAQ process",        "Stopping DAQ",   "warning"),
     ]
 
     fields = []
@@ -166,29 +164,37 @@ def get_daq_control_status():
     return {"status": "UNKNOWN STATE", "color": "danger", "fields": fields}
 
 
-def get_decoder_status():
+def get_processor_status():
     try:
         output = subprocess.check_output(
-            ["tmux", "capture-pane", "-pS", "-10", "-t", "decoder:0.0"],
+            ["tmux", "capture-pane", "-pS", "-50", "-t", "processor:0.0"],
             text=True
         )
     except subprocess.CalledProcessError:
-        return {
-            "status": "ERROR",
-            "color": "danger",
-            "fields": [{"label": "Details", "value": "decoder tmux not running"}]
-        }
+        return {"status": "NOT RUNNING", "color": "secondary", "fields": []}
 
     rules = [
-        ("Decoder started", "RUNNING", "success"),
-        ("Starting Decoder", "STARTING", "warning"),
-        ("Decoder stopped", "STOPPED", "warning"),
-        ("Listening on ", "WAITING", "secondary"),
+        ("[watcher] Done.",       "DONE",       "info"),
+        ("[watcher] Timeout:",    "TIMED OUT",  "warning"),
+        ("[m3_track]",            "PROCESSING", "success"),
+        ("[m3_filter]",           "PROCESSING", "success"),
+        ("[combine]",             "PROCESSING", "success"),
+        ("[analyze]",             "PROCESSING", "success"),
+        ("[decode]",              "PROCESSING", "success"),
+        ("[watcher] Sleeping",    "IDLE",        "info"),
+        ("[watcher] runs_dir",    "STARTING",   "warning"),
     ]
 
+    fields = []
     for line in reversed(output.splitlines()):
+        m = re.search(r'(\S+/\S+)\s+file_num=(\d+)', line)
+        if m and not fields:
+            fields = [
+                {"label": "Last subrun",   "value": m.group(1).split('/')[-1]},
+                {"label": "Last file_num", "value": m.group(2)},
+            ]
         for flag, status, color in rules:
             if flag in line:
-                return {"status": status, "color": color, "fields": []}
+                return {"status": status, "color": color, "fields": fields}
 
-    return {"status": "UNKNOWN STATE", "color": "danger", "fields": []}
+    return {"status": "UNKNOWN", "color": "secondary", "fields": fields}
