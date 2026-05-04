@@ -28,12 +28,10 @@ class Config:
         self.detector_info_dir = f'{self.base_out_dir}config/detectors/'
         self.m3_feu_num = None
         self.power_off_hv_at_end = False  # True to power off HV at end of run
-        self.filtering_by_m3 = False  # True to filter by m3 tracking, False to do no filtering
-        self.process_on_fly = False  # True to process data on fly, False to process after run
-        self.save_fdfs = True  # True to save FDF files, False to delete after decoding
+        self.filtering_by_m3 = False  # True to filter by m3 tracking (handled by processor_watcher)
+        self.save_fdfs = True  # True to save FDF files after processing
         self.start_time = None
         self.write_all_dectors_to_json = True  # Only when making run config json template.
-        self.generate_external_triggers = True  # If true, use raspberry pi to generate external triggers for DAQ
         self.gas = 'Ar/CO2/Iso 93/5/2'  # Gas type for run
 
         self.dream_daq_info = {
@@ -44,25 +42,13 @@ class Config:
             'data_out_dir': self.run_out_dir,
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
             'n_samples_per_waveform': 24,  # Number of samples per waveform to configure in DAQ
-            'go_timeout': 5 * 60,  # Seconds to wait for 'Go' response from RunCtrl before assuming failure
-            'max_run_time_addition': 60 * 5,  # Seconds to add to requested run time before killing run
             'copy_on_fly': False,  # True to copy raw data to out dir during run, False to copy after run
-            'batch_mode': True,  # Run Dream RunCtrl in batch mode. Not implemented for cosmic bench CPU.
             'zero_suppress': False,  # True to run in zero suppression mode, False to run in full readout mode
             'latency': 33,  # Latency setting for DAQ in clock cycles
             # 'latency': 22,  # Latency setting for DAQ in clock cycles
             'sample_period': 40,  # ns, sampling period
             # 'samples_beyond_threshold': 1,  # Number of samples to read out beyond threshold crossing
             'samples_beyond_threshold': 4,  # Number of samples to read out beyond threshold crossing
-        }
-
-        self.banco_info = {
-            'ip': '128.141.41.199',
-            'port': 1100,
-            'daq_run_command': 'cd /home/banco/SPS_Test_Beam_25/framework/bin && ./test_multi_noiseocc_int',
-            'data_temp_dir': '/home/banco/SPS_Test_Beam_25/data',
-            'data_out_dir': self.run_out_dir,
-            'data_inner_dir': 'banco_data'
         }
 
         self.hv_control_info = {
@@ -79,19 +65,6 @@ class Config:
             'run_out_dir': self.run_out_dir,
             'hv_monitoring': True,  # True to monitor HV during run, False to not monitor
             'monitor_interval': 5,  # Seconds between HV monitoring
-        }
-
-        self.trigger_switch_info = {
-            'ip': '192.168.10.101',
-            'port': 1100,
-        }
-
-        self.trigger_gen_info = {  # n_triggers/rate fine tuned for run time about right.
-            'ip': '192.168.10.101',
-            'port': 1105,
-            'n_triggers': 100000,  # Number of triggers to send during run
-            'trigger_rate': 700,  # Hz  Trigger rate to send during run
-            'pulse_freq_ratio': 0.1,  # Ratio of pulse frequency to trigger frequency
         }
 
         self.sub_runs = [

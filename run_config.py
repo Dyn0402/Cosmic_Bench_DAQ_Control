@@ -14,7 +14,7 @@ import copy
 
 class Config:
     def __init__(self):
-        self.run_name = 'mx17_det2_Ar_Iso_HV_Scan_5-4-26'
+        self.run_name = 'mx17_daq_test_5-4-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -25,12 +25,10 @@ class Config:
         self.detector_info_dir = f'/mnt/cosmic_data/config/detectors/'
         self.m3_feu_num = 1
         self.power_off_hv_at_end = True  # True to power off HV at end of run
-        self.filtering_by_m3 = False  # True to filter by m3 tracking, False to do no filtering
-        self.process_on_fly = False  # True to process data on fly, False to process after run
-        self.save_fdfs = True  # True to save FDF files, False to delete after decoding
+        self.filtering_by_m3 = False  # True to filter by m3 tracking (handled by processor_watcher)
+        self.save_fdfs = True  # True to save FDF files after processing
         self.start_time = None  # '2024-06-03 15:30:00'  # 'YYYY-MM-DD HH:MM:SS' or None to start immediately
         self.write_all_dectors_to_json = False  # Only when making run config json template.
-        self.generate_external_triggers = False  # If true, use raspberry pi to generate external triggers for DAQ
         self.gas = 'Ar/Iso 95/5'  # Gas type for run
         # self.gas = 'Ar/CO2/Iso 93/5/2'  # Gas type for run
         # self.gas = 'Helium/Ethane 96.5/3.5'  # Gas type for run
@@ -48,46 +46,8 @@ class Config:
             # 'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
             'data_out_dir': self.run_out_dir,
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
-            'go_timeout': 7 * 60,  # Seconds to wait for 'Go' response from RunCtrl before assuming failure
-            'max_run_time_addition': 60 * 5,  # Seconds to add to requested run time before killing run
             'copy_on_fly': True,  # True to copy raw data to out dir during run, False to copy after run
-            'batch_mode': True,  # Run Dream RunCtrl in batch mode. Not implemented for cosmic bench C
             'zero_suppress': False,  # True to run in zero suppression mode, False to run in full readout mode
-        }
-
-        self.banco_info = {
-            'ip': '132.166.30.82',
-            'port': 1100,
-            'daq_run_command': 'cd /home/banco/dylan/Run/framework/bin && ./test_multi_noiseocc_int',
-            'data_temp_dir': '/home/banco/dylan/Run/data',
-            'data_out_dir': self.run_out_dir,
-            'data_inner_dir': 'banco_data'
-        }
-
-        self.dedip196_processor_info = {
-            'ip': '192.168.10.1',
-            'port': 1201,
-            'run_dir': self.run_out_dir,
-            'raw_daq_inner_dir': self.raw_daq_inner_dir,
-            'decoded_root_inner_dir': self.decoded_root_inner_dir,
-            'm3_tracking_inner_dir': self.m3_tracking_inner_dir,
-            'decode_path': '/local/home/usernsw/dylan/decode/decode',
-            'convert_path': '/local/home/usernsw/dylan/decode/convert_vec_tree_to_array',
-            'detector_info_dir': self.detector_info_dir,
-            'filtered_root_inner_dir': self.filtered_root_inner_dir,
-            'out_type': 'array',  # 'vec', 'array', or 'both'
-            'm3_feu_num': self.m3_feu_num,
-        }
-
-        self.sedip28_processor_info = {
-            'ip': '192.168.10.1',
-            'port': 1200,
-            'run_dir': self.run_out_dir,
-            'raw_daq_inner_dir': self.raw_daq_inner_dir,
-            'm3_tracking_inner_dir': self.m3_tracking_inner_dir,
-            'tracking_run_dir': '/local/home/usernsw/dylan/m3_tracking/',
-            'tracking_sh_path': '/local/home/usernsw/dylan/m3_tracking/run_tracking_single.sh',
-            'm3_feu_num': self.m3_feu_num,
         }
 
         self.hv_control_info = {
@@ -106,18 +66,6 @@ class Config:
             'monitor_interval': 2,  # Seconds between HV monitoring
         }
 
-        self.trigger_switch_info = {
-            'ip': '192.168.10.101',
-            'port': 1100,
-        }
-
-        self.trigger_gen_info = {
-            'ip': '192.168.10.101',
-            'port': 1105,
-            'n_triggers': 1000000,  # Number of triggers to send during run
-            'trigger_rate': 200,  # Hz  Trigger rate to send during run
-            'pulse_freq_ratio': 0.1,  # Ratio of pulse frequency to trigger frequency
-        }
 
         self.sub_runs = [
             # {
@@ -286,32 +234,49 @@ class Config:
         # }
         # self.sub_runs.append(new_subrun)
 
-        drifts = [1000]
-        for drift in drifts:
-            resists = [490, 510, 500, 480, 470, 460, 450, 440, 430]
-            for resist in resists:
-                time = 90
-                new_subrun = {
-                    'sub_run_name': f'resist_{resist}V_drift_{drift}V',
-                    'run_time': time,  # Minutes
-                    'hvs': {
-                        0: {
-                            7: drift,
-                            8: 500,
-                            9: 500,
-                            10: 500,
-                            11: 500,
-                        },
-                        3: {
-                            0: resist,
-                            8: 455,
-                            9: 455,
-                            10: 455,
-                            11: 455,
-                        },
-                    }
+        # drifts = [1000]
+        # for drift in drifts:
+        #     resists = [490, 510, 500, 480, 470, 460, 450, 440, 430]
+        #     for resist in resists:
+        #         time = 90
+        #         new_subrun = {
+        #             'sub_run_name': f'resist_{resist}V_drift_{drift}V',
+        #             'run_time': time,  # Minutes
+        #             'hvs': {
+        #                 0: {
+        #                     7: drift,
+        #                     8: 500,
+        #                     9: 500,
+        #                     10: 500,
+        #                     11: 500,
+        #                 },
+        #                 3: {
+        #                     0: resist,
+        #                     8: 455,
+        #                     9: 455,
+        #                     10: 455,
+        #                     11: 455,
+        #                 },
+        #             }
+        #         }
+        #         self.sub_runs.append(new_subrun)
+
+        for i in range(10):
+            time = 2
+            new_subrun = {
+                'sub_run_name': f'test_{i}',
+                'run_time': time,  # Minutes
+                'hvs': {
+                    0: {
+                        7: 0,
+                    },
+                    3: {
+                        0: 0,
+                    },
                 }
-                self.sub_runs.append(new_subrun)
+            }
+            self.sub_runs.append(new_subrun)
+
         #
         # drift, resist = 800, 505
         # new_subrun = {

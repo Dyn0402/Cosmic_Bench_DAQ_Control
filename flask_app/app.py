@@ -33,10 +33,8 @@ CONFIG_TEMPLATE_DIR = f"{BASE_DIR}/config/json_templates"
 CONFIG_RUN_DIR = f"{BASE_DIR}/config/json_run_configs"
 CONFIG_PY_PATH = f"{BASE_DIR}/run_config_beam.py"
 BASH_DIR = f"{BASE_DIR}/bash_scripts"
-# ANALYSIS_DIR = "/media/dylan/data/x17"
-# RUN_DIR = "/media/dylan/data/x17/dream_run_test"
-# ANALYSIS_DIR = "/mnt/data/x17/beam_feb/analysis"
-# RUN_DIR = "/mnt/data/x17/beam_feb/runs"
+PROCESSOR_CONFIG_PATH = f"{BASE_DIR}/config/processor_config.json"
+PROCESSOR_SESSION = "processor"
 ANALYSIS_DIR = "/data/cosmic_data/Analysis"
 RUN_DIR = "/data/cosmic_data/Run"
 HV_TAIL = 1000  # number of most recent rows to show
@@ -45,7 +43,7 @@ HV_TAIL = 1000  # number of most recent rows to show
 app = Flask(__name__)
 socketio = SocketIO(app)
 
-TMUX_SESSIONS = ["daq_control", "dream_daq", "hv_control"]
+TMUX_SESSIONS = ["daq_control", "dream_daq", "hv_control", "processor"]
 sessions = {}
 
 @app.route("/")
@@ -67,6 +65,8 @@ def status_all():
             info = get_hv_control_status()
         elif s == "daq_control":
             info = get_daq_control_status()
+        elif s == "processor":
+            info = get_processor_status()
         else:
             info = {"status": "READY", "color": "secondary", "fields": []}
 
@@ -180,6 +180,36 @@ def take_pedestals():
     try:
         subprocess.Popen([f"{BASH_DIR}/run_pedestals.sh"])
         return jsonify({"success": True, "message": "Taking pedestals"})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@app.route("/start_processor", methods=["POST"])
+def start_processor():
+    try:
+        # Regenerate processor_config.json from processor_config.py before starting
+        result = subprocess.run(
+            ["python", f"{BASE_DIR}/processor_config.py"],
+            capture_output=True, text=True
+        )
+        if result.returncode != 0:
+            return jsonify({"success": False,
+                            "message": f"Failed to regenerate processor config: {result.stderr}"}), 500
+
+        subprocess.Popen(['tmux', 'kill-session', '-t', PROCESSOR_SESSION],
+                         stderr=subprocess.PIPE).wait()
+        command = f'python {BASE_DIR}/processor_watcher.py "{PROCESSOR_CONFIG_PATH}"'
+        subprocess.Popen([f'{BASH_DIR}/start_tmux.sh', PROCESSOR_SESSION, command])
+        return jsonify({"success": True, "message": "Processor watcher started"})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@app.route("/stop_processor", methods=["POST"])
+def stop_processor():
+    try:
+        subprocess.Popen(['tmux', 'kill-session', '-t', PROCESSOR_SESSION])
+        return jsonify({"success": True, "message": "Processor watcher stopped"})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
 
