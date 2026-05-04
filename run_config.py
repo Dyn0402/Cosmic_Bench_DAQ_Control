@@ -14,7 +14,7 @@ import copy
 
 class Config:
     def __init__(self):
-        self.run_name = 'mx17_det1_Ar_CF4_HV_Scan_4-25-26'
+        self.run_name = 'mx17_det2_Ar_Iso_HV_Scan_5-4-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -288,7 +288,7 @@ class Config:
 
         drifts = [1000]
         for drift in drifts:
-            resists = [550, 530, 510, 500, 490, 480, 470, 460, 450, 430, 410]
+            resists = [490, 510, 500, 480, 470, 460, 450, 440, 430]
             for resist in resists:
                 time = 90
                 new_subrun = {
