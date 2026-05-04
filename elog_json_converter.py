@@ -21,7 +21,7 @@ def main():
         print("Usage: python elog_json_converter.py input_run_json_path")
         sys.exit(1)
     input_run_json_path = sys.argv[1]
-    # input_run_json_path = '/local/home/dn277127/PycharmProjects/Cosmic_Bench_DAQ_Control/config/json_run_configs/run_config_beam.json'
+    # input_run_json_path = '/local/home/usernsw/Cosmic_Bench_DAQ_Control/config/json_run_configs/run_config_beam.json'
 
     log_id = None
     if len(sys.argv) == 3:
