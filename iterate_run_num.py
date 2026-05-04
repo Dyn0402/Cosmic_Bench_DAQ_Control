@@ -13,7 +13,7 @@ import re
 from pathlib import Path
 
 from run_config_beam import Config
-BASE_DIR = '/local/home/banco/dylan/Cosmic_Bench_DAQ_Control'
+BASE_DIR = '/local/home/usernsw/Cosmic_Bench_DAQ_Control'
 RUNCONFIG_PY_PATH = 'run_config_beam.py'
 
 
