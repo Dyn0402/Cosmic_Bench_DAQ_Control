@@ -1129,7 +1129,7 @@ class Config:
 
 
 if __name__ == '__main__':
-    out_dir = '/local/home/dn277127/Bureau/beam_test_25/'
+    out_dir = '/local/home/usernsw/dylan/'
     # out_dir = 'C:/Users/Dylan/Desktop/banco_test3/'
     config = Config()
     config.write_to_file(f'{out_dir}run_config_test.json')
