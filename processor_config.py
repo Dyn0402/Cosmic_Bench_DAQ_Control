@@ -11,7 +11,7 @@ import os
 
 # --- Paths ---
 BASE_DATA = '/data/cosmic_data/Run_MX/'
-MM_BUILD = '/local/home/usernsw/dylan/CLionProjects/mm_strip_reconstruction/build'
+MM_BUILD = '/local/home/usernsw/mm_strip_reconstruction/build'
 
 M3_TRACKING_DIR = '/local/home/usernsw/dylan/m3_tracking/'
 
