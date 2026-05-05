@@ -14,7 +14,7 @@ import copy
 
 class Config:
     def __init__(self):
-        self.run_name = 'mx17_daq_test_5-4-26'
+        self.run_name = 'mx17_daq_det3_quick_test_5-5-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -68,26 +68,26 @@ class Config:
 
 
         self.sub_runs = [
-            # {
-            #     'sub_run_name': 'resist_scan_440V',
-            #     'run_time': 10,  # Minutes
-            #     'hvs': {
-            #         0: {
-            #             7: 600,
-            #             8: 500,
-            #             9: 500,
-            #             10: 500,
-            #             11: 500,
-            #         },
-            #         3: {
-            #             0: 440,
-            #             8: 450,
-            #             9: 450,
-            #             10: 450,
-            #             11: 450,
-            #         }
-            #     }
-            # },
+            {
+                'sub_run_name': 'quick_test',
+                'run_time': 24*60,  # Minutes
+                'hvs': {
+                    0: {
+                        7: 900,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    3: {
+                        0: 600,
+                        8: 455,
+                        9: 455,
+                        10: 455,
+                        11: 455,
+                    }
+                }
+            },
             # {
             #     'sub_run_name': 'resist_scan_450V',
             #     'run_time': 10,  # Minutes
@@ -261,22 +261,6 @@ class Config:
         #         }
         #         self.sub_runs.append(new_subrun)
 
-        for i in range(10):
-            time = 2
-            new_subrun = {
-                'sub_run_name': f'test_{i}',
-                'run_time': time,  # Minutes
-                'hvs': {
-                    0: {
-                        7: 0,
-                    },
-                    3: {
-                        0: 0,
-                    },
-                }
-            }
-            self.sub_runs.append(new_subrun)
-
         #
         # drift, resist = 800, 505
         # new_subrun = {
@@ -324,7 +308,7 @@ class Config:
         self.detectors = [
             {
                 'name': 'mx17_1',
-                'description': 'Bulked 4-24-26. Strip resist horizontal. Waves on mesh. Resist strips broken.',
+                'description': 'Bulked 5-5-26. Strip resist vertical. ESL no silver paste',
                 'det_type': 'mx17',
                 'resist_type': 'strip_with_silver_paste',
                 'det_center_coords': {  # Center of detector
