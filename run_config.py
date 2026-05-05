@@ -50,6 +50,32 @@ class Config:
             'zero_suppress': False,  # True to run in zero suppression mode, False to run in full readout mode
         }
 
+        self.dedip196_processor_info = {
+            'ip': '192.168.10.1',
+            'port': 1201,
+            'run_dir': self.run_out_dir,
+            'raw_daq_inner_dir': self.raw_daq_inner_dir,
+            'decoded_root_inner_dir': self.decoded_root_inner_dir,
+            'm3_tracking_inner_dir': self.m3_tracking_inner_dir,
+            'decode_path': '/local/home/usernsw/dylan/decode/decode',
+            'convert_path': '/local/home/usernsw/dylan/decode/convert_vec_tree_to_array',
+            'detector_info_dir': self.detector_info_dir,
+            'filtered_root_inner_dir': self.filtered_root_inner_dir,
+            'out_type': 'array',  # 'vec', 'array', or 'both'
+            'm3_feu_num': self.m3_feu_num,
+        }
+
+        self.sedip28_processor_info = {
+            'ip': '192.168.10.1',
+            'port': 1200,
+            'run_dir': self.run_out_dir,
+            'raw_daq_inner_dir': self.raw_daq_inner_dir,
+            'm3_tracking_inner_dir': self.m3_tracking_inner_dir,
+            'tracking_run_dir': '/local/home/usernsw/dylan/m3_tracking/',
+            'tracking_sh_path': '/local/home/usernsw/dylan/m3_tracking/run_tracking_single.sh',
+            'm3_feu_num': self.m3_feu_num,
+        }
+
         self.hv_control_info = {
             'ip': '192.168.10.1',
             'port': 1100,
