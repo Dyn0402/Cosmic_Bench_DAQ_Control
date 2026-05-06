@@ -14,7 +14,7 @@ import copy
 
 class Config:
     def __init__(self):
-        self.run_name = 'mx17_det3_ArCF4_gas_change_5-6-26'
+        self.run_name = 'mx17_det3_ArCF4_HV_Scan_5-6-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -95,26 +95,26 @@ class Config:
 
 
         self.sub_runs = [
-            {
-                'sub_run_name': 'long_run',
-                'run_time': 24 * 60,  # Minutes
-                'hvs': {
-                    0: {
-                        7: 900,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500,
-                    },
-                    3: {
-                        0: 510,
-                        8: 455,
-                        9: 455,
-                        10: 455,
-                        11: 455,
-                    }
-                }
-            },
+            # {
+            #     'sub_run_name': 'long_run',
+            #     'run_time': 24 * 60,  # Minutes
+            #     'hvs': {
+            #         0: {
+            #             7: 900,
+            #             8: 500,
+            #             9: 500,
+            #             10: 500,
+            #             11: 500,
+            #         },
+            #         3: {
+            #             0: 510,
+            #             8: 455,
+            #             9: 455,
+            #             10: 455,
+            #             11: 455,
+            #         }
+            #     }
+            # },
             # {
             #     'sub_run_name': 'resist_scan_450V',
             #     'run_time': 10,  # Minutes
@@ -261,32 +261,32 @@ class Config:
         # }
         # self.sub_runs.append(new_subrun)
 
-        # drifts = [900]
-        # for drift in drifts:
-        #     resists = [510, 530, 520, 500, 490, 480, 470, 460, 450, 440, 430]
-        #     for resist in resists:
-        #         time = 90
-        #         new_subrun = {
-        #             'sub_run_name': f'resist_{resist}V_drift_{drift}V',
-        #             'run_time': time,  # Minutes
-        #             'hvs': {
-        #                 0: {
-        #                     7: drift,
-        #                     8: 500,
-        #                     9: 500,
-        #                     10: 500,
-        #                     11: 500,
-        #                 },
-        #                 3: {
-        #                     0: resist,
-        #                     8: 455,
-        #                     9: 455,
-        #                     10: 455,
-        #                     11: 455,
-        #                 },
-        #             }
-        #         }
-        #         self.sub_runs.append(new_subrun)
+        drifts = [900]
+        for drift in drifts:
+            resists = [650, 670, 660, 640, 630, 620, 610, 600, 590, 580, 570, 560, 550, 540, 530, 520, 510]
+            for resist in resists:
+                time = 120 if resist == 650 else 60
+                new_subrun = {
+                    'sub_run_name': f'resist_{resist}V_drift_{drift}V',
+                    'run_time': time,  # Minutes
+                    'hvs': {
+                        0: {
+                            7: drift,
+                            8: 500,
+                            9: 500,
+                            10: 500,
+                            11: 500,
+                        },
+                        3: {
+                            0: resist,
+                            8: 455,
+                            9: 455,
+                            10: 455,
+                            11: 455,
+                        },
+                    }
+                }
+                self.sub_runs.append(new_subrun)
 
         #
         # drift, resist = 800, 505
