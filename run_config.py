@@ -14,7 +14,7 @@ import copy
 
 class Config:
     def __init__(self):
-        self.run_name = 'mx17_det3_long_run_5-6-26'
+        self.run_name = 'mx17_det3_ArCF4_gas_change_5-6-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -24,14 +24,15 @@ class Config:
         self.m3_tracking_inner_dir = 'm3_tracking_root'
         self.detector_info_dir = f'/mnt/cosmic_data/config/detectors/'
         self.m3_feu_num = 1
-        self.power_off_hv_at_end = True  # True to power off HV at end of run
+        self.power_off_hv_at_end = False  # True to power off HV at end of run
         self.filtering_by_m3 = False  # True to filter by m3 tracking (handled by processor_watcher)
         self.save_fdfs = True  # True to save FDF files after processing
         self.start_time = None  # '2024-06-03 15:30:00'  # 'YYYY-MM-DD HH:MM:SS' or None to start immediately
         self.write_all_dectors_to_json = False  # Only when making run config json template.
-        self.gas = 'Ar/Iso 95/5'  # Gas type for run
+        # self.gas = 'Ar/Iso 95/5'  # Gas type for run
         # self.gas = 'Ar/CO2/Iso 93/5/2'  # Gas type for run
         # self.gas = 'Helium/Ethane 96.5/3.5'  # Gas type for run
+        self.gas = 'Ar/CF4 90/10'  # Gas type for run
 
         self.dream_daq_info = {
             # 'ip': '192.168.10.100',

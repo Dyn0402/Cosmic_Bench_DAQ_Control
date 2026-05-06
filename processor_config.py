@@ -72,6 +72,13 @@ CONFIG = {
         'source scl_source enable devtoolset-9'
     ),
 
+    # Run filtering: process only specific runs or exclude certain runs by directory name.
+    # If include_runs is a non-empty list, only those run directories are processed.
+    # If exclude_runs is a non-empty list, those run directories are skipped.
+    # Both null/empty means process all runs as normal.
+    'include_runs': ['mx17_det3_ArCF4_gas_change_5-6-26'],  # e.g. ['run_42', 'run_43'] — only process these runs
+    'exclude_runs': None,  # e.g. ['run_1', 'run_2']  — skip these runs
+
     # Watcher behavior
     'poll_interval':  30,  # seconds between full directory scans
     'stale_run_days':  4,  # runs with no new FDFs for this many days are checked once then skipped

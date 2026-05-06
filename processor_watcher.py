@@ -46,6 +46,8 @@ Config keys (see processor_config.py to generate the JSON):
 
   pedestal_loc            : 'same' | 'abs' | 'find'
   pedestal_dir            : base pedestal dir (for 'abs' or 'find' modes)
+  include_runs            : list of run directory names to process exclusively (null = all)
+  exclude_runs            : list of run directory names to skip (null = none skipped)
   poll_interval           : seconds between full directory scans    (default: 30)
   stale_run_days          : runs with no new FDFs for this many days are skipped  (default: 4)
   free_threads            : CPU threads to leave free during processing (default: 2)
@@ -112,6 +114,9 @@ def run_watcher(config: dict):
     pedestal_loc      = config.get('pedestal_loc', 'same')
     pedestal_base_dir = config.get('pedestal_dir', '') or ''
 
+    include_runs   = set(config['include_runs']) if config.get('include_runs') else None
+    exclude_runs   = set(config['exclude_runs']) if config.get('exclude_runs') else set()
+
     poll_interval  = config.get('poll_interval',  30)
     stale_run_days = config.get('stale_run_days',  4)
     free_threads   = config.get('free_threads',    2)
@@ -121,6 +126,10 @@ def run_watcher(config: dict):
     cpp_env   = _build_cpp_env(cpp_setup) if cpp_setup else None
 
     print(f"[watcher] runs_dir      : {runs_dir}")
+    if include_runs:
+        print(f"[watcher] include_runs  : {sorted(include_runs)}")
+    if exclude_runs:
+        print(f"[watcher] exclude_runs  : {sorted(exclude_runs)}")
     print(f"[watcher] pipeline      : decode={do_decode}  analyze={do_analyze}  combine={do_combine}")
     print(f"[watcher] m3            : tracking={do_m3_tracking}  filter={filter_by_m3}  feu={m3_feu_num}")
     print(f"[watcher] threads       : {n_threads}  poll={poll_interval}s  stale_after={stale_run_days}d")
@@ -138,6 +147,10 @@ def run_watcher(config: dict):
         else:
             for run_dir in sorted(runs_dir.iterdir()):
                 if not run_dir.is_dir():
+                    continue
+                if include_runs is not None and run_dir.name not in include_runs:
+                    continue
+                if run_dir.name in exclude_runs:
                     continue
                 if run_dir.name in checked_stale_runs:
                     continue
