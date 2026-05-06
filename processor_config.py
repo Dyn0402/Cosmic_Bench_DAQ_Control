@@ -64,6 +64,14 @@ CONFIG = {
     'pedestal_loc': 'same',
     'pedestal_dir': None,
 
+    # Shell commands to set up the C++ environment (ROOT + devtoolset) for decode/analyze/combine.
+    # Run in a login bash shell at watcher startup; the captured env dict is passed to all
+    # C++ subprocess calls.  M3 tracking always runs in the default process env (no ROOT sourced).
+    'cpp_setup_script': (
+        'source ~/root_6_30_02/root-build/bin/thisroot.sh && '
+        'source scl_source enable devtoolset-9'
+    ),
+
     # Watcher behavior
     'poll_interval':  30,  # seconds between full directory scans
     'stale_run_days':  4,  # runs with no new FDFs for this many days are checked once then skipped

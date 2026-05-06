@@ -26,7 +26,8 @@ start_tmux() {
 # Start sessions
 start_tmux hv_control "python hv_control.py"
 start_tmux dream_daq "python dream_daq_control.py"
-start_tmux decoder 'bash -lc "source /local/home/usernsw/dylan/root/obj/bin/thisroot.sh && python processing_control.py"'
+PROCESSOR_CONFIG="/local/home/usernsw/Cosmic_Bench_DAQ_Control/config/processor_config.json"
+start_tmux processor "python processor_watcher.py $PROCESSOR_CONFIG"
 start_tmux m3_tracking "python m3_tracking_control.py"
 start_tmux daq_control "echo 'Daq control session started'"
 #start_tmux flask_server "flask_app/start_flask.sh"

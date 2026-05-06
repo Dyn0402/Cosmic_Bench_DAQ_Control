@@ -117,11 +117,15 @@ def run_watcher(config: dict):
     free_threads   = config.get('free_threads',    2)
     n_threads      = max(1, (os.cpu_count() or 1) - free_threads)
 
+    cpp_setup = config.get('cpp_setup_script', '')
+    cpp_env   = _build_cpp_env(cpp_setup) if cpp_setup else None
+
     print(f"[watcher] runs_dir      : {runs_dir}")
     print(f"[watcher] pipeline      : decode={do_decode}  analyze={do_analyze}  combine={do_combine}")
     print(f"[watcher] m3            : tracking={do_m3_tracking}  filter={filter_by_m3}  feu={m3_feu_num}")
     print(f"[watcher] threads       : {n_threads}  poll={poll_interval}s  stale_after={stale_run_days}d")
     print(f"[watcher] pedestal      : loc={pedestal_loc}  base={pedestal_base_dir or '(same as raw)'}")
+    print(f"[watcher] cpp_env       : {'built from cpp_setup_script' if cpp_env else 'default process env'}")
 
     checked_stale_runs: set = set()
     prev_sizes: dict = {}
@@ -156,7 +160,7 @@ def run_watcher(config: dict):
                     ped_dir = _resolve_pedestal_dir(raw_dir, pedestal_loc, pedestal_base_dir)
 
                     if do_decode and ped_dir:
-                        _decode_pedestals(ped_dir, decode_exe)
+                        _decode_pedestals(ped_dir, decode_exe, cpp_env)
 
                     all_fnums  = _get_data_file_nums(raw_dir)
                     done_fnums = _get_processed_file_nums(
@@ -192,7 +196,7 @@ def run_watcher(config: dict):
                                 do_m3_tracking, filter_by_m3,
                                 m3_feu_num, tracking_sh_path, tracking_run_dir,
                                 run_detectors, run_included, detector_info_dir,
-                                save_fdfs, save_decoded, n_threads
+                                save_fdfs, save_decoded, n_threads, cpp_env
                             )
                             del prev_sizes[key]
                             found_new = True
@@ -220,7 +224,7 @@ def _process_file_num(fnum, all_fdf_paths, subrun_dir, ped_dir,
                        do_m3_tracking, filter_by_m3,
                        m3_feu_num, tracking_sh_path, tracking_run_dir,
                        detectors, included_detectors, detector_info_dir,
-                       save_fdfs, save_decoded, n_threads):
+                       save_fdfs, save_decoded, n_threads, cpp_env):
 
     decoded_dir  = subrun_dir / decoded_inner
     hits_dir     = subrun_dir / hits_inner
@@ -235,9 +239,8 @@ def _process_file_num(fnum, all_fdf_paths, subrun_dir, ped_dir,
     if do_m3_tracking and m3_fdfs and not _m3_tracking_done(m3_track_dir, fnum):
         create_dir_if_not_exist(str(m3_track_dir))
         print(f"[m3_track] Running M3 tracking for file_num={fnum:03d}")
-        _run_m3_tracking(subrun_dir / decoded_inner.replace('decoded_root', '').rstrip('/'),
-                          m3_fdfs[0].parent, m3_track_dir,
-                          tracking_sh_path, tracking_run_dir, m3_feu_num, fnum)
+        _run_m3_tracking(m3_fdfs[0].parent, m3_track_dir,
+                         tracking_sh_path, tracking_run_dir, m3_feu_num, fnum)
 
     # Step 2: Decode non-M3 FDFs
     if do_decode and main_fdfs:
@@ -248,7 +251,7 @@ def _process_file_num(fnum, all_fdf_paths, subrun_dir, ped_dir,
                 root_path = decoded_dir / fdf.name.replace('.fdf', '.root')
                 if root_path.exists():
                     continue
-                tasks.append(pool.submit(_decode_file, str(fdf), str(root_path), decode_exe))
+                tasks.append(pool.submit(_decode_file, str(fdf), str(root_path), decode_exe, cpp_env))
             for t in as_completed(tasks):
                 t.result()
 
@@ -275,7 +278,7 @@ def _process_file_num(fnum, all_fdf_paths, subrun_dir, ped_dir,
                 hits_path = hits_dir / root_path.name.replace('.root', '_hits.root')
                 if hits_path.exists():
                     continue
-                tasks.append(pool.submit(_analyze_file, str(root_path), ped_dir, str(hits_path), analyze_exe))
+                tasks.append(pool.submit(_analyze_file, str(root_path), ped_dir, str(hits_path), analyze_exe, cpp_env))
             for t in as_completed(tasks):
                 t.result()
 
@@ -287,7 +290,7 @@ def _process_file_num(fnum, all_fdf_paths, subrun_dir, ped_dir,
             combined_name = _make_combined_name(next(iter(feu_hits_map.values())))
             combined_path = combined_dir / combined_name
             if not combined_path.exists():
-                _combine_hits(feu_hits_map, str(combined_path), combine_exe)
+                _combine_hits(feu_hits_map, str(combined_path), combine_exe, cpp_env)
 
     # Step 6: Cleanup
     if not save_fdfs:
@@ -307,7 +310,7 @@ def _process_file_num(fnum, all_fdf_paths, subrun_dir, ped_dir,
                     print(f"[cleanup] Removed filtered {f.name}")
 
 
-def _decode_pedestals(ped_dir: str, decode_exe: str):
+def _decode_pedestals(ped_dir: str, decode_exe: str, cpp_env):
     """Decode pedestal FDFs in ped_dir in-place, skipping already-decoded ones."""
     ped_path = Path(ped_dir)
     if not ped_path.exists():
@@ -319,7 +322,7 @@ def _decode_pedestals(ped_dir: str, decode_exe: str):
         if root_out.exists():
             continue
         print(f"[watcher] Decoding pedestal: {fdf.name}")
-        _decode_file(str(fdf), str(root_out), decode_exe)
+        _decode_file(str(fdf), str(root_out), decode_exe, cpp_env)
 
 
 # ---------------------------------------------------------------------------
@@ -335,10 +338,10 @@ def _m3_tracking_done(m3_track_dir: Path, fnum: int) -> bool:
     return False
 
 
-def _run_m3_tracking(_, fdf_dir: Path, m3_track_dir: Path,
+def _run_m3_tracking(fdf_dir: Path, m3_track_dir: Path,
                      tracking_sh_path: str, tracking_run_dir: str,
                      m3_feu_num: int, fnum: int):
-    """Run M3 tracking shell script for the given fnum's M3 FDF files."""
+    """Run M3 tracking in the default process environment (no ROOT sourced)."""
     try:
         from m3_tracking_control import m3_tracking
     except ImportError:
@@ -504,12 +507,12 @@ def _make_combined_name(a_hits_path: str) -> str:
 # Worker functions (invoke C++ executables)
 # ---------------------------------------------------------------------------
 
-def _decode_file(fdf_path: str, root_path: str, decode_exe: str):
+def _decode_file(fdf_path: str, root_path: str, decode_exe: str, cpp_env):
     print(f"[decode]  {os.path.basename(fdf_path)}")
-    os.system(f'"{decode_exe}" "{fdf_path}" "{root_path}"')
+    subprocess.run([decode_exe, fdf_path, root_path], env=cpp_env)
 
 
-def _analyze_file(root_path: str, ped_dir: str, hits_out_path: str, analyze_exe: str):
+def _analyze_file(root_path: str, ped_dir: str, hits_out_path: str, analyze_exe: str, cpp_env):
     feu_match = re.search(r'_(\d{3})_(\d{2})', os.path.basename(root_path))
     if not feu_match:
         print(f"[analyze] Cannot extract FEU number from {root_path}, skipping")
@@ -525,16 +528,44 @@ def _analyze_file(root_path: str, ped_dir: str, hits_out_path: str, analyze_exe:
                 break
 
     print(f"[analyze] {os.path.basename(root_path)}")
-    os.system(f'"{analyze_exe}" "{root_path}" "{hits_out_path}" "{ped_path}"')
+    subprocess.run([analyze_exe, root_path, hits_out_path, ped_path], env=cpp_env)
 
 
-def _combine_hits(feu_hits_map: dict, combined_path: str, combine_exe: str):
+def _combine_hits(feu_hits_map: dict, combined_path: str, combine_exe: str, cpp_env):
     print(f"[combine] -> {os.path.basename(combined_path)}")
     with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=True) as tmp:
         for feu, path in sorted(feu_hits_map.items()):
             tmp.write(f"{path} {feu}\n")
         tmp.flush()
-        subprocess.run([combine_exe, tmp.name, combined_path], check=True)
+        subprocess.run([combine_exe, tmp.name, combined_path], check=True, env=cpp_env)
+
+
+# ---------------------------------------------------------------------------
+# Environment setup
+# ---------------------------------------------------------------------------
+
+def _build_cpp_env(setup_script: str):
+    """Source setup_script in a login bash shell and return the resulting env dict.
+
+    Uses 'env -0' (null-byte-separated) so env vars with newlines in their
+    values don't corrupt the parse (e.g. LS_COLORS, BASH_FUNC_*, etc.).
+    Returns None and falls back to the process default env if sourcing fails.
+    """
+    result = subprocess.run(
+        ['bash', '-l', '-c', f'{setup_script} && env -0'],
+        capture_output=True, text=True
+    )
+    if result.returncode != 0:
+        print(f"[watcher] WARNING: cpp_setup_script exited {result.returncode}:\n{result.stderr[:400]}")
+    env = {}
+    for entry in result.stdout.split('\0'):
+        if '=' in entry:
+            k, _, v = entry.partition('=')
+            env[k] = v
+    if not env:
+        print("[watcher] WARNING: _build_cpp_env produced empty env, using process default")
+        return None
+    return env
 
 
 if __name__ == '__main__':
