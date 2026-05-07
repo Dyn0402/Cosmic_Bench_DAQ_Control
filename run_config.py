@@ -14,7 +14,7 @@ import copy
 
 class Config:
     def __init__(self):
-        self.run_name = 'mx17_det3_ArCF4_HV_Scan_5-6-26'
+        self.run_name = 'mx17_det4_ArIso_HV_Scan_5-7-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
@@ -24,7 +24,7 @@ class Config:
         self.m3_tracking_inner_dir = 'm3_tracking_root'
         self.detector_info_dir = f'/mnt/cosmic_data/config/detectors/'
         self.m3_feu_num = 1
-        self.power_off_hv_at_end = False  # True to power off HV at end of run
+        self.power_off_hv_at_end = True  # True to power off HV at end of run
         self.filtering_by_m3 = False  # True to filter by m3 tracking (handled by processor_watcher)
         self.save_fdfs = True  # True to save FDF files after processing
         self.start_time = None  # '2024-06-03 15:30:00'  # 'YYYY-MM-DD HH:MM:SS' or None to start immediately
@@ -263,9 +263,9 @@ class Config:
 
         drifts = [900]
         for drift in drifts:
-            resists = [650, 670, 660, 640, 630, 620, 610, 600, 590, 580, 570, 560, 550, 540, 530, 520, 510]
+            resists = [530, 520, 500, 490, 480, 470, 460, 450, 440, 510]
             for resist in resists:
-                time = 120 if resist == 650 else 60
+                time = 6.5 * 60 if resist == 510 else 45
                 new_subrun = {
                     'sub_run_name': f'resist_{resist}V_drift_{drift}V',
                     'run_time': time,  # Minutes
@@ -335,9 +335,9 @@ class Config:
         self.detectors = [
             {
                 'name': 'mx17_1',
-                'description': 'Bulked 5-5-26. Strip resist vertical. ESL no silver paste',
+                'description': 'Bulked 5-6-26. ESL no silver paste',
                 'det_type': 'mx17',
-                'resist_type': 'strip_with_silver_paste',
+                'resist_type': 'strip',
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
