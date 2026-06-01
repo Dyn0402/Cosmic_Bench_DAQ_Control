@@ -246,17 +246,20 @@ A full detector entry looks like this:
 
 The bench coordinate system has **z along the cosmic axis** (vertical, increasing upward), with x and y transverse. The origin is defined by the M3 reference trackers. Coordinates are in mm.
 
-For the z position, you can use the `bench_geometry` helper values when the detector sits on the stand:
+All z positions are measured relative to the physical reference points of the bench (P1, P2, stand levels, etc.) defined in `self.bench_geometry`. Use these constants rather than hardcoded absolute values so that the geometry stays consistent if the bench is reconfigured:
 
 ```python
-# Level N on the stand (N=0 is the bottom level)
+# Detector sitting at the P1 level
+'z': self.bench_geometry['p1_z'] + self.bench_geometry['board_thickness']
+
+# Detector on stand level N (N=0 is the bottom level)
 'z': self.bench_geometry['p1_z']
     + self.bench_geometry['bottom_level_z']
     + N * self.bench_geometry['level_z_spacing']
     + self.bench_geometry['board_thickness']
 ```
 
-Or use an absolute measured value from an alignment run:
+If the detector position has been measured precisely from an alignment run, use that measured value directly instead:
 
 ```python
 'z': 712.7  # mm, from alignment
