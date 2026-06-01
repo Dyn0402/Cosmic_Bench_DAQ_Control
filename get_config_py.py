@@ -13,7 +13,8 @@ import runpy
 
 def main():
     # load run_config_beam.py AS A SCRIPT, not a module
-    config_namespace = runpy.run_path("run_config_beam.py")
+    # config_namespace = runpy.run_path("run_config_beam.py")
+    config_namespace = runpy.run_path("run_config.py")
 
     # the file now acts like a dict namespace
     Config = config_namespace["Config"]
