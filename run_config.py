@@ -14,9 +14,11 @@ import copy
 
 class Config:
     def __init__(self):
-        self.run_name = 'mx17_det4_ArIso_HV_Scan_5-7-26'
+        # self.run_name = 'mx17_det4_ArIso_HV_Scan_5-7-26'
+        self.run_name = 'clas12_test_run1'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
-        self.data_out_dir = '/data/cosmic_data/Run_MX/'
+        # self.data_out_dir = '/data/cosmic_data/Run_MX/'
+        self.data_out_dir = '/mnt/cosmic_data/clas12/Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
         self.raw_daq_inner_dir = 'raw_daq_data'
         self.decoded_root_inner_dir = 'decoded_root'
@@ -29,21 +31,23 @@ class Config:
         self.save_fdfs = True  # True to save FDF files after processing
         self.start_time = None  # '2024-06-03 15:30:00'  # 'YYYY-MM-DD HH:MM:SS' or None to start immediately
         self.write_all_dectors_to_json = False  # Only when making run config json template.
-        # self.gas = 'Ar/Iso 95/5'  # Gas type for run
+        self.gas = 'Ar/Iso 95/5'  # Gas type for run
         # self.gas = 'Ar/CO2/Iso 93/5/2'  # Gas type for run
         # self.gas = 'Helium/Ethane 96.5/3.5'  # Gas type for run
-        self.gas = 'Ar/CF4 90/10'  # Gas type for run
+        # self.gas = 'Ar/CF4 90/10'  # Gas type for run
 
         self.dream_daq_info = {
             # 'ip': '192.168.10.100',
             'ip': '192.168.10.1',
             'port': 1101,
-            'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_MX17.cfg',
+            # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_MX17.cfg',
+            'daq_config_template_path': '/mnt/cosmic_data/clas12/dream_config/CosmicTb_clas12.cfg',
             # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_TPOT.cfg',
             # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_TPOT_P2.cfg',
             # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_SelfTrigger_thresh.cfg',
             # 'run_directory': f'/local/home/usernsw/dylan/Run/{self.run_name}/',
-            'run_directory': f'/data/cosmic_data/Run_MX_temp/{self.run_name}/',
+            # 'run_directory': f'/data/cosmic_data/Run_MX_temp/{self.run_name}/',
+            'run_directory': f'/data/cosmic_data/clas12/Run_temp/{self.run_name}/',
             # 'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
             'data_out_dir': self.run_out_dir,
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
@@ -58,7 +62,9 @@ class Config:
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
             'decoded_root_inner_dir': self.decoded_root_inner_dir,
             'm3_tracking_inner_dir': self.m3_tracking_inner_dir,
+            # 'decode_path': '/local/home/usernsw/dylan/decode/decode',
             'decode_path': '/local/home/usernsw/dylan/decode/decode',
+            # 'convert_path': '/local/home/usernsw/dylan/decode/convert_vec_tree_to_array',
             'convert_path': '/local/home/usernsw/dylan/decode/convert_vec_tree_to_array',
             'detector_info_dir': self.detector_info_dir,
             'filtered_root_inner_dir': self.filtered_root_inner_dir,
@@ -265,7 +271,8 @@ class Config:
         for drift in drifts:
             resists = [530, 520, 500, 490, 480, 470, 460, 450, 440, 510]
             for resist in resists:
-                time = 6.5 * 60 if resist == 510 else 45
+                # time = 6.5 * 60 if resist == 510 else 45
+                time = 5
                 new_subrun = {
                     'sub_run_name': f'resist_{resist}V_drift_{drift}V',
                     'run_time': time,  # Minutes
@@ -329,14 +336,25 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
-        self.included_detectors = ['mx17_1',
-                                   'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
+        # self.included_detectors = ['mx17_1',
+        #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
+        self.included_detectors = ['clas12_test',
+                                           'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
 
         self.detectors = [
             {
-                'name': 'mx17_1',
-                'description': 'Bulked 5-6-26. ESL no silver paste',
-                'det_type': 'mx17',
+                # 'name': 'mx17_1',
+                # 'description': 'Bulked 5-6-26. ESL no silver paste',
+                # 'det_type': 'mx17',
+                # 'resist_type': 'strip',
+                # 'det_center_coords': {  # Center of detector
+                #     'x': 0,  # mm
+                #     'y': 0,  # mm
+                #     'z': self.bench_geometry['p1_z'] + self.bench_geometry['board_thickness'],  # mm
+                # },
+                'name': 'clas12_test_1',
+                'description': 'tested for daq',
+                'det_type': 'clas12_test',
                 'resist_type': 'strip',
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
@@ -1130,7 +1148,8 @@ class Config:
 
 
 if __name__ == '__main__':
-    out_dir = '/local/home/usernsw/dylan/'
+    # out_dir = '/local/home/usernsw/dylan/'
+    out_dir = '/mnt/cosmic_data/clas12/'
     # out_dir = 'C:/Users/Dylan/Desktop/banco_test3/'
     config = Config()
     config.write_to_file(f'{out_dir}run_config_test.json')

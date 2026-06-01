@@ -10,7 +10,8 @@ import json
 import os
 
 # --- Paths ---
-BASE_DATA = '/data/cosmic_data/Run_MX/'
+# BASE_DATA = '/data/cosmic_data/Run_MX/'
+BASE_DATA = '/mnt/cosmic_data/clas12/Run/'
 MM_BUILD = '/local/home/usernsw/mm_dream_reconstruction/build'
 
 M3_TRACKING_DIR = '/local/home/usernsw/dylan/m3_tracking/'
