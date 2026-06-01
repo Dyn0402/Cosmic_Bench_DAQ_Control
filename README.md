@@ -86,7 +86,7 @@ Run `processor_config.py` to generate a JSON config for `processor_watcher.py`. 
 
 ## How to Run
 
-### 1. Start the background servers
+### 1. Start the background servers (once per session)
 
 ```bash
 ./start_servers_cosmics.sh
@@ -99,29 +99,35 @@ This launches five tmux sessions:
 | `hv_control` | `python hv_control.py` |
 | `dream_daq` | `python dream_daq_control.py` |
 | `m3_tracking` | `python m3_tracking_control.py` |
-| `daq_control` | (idle, waiting for run commands) |
+| `daq_control` | (idle, ready to receive run commands) |
 | `flask_server` | Flask monitoring dashboard |
 
 Attach to any session with `tmux attach -t <session_name>`.
 
 ### 2. Start a run
 
+Edit `run_config.py` (or prepare a JSON config), then attach to the `daq_control` tmux session and run the script from there:
+
+```bash
+tmux attach -t daq_control
+python daq_control.py                                             # uses run_config.py directly
+python daq_control.py config/json_run_configs/my_run_config.json  # or pass a JSON config
+```
+
+This single command handles the full run automatically — no need to interact with the individual servers. It follows these steps:
+
+1. Connects to the HV and DREAM DAQ servers
+2. For each sub-run defined in the config:
+   - Ramps the HV channels to the specified voltages and waits until stable
+   - Starts HV monitoring
+   - Starts the DREAM DAQ and acquires data for the configured run time
+   - Stops the DAQ and ends HV monitoring
+3. Powers off HV at the end (if `power_off_hv_at_end = True`)
+
+Alternatively, if you don't want to attach to the session, `bash_scripts/start_run.sh` sends the command to the `daq_control` tmux session from any terminal:
+
 ```bash
 bash bash_scripts/start_run.sh <config_path>
-```
-
-`<config_path>` can be a `.json` file under `config/json_run_configs/` (relative path) or an absolute path. If omitted the script will print usage. The command is sent to the `daq_control` tmux session.
-
-Alternatively, run directly:
-
-```bash
-python daq_control.py config/json_run_configs/my_run_config.json
-```
-
-Or with the in-code config (edit `run_config.py` then):
-
-```bash
-python daq_control.py
 ```
 
 ### 3. Run pedestals
@@ -144,7 +150,7 @@ python processor_watcher.py <processor_config_json_path>
 bash bash_scripts/stop_run.sh
 ```
 
-To stop only the current sub-run:
+To stop only the current sub-run without ending the full sequence:
 
 ```bash
 bash bash_scripts/stop_sub_run.sh
