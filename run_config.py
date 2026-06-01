@@ -1150,7 +1150,7 @@ class Config:
 if __name__ == '__main__':
     # out_dir = '/local/home/usernsw/dylan/'
     # out_dir = '/mnt/cosmic_data/clas12/'
-    out_run_dir = 'config/json_run_configs'
+    out_run_dir = '/local/home/usernsw/Cosmic_Bench_DAQ_Control/config/json_run_configs'
     config_name = 'run_config.json'
     config = Config()
     config.write_to_file(f'{out_run_dir}{config_name}')
