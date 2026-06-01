@@ -23,12 +23,14 @@ All server sessions are managed with **tmux**.
 
 ---
 
-## Supported Detectors
+## Implemented Detector Types
 
 - **Micromegas** (various geometries: mx17, urw, asacusa_strip, strip_plein, strip_strip, rd5, p2) read out via DREAM FEUs
 - **BANCO silicon pixel ladders** (banco_ladder*)
 - **M3 Micromegas reference trackers** (4 planes: bot_bot, bot_top, top_bot, top_top)
 - **Scintillators** (top and bottom trigger counters)
+
+Adding a new detector instance to an existing type is straightforward — see the [Adding a New Detector](#adding-a-new-detector) section. Adding a completely new detector type is also possible, but requires one additional step: creating a geometry JSON file in `config/detectors/` named after the `det_type` (e.g. `config/detectors/my_new_type.json`). This file describes the physical dimensions and strip map type of the detector and is used by the processing code. It is only strictly required if `filtering_by_m3 = True`, since the M3 filter needs to know the active area of the detector to select tracks that pass through it — without it, basic DAQ and decoding will still work.
 
 ---
 
@@ -189,6 +191,172 @@ bash bash_scripts/restart_all_tmux_processes.sh
 | `elog_updater.py` | Post run summaries to the e-log |
 | `get_run_events.py` | Count events in a run |
 | `convert_fdf_to_root.py` | Standalone FDF → ROOT conversion |
+
+---
+
+## Adding a New Detector
+
+### 1. Add an entry to `self.detectors`
+
+Every detector that may ever be used must have an entry in the `self.detectors` list in `run_config.py`. Only detectors whose `name` appears in `self.included_detectors` are actually written to the run config JSON and used in processing.
+
+A full detector entry looks like this:
+
+```python
+{
+    'name': 'my_detector_1',          # unique identifier used everywhere
+    'description': 'Notes about this detector build',  # optional, for bookkeeping
+    'det_type': 'mx17',               # detector type — must match a type known to the processing code
+    'det_center_coords': {            # physical center of the detector in bench coordinates (mm)
+        'x': 0,
+        'y': 0,
+        'z': 232,
+    },
+    'det_orientation': {              # rotation of the detector about each axis (degrees)
+        'x': 0,
+        'y': 0,
+        'z': 0,
+    },
+    'hv_channels': {                  # CAEN crate wiring: {electrode: (card, channel)}
+        'drift':  (0, 7),
+        'resist': (3, 0),
+    },
+    'dream_feus': {                   # DREAM DAQ wiring: {feu_label: (crate, feu_number)}
+        'x_1': (3, 1),                # strips running along x → give hit position in y
+        'x_2': (3, 2),
+        'y_1': (4, 1),                # strips running along y → give hit position in x
+        'y_2': (4, 2),
+    },
+    'dream_feu_orientation': {        # how the FEU connector is physically plugged in
+        'x_1': 'inverted',            # 'normal', 'inverted', 'rotated', or 'rotated_inverted'
+        'x_2': 'inverted',
+        'y_1': 'inverted',
+        'y_2': 'inverted',
+    },
+},
+```
+
+**`hv_channels`** — check the CAEN crate wiring diagram for the card and channel numbers connected to each electrode (drift, resist/mesh).
+
+**`dream_feus`** — check the DREAM DAQ wiring for the crate and FEU numbers. The label convention is `x_N` for strips that run along the x-axis (they measure the y coordinate of a hit) and `y_N` for strips that run along the y-axis (they measure the x coordinate).
+
+**`dream_feu_orientation`** — depends on the physical direction the FEU connector is inserted. If strips appear mirrored in the data, try `'inverted'`.
+
+### 2. Set the position and alignment
+
+The bench coordinate system has **z along the cosmic axis** (vertical, increasing upward), with x and y transverse. The origin is defined by the M3 reference trackers. Coordinates are in mm.
+
+For the z position, you can use the `bench_geometry` helper values when the detector sits on the stand:
+
+```python
+# Level N on the stand (N=0 is the bottom level)
+'z': self.bench_geometry['p1_z']
+    + self.bench_geometry['bottom_level_z']
+    + N * self.bench_geometry['level_z_spacing']
+    + self.bench_geometry['board_thickness']
+```
+
+Or use an absolute measured value from an alignment run:
+
+```python
+'z': 712.7  # mm, from alignment
+```
+
+x and y offsets relative to the M3 telescope centre are also set from alignment. If the detector is centred on the telescope, use `x: 0, y: 0`.
+
+`det_orientation` is the physical rotation of the detector about each axis in degrees. For a standard flat detector with no rotation, all three are `0`.
+
+### 3. Add the name to `self.included_detectors`
+
+```python
+self.included_detectors = [
+    'my_detector_1',
+    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top',  # always include M3 reference trackers
+]
+```
+
+Only detectors in this list are active in the run. The M3 reference trackers should always be included as they provide the reference tracks for efficiency and alignment measurements.
+
+---
+
+## Running an HV Scan
+
+An HV scan is just a normal run where multiple sub-runs are defined, each with a different HV voltage. `daq_control.py` steps through them automatically.
+
+### 1. Find the HV card and channel for your detector
+
+Each detector in `run_config.py` has an `hv_channels` entry that maps the logical electrode names to `(card, channel)` pairs on the CAEN crate:
+
+```python
+'hv_channels': {
+    'drift': (0, 7),   # card 0, channel 7
+    'resist': (3, 0),  # card 3, channel 0
+},
+```
+
+Use these card/channel numbers when building the `hvs` dict in your sub-runs.
+
+### 2. Set the run metadata
+
+```python
+self.run_name = 'det_name_HV_scan_date'
+self.gas = 'Ar/CF4 90/10'
+self.power_off_hv_at_end = True
+self.included_detectors = ['your_detector', 'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
+```
+
+### 3. Define the sub-runs
+
+The `sub_runs` list drives the scan. Each entry sets the voltages for all active channels and the acquisition time. You can write them explicitly or generate them in a loop:
+
+```python
+# Explicit list
+self.sub_runs = [
+    {
+        'sub_run_name': 'resist_450V_drift_900V',
+        'run_time': 45,   # minutes
+        'hvs': {
+            0: {7: 900},  # drift voltage  (card: {channel: voltage})
+            3: {0: 450},  # resist voltage
+        }
+    },
+    {
+        'sub_run_name': 'resist_460V_drift_900V',
+        'run_time': 45,
+        'hvs': {
+            0: {7: 900},
+            3: {0: 460},
+        }
+    },
+    # ...
+]
+
+# Or generate programmatically (as in the current run_config.py)
+drifts = [900]
+resists = [450, 460, 470, 480, 490, 500]
+for drift in drifts:
+    for resist in resists:
+        self.sub_runs.append({
+            'sub_run_name': f'resist_{resist}V_drift_{drift}V',
+            'run_time': 45,
+            'hvs': {
+                0: {7: drift},
+                3: {0: resist},
+            }
+        })
+```
+
+> **Note:** The `hvs` dict only needs to list channels that should be actively set for that sub-run. Any channel not listed keeps whatever voltage it was last set to. Make sure to include all channels that need to be at specific values (e.g. M3 tracker HV if the M3 is running).
+
+### 4. Run
+
+Start the servers if not already running, then from the `daq_control` tmux session:
+
+```bash
+python daq_control.py
+```
+
+The scan runs fully automatically — HV is ramped, data is acquired, and the next voltage step starts until all sub-runs are done.
 
 ---
 
