@@ -1149,8 +1149,9 @@ class Config:
 
 if __name__ == '__main__':
     # out_dir = '/local/home/usernsw/dylan/'
-    out_dir = '/mnt/cosmic_data/clas12/'
-    # out_dir = 'C:/Users/Dylan/Desktop/banco_test3/'
+    # out_dir = '/mnt/cosmic_data/clas12/'
+    out_run_dir = 'config/json_run_configs'
+    config_name = 'run_config.json'
     config = Config()
-    config.write_to_file(f'{out_dir}run_config_test.json')
+    config.write_to_file(f'{out_run_dir}{config_name}')
     print('donzo')
