@@ -148,9 +148,11 @@ def update_run_config_py():
 @app.route("/run_config_py", methods=['POST'])
 def run_config_py():
     try:
-        subprocess.Popen(["python", f"{BASE_DIR}/run_config_beam.py"])
+        # subprocess.Popen(["python", f"{BASE_DIR}/run_config_beam.py"])
+        subprocess.Popen(["python", f"{BASE_DIR}/run_config.py"])
         time.sleep(1)
-        config_path = os.path.join(CONFIG_RUN_DIR, 'run_config_beam.json')
+        # config_path = os.path.join(CONFIG_RUN_DIR, 'run_config_beam.json')
+        config_path = os.path.join(CONFIG_RUN_DIR, 'run_config.json')
         if not os.path.exists(config_path):
             return jsonify({"message": f"Config not found: {config_path}"}), 404
 
@@ -170,7 +172,8 @@ def run_config_py():
             run_name = "Error loading run name"
 
         if result.returncode == 0:
-            return jsonify({"success": True, "message": f"Run started with loaded run_config_beam.py", "run_name": run_name})
+            # return jsonify({"success": True, "message": f"Run started with loaded run_config_beam.py", "run_name": run_name})
+            return jsonify({"success": True, "message": f"Run started with loaded run_config.py", "run_name": run_name})
         else:
             return jsonify({"message": f"Error: {result.stderr}"}), 500
     except Exception as e:
