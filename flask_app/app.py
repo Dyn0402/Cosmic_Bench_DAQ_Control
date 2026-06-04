@@ -31,12 +31,14 @@ from get_run_events import get_total_events_for_run
 BASE_DIR = "/local/home/usernsw/Cosmic_Bench_DAQ_Control"
 CONFIG_TEMPLATE_DIR = f"{BASE_DIR}/config/json_templates"
 CONFIG_RUN_DIR = f"{BASE_DIR}/config/json_run_configs"
-CONFIG_PY_PATH = f"{BASE_DIR}/run_config_beam.py"
+# CONFIG_PY_PATH = f"{BASE_DIR}/run_config_beam.py"
+CONFIG_PY_PATH = f"{BASE_DIR}/run_config.py"
 BASH_DIR = f"{BASE_DIR}/bash_scripts"
 PROCESSOR_CONFIG_PATH = f"{BASE_DIR}/config/processor_config.json"
 PROCESSOR_SESSION = "processor"
 ANALYSIS_DIR = "/data/cosmic_data/Analysis"
-RUN_DIR = "/data/cosmic_data/Run"
+# RUN_DIR = "/data/cosmic_data/Run"
+RUN_DIR = "/mnt/cosmic_data/clas12/Run"
 HV_TAIL = 1000  # number of most recent rows to show
 
 
@@ -146,9 +148,11 @@ def update_run_config_py():
 @app.route("/run_config_py", methods=['POST'])
 def run_config_py():
     try:
-        subprocess.Popen(["python", f"{BASE_DIR}/run_config_beam.py"])
+        # subprocess.Popen(["python", f"{BASE_DIR}/run_config_beam.py"])
+        subprocess.Popen(["python", f"{BASE_DIR}/run_config.py"])
         time.sleep(1)
-        config_path = os.path.join(CONFIG_RUN_DIR, 'run_config_beam.json')
+        # config_path = os.path.join(CONFIG_RUN_DIR, 'run_config_beam.json')
+        config_path = os.path.join(CONFIG_RUN_DIR, 'run_config.json')
         if not os.path.exists(config_path):
             return jsonify({"message": f"Config not found: {config_path}"}), 404
 
@@ -168,7 +172,8 @@ def run_config_py():
             run_name = "Error loading run name"
 
         if result.returncode == 0:
-            return jsonify({"success": True, "message": f"Run started with loaded run_config_beam.py", "run_name": run_name})
+            # return jsonify({"success": True, "message": f"Run started with loaded run_config_beam.py", "run_name": run_name})
+            return jsonify({"success": True, "message": f"Run started with loaded run_config.py", "run_name": run_name})
         else:
             return jsonify({"message": f"Error: {result.stderr}"}), 500
     except Exception as e:
