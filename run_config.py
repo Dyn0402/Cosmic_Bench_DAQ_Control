@@ -15,10 +15,10 @@ import copy
 class Config:
     def __init__(self):
         # self.run_name = 'mx17_det4_ArIso_HV_Scan_5-7-26'
-        self.run_name = 'clas12_test_run1'
+        self.run_name = 'zs_test_run1'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         # self.data_out_dir = '/data/cosmic_data/Run_MX/'
-        self.data_out_dir = '/mnt/cosmic_data/clas12/Run/'
+        self.data_out_dir = '/mnt/cosmic_data/test/zs_test/Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
         self.raw_daq_inner_dir = 'raw_daq_data'
         self.decoded_root_inner_dir = 'decoded_root'
@@ -41,13 +41,14 @@ class Config:
             'ip': '192.168.10.1',
             'port': 1101,
             # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_MX17.cfg',
-            'daq_config_template_path': '/mnt/cosmic_data/clas12/dream_config/CosmicTb_clas12.cfg',
+            # 'daq_config_template_path': '/mnt/cosmic_data/clas12/dream_config/CosmicTb_clas12.cfg',
+            'daq_config_template_path': '/mnt/cosmic_data/test/zs_test/dream_config/CosmicTb_M3_ZS_test.cfg',
             # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_TPOT.cfg',
             # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_TPOT_P2.cfg',
             # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_SelfTrigger_thresh.cfg',
             # 'run_directory': f'/local/home/usernsw/dylan/Run/{self.run_name}/',
             # 'run_directory': f'/data/cosmic_data/Run_MX_temp/{self.run_name}/',
-            'run_directory': f'/data/cosmic_data/clas12/Run_temp/{self.run_name}/',
+            'run_directory': f'/data/cosmic_data/test/zs_test/Run_temp/{self.run_name}/',
             # 'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
             'data_out_dir': self.run_out_dir,
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
@@ -101,6 +102,26 @@ class Config:
 
 
         self.sub_runs = [
+            {
+                'sub_run_name': 'quick_test',
+                'run_time': 5,  # Minutes
+                'hvs': {
+                    0: {
+                        7: 900,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    3: {
+                        0: 510,
+                        8: 455,
+                        9: 455,
+                        10: 455,
+                        11: 455,
+                    }
+                }
+            },
             # {
             #     'sub_run_name': 'long_run',
             #     'run_time': 24 * 60,  # Minutes
@@ -267,33 +288,33 @@ class Config:
         # }
         # self.sub_runs.append(new_subrun)
 
-        drifts = [900]
-        for drift in drifts:
-            resists = [530, 520, 500, 490, 480, 470, 460, 450, 440, 510]
-            for resist in resists:
-                # time = 6.5 * 60 if resist == 510 else 45
-                time = 5
-                new_subrun = {
-                    'sub_run_name': f'resist_{resist}V_drift_{drift}V',
-                    'run_time': time,  # Minutes
-                    'hvs': {
-                        0: {
-                            7: drift,
-                            8: 500,
-                            9: 500,
-                            10: 500,
-                            11: 500,
-                        },
-                        3: {
-                            0: resist,
-                            8: 455,
-                            9: 455,
-                            10: 455,
-                            11: 455,
-                        },
-                    }
-                }
-                self.sub_runs.append(new_subrun)
+        # drifts = [900]
+        # for drift in drifts:
+        #     resists = [530, 520, 500, 490, 480, 470, 460, 450, 440, 510]
+        #     for resist in resists:
+        #         # time = 6.5 * 60 if resist == 510 else 45
+        #         time = 5
+        #         new_subrun = {
+        #             'sub_run_name': f'resist_{resist}V_drift_{drift}V',
+        #             'run_time': time,  # Minutes
+        #             'hvs': {
+        #                 0: {
+        #                     7: drift,
+        #                     8: 500,
+        #                     9: 500,
+        #                     10: 500,
+        #                     11: 500,
+        #                 },
+        #                 3: {
+        #                     0: resist,
+        #                     8: 455,
+        #                     9: 455,
+        #                     10: 455,
+        #                     11: 455,
+        #                 },
+        #             }
+        #         }
+        #         self.sub_runs.append(new_subrun)
 
         #
         # drift, resist = 800, 505
