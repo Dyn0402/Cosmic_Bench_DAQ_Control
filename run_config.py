@@ -15,10 +15,11 @@ import copy
 class Config:
     def __init__(self):
         # self.run_name = 'mx17_det4_ArIso_HV_Scan_5-7-26'
-        self.run_name = 'zs_test_run1'
+        self.run_name = 'zs_compression_scan_6-6-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         # self.data_out_dir = '/data/cosmic_data/Run_MX/'
-        self.data_out_dir = '/mnt/cosmic_data/test/zs_test/Run/'
+        self.base_out_dir = '/mnt/cosmic_data/MX17/'
+        self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
         self.raw_daq_inner_dir = 'raw_daq_data'
         self.decoded_root_inner_dir = 'decoded_root'
@@ -42,18 +43,32 @@ class Config:
             'port': 1101,
             # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_MX17.cfg',
             # 'daq_config_template_path': '/mnt/cosmic_data/clas12/dream_config/CosmicTb_clas12.cfg',
-            'daq_config_template_path': '/mnt/cosmic_data/test/zs_test/dream_config/CosmicTb_M3_ZS_test.cfg',
+            'daq_config_template_path': '/mnt/cosmic_data/MX17/dream_config/CosmicTb_MX17_ZS_scan.cfg',
             # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_TPOT.cfg',
             # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_TPOT_P2.cfg',
             # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_SelfTrigger_thresh.cfg',
             # 'run_directory': f'/local/home/usernsw/dylan/Run/{self.run_name}/',
             # 'run_directory': f'/data/cosmic_data/Run_MX_temp/{self.run_name}/',
-            'run_directory': f'/data/cosmic_data/test/zs_test/Run_temp/{self.run_name}/',
+            'run_directory': f'{self.base_out_dir}dream_run/{self.run_name}/',
             # 'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
             'data_out_dir': self.run_out_dir,
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
             'copy_on_fly': True,  # True to copy raw data to out dir during run, False to copy after run
-            'zero_suppress': False,  # True to run in zero suppression mode, False to run in full readout mode
+            'n_samples_per_waveform': 32,  # Number of samples per waveform to configure in DAQ
+            'zero_suppress': True,  # True to run in zero suppression mode, False to run in full readout mode
+            # 'pedestals_dir': f'{self.base_out_dir}pedestals_noise/',
+            'pedestals_dir': f'{self.base_out_dir}pedestals/',
+            # None to ignore, else top directory for pedestal runs
+            'pedestals': 'latest',
+            # 'latest' for most recent, otherwise specify directory name, eg "pedestals_10-22-25_13-43-34"
+            # 'latency': 33,  # Latency setting for DAQ in clock cycles
+            # 'latency': 22,  # Latency setting for DAQ in clock cycles
+            'sample_period': 60,  # ns, sampling period
+            'zs_check_sample': 1,  # Number of samples to read out beyond threshold crossing
+            # 'zs_check_sample': 4,  # Number of samples to read out beyond threshold crossing
+            'pedestal_subtraction': False,
+            'common_noise_subtraction': True,
+            'zs_type': 'tpc',
         }
 
         self.dedip196_processor_info = {
@@ -103,8 +118,8 @@ class Config:
 
         self.sub_runs = [
             {
-                'sub_run_name': 'quick_test',
-                'run_time': 5,  # Minutes
+                'sub_run_name': 'no_zs',
+                'run_time': 10,  # Minutes
                 'hvs': {
                     0: {
                         7: 900,
@@ -114,13 +129,37 @@ class Config:
                         11: 500,
                     },
                     3: {
-                        0: 510,
+                        0: 500,
                         8: 455,
                         9: 455,
                         10: 455,
                         11: 455,
                     }
-                }
+                },
+                'zero_suppress': False,
+                'pedestals': 'pedestals_290'
+            },
+            {
+                'sub_run_name': 'zs_type_tracker',
+                'run_time': 10,  # Minutes
+                'hvs': {
+                    0: {
+                        7: 900,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    3: {
+                        0: 500,
+                        8: 455,
+                        9: 455,
+                        10: 455,
+                        11: 455,
+                    }
+                },
+                'pedestals': 'pedestals_290',
+                'zs_type': 'tracker',
             },
             # {
             #     'sub_run_name': 'long_run',
@@ -340,6 +379,86 @@ class Config:
         # }
         # self.sub_runs.append(new_subrun)
 
+        check_samples = [0, 1, 2, 3, 4]
+        for check_sample in check_samples:
+            new_subrun = {
+                'sub_run_name': f'zs_type_tpc_{check_sample}_sample',
+                'run_time': 10,  # Minutes
+                'hvs': {
+                    0: {
+                        7: 900,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    3: {
+                        0: 500,
+                        8: 455,
+                        9: 455,
+                        10: 455,
+                        11: 455,
+                    }
+                },
+                'pedestals': 'pedestals_290',
+                'zs_type': 'tpc',
+                'zs_check_sample': check_sample,
+            }
+            self.sub_runs.append(new_subrun)
+
+        peds = [290, 300, 310, 320, 330, 340, 350, 400, 450, 500, 550, 600, 700, 800, 900, 1000]
+        for ped in peds:
+            new_subrun = {
+                'sub_run_name': f'ped_{ped}',
+                'run_time': 5,  # Minutes
+                'hvs': {
+                    0: {
+                        7: 900,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    3: {
+                        0: 500,
+                        8: 455,
+                        9: 455,
+                        10: 455,
+                        11: 455,
+                    }
+                },
+                'pedestals': f'pedestals_{ped}',
+                'zs_type': 'tpc',
+                'zs_check_sample': 1,
+            }
+            self.sub_runs.append(new_subrun)
+
+        new_subrun = {
+            'sub_run_name': f'final_run',
+            'run_time': 8 * 60,  # Minutes
+            'hvs': {
+                0: {
+                    7: 900,
+                    8: 500,
+                    9: 500,
+                    10: 500,
+                    11: 500,
+                },
+                3: {
+                    0: 500,
+                    8: 455,
+                    9: 455,
+                    10: 455,
+                    11: 455,
+                }
+            },
+            'daq_config_template_path': '/mnt/cosmic_data/MX17/dream_config/CosmicTb_MX17.cfg',
+            'pedestals_dir': f'{self.base_out_dir}pedestals/',
+            'zero_suppress': False,
+            'common_noise_subtraction': False,
+        }
+        self.sub_runs.append(new_subrun)
+
 
         self.bench_geometry = {
             'p1_z': 227,  # mm  To the top of P1 from the top of PB
@@ -357,31 +476,31 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
-        # self.included_detectors = ['mx17_1',
-        #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
-        self.included_detectors = ['clas12_test',
-                                           'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
+        self.included_detectors = ['mx17_1',
+                                   'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
+        # self.included_detectors = ['clas12_test',
+        #                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
 
         self.detectors = [
             {
-                # 'name': 'mx17_1',
-                # 'description': 'Bulked 5-6-26. ESL no silver paste',
-                # 'det_type': 'mx17',
-                # 'resist_type': 'strip',
-                # 'det_center_coords': {  # Center of detector
-                #     'x': 0,  # mm
-                #     'y': 0,  # mm
-                #     'z': self.bench_geometry['p1_z'] + self.bench_geometry['board_thickness'],  # mm
-                # },
-                'name': 'clas12_test_1',
-                'description': 'tested for daq',
-                'det_type': 'clas12_test',
+                'name': 'mx17_1',
+                'description': 'Det3 from May beam test',
+                'det_type': 'mx17',
                 'resist_type': 'strip',
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
                     'z': self.bench_geometry['p1_z'] + self.bench_geometry['board_thickness'],  # mm
                 },
+                # 'name': 'clas12_test_1',
+                # 'description': 'tested for daq',
+                # 'det_type': 'clas12_test',
+                # 'resist_type': 'strip',
+                # 'det_center_coords': {  # Center of detector
+                #     'x': 0,  # mm
+                #     'y': 0,  # mm
+                #     'z': self.bench_geometry['p1_z'] + self.bench_geometry['board_thickness'],  # mm
+                # },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
                     'y': 0,  # deg  Rotation about y axis

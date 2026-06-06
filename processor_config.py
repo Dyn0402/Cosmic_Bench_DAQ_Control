@@ -10,8 +10,8 @@ import json
 import os
 
 # --- Paths ---
-# BASE_DATA = '/data/cosmic_data/Run_MX/'
-BASE_DATA = '/mnt/cosmic_data/clas12/Run/'
+BASE_DATA = '/mnt/cosmic_data/MX17/Run/'
+# BASE_DATA = '/mnt/cosmic_data/clas12/Run/'
 MM_BUILD = '/local/home/usernsw/mm_dream_reconstruction/build'
 
 M3_TRACKING_DIR = '/local/home/usernsw/dylan/m3_tracking/'
@@ -77,7 +77,7 @@ CONFIG = {
     # If include_runs is a non-empty list, only those run directories are processed.
     # If exclude_runs is a non-empty list, those run directories are skipped.
     # Both null/empty means process all runs as normal.
-    'include_runs': ['mx17_det3_ArCF4_gas_change_5-6-26'],  # e.g. ['run_42', 'run_43'] — only process these runs
+    'include_runs': None,  # e.g. ['run_42', 'run_43'] — only process these runs
     'exclude_runs': None,  # e.g. ['run_1', 'run_2']  — skip these runs
 
     # Watcher behavior

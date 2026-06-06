@@ -47,8 +47,8 @@ class Config:
             'latency': 33,  # Latency setting for DAQ in clock cycles
             # 'latency': 22,  # Latency setting for DAQ in clock cycles
             'sample_period': 40,  # ns, sampling period
-            # 'samples_beyond_threshold': 1,  # Number of samples to read out beyond threshold crossing
-            'samples_beyond_threshold': 4,  # Number of samples to read out beyond threshold crossing
+            # 'zs_check_sample': 1,  # Number of samples to read out beyond threshold crossing
+            'zs_check_sample': 4,  # Number of samples to read out beyond threshold crossing
         }
 
         self.hv_control_info = {
