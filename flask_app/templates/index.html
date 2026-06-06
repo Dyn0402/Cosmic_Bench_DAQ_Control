@@ -17,7 +17,6 @@
 
   <!-- Control buttons -->
   <div class="mb-4 d-flex flex-wrap align-items-center gap-2">
-    <select id="run-select" class="form-select me-3 d-none" style="width:auto;"></select>
     <button id="run-config-py" class="btn btn-success me-2 mb-2">Start Run</button>
     <button id="stop-sub-run" class="btn btn-warning me-2 mb-2">Stop Sub-Run</button>
     <button id="stop-run" class="btn btn-danger me-2 mb-2">Stop Run</button>
@@ -35,10 +34,18 @@
 
     <h3>HV Monitor</h3>
     <p class="text-muted" style="color:#fff;">Latest voltage and current readings from HV control system</p>
-    <label for="hv-subrun-select" class="me-2">Subrun:</label>
-          <select id="hv-subrun-select" class="form-select me-3" style="width:auto;">
-            <option value="">(none)</option>
-          </select>
+    <div class="d-flex align-items-center gap-3 mb-2 flex-wrap">
+      <div class="d-flex align-items-center gap-2">
+        <label for="run-select" class="me-1 text-white">Run:</label>
+        <select id="run-select" class="form-select" style="width:auto;"></select>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <label for="hv-subrun-select" class="me-1 text-white">Subrun:</label>
+        <select id="hv-subrun-select" class="form-select" style="width:auto;">
+          <option value="">(none)</option>
+        </select>
+      </div>
+    </div>
 
     <div id="hv-voltage-plot" style="width:100%;height:400px;"></div>
     <div id="hv-current-plot" style="width:100%;height:400px;"></div>
@@ -354,14 +361,24 @@ async function updateHVPlots() {
 }
 
 async function loadRuns() {
-    // Hack to only allow run_config_beam.json
+  const res = await fetch('/get_runs');
+  const runs = await res.json();
   const runSelect = document.getElementById("run-select");
+  const prev = runSelect.value;
   runSelect.innerHTML = "";
-  const opt = document.createElement("option");
-  opt.value = "run_config_beam.json";
-  opt.textContent = "run_config_beam.json";
-  runSelect.appendChild(opt);
-  runSelect.value = "run_config_beam.json";
+  runs.forEach(r => {
+    const opt = document.createElement("option");
+    opt.value = r;
+    opt.textContent = r;
+    runSelect.appendChild(opt);
+  });
+  if (runs.includes(prev)) {
+    runSelect.value = prev;
+  } else if (runs.includes('run_config.json')) {
+    runSelect.value = 'run_config.json';
+  } else if (runs.length > 0) {
+    runSelect.value = runs[0];
+  }
   loadSubruns();
 }
 
@@ -536,11 +553,6 @@ document.getElementById("run-config-py").addEventListener("click", async functio
     document.getElementById("run-display").textContent = data.run_name;
 
     await loadRuns();
-
-    const runSelect = document.getElementById("run-select");
-    runSelect.value = "run_config_beam.json";
-
-    await loadSubruns();
     updateHVPlots();
   }
 });
