@@ -83,6 +83,7 @@ def main():
                 hv.send_json(sub_run)
                 res = hv.receive()
                 if 'HV Set' in res:
+                    print(f'[status] run={config.run_name}  subrun={sub_run_name}  run_time={sub_run.get("run_time", "?")}min')
                     print(f'Starting run for sub run {sub_run_name}')
                     run_daq_controller(sub_run, sub_out_dir, dream_daq)
 

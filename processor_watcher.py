@@ -422,7 +422,7 @@ def _resolve_pedestal_dir(raw_dir: Path, pedestal_loc: str, pedestal_base_dir: s
         txt = raw_dir / 'pedestal_run.txt'
         if txt.exists():
             ped_run = txt.read_text().strip()
-            return str(Path(pedestal_base_dir) / ped_run / 'pedestals_noise')
+            return str(Path(pedestal_base_dir) / ped_run / 'pedestals')
         print(f"[watcher] pedestal_run.txt not found in {raw_dir}, skipping pedestal decode")
     return ''
 

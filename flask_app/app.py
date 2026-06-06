@@ -37,8 +37,8 @@ BASH_DIR = f"{BASE_DIR}/bash_scripts"
 PROCESSOR_CONFIG_PATH = f"{BASE_DIR}/config/processor_config.json"
 PROCESSOR_SESSION = "processor"
 ANALYSIS_DIR = "/data/cosmic_data/Analysis"
-# RUN_DIR = "/data/cosmic_data/Run"
-RUN_DIR = "/mnt/cosmic_data/clas12/Run"
+# RUN_DIR = "/mnt/cosmic_data/clas12/Run"
+RUN_DIR = "/mnt/cosmic_data/MX17/Run"
 HV_TAIL = 1000  # number of most recent rows to show
 
 
