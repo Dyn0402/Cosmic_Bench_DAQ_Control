@@ -140,7 +140,7 @@ class Config:
                 'pedestals_dir': f'{self.base_out_dir}pedestals/',
                 'zero_suppress': False,
                 'common_noise_subtraction': False,
-            }
+            },
             {
                 'sub_run_name': 'no_zs',
                 'run_time': 10,  # Minutes
