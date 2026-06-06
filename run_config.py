@@ -15,7 +15,7 @@ import copy
 class Config:
     def __init__(self):
         # self.run_name = 'mx17_det4_ArIso_HV_Scan_5-7-26'
-        self.run_name = 'zs_compression_scan_6-6-26'
+        self.run_name = 'zs_compression_scan_2_6-6-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         # self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.base_out_dir = '/mnt/cosmic_data/MX17/'
@@ -117,50 +117,51 @@ class Config:
 
 
         self.sub_runs = [
-            {
-                'sub_run_name': 'no_zs',
-                'run_time': 10,  # Minutes
-                'hvs': {
-                    0: {
-                        7: 900,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500,
-                    },
-                    3: {
-                        0: 500,
-                        8: 455,
-                        9: 455,
-                        10: 455,
-                        11: 455,
-                    }
-                },
-                'zero_suppress': False,
-                'pedestals': 'pedestals_290'
-            },
-            {
-                'sub_run_name': 'zs_type_tracker',
-                'run_time': 10,  # Minutes
-                'hvs': {
-                    0: {
-                        7: 900,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500,
-                    },
-                    3: {
-                        0: 500,
-                        8: 455,
-                        9: 455,
-                        10: 455,
-                        11: 455,
-                    }
-                },
-                'pedestals': 'pedestals_290',
-                'zs_type': 'tracker',
-            },
+            # {
+            #     'sub_run_name': 'no_zs',
+            #     'run_time': 10,  # Minutes
+            #     'hvs': {
+            #         0: {
+            #             7: 900,
+            #             8: 500,
+            #             9: 500,
+            #             10: 500,
+            #             11: 500,
+            #         },
+            #         3: {
+            #             0: 500,
+            #             8: 455,
+            #             9: 455,
+            #             10: 455,
+            #             11: 455,
+            #         }
+            #     },
+            #     'zero_suppress': False,
+            #     'pedestals': 'pedestals_290'
+            # },
+            # {
+            #     'sub_run_name': 'zs_type_tracker',
+            #     'run_time': 10,  # Minutes
+            #     'hvs': {
+            #         0: {
+            #             7: 900,
+            #             8: 500,
+            #             9: 500,
+            #             10: 500,
+            #             11: 500,
+            #         },
+            #         3: {
+            #             0: 500,
+            #             8: 455,
+            #             9: 455,
+            #             10: 455,
+            #             11: 455,
+            #         }
+            #     },
+            #     'pedestals': 'pedestals_290',
+            #     'zs_type': 'tracker',
+            # },
+
             # {
             #     'sub_run_name': 'long_run',
             #     'run_time': 24 * 60,  # Minutes
@@ -379,38 +380,38 @@ class Config:
         # }
         # self.sub_runs.append(new_subrun)
 
-        check_samples = [0, 1, 2, 3, 4]
-        for check_sample in check_samples:
-            new_subrun = {
-                'sub_run_name': f'zs_type_tpc_{check_sample}_sample',
-                'run_time': 10,  # Minutes
-                'hvs': {
-                    0: {
-                        7: 900,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500,
-                    },
-                    3: {
-                        0: 500,
-                        8: 455,
-                        9: 455,
-                        10: 455,
-                        11: 455,
-                    }
-                },
-                'pedestals': 'pedestals_290',
-                'zs_type': 'tpc',
-                'zs_check_sample': check_sample,
-            }
-            self.sub_runs.append(new_subrun)
+        # check_samples = [0, 1, 2, 3, 4]
+        # for check_sample in check_samples:
+        #     new_subrun = {
+        #         'sub_run_name': f'zs_type_tpc_{check_sample}_sample',
+        #         'run_time': 10,  # Minutes
+        #         'hvs': {
+        #             0: {
+        #                 7: 900,
+        #                 8: 500,
+        #                 9: 500,
+        #                 10: 500,
+        #                 11: 500,
+        #             },
+        #             3: {
+        #                 0: 500,
+        #                 8: 455,
+        #                 9: 455,
+        #                 10: 455,
+        #                 11: 455,
+        #             }
+        #         },
+        #         'pedestals': 'pedestals_290',
+        #         'zs_type': 'tpc',
+        #         'zs_check_sample': check_sample,
+        #     }
+        #     self.sub_runs.append(new_subrun)
 
         peds = [290, 300, 310, 320, 330, 340, 350, 400, 450, 500, 550, 600, 700, 800, 900, 1000]
         for ped in peds:
             new_subrun = {
                 'sub_run_name': f'ped_{ped}',
-                'run_time': 5,  # Minutes
+                'run_time': 15,  # Minutes
                 'hvs': {
                     0: {
                         7: 900,
