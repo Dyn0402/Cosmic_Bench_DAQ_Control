@@ -137,14 +137,16 @@ def get_daq_control_status():
         }
 
     rules = [
-        ("Daq control session started", "WAITING",        "secondary"),
-        ("Run complete",                "Run Complete",    "info"),
-        ("donzo",                       "Run Complete",    "info"),
-        ("Finished with sub run ",      "Finished Sub Run","warning"),
-        ("Ramping HVs for ",            "Ramping HV",     "warning"),
-        ("Starting DAQ Control",        "STARTING",       "warning"),
-        ("Dream DAQ starting",          "RUNNING",        "success"),
-        ("Stopping DAQ process",        "Stopping DAQ",   "warning"),
+        ("Daq control session started",  "WAITING",          "secondary"),
+        ("Run complete",                 "Run Complete",     "info"),
+        ("donzo",                        "Run Complete",     "info"),
+        ("Finished with sub run ",       "Finished Sub Run", "warning"),
+        ("Dream DAQ taking pedestals",   "Prepping DAQs",    "warning"),
+        ("Prepping DAQs for ",           "Prepping DAQs",    "warning"),
+        ("Ramping HVs for ",             "Ramping HV",       "warning"),
+        ("Starting DAQ Control",         "STARTING",         "warning"),
+        ("Dream DAQ starting",           "RUNNING",          "success"),
+        ("Stopping DAQ process",         "Stopping DAQ",     "warning"),
     ]
 
     fields = []
@@ -198,3 +200,96 @@ def get_processor_status():
                 return {"status": status, "color": color, "fields": fields}
 
     return {"status": "UNKNOWN", "color": "secondary", "fields": fields}
+
+
+def get_qa_watcher_status():
+    try:
+        output = subprocess.check_output(
+            ["tmux", "capture-pane", "-pS", "-50", "-t", "qa_watcher:0.0"],
+            text=True
+        )
+    except subprocess.CalledProcessError:
+        return {"status": "STOPPED", "color": "secondary", "fields": []}
+
+    lines = [l for l in output.splitlines() if l.strip()]
+
+    fields = []
+    for line in reversed(lines):
+        m = re.search(r'\[qa_watcher\] (\S+)/(\S+)', line)
+        if m and 'idle' not in line and 'Marked stale' not in line \
+                and 'waiting' not in line and 'runs_dir' not in line:
+            fields = [
+                {"label": "Run",    "value": m.group(1)},
+                {"label": "Subrun", "value": m.group(2)},
+            ]
+            break
+
+    _noise = ("[qa_watcher] Marked stale",)
+    for line in reversed(lines):
+        if any(n in line for n in _noise):
+            continue
+        m = re.search(r'\[qa\] (\S+) —', line)
+        if m:
+            return {"status": "Running QA",  "color": "success", "fields": fields + [{"label": "Detector", "value": m.group(1)}]}
+        if "[qa_watcher]" in line and " idle " in line:
+            return {"status": "IDLE",        "color": "info",    "fields": fields}
+        if "[qa_watcher]" in line and "waiting for runs_dir" in line:
+            return {"status": "Waiting for Dir", "color": "warning", "fields": []}
+        if "[qa_watcher]" in line:
+            return {"status": "RUNNING",     "color": "info",    "fields": fields}
+
+    return {"status": "UNKNOWN", "color": "danger", "fields": []}
+
+
+def get_backup_watcher_status():
+    try:
+        output = subprocess.check_output(
+            ["tmux", "capture-pane", "-pS", "-50", "-t", "backup_watcher:0.0"],
+            text=True
+        )
+    except subprocess.CalledProcessError:
+        return {"status": "STOPPED", "color": "secondary", "fields": []}
+
+    lines = [l for l in output.splitlines() if l.strip()]
+
+    fields = []
+    for line in reversed(lines):
+        m = re.search(r'\[backup\] (\S+)/(\S+)\s+size=', line)
+        if m:
+            fields = [
+                {"label": "Run",    "value": m.group(1)},
+                {"label": "Subrun", "value": m.group(2)},
+            ]
+            break
+
+    progress_fields = []
+    for line in lines:
+        mp = re.search(r'([\d,]+)\s+(\d+)%\s+([\d.]+\s*\S+/s)\s+([\d:]+)(?:.*?to-chk=(\d+)/(\d+))?', line)
+        if mp:
+            pct, speed, eta = mp.group(2), mp.group(3).strip(), mp.group(4)
+            progress_fields = [{"label": "Progress", "value": f"{pct}%  {speed}  eta {eta}"}]
+            if mp.group(5) and mp.group(6):
+                remaining, total = int(mp.group(5)), int(mp.group(6))
+                progress_fields.append({"label": "Files", "value": f"{total - remaining}/{total}"})
+
+    for line in reversed(lines):
+        if "[backup] rsync ->" in line or "[backup] rsync done" in line:
+            return {"status": "Syncing",     "color": "success", "fields": fields + progress_fields}
+        m = re.search(r'\[backup\] extra sync(?! done| FAILED): (\S+)', line)
+        if m:
+            return {"status": "Syncing",     "color": "success",
+                    "fields": [{"label": "Folder", "value": m.group(1)}] + progress_fields}
+        if "[backup] extra sync done" in line or "[backup] extra sync FAILED" in line:
+            pass
+        if "AUTH ERROR" in line or "Kerberos FAILED" in line:
+            return {"status": "Auth Error",  "color": "danger",  "fields": fields}
+        if "[backup] rsync FAILED" in line:
+            return {"status": "rsync Error", "color": "danger",  "fields": fields}
+        if "[backup]" in line and " idle " in line:
+            return {"status": "IDLE",        "color": "info",    "fields": fields}
+        if "[backup]" in line and "waiting for source_dir" in line:
+            return {"status": "Waiting for Dir", "color": "warning", "fields": []}
+        if "[backup]" in line:
+            return {"status": "RUNNING",     "color": "info",    "fields": fields}
+
+    return {"status": "UNKNOWN", "color": "danger", "fields": []}

@@ -16,7 +16,9 @@ import select
 import threading
 import time
 import json
+from datetime import datetime
 import pandas as pd
+from urllib.parse import quote
 from flask import Flask, render_template, jsonify, request, send_from_directory, abort
 from flask_socketio import SocketIO, emit
 
@@ -36,16 +38,37 @@ CONFIG_PY_PATH = f"{BASE_DIR}/run_config.py"
 BASH_DIR = f"{BASE_DIR}/bash_scripts"
 PROCESSOR_CONFIG_PATH = f"{BASE_DIR}/config/processor_config.json"
 PROCESSOR_SESSION = "processor"
+QA_CONFIG_PATH = f"{BASE_DIR}/config/qa_config.json"
+QA_RESET_PATH  = f"{BASE_DIR}/config/qa_reset.json"
+QA_TMUX = "qa_watcher"
+BACKUP_CONFIG_PATH = f"{BASE_DIR}/config/backup_config.json"
+BACKUP_TMUX = "backup_watcher"
 ANALYSIS_DIR = "/data/cosmic_data/Analysis"
+GENERAL_ANALYSIS_DIR = "/data/cosmic_data/Analysis"
 # RUN_DIR = "/mnt/cosmic_data/clas12/Run"
 RUN_DIR = "/mnt/cosmic_data/MX17/Run"
 HV_TAIL = 1000  # number of most recent rows to show
+
+LOG_DIR = f"{BASE_DIR}/logs"
+LOG_FILE = f"{LOG_DIR}/daq_events.log"
+
+
+def log_event(event, source, **details):
+    try:
+        os.makedirs(LOG_DIR, exist_ok=True)
+        ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        detail_str = ' | '.join(f'{k}={v}' for k, v in details.items())
+        line = f"{ts} | {event:<14} | {source:<12} | {detail_str}\n"
+        with open(LOG_FILE, 'a') as f:
+            f.write(line)
+    except Exception as e:
+        print(f"Warning: could not write to event log: {e}")
 
 
 app = Flask(__name__)
 socketio = SocketIO(app)
 
-TMUX_SESSIONS = ["daq_control", "dream_daq", "hv_control", "processor"]
+TMUX_SESSIONS = ["daq_control", "dream_daq", "hv_control", "processor", "qa_watcher", "backup_watcher"]
 sessions = {}
 
 @app.route("/")
@@ -69,6 +92,10 @@ def status_all():
             info = get_daq_control_status()
         elif s == "processor":
             info = get_processor_status()
+        elif s == "qa_watcher":
+            info = get_qa_watcher_status()
+        elif s == "backup_watcher":
+            info = get_backup_watcher_status()
         else:
             info = {"status": "READY", "color": "secondary", "fields": []}
 
@@ -219,6 +246,75 @@ def stop_processor():
         return jsonify({"success": False, "message": str(e)}), 500
 
 
+@app.route("/start_qa", methods=["POST"])
+def start_qa():
+    try:
+        result = subprocess.run(
+            ["python", f"{BASE_DIR}/qa_config.py"],
+            capture_output=True, text=True
+        )
+        if result.returncode != 0:
+            return jsonify({"success": False, "message": f"Config generation failed: {result.stderr}"}), 500
+        subprocess.run(["tmux", "kill-session", "-t", QA_TMUX], capture_output=True)
+        subprocess.Popen([
+            "tmux", "new-session", "-d", "-s", QA_TMUX,
+            "python", f"{BASE_DIR}/qa_watcher.py", QA_CONFIG_PATH
+        ])
+        return jsonify({"success": True, "message": "QA watcher started"})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@app.route("/stop_qa", methods=["POST"])
+def stop_qa():
+    try:
+        subprocess.run(["tmux", "kill-session", "-t", QA_TMUX], capture_output=True)
+        return jsonify({"success": True, "message": "QA watcher stopped"})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@app.route("/rerun_qa", methods=["POST"])
+def rerun_qa():
+    try:
+        data = request.get_json(silent=True) or {}
+        runs = data.get('runs') or None
+        with open(QA_RESET_PATH, 'w') as f:
+            json.dump({"runs": runs}, f)
+        msg = f"QA rerun queued for: {', '.join(runs)}" if runs else "QA rerun queued for all runs"
+        return jsonify({"success": True, "message": msg})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@app.route("/start_backup", methods=["POST"])
+def start_backup():
+    try:
+        result = subprocess.run(
+            ["python", f"{BASE_DIR}/backup_config.py"],
+            capture_output=True, text=True
+        )
+        if result.returncode != 0:
+            return jsonify({"success": False, "message": f"Config generation failed: {result.stderr}"}), 500
+        subprocess.run(["tmux", "kill-session", "-t", BACKUP_TMUX], capture_output=True)
+        subprocess.Popen([
+            "tmux", "new-session", "-d", "-s", BACKUP_TMUX,
+            "python", f"{BASE_DIR}/backup_watcher.py", BACKUP_CONFIG_PATH
+        ])
+        return jsonify({"success": True, "message": "Backup watcher started"})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@app.route("/stop_backup", methods=["POST"])
+def stop_backup():
+    try:
+        subprocess.run(["tmux", "kill-session", "-t", BACKUP_TMUX], capture_output=True)
+        return jsonify({"success": True, "message": "Backup watcher stopped"})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
 @app.route("/git_reset", methods=["POST"])
 def git_reset():
     try:
@@ -356,7 +452,7 @@ def list_pngs():
     if not os.path.isdir(directory):
         return jsonify(success=False, message=f"Invalid directory: {directory}")
 
-    pngs = [f for f in os.listdir(directory) if f.lower().endswith(".png")]
+    pngs = sorted(f for f in os.listdir(directory) if f.lower().endswith(".png"))
     if not pngs:
         return jsonify(success=True, images=[])
 
@@ -374,6 +470,49 @@ def serve_png():
     if not os.path.isfile(os.path.join(directory, filename)):
         abort(404, "File not found")
     return send_from_directory(directory, filename)
+
+
+@app.route("/browse_analysis")
+def browse_analysis():
+    rel_path = request.args.get("path", "").strip("/")
+    target = os.path.normpath(os.path.join(GENERAL_ANALYSIS_DIR, rel_path)) if rel_path \
+             else os.path.normpath(GENERAL_ANALYSIS_DIR)
+
+    if not target.startswith(os.path.abspath(GENERAL_ANALYSIS_DIR)):
+        return jsonify(success=False, message="Invalid path"), 403
+    if not os.path.isdir(target):
+        return jsonify(success=False, message=f"Directory not found: {target}")
+
+    subdirs = sorted(d for d in os.listdir(target)
+                     if os.path.isdir(os.path.join(target, d)))
+    images  = [f"/serve_png?dir={quote(target, safe='')}&file={quote(f, safe='')}"
+               for f in sorted(os.listdir(target))
+               if f.lower().endswith(".png")]
+
+    return jsonify(success=True, subdirs=subdirs, images=images, path=rel_path)
+
+
+@app.route("/system_stats")
+def system_stats():
+    try:
+        import psutil
+        cpu_pcts = psutil.cpu_percent(percpu=True)
+        mem = psutil.virtual_memory()
+        swap = psutil.swap_memory()
+        disk = psutil.disk_usage('/')
+        load = os.getloadavg()
+        return jsonify({
+            "success": True,
+            "cpu_cores": cpu_pcts,
+            "memory": {"total": mem.total, "used": mem.used, "percent": mem.percent},
+            "swap":   {"total": swap.total, "used": swap.used, "percent": swap.percent},
+            "disk":   {"total": disk.total, "used": disk.used, "percent": disk.percent},
+            "load_avg": list(load),
+        })
+    except ImportError:
+        return jsonify({"success": False, "message": "psutil not installed"})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)})
 
 
 @app.route("/get_config_py", methods=['GET'])
