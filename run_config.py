@@ -15,7 +15,7 @@ import copy
 class Config:
     def __init__(self):
         # self.run_name = 'mx17_det4_ArIso_HV_Scan_5-7-26'
-        self.run_name = 'zs_compression_scan_2_6-6-26'
+        self.run_name = 'zs_compression_scan_3_6-6-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         # self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.base_out_dir = '/mnt/cosmic_data/MX17/'
