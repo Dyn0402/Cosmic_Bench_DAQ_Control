@@ -15,7 +15,7 @@ import copy
 class Config:
     def __init__(self):
         # self.run_name = 'mx17_det4_ArIso_HV_Scan_5-7-26'
-        self.run_name = 'zs_compression_scan_3_6-6-26'
+        self.run_name = 'zs_compression_scan_4_6-6-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         # self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.base_out_dir = '/mnt/cosmic_data/MX17/'
@@ -117,50 +117,74 @@ class Config:
 
 
         self.sub_runs = [
-            # {
-            #     'sub_run_name': 'no_zs',
-            #     'run_time': 10,  # Minutes
-            #     'hvs': {
-            #         0: {
-            #             7: 900,
-            #             8: 500,
-            #             9: 500,
-            #             10: 500,
-            #             11: 500,
-            #         },
-            #         3: {
-            #             0: 500,
-            #             8: 455,
-            #             9: 455,
-            #             10: 455,
-            #             11: 455,
-            #         }
-            #     },
-            #     'zero_suppress': False,
-            #     'pedestals': 'pedestals_290'
-            # },
-            # {
-            #     'sub_run_name': 'zs_type_tracker',
-            #     'run_time': 10,  # Minutes
-            #     'hvs': {
-            #         0: {
-            #             7: 900,
-            #             8: 500,
-            #             9: 500,
-            #             10: 500,
-            #             11: 500,
-            #         },
-            #         3: {
-            #             0: 500,
-            #             8: 455,
-            #             9: 455,
-            #             10: 455,
-            #             11: 455,
-            #         }
-            #     },
-            #     'pedestals': 'pedestals_290',
-            #     'zs_type': 'tracker',
-            # },
+            {
+                'sub_run_name': f'initial_run',
+                'run_time': 8 * 60,  # Minutes
+                'hvs': {
+                    0: {
+                        7: 900,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    3: {
+                        0: 500,
+                        8: 455,
+                        9: 455,
+                        10: 455,
+                        11: 455,
+                    }
+                },
+                'daq_config_template_path': '/mnt/cosmic_data/MX17/dream_config/CosmicTb_MX17.cfg',
+                'pedestals_dir': f'{self.base_out_dir}pedestals/',
+                'zero_suppress': False,
+                'common_noise_subtraction': False,
+            }
+            {
+                'sub_run_name': 'no_zs',
+                'run_time': 10,  # Minutes
+                'hvs': {
+                    0: {
+                        7: 900,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    3: {
+                        0: 500,
+                        8: 455,
+                        9: 455,
+                        10: 455,
+                        11: 455,
+                    }
+                },
+                'zero_suppress': False,
+                'pedestals': 'pedestals_290'
+            },
+            {
+                'sub_run_name': 'zs_type_tracker',
+                'run_time': 10,  # Minutes
+                'hvs': {
+                    0: {
+                        7: 900,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    3: {
+                        0: 500,
+                        8: 455,
+                        9: 455,
+                        10: 455,
+                        11: 455,
+                    }
+                },
+                'pedestals': 'pedestals_290',
+                'zs_type': 'tracker',
+            },
 
             # {
             #     'sub_run_name': 'long_run',
@@ -380,34 +404,35 @@ class Config:
         # }
         # self.sub_runs.append(new_subrun)
 
-        # check_samples = [0, 1, 2, 3, 4]
-        # for check_sample in check_samples:
-        #     new_subrun = {
-        #         'sub_run_name': f'zs_type_tpc_{check_sample}_sample',
-        #         'run_time': 10,  # Minutes
-        #         'hvs': {
-        #             0: {
-        #                 7: 900,
-        #                 8: 500,
-        #                 9: 500,
-        #                 10: 500,
-        #                 11: 500,
-        #             },
-        #             3: {
-        #                 0: 500,
-        #                 8: 455,
-        #                 9: 455,
-        #                 10: 455,
-        #                 11: 455,
-        #             }
-        #         },
-        #         'pedestals': 'pedestals_290',
-        #         'zs_type': 'tpc',
-        #         'zs_check_sample': check_sample,
-        #     }
-        #     self.sub_runs.append(new_subrun)
+        check_samples = [0, 1, 2, 3, 4]
+        for check_sample in check_samples:
+            new_subrun = {
+                'sub_run_name': f'zs_type_tpc_{check_sample}_sample',
+                'run_time': 10,  # Minutes
+                'hvs': {
+                    0: {
+                        7: 900,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    3: {
+                        0: 500,
+                        8: 455,
+                        9: 455,
+                        10: 455,
+                        11: 455,
+                    }
+                },
+                'pedestals': 'pedestals_290',
+                'zs_type': 'tpc',
+                'zs_check_sample': check_sample,
+            }
+            self.sub_runs.append(new_subrun)
 
-        peds = [290, 300, 310, 320, 330, 340, 350, 400, 450, 500, 550, 600, 700, 800, 900, 1000]
+        # peds = [290, 300, 310, 320, 330, 340, 350, 400, 450, 500, 550, 600, 700, 800, 900, 1000]
+        peds = [290, 300, 310, 330, 340, 350, 400, 450, 500, 550, 600, 700, 800, 900, 1000, 320]
         for ped in peds:
             new_subrun = {
                 'sub_run_name': f'ped_{ped}',
@@ -434,31 +459,31 @@ class Config:
             }
             self.sub_runs.append(new_subrun)
 
-        new_subrun = {
-            'sub_run_name': f'final_run',
-            'run_time': 8 * 60,  # Minutes
-            'hvs': {
-                0: {
-                    7: 900,
-                    8: 500,
-                    9: 500,
-                    10: 500,
-                    11: 500,
-                },
-                3: {
-                    0: 500,
-                    8: 455,
-                    9: 455,
-                    10: 455,
-                    11: 455,
-                }
-            },
-            'daq_config_template_path': '/mnt/cosmic_data/MX17/dream_config/CosmicTb_MX17.cfg',
-            'pedestals_dir': f'{self.base_out_dir}pedestals/',
-            'zero_suppress': False,
-            'common_noise_subtraction': False,
-        }
-        self.sub_runs.append(new_subrun)
+        # new_subrun = {
+        #     'sub_run_name': f'final_run',
+        #     'run_time': 8 * 60,  # Minutes
+        #     'hvs': {
+        #         0: {
+        #             7: 900,
+        #             8: 500,
+        #             9: 500,
+        #             10: 500,
+        #             11: 500,
+        #         },
+        #         3: {
+        #             0: 500,
+        #             8: 455,
+        #             9: 455,
+        #             10: 455,
+        #             11: 455,
+        #         }
+        #     },
+        #     'daq_config_template_path': '/mnt/cosmic_data/MX17/dream_config/CosmicTb_MX17.cfg',
+        #     'pedestals_dir': f'{self.base_out_dir}pedestals/',
+        #     'zero_suppress': False,
+        #     'common_noise_subtraction': False,
+        # }
+        # self.sub_runs.append(new_subrun)
 
 
         self.bench_geometry = {
