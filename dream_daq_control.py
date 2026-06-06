@@ -292,7 +292,7 @@ def get_pedestals(pedestals_dir, pedestals, run_dir, out_dir=None):
     """
     Get pedestal files from specified directory and copy to run directory with proper naming.
     """
-    sub_run_name = 'pedestals_noise'  # Standard name for cosmic bench pedestal runs
+    sub_run_name = 'pedestals'  # Standard name for cosmic bench pedestal runs
     if not os.path.isdir(pedestals_dir):
         print(f'Pedestals directory `{pedestals_dir}` does not exist.')
         return None
