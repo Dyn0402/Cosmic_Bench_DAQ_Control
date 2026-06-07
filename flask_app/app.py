@@ -41,8 +41,6 @@ PROCESSOR_SESSION = "processor"
 QA_CONFIG_PATH = f"{BASE_DIR}/config/qa_config.json"
 QA_RESET_PATH  = f"{BASE_DIR}/config/qa_reset.json"
 QA_TMUX = "qa_watcher"
-BACKUP_CONFIG_PATH = f"{BASE_DIR}/config/backup_config.json"
-BACKUP_TMUX = "backup_watcher"
 ANALYSIS_DIR = "/data/cosmic_data/Analysis"
 GENERAL_ANALYSIS_DIR = "/data/cosmic_data/Analysis"
 # RUN_DIR = "/mnt/cosmic_data/clas12/Run"
@@ -68,7 +66,7 @@ def log_event(event, source, **details):
 app = Flask(__name__)
 socketio = SocketIO(app)
 
-TMUX_SESSIONS = ["daq_control", "dream_daq", "hv_control", "processor", "qa_watcher", "backup_watcher"]
+TMUX_SESSIONS = ["daq_control", "dream_daq", "hv_control", "processor", "qa_watcher"]
 sessions = {}
 
 @app.route("/")
@@ -94,8 +92,6 @@ def status_all():
             info = get_processor_status()
         elif s == "qa_watcher":
             info = get_qa_watcher_status()
-        elif s == "backup_watcher":
-            info = get_backup_watcher_status()
         else:
             info = {"status": "READY", "color": "secondary", "fields": []}
 
@@ -283,34 +279,6 @@ def rerun_qa():
             json.dump({"runs": runs}, f)
         msg = f"QA rerun queued for: {', '.join(runs)}" if runs else "QA rerun queued for all runs"
         return jsonify({"success": True, "message": msg})
-    except Exception as e:
-        return jsonify({"success": False, "message": str(e)}), 500
-
-
-@app.route("/start_backup", methods=["POST"])
-def start_backup():
-    try:
-        result = subprocess.run(
-            ["python", f"{BASE_DIR}/backup_config.py"],
-            capture_output=True, text=True
-        )
-        if result.returncode != 0:
-            return jsonify({"success": False, "message": f"Config generation failed: {result.stderr}"}), 500
-        subprocess.run(["tmux", "kill-session", "-t", BACKUP_TMUX], capture_output=True)
-        subprocess.Popen([
-            "tmux", "new-session", "-d", "-s", BACKUP_TMUX,
-            "python", f"{BASE_DIR}/backup_watcher.py", BACKUP_CONFIG_PATH
-        ])
-        return jsonify({"success": True, "message": "Backup watcher started"})
-    except Exception as e:
-        return jsonify({"success": False, "message": str(e)}), 500
-
-
-@app.route("/stop_backup", methods=["POST"])
-def stop_backup():
-    try:
-        subprocess.run(["tmux", "kill-session", "-t", BACKUP_TMUX], capture_output=True)
-        return jsonify({"success": True, "message": "Backup watcher stopped"})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
 
