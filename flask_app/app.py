@@ -41,8 +41,8 @@ PROCESSOR_SESSION = "processor"
 QA_CONFIG_PATH = f"{BASE_DIR}/config/qa_config.json"
 QA_RESET_PATH  = f"{BASE_DIR}/config/qa_reset.json"
 QA_TMUX = "qa_watcher"
-ANALYSIS_DIR = "/data/cosmic_data/Analysis"
-GENERAL_ANALYSIS_DIR = "/data/cosmic_data/Analysis"
+ANALYSIS_DIR = f'{BASE_DATA_DIR}analysis'
+GENERAL_ANALYSIS_DIR = f'{BASE_DATA_DIR}analysis'
 RUN_DIR = f'{BASE_DATA_DIR}Run'
 HV_TAIL = 1000  # number of most recent rows to show
 

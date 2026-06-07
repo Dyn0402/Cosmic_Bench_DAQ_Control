@@ -26,6 +26,7 @@ allowing clean axis separation from the feu column (e.g. mx17 detectors).
 """
 
 import gc
+import copy
 import re
 import sys
 import json
@@ -316,7 +317,7 @@ def _plot_time_vs_channel(df: pd.DataFrame, title: str, out_dir: Path):
     fig, axes = plt.subplots(1, n, figsize=(7 * n, 5), squeeze=False)
     axes = axes[0]
 
-    cmap = plt.get_cmap('viridis').copy()
+    cmap = copy.copy(plt.get_cmap('viridis'))
     cmap.set_bad('white')
 
     for ax, feu in zip(axes, feus):
@@ -487,7 +488,7 @@ def _plot_xy_hit_map(df: pd.DataFrame, x_feu_ids: set, y_feu_ids: set,
 
     fig, ax = plt.subplots(figsize=(7, 6))
     h, xedges, yedges = np.histogram2d(pos['x_ch'].values, pos['y_ch'].values, bins=64)
-    cmap = plt.get_cmap('viridis').copy()
+    cmap = copy.copy(plt.get_cmap('viridis'))
     cmap.set_bad('lightgrey')
     im = ax.imshow(np.where(h > 0, h, np.nan).T, origin='lower', aspect='auto',
                    extent=[xedges[0], xedges[-1], yedges[0], yedges[-1]], cmap=cmap)
@@ -547,7 +548,7 @@ def _load_wf_stats_from_decoded(decoded_dir: Path, feu_ids) -> dict:
 def _plot_wf_mean_rms(stats: dict, feu_ids, title: str, out_dir: Path,
                        ns_per_sample: float) -> None:
     """2D color maps of mean and RMS amplitude vs channel and time, per FEU."""
-    cmap = plt.get_cmap('viridis').copy()
+    cmap = copy.copy(plt.get_cmap('viridis'))
     cmap.set_bad('lightgrey')
 
     for feu in sorted(feu_ids):
