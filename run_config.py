@@ -113,7 +113,7 @@ class Config:
                     11: 455,
                 }
             },
-        },
+        }
         self.sub_runs.append(new_subrun)
 
         # new_subrun = {

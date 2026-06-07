@@ -91,7 +91,7 @@ Run `processor_config.py` to generate a JSON config for `processor_watcher.py`. 
 ### 1. Start the background servers (once per session)
 
 ```bash
-./start_servers_cosmics.sh
+./start_servers.sh
 ```
 
 This launches five tmux sessions:
