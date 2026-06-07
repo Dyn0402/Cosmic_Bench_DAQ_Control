@@ -250,16 +250,15 @@ def start_qa():
         )
         if result.returncode != 0:
             return jsonify({"success": False, "message": f"Config generation failed: {result.stderr}"}), 500
-        subprocess.run(["tmux", "kill-session", "-t", QA_TMUX], capture_output=True)
-        # tmux 1.8 (on the DAQ machine) rejects "new-session ... <command> <arg> <arg>"
-        # passed as separate argv tokens (usage: new-session [...] [command]); it only
-        # accepts a single trailing command string. Match the proven start_tmux.sh
-        # pattern: create an empty detached session, then send the command as one string.
-        subprocess.run(["tmux", "new-session", "-d", "-s", QA_TMUX], capture_output=True)
-        qa_cmd = f"python {BASE_DIR}/qa_watcher.py {QA_CONFIG_PATH}"
-        subprocess.run(["tmux", "send-keys", "-t", QA_TMUX, qa_cmd, "Enter"], capture_output=True)
-        if subprocess.run(["tmux", "has-session", "-t", QA_TMUX], capture_output=True).returncode != 0:
-            return jsonify({"success": False, "message": "Failed to start QA watcher tmux session"}), 500
+        subprocess.Popen(['tmux', 'kill-session', '-t', QA_TMUX],
+                         stderr=subprocess.PIPE).wait()
+        # Delegate to start_tmux.sh (like start_processor does) instead of calling
+        # "tmux new-session"/"send-keys" directly: the script does "unset TMUX" first,
+        # which matters because the Flask server itself runs inside a tmux session, so
+        # $TMUX is set in its env and tmux 1.8 on this machine can't create a fresh
+        # session while it's inherited by the subprocess.
+        command = f'python {BASE_DIR}/qa_watcher.py "{QA_CONFIG_PATH}"'
+        subprocess.Popen([f'{BASH_DIR}/start_tmux.sh', QA_TMUX, command])
         return jsonify({"success": True, "message": "QA watcher started"})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
