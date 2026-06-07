@@ -251,10 +251,15 @@ def start_qa():
         if result.returncode != 0:
             return jsonify({"success": False, "message": f"Config generation failed: {result.stderr}"}), 500
         subprocess.run(["tmux", "kill-session", "-t", QA_TMUX], capture_output=True)
-        subprocess.Popen([
-            "tmux", "new-session", "-d", "-s", QA_TMUX,
-            "python", f"{BASE_DIR}/qa_watcher.py", QA_CONFIG_PATH
-        ])
+        # tmux 1.8 (on the DAQ machine) rejects "new-session ... <command> <arg> <arg>"
+        # passed as separate argv tokens (usage: new-session [...] [command]); it only
+        # accepts a single trailing command string. Match the proven start_tmux.sh
+        # pattern: create an empty detached session, then send the command as one string.
+        subprocess.run(["tmux", "new-session", "-d", "-s", QA_TMUX], capture_output=True)
+        qa_cmd = f"python {BASE_DIR}/qa_watcher.py {QA_CONFIG_PATH}"
+        subprocess.run(["tmux", "send-keys", "-t", QA_TMUX, qa_cmd, "Enter"], capture_output=True)
+        if subprocess.run(["tmux", "has-session", "-t", QA_TMUX], capture_output=True).returncode != 0:
+            return jsonify({"success": False, "message": "Failed to start QA watcher tmux session"}), 500
         return jsonify({"success": True, "message": "QA watcher started"})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
@@ -601,6 +606,19 @@ def get_run_events():
             run_dir=RUN_DIR,
             run_name=run_name
         )
+
+        # Add the in-progress subrun's live event count (from the cache that
+        # get_dream_daq_status() keeps updated via /status polling) on top of
+        # the completed-subrun total. The live subrun's logs aren't copied into
+        # raw_daq_data until it finishes, so get_total_events_for_run never
+        # includes it -- no double counting.
+        live_count = get_live_dream_daq_event_count()
+        if live_count is not None:
+            ctrl_fields = {f["label"]: f["value"] for f in get_daq_control_status().get("fields", [])}
+            if ctrl_fields.get("Run") == run_name:
+                subrun_details[ctrl_fields.get("Subrun", "current")] = live_count
+                total_events += live_count
+
         return jsonify({
             "success": True,
             "total_events": total_events,

@@ -23,6 +23,16 @@ import re
 - dark (black)
 """
 
+# Live Dream DAQ event count, updated by get_dream_daq_status() on every poll and
+# read by get_live_dream_daq_event_count() (e.g. from /get_run_events) without
+# triggering another tmux capture. "count" only ever increases within a single
+# data-taking phase so a single bad regex scrape can't make it jump backward;
+# "taking_data" flips to False whenever the pane leaves "_TakeData:" so the next
+# data-taking phase (new subrun) starts from a fresh baseline instead of max-ing
+# against the previous subrun's leftover count.
+_live_events = {"count": 0, "taking_data": False}
+
+
 def get_dream_daq_status():
     try:
         output = subprocess.check_output(
@@ -30,6 +40,7 @@ def get_dream_daq_status():
             text=True
         )
     except subprocess.CalledProcessError:
+        _live_events["taking_data"] = False
         return {
             "status": "ERROR",
             "color": "danger",
@@ -40,9 +51,11 @@ def get_dream_daq_status():
     if "_TakePedThr" in output:
         status = "Taking Pedestals"
         color = "warning"
+        _live_events["taking_data"] = False
     elif "Scan trigger thresholds in process" in output:
         status = "Scanning Trigger Thresholds"
         color = "warning"
+        _live_events["taking_data"] = False
     elif "_TakeData:" in output:
         status = "RUNNING"
         color = "success"
@@ -53,7 +66,15 @@ def get_dream_daq_status():
         if m_ir: fields.append({"label": "Int Rate", "value": m_ir.group(1)})
 
         m_ev = re.search(r"nb_of_events=(\d+)", output)
-        if m_ev: fields.append({"label": "Events", "value": m_ev.group(1)})
+        if m_ev:
+            seen = int(m_ev.group(1))
+            if not _live_events["taking_data"]:
+                _live_events["count"] = seen  # entering a new data-taking phase -> fresh baseline
+            else:
+                _live_events["count"] = max(_live_events["count"], seen)  # never decrease
+            _live_events["taking_data"] = True
+        if _live_events["taking_data"]:
+            fields.append({"label": "Events", "value": str(_live_events["count"])})
 
         # m_wait = re.search(
         #     r"wait for\s*((?:(\d+)h\s*)?(?:(\d+)m\s*)?(?:(\d+)s)?)", output
@@ -68,17 +89,30 @@ def get_dream_daq_status():
     elif "Listening on " in output:
         status = "WAITING"
         color = "secondary"
+        _live_events["taking_data"] = False
     elif "Signaling on-the-fly copier to finish soon" in output:
         status = "Copying fdfs"
         color = "info"
+        _live_events["taking_data"] = False
     elif "Sent: Dream DAQ stopped" in output:
         status = "DAQ Stopped"
         color = "info"
+        _live_events["taking_data"] = False
     else:
         status = "UNKNOWN STATE"
         color = "danger"
+        _live_events["taking_data"] = False
 
     return {"status": status, "color": color, "fields": fields}
+
+
+def get_live_dream_daq_event_count():
+    """
+    Cached live event count for the in-progress data-taking phase (updated by
+    get_dream_daq_status() on each poll), or None if Dream DAQ is not currently
+    taking data.
+    """
+    return _live_events["count"] if _live_events["taking_data"] else None
 
 
 def get_hv_control_status():
