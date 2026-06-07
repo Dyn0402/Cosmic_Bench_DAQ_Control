@@ -3,726 +3,114 @@
 """
 Created on April 29 9:37 PM 2024
 Created in PyCharm
-Created as Cosmic_Bench_DAQ_Control/run_config_template.py
+Created as Cosmic_Bench_DAQ_Control/run_config_pedestals.py
 
 @author: Dylan Neff, Dylan
 """
 
-import sys
+import os
 import json
 import copy
 from datetime import datetime
 
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from run_config import Config as RunConfig
+
 
 class Config:
     def __init__(self):
-        date_time_str = datetime.now().strftime('%m-%d-%y_%H-%M-%S')
-        self.run_name = f'pedestals_{date_time_str}'
-        self.base_out_dir = '/mnt/data/beam_sps_25/'
-        self.data_out_dir = f'{self.base_out_dir}pedestals_noise/'
-        self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
-        self.raw_daq_inner_dir = 'raw_daq_data'
-        self.decoded_root_inner_dir = 'decoded_root'
-        self.filtered_root_inner_dir = 'filtered_root'
-        self.m3_tracking_inner_dir = 'm3_tracking_root'
-        self.detector_info_dir = f'{self.base_out_dir}config/detectors/'
-        self.m3_feu_num = None
-        self.power_off_hv_at_end = False  # True to power off HV at end of run
-        self.filtering_by_m3 = False  # True to filter by m3 tracking (handled by processor_watcher)
-        self.save_fdfs = True  # True to save FDF files after processing
+        # Pull all hardware / detector settings from the active run config so
+        # the two files never drift apart.
+        run = RunConfig()
+        self.__dict__.update(run.__dict__)
+
+        # --- Pedestal-specific overrides ---
+        date_str = datetime.now().strftime('%m-%d-%y_%H-%M-%S')
+        self.run_name = f'pedestals_{date_str}'
+        self.data_out_dir = f'{self.base_out_dir}pedestals/'
+        self.run_out_dir  = f'{self.data_out_dir}{self.run_name}/'
+
+        self.power_off_hv_at_end = False
         self.start_time = None
-        self.write_all_dectors_to_json = True  # Only when making run config json template.
-        self.gas = 'Ar/CO2/Iso 93/5/2'  # Gas type for run
 
-        self.dream_daq_info = {
-            'ip': '192.168.10.8',
-            'port': 1101,
-            'daq_config_template_path': f'{self.base_out_dir}dream_run/config/TbSPS25_ped.cfg',
-            'run_directory': self.run_out_dir,
-            'data_out_dir': self.run_out_dir,
-            'raw_daq_inner_dir': self.raw_daq_inner_dir,
-            'n_samples_per_waveform': 24,  # Number of samples per waveform to configure in DAQ
-            'copy_on_fly': False,  # True to copy raw data to out dir during run, False to copy after run
-            'zero_suppress': False,  # True to run in zero suppression mode, False to run in full readout mode
-            'latency': 33,  # Latency setting for DAQ in clock cycles
-            # 'latency': 22,  # Latency setting for DAQ in clock cycles
-            'sample_period': 40,  # ns, sampling period
-            # 'zs_check_sample': 1,  # Number of samples to read out beyond threshold crossing
-            'zs_check_sample': 4,  # Number of samples to read out beyond threshold crossing
-        }
+        # dream_daq_info: inherit from run config, then force pedestal-mode flags
+        self.dream_daq_info = copy.deepcopy(run.dream_daq_info)
+        self.dream_daq_info.update({
+            'run_directory':          f'{self.base_out_dir}dream_run/{self.run_name}/',
+            'data_out_dir':           self.run_out_dir,
+            'zero_suppress':          False,   # always full readout for pedestals
+            'pedestal_subtraction':   False,
+            'common_noise_subtraction': False,
+            'pedestals_dir':          None,    # no existing pedestals applied
+            'pedestals':              None,
+            'do_pedestal_threshold_run': True,   # Sys Action PedThrRun (bool/int/str → 0 or 1)
+            'do_trigger_threshold_run': False,   # Sys Action TrgThrRun
+            'do_data_run': True,                 # Sys Action DataRun
+        })
 
-        self.hv_control_info = {
-            'ip': '192.168.10.8',
-            'port': 1100,
-        }
+        # Update processor and HV info paths to point at the pedestal output dir
+        self.dedip196_processor_info = copy.deepcopy(run.dedip196_processor_info)
+        self.dedip196_processor_info['run_dir'] = self.run_out_dir
 
-        self.hv_info = {
-            'ip': '192.168.10.199',
-            'username': 'admin',
-            'password': 'admin',
-            'n_cards': 6,
-            'n_channels_per_card': 12,
-            'run_out_dir': self.run_out_dir,
-            'hv_monitoring': True,  # True to monitor HV during run, False to not monitor
-            'monitor_interval': 5,  # Seconds between HV monitoring
-        }
+        self.sedip28_processor_info = copy.deepcopy(run.sedip28_processor_info)
+        self.sedip28_processor_info['run_dir'] = self.run_out_dir
 
+        self.hv_info = copy.deepcopy(run.hv_info)
+        self.hv_info['run_out_dir'] = self.run_out_dir
+
+        # Single pedestal subrun — set all channels to 0 V.
+        # Adjust hvs here if low-voltage bias is needed during pedestal acquisition.
         self.sub_runs = [
             {
-                'sub_run_name': 'pedestals_noise',
-                'run_time': 1.0,  # Minutes
-                    'hvs': {
-                    '2': {
-                        '0': 200,
-                        '1': 200,
-                        '2': 200,
-                        '3': 200,
-                        '4': 200,
-                        '5': 200,
-                        '6': 200,
-                        '7': 200,
-                        '8': 200,
-                        '9': 200,
-                        '10': 200,
+                'sub_run_name': 'pedestals',
+                'run_time': 10 / 60,  # Minutes
+                'hvs': {
+                    0: {
+                        0: 200,
+                        1: 200,
+                        2: 200,
+                        3: 200,
+                        4: 200,
+                        5: 200,
+                        6: 200,
+                        7: 200,
+                        8: 200,
+                        9: 200,
+                        10: 200,
+                        11: 200,
                     },
-                    '5': {
-                        '0': 200,
-                        '1': 200,
-                        # '2': 400,
-                        # '3': 200,
-                        # '4': 100,
-                        # '5': 100,
-                        # '6': 400,
-                        # '7': 200,
-                        # '8': 400,
-                        # '9': 200,
-                        # '10': 400,
-                        # '11': 200,
+                    3: {
+                        0: 200,
+                        1: 200,
+                        2: 200,
+                        3: 200,
+                        4: 200,
+                        5: 200,
+                        6: 200,
+                        7: 200,
+                        8: 200,
+                        9: 200,
+                        10: 200,
+                        11: 200,
                     },
-                    # '12': {
-                        # '0': 200
-                    # }
-                }
-            },
-            # {
-            #     'sub_run_name': 'sub_run_2',
-            #     'run_time': 2,  # Minutes
-            #     'hvs': {
-            #         '2': {
-            #             '0': 300,
-            #             '1': 300,
-            #             '2': 300,
-            #             '3': 300,
-            #             '4': 300,
-            #             '5': 300,
-            #             '6': 300,
-            #             '7': 300,
-            #             '8': 300,
-            #             '9': 300,
-            #             '10': 300,
-            #         },
-            #         '5': {
-            #             '0': 500,
-            #             '1': 500,
-            #             '6': 400,
-            #             '7': 200,
-            #             '8': 400,
-            #             '9': 200,
-            #             '10': 400,
-            #             '11': 200,
-            #         }
-            #     }
-            # },
+                },
+            }
         ]
-
-        self.bench_geometry = {
-            'board_thickness': 5,  # mm  Thickness of PCB for test boards  Guess!
-            'banco_arm_bottom_to_center': (193 - 172) / 2,  # mm from bottom of lower banco arm to center of banco arm
-            'banco_ladder_separation_z': 11.0,  # mm Space between ladders on same arm.
-            'banco_arm_separation_z': 172 - 41,  # mm from bottom of lower banco arm to bottom of upper banco arm
-            'banco_arm_right_y': 34 + 100,  # mm from center of banco to right edge of banco arm
-            'banco_arm_length_y': 230,  # mm from left edge of banco arm to right edge of banco arm
-            'banco_moveable_y_position': 40.0,  # mm  Offset from moving table. Positive moves banco up.
-        }
-
-        self.included_detectors = ['banco_ladder160', 'banco_ladder163', 'banco_ladder157', 'banco_ladder162',
-                                   'urw_inter', 'rd5_plein_saral_2', 'rd5_plein_esl_1', 'urw_strip', 'rd5_grid_vfp_1',
-                                   'rd5_plein_saral_1', 'rd5_strip_saral_1', 'rd5_strip_esl_1']
-
-        self.detectors = [
-            {
-                'name': 'banco_ladder157',
-                'det_type': 'banco',
-                'det_center_coords': {  # Center of detector
-                    'x': -13.54,  # mm  Guess from previous alignment plus shift measurement
-                    'y': self.bench_geometry['banco_moveable_y_position'],  # mm
-                    'z': 842.20 - 842.20 + 500,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 180,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': 'banco',
-                'dream_feus': 'banco',
-            },
-            {
-                'name': 'banco_ladder162',
-                'det_type': 'banco',
-                'det_center_coords': {  # Center of detector
-                    'x': -15.41,  # mm  Guess from previous alignment plus shift measurement
-                    'y': self.bench_geometry['banco_moveable_y_position'],  # mm
-                    # 'z': 853.26 - 842.20 + 500,  # mm
-                    'z': 500 + self.bench_geometry['banco_ladder_separation_z'],  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': 'banco',
-                'dream_feus': 'banco',
-            },
-            {
-                'name': 'banco_ladder160',
-                'det_type': 'banco',
-                'det_center_coords': {  # Center of detector
-                    'x': -13.21,  # mm  Guess from previous alignment plus shift measurement
-                    'y': self.bench_geometry['banco_moveable_y_position'],  # mm
-                    'z': 600,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 180,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': 'banco',
-                'dream_feus': 'banco',
-            },
-            {
-                'name': 'banco_ladder163',
-                'det_type': 'banco',
-                'det_center_coords': {  # Center of detector
-                    'x': -15.03,  # mm  Guess from previous alignment plus shift measurement
-                    'y': self.bench_geometry['banco_moveable_y_position'],  # mm
-                    'z': 600 + self.bench_geometry['banco_ladder_separation_z'],  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': 'banco',
-                'dream_feus': 'banco',
-            },
-
-            {
-                'name': 'urw_strip',
-                'det_type': 'urw_strip',
-                'det_center_coords': {  # Center of detector
-                    'x': 0,  # mm
-                    'y': 0,  # mm
-                    'z': 400,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 30,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (5, 0),
-                    'resist_2': (2, 3)
-                },
-                'dream_feus': {
-                    'x_1': (2, 5),  # Runs along x direction, indicates y hit location
-                    'x_2': (2, 6),
-                    'y_1': (2, 7),  # Runs along y direction, indicates x hit location
-                    'y_2': (2, 8),
-                },
-                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
-                    'x_1': True,
-                    'x_2': True,
-                    'y_1': True,
-                    'y_2': True,
-                }
-            },
-
-            {
-                'name': 'urw_inter',
-                'det_type': 'urw_inter',
-                'det_center_coords': {  # Center of detector
-                    'x': 0,  # mm
-                    'y': 0,  # mm
-                    'z': 100,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': -30,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (5, 0),
-                    'resist_1': (2, 0)
-                },
-                'dream_feus': {
-                    'x_1': (1, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (1, 2),
-                    'y_1': (1, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (1, 4),
-                },
-                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
-                    'x_1': True,
-                    'x_2': True,
-                    'y_1': False,
-                    'y_2': False,
-                }
-            },
-
-            {
-                'name': 'asacusa_strip_2',
-                'det_type': 'asacusa_strip',
-                'det_center_coords': {  # Center of detector
-                    'x': 0,  # mm
-                    'y': 0,  # mm
-                    'z': 400,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (5, 0),
-                    'resist_2': (2, 3)
-                },
-                'dream_feus': {
-                    'x_1': (2, 5),  # Runs along x direction, indicates y hit location
-                    'x_2': (2, 6),
-                    'y_1': (2, 7),  # Runs along y direction, indicates x hit location
-                    'y_2': (2, 8),
-                },
-                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
-                    'x_1': True,
-                    'x_2': True,
-                    'y_1': False,
-                    'y_2': False,
-                }
-            },
-
-            {
-                'name': 'rd5_plein_saral_2',
-                'det_type': 'rd5_plein_saral',
-                'det_center_coords': {  # Center of detector
-                    'x': 0,  # mm
-                    'y': 0,  # mm
-                    'z': 200,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': -60,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (5, 0),
-                    'resist_2': (2, 1)
-                },
-                'dream_feus': {
-                    'x_1': (1, 5),  # Runs along x direction, indicates y hit location
-                    'x_2': (1, 6),
-                    'y_1': (1, 7),  # Runs along y direction, indicates x hit location
-                    'y_2': (1, 8),
-                },
-                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
-                    'x_1': True,
-                    'x_2': True,
-                    'y_1': False,
-                    'y_2': False,
-                }
-            },
-
-            {
-                'name': 'rd5_strip_saral_1',
-                'det_type': 'rd5_strip_saral',
-                'det_center_coords': {  # Center of detector
-                    'x': 0,  # mm
-                    'y': 0,  # mm
-                    'z': 1000,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': -60,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (5, 1),
-                    'resist_1': (2, 7),
-                    'resist_2': (2, 8)
-                },
-                'dream_feus': {
-                    'x_1': (4, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (4, 2),
-                    'y_1': (4, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (4, 4),
-                },
-                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
-                    'x_1': True,
-                    'x_2': True,
-                    'y_1': False,
-                    'y_2': False,
-                }
-            },
-
-            {
-                'name': 'rd5_grid_saral_1',
-                'det_type': 'rd5_grid_saral',
-                'det_center_coords': {  # Center of detector
-                    'x': 0,  # mm
-                    'y': 0,  # mm
-                    'z': 900,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': -60,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (5, 1),
-                    'resist_1': (2, 5),
-                    'resist_2': (2, 6)
-                },
-                'dream_feus': {
-                    'x_1': (2, 5),  # Runs along x direction, indicates y hit location
-                    'x_2': (2, 6),
-                    'y_1': (2, 7),  # Runs along y direction, indicates x hit location
-                    'y_2': (2, 8),
-                },
-                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
-                    'x_1': True,
-                    'x_2': True,
-                    'y_1': False,
-                    'y_2': False,
-                }
-            },
-
-            {
-                'name': 'rd5_plein_vfp_1',
-                'det_type': 'rd5_plein_vfp',
-                'det_center_coords': {  # Center of detector
-                    'x': 0,  # mm
-                    'y': 0,  # mm
-                    'z': 300,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': -60,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (5, 0),
-                    'resist_2': (2, 2)
-                },
-                'dream_feus': {
-                    'x_1': (2, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (2, 2),
-                    'y_1': (2, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (2, 4),
-                },
-                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
-                    'x_1': True,
-                    'x_2': True,
-                    'y_1': False,
-                    'y_2': False,
-                }
-            },
-
-            {
-                'name': 'rd5_strip_vfp_1',
-                'det_type': 'rd5_strip_vfp',
-                'det_center_coords': {  # Center of detector
-                    'x': 0,  # mm
-                    'y': 0,  # mm
-                    'z': 0,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (0, 0),
-                    'resist_1': (3, 1)
-                },
-                'dream_feus': {
-                    'x_1': (6, 5),  # Runs along x direction, indicates y hit location
-                    'x_2': (6, 6),
-                    'y_1': (6, 7),  # Runs along y direction, indicates x hit location
-                    'y_2': (6, 8),
-                },
-                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
-                    'x_1': True,
-                    'x_2': True,
-                    'y_1': False,
-                    'y_2': False,
-                }
-            },
-
-            {
-                'name': 'rd5_grid_vfp_1',
-                'det_type': 'rd5_grid_vfp',
-                'det_center_coords': {  # Center of detector
-                    'x': 0,  # mm
-                    'y': 0,  # mm
-                    'z': 0,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (0, 0),
-                    'resist_1': (3, 1)
-                },
-                'dream_feus': {
-                    'x_1': (6, 5),  # Runs along x direction, indicates y hit location
-                    'x_2': (6, 6),
-                    'y_1': (6, 7),  # Runs along y direction, indicates x hit location
-                    'y_2': (6, 8),
-                },
-                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
-                    'x_1': True,
-                    'x_2': True,
-                    'y_1': False,
-                    'y_2': False,
-                }
-            },
-
-            {
-                'name': 'rd5_plein_esl_1',
-                'det_type': 'rd5_plein_esl',
-                'det_center_coords': {  # Center of detector
-                    'x': 0,  # mm
-                    'y': 0,  # mm
-                    'z': 100,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 30,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (5, 0),
-                    'resist_1': (12, 0),
-                    'resist_2': (2, 0)
-                },
-                'dream_feus': {
-                    'x_1': (1, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (1, 2),
-                    'y_1': (1, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (1, 4),
-                },
-                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
-                    'x_1': True,
-                    'x_2': True,
-                    'y_1': False,
-                    'y_2': False,
-                }
-            },
-
-            {
-                'name': 'rd5_strip_esl_1',
-                'det_type': 'rd5_strip_esl',
-                'det_center_coords': {  # Center of detector
-                    'x': 0,  # mm
-                    'y': 0,  # mm
-                    'z': 1100,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': -60,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (5, 1),
-                    'resist_1': (2, 9),
-                    'resist_2': (2, 10)
-                },
-                'dream_feus': {
-                    'x_1': (4, 5),  # Runs along x direction, indicates y hit location
-                    'x_2': (4, 6),
-                    'y_1': (4, 7),  # Runs along y direction, indicates x hit location
-                    'y_2': (4, 8),
-                },
-                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
-                    'x_1': True,
-                    'x_2': True,
-                    'y_1': False,
-                    'y_2': False,
-                }
-            },
-
-            {
-                'name': 'rd5_grid_esl_1',
-                'det_type': 'rd5_grid_esl',
-                'det_center_coords': {  # Center of detector
-                    'x': 0,  # mm
-                    'y': 0,  # mm
-                    'z': 0,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (0, 0),
-                    'resist_1': (3, 1)
-                },
-                'dream_feus': {
-                    'x_1': (6, 5),  # Runs along x direction, indicates y hit location
-                    'x_2': (6, 6),
-                    'y_1': (6, 7),  # Runs along y direction, indicates x hit location
-                    'y_2': (6, 8),
-                },
-                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
-                    'x_1': True,
-                    'x_2': True,
-                    'y_1': False,
-                    'y_2': False,
-                }
-            },
-
-            {
-                'name': 'p2_small_1',
-                'det_type': 'p2',
-                'det_center_coords': {  # Center of detector
-                    'x': 0,  # mm
-                    'y': 0,  # mm
-                    'z': 1490,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (5, 8),
-                    'mesh': (5, 9)
-                },
-                'dream_feus': {
-                    'x_1': (5, 5),
-                    'x_2': (5, 6),
-                },
-                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
-                    'x_1': False,
-                    'x_2': False,
-                }
-            },
-
-            {
-                'name': 'p2_small_2',
-                'det_type': 'p2',
-                'det_center_coords': {  # Center of detector
-                    'x': 0,  # mm
-                    'y': 0,  # mm
-                    'z': 1620,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (5, 10),
-                    'mesh_1': (5, 11)
-                },
-                'dream_feus': {
-                    # 'x_1': (5, 7),
-                    # 'x_2': (5, 8),
-                },
-                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
-                    'x_1': True,
-                    'x_2': True,
-                }
-            },
-
-            {
-                'name': 'p2_small_3',
-                'det_type': 'p2',
-                'det_center_coords': {  # Center of detector
-                    'x': 0,  # mm
-                    'y': 0,  # mm
-                    'z': 1560,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (5, 2),
-                    'mesh_1': (5, 3)
-                },
-                'dream_feus': {
-                    'x_1': (5, 7),
-                    'x_2': (5, 8),
-                },
-                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
-                    'x_1': True,
-                    'x_2': True,
-                }
-            },
-
-            {
-                'name': 'p2_large_1',
-                'det_type': 'p2',
-                'det_center_coords': {  # Center of detector
-                    'x': 0.0,  # mm
-                    'y': 0.0,  # mm
-                    'z': 1290,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (5, 6),
-                    'mesh': (5, 7),
-                },
-                'dream_feus': {
-                    '9': (5, 1),
-                    '10': (5, 2),
-                    '11': (5, 3),
-                    '12': (5, 4),
-                },
-            },
-
-        ]
-
-        if not self.write_all_dectors_to_json:
-            self.detectors = [det for det in self.detectors if det['name'] in self.included_detectors]
 
     def write_to_file(self, file_path):
-        with open(file_path, 'w') as file:
-            json.dump(self.__dict__, file, indent=4)
+        with open(file_path, 'w') as f:
+            json.dump(self.__dict__, f, indent=4)
 
     def load_from_file(self, file_path):
-        with open(file_path, 'r') as file:
-            data = json.load(file)
-            self.__dict__.clear()
-            self.__dict__.update(data)
+        with open(file_path, 'r') as f:
+            data = json.load(f)
+        self.__dict__.clear()
+        self.__dict__.update(data)
 
 
 if __name__ == '__main__':
-    # out_dir = '/local/home/dn277127/Bureau/beam_test_25/'
-    # out_template_dir = 'config/json_templates/'
-    out_run_dir = 'config/json_run_configs/'
-
-    config_name = 'run_config_pedestals.json'
-
+    out_run_dir = '/local/home/usernsw/Cosmic_Bench_DAQ_Control/config/json_run_configs'
     config = Config()
-
-    config.write_to_file(f'{out_run_dir}{config_name}')
-
+    config.write_to_file(os.path.join(out_run_dir, 'run_config_pedestals.json'))
     print('donzo')

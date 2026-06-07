@@ -25,7 +25,7 @@ from flask_socketio import SocketIO, emit
 from daq_status import *
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # Add parent dir to path
-from run_config_beam import Config
+from run_config import BASE_DISK, PROJECT, BASE_DATA_DIR
 from get_run_events import get_total_events_for_run
 
 # BASE_DIR = "/home/dylan/PycharmProjects/nTof_x17_DAQ"
@@ -43,8 +43,7 @@ QA_RESET_PATH  = f"{BASE_DIR}/config/qa_reset.json"
 QA_TMUX = "qa_watcher"
 ANALYSIS_DIR = "/data/cosmic_data/Analysis"
 GENERAL_ANALYSIS_DIR = "/data/cosmic_data/Analysis"
-# RUN_DIR = "/mnt/cosmic_data/clas12/Run"
-RUN_DIR = "/mnt/cosmic_data/MX17/Run"
+RUN_DIR = f'{BASE_DATA_DIR}Run'
 HV_TAIL = 1000  # number of most recent rows to show
 
 LOG_DIR = f"{BASE_DIR}/logs"
@@ -283,6 +282,85 @@ def rerun_qa():
         return jsonify({"success": False, "message": str(e)}), 500
 
 
+def _load_run_config():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("_run_config_live", f"{BASE_DIR}/run_config.py")
+    mod  = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+@app.route("/get_project")
+def get_project():
+    mod = _load_run_config()
+    return jsonify(success=True, base_disk=mod.BASE_DISK, project=mod.PROJECT)
+
+
+@app.route("/get_projects")
+def get_projects():
+    mod  = _load_run_config()
+    disk = request.args.get("base_disk", mod.BASE_DISK)
+    if not os.path.isdir(disk):
+        return jsonify(success=False, message=f"Base disk not found: {disk}",
+                       base_disk=mod.BASE_DISK, project=mod.PROJECT, projects=[])
+    projects = sorted(
+        d for d in os.listdir(disk)
+        if os.path.isdir(os.path.join(disk, d)) and not d.startswith('.')
+    )
+    return jsonify(success=True, base_disk=mod.BASE_DISK, project=mod.PROJECT, projects=projects)
+
+
+@app.route("/set_project", methods=["POST"])
+def set_project():
+    import re, tempfile
+    data = request.get_json(silent=True) or {}
+    new_disk    = data.get("base_disk", "").strip()
+    new_project = data.get("project", "").strip()
+
+    # --- Validate base_disk ---
+    if not re.fullmatch(r'/[a-zA-Z0-9_./ -]{1,98}/', new_disk):
+        return jsonify(success=False, message="Invalid BASE_DISK: must be an absolute path ending in '/', max 100 chars, no special chars"), 400
+    if not os.path.isdir(new_disk):
+        return jsonify(success=False, message=f"BASE_DISK does not exist: {new_disk}"), 400
+
+    # --- Validate project ---
+    if not re.fullmatch(r'[a-zA-Z0-9_.][a-zA-Z0-9_.-]{0,49}', new_project):
+        return jsonify(success=False, message="Invalid PROJECT: alphanumeric/underscore/hyphen/dot only, max 50 chars"), 400
+    if not os.path.isdir(os.path.join(new_disk, new_project)):
+        return jsonify(success=False, message=f"Project directory not found: {os.path.join(new_disk, new_project)}"), 400
+
+    run_config_path = f"{BASE_DIR}/run_config.py"
+    with open(run_config_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    # Replace only the specific module-level constant lines — abort if not exactly 1 match each
+    updated, n_disk = re.subn(
+        r"^BASE_DISK\s*=\s*'[^']*'",
+        f"BASE_DISK     = '{new_disk}'",
+        content, flags=re.MULTILINE
+    )
+    if n_disk != 1:
+        return jsonify(success=False, message=f"Expected 1 BASE_DISK line, found {n_disk}"), 500
+
+    updated, n_proj = re.subn(
+        r"^PROJECT\s*=\s*'[^']*'",
+        f"PROJECT       = '{new_project}'",
+        updated, flags=re.MULTILINE
+    )
+    if n_proj != 1:
+        return jsonify(success=False, message=f"Expected 1 PROJECT line, found {n_proj}"), 500
+
+    # Atomic write
+    dir_ = os.path.dirname(run_config_path)
+    with tempfile.NamedTemporaryFile("w", dir=dir_, delete=False, suffix=".tmp", encoding="utf-8") as tmp:
+        tmp.write(updated)
+        tmp_path = tmp.name
+    os.replace(tmp_path, run_config_path)
+
+    log_event("SET_PROJECT", "flask", base_disk=new_disk, project=new_project)
+    return jsonify(success=True, message=f"Project set to {new_disk}{new_project}")
+
+
 @app.route("/git_reset", methods=["POST"])
 def git_reset():
     try:
@@ -519,10 +597,9 @@ def get_run_events():
         output = result.stdout.strip()
         config_data = json.loads(output)
         run_name = config_data.get("run_name", "Unknown")
-        run_number = int(run_name.replace("run_", ""))
         total_events, subrun_details = get_total_events_for_run(
             run_dir=RUN_DIR,
-            run_number=run_number
+            run_name=run_name
         )
         return jsonify({
             "success": True,

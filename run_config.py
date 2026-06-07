@@ -11,14 +11,21 @@ Created as Cosmic_Bench_DAQ_Control/run_config_template.py
 import json
 import copy
 
+# ---------------------------------------------------------------------------
+# Site configuration — edit here or use the Flask GUI to switch projects
+# ---------------------------------------------------------------------------
+BASE_DISK     = '/mnt/cosmic_data/'
+PROJECT       = 'MX17'  # 'P2', 'clas12', 'EIC'
+BASE_DATA_DIR = f'{BASE_DISK}{PROJECT}/'
+
 
 class Config:
     def __init__(self):
         # self.run_name = 'mx17_det4_ArIso_HV_Scan_5-7-26'
-        self.run_name = 'zs_compression_scan_4_6-6-26'
+        self.run_name = 'zs_compression_test_M3_6-7-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         # self.data_out_dir = '/data/cosmic_data/Run_MX/'
-        self.base_out_dir = '/mnt/cosmic_data/MX17/'
+        self.base_out_dir = BASE_DATA_DIR
         self.data_out_dir = f'{self.base_out_dir}Run/'
         self.run_out_dir = f'{self.data_out_dir}{self.run_name}/'
         self.raw_daq_inner_dir = 'raw_daq_data'
@@ -28,7 +35,6 @@ class Config:
         self.detector_info_dir = f'/mnt/cosmic_data/config/detectors/'
         self.m3_feu_num = 1
         self.power_off_hv_at_end = True  # True to power off HV at end of run
-        self.filtering_by_m3 = False  # True to filter by m3 tracking (handled by processor_watcher)
         self.save_fdfs = True  # True to save FDF files after processing
         self.start_time = None  # '2024-06-03 15:30:00'  # 'YYYY-MM-DD HH:MM:SS' or None to start immediately
         self.write_all_dectors_to_json = False  # Only when making run config json template.
@@ -41,13 +47,9 @@ class Config:
             # 'ip': '192.168.10.100',
             'ip': '192.168.10.1',
             'port': 1101,
-            # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_MX17.cfg',
             # 'daq_config_template_path': '/mnt/cosmic_data/clas12/dream_config/CosmicTb_clas12.cfg',
-            'daq_config_template_path': '/mnt/cosmic_data/MX17/dream_config/CosmicTb_MX17_ZS_scan.cfg',
-            # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_TPOT.cfg',
-            # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_TPOT_P2.cfg',
-            # 'daq_config_template_path': '/local/home/usernsw/dylan/Run/config/CosmicTb_SelfTrigger_thresh.cfg',
-            # 'run_directory': f'/local/home/usernsw/dylan/Run/{self.run_name}/',
+            # 'daq_config_template_path': '/mnt/cosmic_data/MX17/dream_config/CosmicTb_MX17_ZS_scan.cfg',
+            'daq_config_template_path': '/mnt/cosmic_data/MX17/dream_config/CosmicTb_MX17.cfg',
             # 'run_directory': f'/data/cosmic_data/Run_MX_temp/{self.run_name}/',
             'run_directory': f'{self.base_out_dir}dream_run/{self.run_name}/',
             # 'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
@@ -56,9 +58,8 @@ class Config:
             'copy_on_fly': True,  # True to copy raw data to out dir during run, False to copy after run
             'n_samples_per_waveform': 32,  # Number of samples per waveform to configure in DAQ
             'zero_suppress': True,  # True to run in zero suppression mode, False to run in full readout mode
-            # 'pedestals_dir': f'{self.base_out_dir}pedestals_noise/',
-            'pedestals_dir': f'{self.base_out_dir}pedestals/',
-            # None to ignore, else top directory for pedestal runs
+            # 'pedestals_dir': f'{self.base_out_dir}pedestals/',  # None to ignore, else top directory for pedestal runs
+            'pedestals_dir': None,  # None to ignore, else top directory for pedestal runs
             'pedestals': 'latest',
             # 'latest' for most recent, otherwise specify directory name, eg "pedestals_10-22-25_13-43-34"
             # 'latency': 33,  # Latency setting for DAQ in clock cycles
@@ -69,34 +70,9 @@ class Config:
             'pedestal_subtraction': False,
             'common_noise_subtraction': True,
             'zs_type': 'tpc',
-        }
-
-        self.dedip196_processor_info = {
-            'ip': '192.168.10.1',
-            'port': 1201,
-            'run_dir': self.run_out_dir,
-            'raw_daq_inner_dir': self.raw_daq_inner_dir,
-            'decoded_root_inner_dir': self.decoded_root_inner_dir,
-            'm3_tracking_inner_dir': self.m3_tracking_inner_dir,
-            # 'decode_path': '/local/home/usernsw/dylan/decode/decode',
-            'decode_path': '/local/home/usernsw/dylan/decode/decode',
-            # 'convert_path': '/local/home/usernsw/dylan/decode/convert_vec_tree_to_array',
-            'convert_path': '/local/home/usernsw/dylan/decode/convert_vec_tree_to_array',
-            'detector_info_dir': self.detector_info_dir,
-            'filtered_root_inner_dir': self.filtered_root_inner_dir,
-            'out_type': 'array',  # 'vec', 'array', or 'both'
-            'm3_feu_num': self.m3_feu_num,
-        }
-
-        self.sedip28_processor_info = {
-            'ip': '192.168.10.1',
-            'port': 1200,
-            'run_dir': self.run_out_dir,
-            'raw_daq_inner_dir': self.raw_daq_inner_dir,
-            'm3_tracking_inner_dir': self.m3_tracking_inner_dir,
-            'tracking_run_dir': '/local/home/usernsw/dylan/m3_tracking/',
-            'tracking_sh_path': '/local/home/usernsw/dylan/m3_tracking/run_tracking_single.sh',
-            'm3_feu_num': self.m3_feu_num,
+            'do_pedestal_threshold_run': True,   # Sys Action PedThrRun (bool/int/str → 0 or 1)
+            'do_trigger_threshold_run': False,   # Sys Action TrgThrRun
+            'do_data_run': True,                 # Sys Action DataRun
         }
 
         self.hv_control_info = {
@@ -116,240 +92,124 @@ class Config:
         }
 
 
-        self.sub_runs = [
-            {
-                'sub_run_name': f'initial_run',
-                'run_time': 8 * 60,  # Minutes
-                'hvs': {
-                    0: {
-                        7: 900,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500,
-                    },
-                    3: {
-                        0: 500,
-                        8: 455,
-                        9: 455,
-                        10: 455,
-                        11: 455,
-                    }
-                },
-                'daq_config_template_path': '/mnt/cosmic_data/MX17/dream_config/CosmicTb_MX17.cfg',
-                'pedestals_dir': f'{self.base_out_dir}pedestals/',
-                'zero_suppress': False,
-                'common_noise_subtraction': False,
-            },
-            {
-                'sub_run_name': 'no_zs',
-                'run_time': 10,  # Minutes
-                'hvs': {
-                    0: {
-                        7: 900,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500,
-                    },
-                    3: {
-                        0: 500,
-                        8: 455,
-                        9: 455,
-                        10: 455,
-                        11: 455,
-                    }
-                },
-                'zero_suppress': False,
-                'pedestals': 'pedestals_290'
-            },
-            {
-                'sub_run_name': 'zs_type_tracker',
-                'run_time': 10,  # Minutes
-                'hvs': {
-                    0: {
-                        7: 900,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500,
-                    },
-                    3: {
-                        0: 500,
-                        8: 455,
-                        9: 455,
-                        10: 455,
-                        11: 455,
-                    }
-                },
-                'pedestals': 'pedestals_290',
-                'zs_type': 'tracker',
-            },
+        self.sub_runs = []  # Append subruns in order they should be run.
 
-            # {
-            #     'sub_run_name': 'long_run',
-            #     'run_time': 24 * 60,  # Minutes
-            #     'hvs': {
-            #         0: {
-            #             7: 900,
-            #             8: 500,
-            #             9: 500,
-            #             10: 500,
-            #             11: 500,
-            #         },
-            #         3: {
-            #             0: 510,
-            #             8: 455,
-            #             9: 455,
-            #             10: 455,
-            #             11: 455,
-            #         }
-            #     }
-            # },
-            # {
-            #     'sub_run_name': 'resist_scan_450V',
-            #     'run_time': 10,  # Minutes
-            #     'hvs': {
-            #         0: {
-            #             7: 600,
-            #             8: 500,
-            #             9: 500,
-            #             10: 500,
-            #             11: 500,
-            #         },
-            #         3: {
-            #             0: 450,
-            #             8: 450,
-            #             9: 450,
-            #             10: 450,
-            #             11: 450,
-            #         }
-            #     }
-            # },
-            # {
-            #     'sub_run_name': 'resist_scan_460V',
-            #     'run_time': 10,  # Minutes
-            #     'hvs': {
-            #         0: {
-            #             7: 600,
-            #             8: 500,
-            #             9: 500,
-            #             10: 500,
-            #             11: 500,
-            #         },
-            #         3: {
-            #             0: 460,
-            #             8: 450,
-            #             9: 450,
-            #             10: 450,
-            #             11: 450,
-            #         }
-            #     }
-            # },
-            # {
-            #     'sub_run_name': 'resist_scan_470V',
-            #     'run_time': 10,  # Minutes
-            #     'hvs': {
-            #         0: {
-            #             7: 600,
-            #             8: 500,
-            #             9: 500,
-            #             10: 500,
-            #             11: 500,
-            #         },
-            #         3: {
-            #             0: 470,
-            #             8: 450,
-            #             9: 450,
-            #             10: 450,
-            #             11: 450,
-            #         }
-            #     }
-            # },
-            # {
-            #     'sub_run_name': 'flushing_run',
-            #     'run_time': 60 * 2,  # Minutes
-            #     'hvs': {
-            #         0: {
-            #             7: 600,
-            #             8: 500,
-            #             9: 500,
-            #             10: 500,
-            #             11: 500,
-            #         },
-            #         3: {
-            #             0: 465,
-            #             8: 450,
-            #             9: 450,
-            #             10: 450,
-            #             11: 450,
-            #         }
-            #     }
-            # },
-            #     {
-            #         'sub_run_name': 'overnight_run',
-            #         'run_time': 60 * 9,  # Minutes
-            #         'hvs': {
-            #             0: {
-            #                 7: 800,
-            #                 8: 500,
-            #                 9: 500,
-            #                 10: 500,
-            #                 11: 500,
-            #             },
-            #             3: {
-            #                 0: 505,
-            #                 8: 455,
-            #                 9: 455,
-            #                 10: 455,
-            #                 11: 455,
-            #             }
-            #         }
-            #     },
-        ]
+        new_subrun = {
+            'sub_run_name': f'ZS_M3_test',
+            'run_time': 10,  # Minutes
+            'hvs': {
+                0: {
+                    7: 900,
+                    8: 500,
+                    9: 500,
+                    10: 500,
+                    11: 500,
+                },
+                3: {
+                    0: 500,
+                    8: 455,
+                    9: 455,
+                    10: 455,
+                    11: 455,
+                }
+            },
+        },
+        self.sub_runs.append(new_subrun)
 
-        # Append copies of sub_runs where drifts are decreased by 50V for each sub_run
-        # template = self.sub_runs[0]
-        # # eic_drift_vs = [50, 100, 150, 200, 300, 400, 500, 600, 700, 800]
-        # p2_mesh_vs = [415, 410, 405, 400, 395, 390, 385, 380, 375, 370]
-        #
-        # # drift_card_channel = {'card': 0, 'channel': 6}
-        # mesh_card_channel = {'card': 1, 'channel': 1}
-        #
-        # # Create sub-runs
-        # # for drift_v, mesh_v in zip(eic_drift_vs, p2_mesh_vs):
-        # for mesh_v in p2_mesh_vs:
-        #     sub_run = copy.deepcopy(template)
-        #     # sub_run["sub_run_name"] = f"eic_drift_{drift_v}V_p2_mesh_{mesh_v}V"
-        #     sub_run["sub_run_name"] = f"p2_mesh_{mesh_v}V"
-        #
-        #     # Set the voltages
-        #     # sub_run["hvs"][drift_card_channel['card']][drift_card_channel['channel']] = drift_v
-        #     sub_run["hvs"][mesh_card_channel['card']][mesh_card_channel['channel']] = mesh_v
-        #
-        #     self.sub_runs.append(sub_run)
-
-        # drift, resist = 1000, 490
         # new_subrun = {
-        #     'sub_run_name': f'resist_{resist}V_drift_{drift}V',
-        #     'run_time': 3 * 60,  # Minutes
+        #     'sub_run_name': f'initial_run',
+        #     'run_time': 8 * 60,  # Minutes
         #     'hvs': {
         #         0: {
-        #             7: drift,
+        #             7: 900,
         #             8: 500,
         #             9: 500,
         #             10: 500,
         #             11: 500,
         #         },
         #         3: {
-        #             0: resist,
+        #             0: 500,
         #             8: 455,
         #             9: 455,
         #             10: 455,
         #             11: 455,
+        #         }
+        #     },
+        #     'daq_config_template_path': '/mnt/cosmic_data/MX17/dream_config/CosmicTb_MX17.cfg',
+        #     'pedestals_dir': f'{self.base_out_dir}pedestals/',
+        #     'zero_suppress': False,
+        #     'common_noise_subtraction': False,
+        # },
+        # self.sub_runs.append(new_subrun)
+
+        # new_subrun = {
+        #     'sub_run_name': 'no_zs',
+        #     'run_time': 10,  # Minutes
+        #     'hvs': {
+        #         0: {
+        #             7: 900,
+        #             8: 500,
+        #             9: 500,
+        #             10: 500,
+        #             11: 500,
         #         },
+        #         3: {
+        #             0: 500,
+        #             8: 455,
+        #             9: 455,
+        #             10: 455,
+        #             11: 455,
+        #         }
+        #     },
+        #     'zero_suppress': False,
+        #     'pedestals': 'pedestals_290'
+        # },
+        # self.sub_runs.append(new_subrun)
+        #
+        # new_subrun = {
+        #     'sub_run_name': 'zs_type_tracker',
+        #     'run_time': 10,  # Minutes
+        #     'hvs': {
+        #         0: {
+        #             7: 900,
+        #             8: 500,
+        #             9: 500,
+        #             10: 500,
+        #             11: 500,
+        #         },
+        #         3: {
+        #             0: 500,
+        #             8: 455,
+        #             9: 455,
+        #             10: 455,
+        #             11: 455,
+        #         }
+        #     },
+        #     'pedestals': 'pedestals_290',
+        #     'zs_type': 'tracker',
+        # },
+        # self.sub_runs.append(new_subrun)
+        #
+        # new_subrun = {
+        #     'sub_run_name': 'long_run',
+        #     'run_time': 24 * 60,  # Minutes
+        #     'hvs': {
+        #         0: {
+        #             7: 900,
+        #             8: 500,
+        #             9: 500,
+        #             10: 500,
+        #             11: 500,
+        #         },
+        #         3: {
+        #             0: 510,
+        #             8: 455,
+        #             9: 455,
+        #             10: 455,
+        #             11: 455,
+        #         }
         #     }
-        # }
+        # },
         # self.sub_runs.append(new_subrun)
 
         # drifts = [900]
@@ -404,60 +264,59 @@ class Config:
         # }
         # self.sub_runs.append(new_subrun)
 
-        check_samples = [0, 1, 2, 3, 4]
-        for check_sample in check_samples:
-            new_subrun = {
-                'sub_run_name': f'zs_type_tpc_{check_sample}_sample',
-                'run_time': 10,  # Minutes
-                'hvs': {
-                    0: {
-                        7: 900,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500,
-                    },
-                    3: {
-                        0: 500,
-                        8: 455,
-                        9: 455,
-                        10: 455,
-                        11: 455,
-                    }
-                },
-                'pedestals': 'pedestals_290',
-                'zs_type': 'tpc',
-                'zs_check_sample': check_sample,
-            }
-            self.sub_runs.append(new_subrun)
-
-        # peds = [290, 300, 310, 320, 330, 340, 350, 400, 450, 500, 550, 600, 700, 800, 900, 1000]
-        peds = [290, 300, 310, 330, 340, 350, 400, 450, 500, 550, 600, 700, 800, 900, 1000, 320]
-        for ped in peds:
-            new_subrun = {
-                'sub_run_name': f'ped_{ped}',
-                'run_time': 15,  # Minutes
-                'hvs': {
-                    0: {
-                        7: 900,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500,
-                    },
-                    3: {
-                        0: 500,
-                        8: 455,
-                        9: 455,
-                        10: 455,
-                        11: 455,
-                    }
-                },
-                'pedestals': f'pedestals_{ped}',
-                'zs_type': 'tpc',
-                'zs_check_sample': 1,
-            }
-            self.sub_runs.append(new_subrun)
+        # check_samples = [0, 1, 2, 3, 4]
+        # for check_sample in check_samples:
+        #     new_subrun = {
+        #         'sub_run_name': f'zs_type_tpc_{check_sample}_sample',
+        #         'run_time': 10,  # Minutes
+        #         'hvs': {
+        #             0: {
+        #                 7: 900,
+        #                 8: 500,
+        #                 9: 500,
+        #                 10: 500,
+        #                 11: 500,
+        #             },
+        #             3: {
+        #                 0: 500,
+        #                 8: 455,
+        #                 9: 455,
+        #                 10: 455,
+        #                 11: 455,
+        #             }
+        #         },
+        #         'pedestals': 'pedestals_290',
+        #         'zs_type': 'tpc',
+        #         'zs_check_sample': check_sample,
+        #     }
+        #     self.sub_runs.append(new_subrun)
+        #
+        # peds = [290, 300, 310, 330, 340, 350, 400, 450, 500, 550, 600, 700, 800, 900, 1000, 320]
+        # for ped in peds:
+        #     new_subrun = {
+        #         'sub_run_name': f'ped_{ped}',
+        #         'run_time': 15,  # Minutes
+        #         'hvs': {
+        #             0: {
+        #                 7: 900,
+        #                 8: 500,
+        #                 9: 500,
+        #                 10: 500,
+        #                 11: 500,
+        #             },
+        #             3: {
+        #                 0: 500,
+        #                 8: 455,
+        #                 9: 455,
+        #                 10: 455,
+        #                 11: 455,
+        #             }
+        #         },
+        #         'pedestals': f'pedestals_{ped}',
+        #         'zs_type': 'tpc',
+        #         'zs_check_sample': 1,
+        #     }
+        #     self.sub_runs.append(new_subrun)
 
         # new_subrun = {
         #     'sub_run_name': f'final_run',
@@ -518,15 +377,62 @@ class Config:
                     'y': 0,  # mm
                     'z': self.bench_geometry['p1_z'] + self.bench_geometry['board_thickness'],  # mm
                 },
-                # 'name': 'clas12_test_1',
-                # 'description': 'tested for daq',
-                # 'det_type': 'clas12_test',
-                # 'resist_type': 'strip',
-                # 'det_center_coords': {  # Center of detector
-                #     'x': 0,  # mm
-                #     'y': 0,  # mm
-                #     'z': self.bench_geometry['p1_z'] + self.bench_geometry['board_thickness'],  # mm
-                # },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': {
+                    'drift': (0, 7),
+                    'resist': (3, 0),
+                },
+                'dream_feus': {
+                    'x_1': (3, 1),  # Runs along x direction, indicates y hit location
+                    'x_2': (3, 2),
+                    'x_3': (3, 3),
+                    'x_4': (3, 4),
+                    'x_5': (3, 5),
+                    'x_6': (3, 6),
+                    'x_7': (3, 7),
+                    'x_8': (3, 8),
+                    'y_1': (4, 1),  # Runs along y direction, indicates x hit location
+                    'y_2': (4, 2),
+                    'y_3': (4, 3),
+                    'y_4': (4, 4),
+                    'y_5': (4, 5),
+                    'y_6': (4, 6),
+                    'y_7': (4, 7),
+                    'y_8': (4, 8),
+                },
+                'dream_feu_orientation': {  # If connector is normal, inverted, rotated, or rotated_inverted
+                    'x_1': 'inverted',
+                    'x_2': 'inverted',
+                    'x_3': 'inverted',
+                    'x_4': 'inverted',
+                    'x_5': 'inverted',
+                    'x_6': 'inverted',
+                    'x_7': 'inverted',
+                    'x_8': 'inverted',
+                    'y_1': 'inverted',
+                    'y_2': 'inverted',
+                    'y_3': 'inverted',
+                    'y_4': 'inverted',
+                    'y_5': 'inverted',
+                    'y_6': 'inverted',
+                    'y_7': 'inverted',
+                    'y_8': 'inverted',
+                },
+            },
+            {
+                'name': 'clas12_test_1',
+                'description': 'tested for daq',
+                'det_type': 'clas12_test',
+                'resist_type': 'strip',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['board_thickness'],  # mm
+                },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
                     'y': 0,  # deg  Rotation about y axis
@@ -691,186 +597,6 @@ class Config:
                 },
             },
             {
-                'name': 'asacusa_strip_1',
-                'det_type': 'asacusa_strip',
-                'det_center_coords': {  # Center of detector
-                    'x': 0,  # mm
-                    'y': 0,  # mm
-                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
-                         3 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (0, 2),
-                    'resist_1': (3, 3),
-                    'resist_2': (3, 4),
-                },
-                'dream_feus': {
-                    'x_1': (4, 5),  # Runs along x direction, indicates y hit location
-                    'x_2': (4, 6),
-                    'y_1': (4, 7),  # Runs along y direction, indicates x hit location
-                    'y_2': (4, 8),
-                },
-            },
-            {
-                'name': 'asacusa_strip_2',
-                'det_type': 'asacusa_strip',
-                'det_center_coords': {  # Center of detector
-                    'x': 0,  # mm
-                    'y': 0,  # mm
-                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
-                         2 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (0, 3),
-                    'resist_1': (3, 5),
-                    'resist_2': (3, 6)
-                },
-                'dream_feus': {
-                    'x_1': (4, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (4, 2),
-                    'y_1': (4, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (4, 4),
-                },
-            },
-            {
-                'name': 'strip_plein_1',
-                'det_type': 'strip_plein',
-                'det_center_coords': {  # Center of detector
-                    'x': 0,  # mm
-                    'y': 0,  # mm
-                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
-                         1 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (0, 6),
-                    'resist_2': (3, 7),
-                },
-                'dream_feus': {
-                    'x_1': (3, 5),  # Runs along x direction, indicates y hit location
-                    'x_2': (3, 6),
-                    'y_1': (3, 7),  # Runs along y direction, indicates x hit location
-                    'y_2': (3, 8),
-                },
-            },
-            # {
-            #     'name': 'inter_grid_1',
-            #     'det_type': 'inter_grid',
-            #     'det_center_coords': {  # Center of detector
-            #         'x': 0,  # mm
-            #         'y': 0,  # mm
-            #         'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
-            #              1 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
-            #     },
-            #     'det_orientation': {
-            #         'x': 0,  # deg  Rotation about x axis
-            #         'y': 0,  # deg  Rotation about y axis
-            #         'z': 0,  # deg  Rotation about z axis
-            #     },
-            #     'hv_channels': {
-            #         'drift': (0, 6),
-            #         # 'resist_1': (3, 7),
-            #         'resist_2': (2, 0)
-            #     },
-            #     'dream_feus': {
-            #         'x_1': (3, 5),  # Runs along x direction, indicates y hit location
-            #         'x_2': (3, 6),
-            #         'y_1': (3, 7),  # Runs along y direction, indicates x hit location
-            #         'y_2': (3, 8),
-            #     },
-            # },
-            # {
-            #     'name': 'strip_grid_1',
-            #     'det_type': 'strip_grid',
-            #     'det_center_coords': {  # Center of detector
-            #         'x': 0,  # mm
-            #         'y': 0,  # mm
-            #         'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
-            #              0 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
-            #     },
-            #     'det_orientation': {
-            #         'x': 0,  # deg  Rotation about x axis
-            #         'y': 0,  # deg  Rotation about y axis
-            #         'z': 0,  # deg  Rotation about z axis
-            #     },
-            #     'hv_channels': {
-            #         'drift': (0, 7),
-            #         'resist_2': (3, 7)
-            #     },
-            #     'dream_feus': {
-            #         'x_1': (3, 1),  # Runs along x direction, indicates y hit location
-            #         'x_2': (3, 2),
-            #         'y_1': (3, 3),  # Runs along y direction, indicates x hit location
-            #         'y_2': (3, 4),
-            #     },
-            # },
-            {
-                'name': 'strip_strip_1',
-                'det_type': 'strip_strip',
-                'det_center_coords': {  # Center of detector
-                    'x': 9.2,  # mm
-                    'y': 38.4,  # mm
-                    # 'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
-                    #      5 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
-                    'z': 712.7,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (0, 6),
-                    'resist_2': (3, 7),
-                },
-                'dream_feus': {
-                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (6, 2),
-                    'y_1': (6, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (6, 4),
-                },
-            },
-            {
-                'name': 'inter_plein_1',
-                'det_type': 'inter_plein',
-                'det_center_coords': {  # Center of detector
-                    'x': 9.2,  # mm
-                    'y': 38.4,  # mm
-                    # 'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
-                    #      5 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
-                    'z': 712.7,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (0, 6),
-                    'resist_2': (3, 7),
-                },
-                'dream_feus': {
-                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (6, 2),
-                    'y_1': (6, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (6, 4),
-                },
-            },
-            {
                 'name': 'p2_3',
                 'det_type': 'p2',
                 'det_center_coords': {  # Center of detector
@@ -895,237 +621,6 @@ class Config:
                     'x_1': (6, 1),
                     'x_2': (6, 2),
                 },
-            },
-            {
-                'name': 'rd5_plein_1',
-                'det_type': 'rd5_plein',
-                'det_center_coords': {  # Center of detector
-                    'x': 24,  # mm
-                    'y': 75.6,  # mm
-                    'z': 720.8,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (0, 6),
-                    'resist_1': (3, 3),
-                    'resist_2': (3, 4)
-                },
-                'dream_feus': {
-                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (6, 2),
-                    'y_1': (6, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (6, 4),
-                },
-            },
-            {
-                'name': 'rd5_strip_1',
-                'det_type': 'rd5_strip',
-                'det_center_coords': {  # Center of detector
-                    'x': 24,  # mm
-                    'y': 75.6,  # mm
-                    'z': 720.8,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (0, 6),
-                    'resist_1': (3, 3),
-                    'resist_2': (3, 4)
-                },
-                'dream_feus': {
-                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (6, 2),
-                    'y_1': (6, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (6, 4),
-                },
-            },
-            {
-                'name': 'rd5_plein_2',
-                'det_type': 'rd5_plein',
-                'det_center_coords': {  # Center of detector
-                    'x': 24,  # mm
-                    'y': 75.6,  # mm
-                    'z': 720.8,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (0, 6),
-                    'resist_1': (3, 3),
-                    'resist_2': (3, 4)
-                },
-                'dream_feus': {
-                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (6, 2),
-                    'y_1': (6, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (6, 4),
-                },
-            },
-            {
-                'name': 'rd5_plein_3',
-                'det_type': 'rd5_plein',
-                'det_center_coords': {  # Center of detector
-                    'x': 24,  # mm
-                    'y': 75.6,  # mm
-                    'z': 720.8,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (0, 6),
-                    'resist_1': (3, 3),
-                    'resist_2': (3, 4)
-                },
-                'dream_feus': {
-                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (6, 2),
-                    'y_1': (6, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (6, 4),
-                },
-            },
-            {
-                'name': 'rd5_strip_2',
-                'det_type': 'rd5_strip',
-                'det_center_coords': {  # Center of detector
-                    'x': -34.16,  # mm
-                    'y': 33.09,  # mm
-                    'z': 708.9,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (0, 6),
-                    'resist_1': (3, 3),
-                    'resist_2': (3, 4)
-                },
-                'dream_feus': {
-                    'x_1': (6, 0),  # Runs along x direction, indicates y hit location
-                    'x_2': (6, 1),
-                    'y_1': (6, 2),  # Runs along y direction, indicates x hit location
-                    'y_2': (6, 3),
-                },
-            },
-            {
-                'name': 'rd5_plein_vfp_1',
-                'det_type': 'rd5_plein',
-                'det_center_coords': {  # Center of detector
-                    'x': 24,  # mm
-                    'y': 75.6,  # mm
-                    'z': 720.8,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (5, 0),
-                    # 'resist_1': (2, 0),
-                    'resist_2': (2, 1)
-                },
-                'dream_feus': {
-                    'x_1': (1, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (1, 2),
-                    'y_1': (1, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (1, 4),
-                },
-            },
-            {
-                'name': 'rd5_grid_vfp_1',
-                'det_type': 'rd5_grid_vfp',
-                'det_center_coords': {  # Center of detector
-                    'x': 24,  # mm
-                    'y': 75.6,  # mm
-                    'z': 720.8,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (5, 0),
-                    'resist_1': (2, 0),
-                    'resist_2': (2, 1)
-                },
-                'dream_feus': {
-                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (6, 2),
-                    'y_1': (6, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (6, 4),
-                },
-            },
-            {
-                'name': 'rd5_plein_esl_1',
-                'det_type': 'rd5_plein_esl',
-                'det_center_coords': {  # Center of detector
-                    'x': 24,  # mm
-                    'y': 75.6,  # mm
-                    'z': 720.8,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (5, 0),
-                    'resist_1': (2, 0),
-                    'resist_2': (2, 1)
-                },
-                'dream_feus': {
-                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (6, 2),
-                    'y_1': (6, 3),  # Runs along y direction, indicates x hit location
-                    'y_2': (6, 4),
-                },
-            },
-            {
-                'name': 'rd5_strip_esl_1',
-                'det_type': 'rd5_strip_esl',
-                'det_center_coords': {  # Center of detector
-                    'x': 24,  # mm
-                    'y': 75.6,  # mm
-                    'z': 720.8,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (0, 6),
-                    'resist_1': (3, 3),
-                    'resist_2': (3, 4)
-                },
-                'dream_feus': {
-                    'x_1': (6, 0),  # Runs along x direction, indicates y hit location
-                    'x_2': (6, 1),
-                    'y_1': (6, 2),  # Runs along y direction, indicates x hit location
-                    'y_2': (6, 3),
-                },
-                'dream_feu_inversion': {  # If True, connector is inverted --> 1, 0, 3, 2 ...
-                    'x_1': True,
-                    'x_2': True,
-                    'y_1': False,
-                    'y_2': False,
-                }
             },
             {
                 'name': 'p2_1',
@@ -1314,8 +809,6 @@ class Config:
 
 
 if __name__ == '__main__':
-    # out_dir = '/local/home/usernsw/dylan/'
-    # out_dir = '/mnt/cosmic_data/clas12/'
     out_run_dir = '/local/home/usernsw/Cosmic_Bench_DAQ_Control/config/json_run_configs'
     config_name = 'run_config.json'
     config = Config()

@@ -71,6 +71,9 @@ def main():
                         effective_zs_type = effective_info.get('zs_type', None)
                         effective_zs_check_sample = effective_info.get('zs_check_sample', None)
                         effective_latency = effective_info.get('latency', None)
+                        effective_do_ped_thr_run = effective_info.get('do_pedestal_threshold_run', None)
+                        effective_do_trg_thr_run = effective_info.get('do_trigger_threshold_run', None)
+                        effective_do_data_run = effective_info.get('do_data_run', None)
 
                         sub_run_out_raw_inner_dir = f'{effective_out_directory}/{sub_run_name}/{effective_raw_daq_inner_dir}/'
                         create_dir_if_not_exist(sub_run_out_raw_inner_dir)
@@ -89,7 +92,8 @@ def main():
                             sub_run_dir, effective_cfg_template_path, run_time,
                             effective_zero_suppress, effective_samples_per_waveform,
                             effective_pedestal_subtraction, effective_common_noise_subtraction,
-                            effective_zs_type, effective_zs_check_sample, effective_latency)
+                            effective_zs_type, effective_zs_check_sample, effective_latency,
+                            effective_do_ped_thr_run, effective_do_trg_thr_run, effective_do_data_run)
                         shutil.copy(cfg_run_path, sub_run_out_raw_inner_dir)
 
                         if effective_pedestals_dir is not None:
@@ -259,7 +263,8 @@ def _to_zs_typ(val):
 def make_config_from_template(run_dir, cfg_template_file_path, cfg_file_run_time, zero_suppress_mode=False,
                               samples_per_waveform=None, pedestal_subtraction=None,
                               common_noise_subtraction=None, zs_type=None, zs_check_sample=None,
-                              latency=None):
+                              latency=None, do_pedestal_threshold_run=None,
+                              do_trigger_threshold_run=None, do_data_run=None):
     print('Making config file from template...')
     dest = run_dir
     cfg_file_name = os.path.basename(cfg_template_file_path)
@@ -291,6 +296,12 @@ def make_config_from_template(run_dir, cfg_template_file_path, cfg_file_run_time
         updates["Feu * Feu_RunCtrl_ZsChkSmp"] = val
     if latency is not None:
         updates["Feu * Dream * 12"] = f'0x{int(latency):04X}'
+    if do_pedestal_threshold_run is not None:
+        updates["Sys Action PedThrRun"] = _to_bit(do_pedestal_threshold_run)
+    if do_trigger_threshold_run is not None:
+        updates["Sys Action TrgThrRun"] = _to_bit(do_trigger_threshold_run)
+    if do_data_run is not None:
+        updates["Sys Action DataRun"] = _to_bit(do_data_run)
     update_config_value(cfg_file_path, updates)
 
     return cfg_file_path

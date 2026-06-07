@@ -9,8 +9,10 @@ The flask UI's Start Processor button reads that JSON to launch processor_watche
 import json
 import os
 
+from run_config import BASE_DATA_DIR
+
 # --- Paths ---
-BASE_DATA = '/mnt/cosmic_data/MX17/Run/'
+BASE_DATA = f'{BASE_DATA_DIR}Run/'
 # BASE_DATA = '/mnt/cosmic_data/clas12/Run/'
 MM_BUILD = '/local/home/usernsw/mm_dream_reconstruction/build'
 
