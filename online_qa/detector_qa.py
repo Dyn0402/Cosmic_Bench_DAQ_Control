@@ -46,6 +46,12 @@ AMP_THRESHOLD       = 200    # ADC — threshold line in amplitude plots
 HITS_PER_EVENT_ZOOM = 50     # upper x-limit for the zoomed hits/event panel
 WF_NS_PER_SAMPLE    = 20.0   # fallback ns/sample if not in run_config
 
+# Memory control: cap on the number of tree entries read from each ROOT file
+# (combined_hits "hits" rows / decoded "nt" waveform rows). Bounds peak memory
+# regardless of how large an individual file grows over the course of a run.
+# MAX_ENTRIES_PER_FILE = 5000
+MAX_ENTRIES_PER_FILE = None
+
 _SKIP_DET_TYPES = {'banco', 'scintillator'}
 
 
@@ -142,7 +148,7 @@ def run_qa(subrun_dir: Path, run_config_path: Path, mode: str = 'all', file_num:
             _plot_xy_hit_map(df, x_feu_ids, y_feu_ids, title, out_dir)
 
         # --- Per-strip waveform mean/RMS from decoded ROOT files ---
-        _plot_wf_stats(subrun_dir, feu_ids, ns_per_sample, title, out_dir)
+        _plot_wf_stats(subrun_dir, feu_ids, ns_per_sample, title, out_dir, mode, file_num)
 
         plt.close('all')
         gc.collect()
@@ -155,7 +161,21 @@ def run_qa(subrun_dir: Path, run_config_path: Path, mode: str = 'all', file_num:
 
 def _extract_file_num(filename: str):
     m = re.match(r'.*_(\d{3})_feu-combined', filename)
-    return int(m.group(1)) if m else None
+    if m:
+        return int(m.group(1))
+    m = re.match(r'.*_(\d{3})_(\d{2})[._]', filename)
+    if m:
+        return int(m.group(1))
+    return None
+
+
+def _filter_by_mode(files, mode: str, file_num: int = None):
+    """Restrict a sorted file list to the file_num(s) selected by mode (mirrors qa_watcher modes)."""
+    if mode == 'first':
+        return [f for f in files if _extract_file_num(f.name) == 0]
+    if mode == 'per_file' and file_num is not None:
+        return [f for f in files if _extract_file_num(f.name) == file_num]
+    return files
 
 
 def _load_hits(combined_dir: Path, feu_ids: set, mode: str,
@@ -167,20 +187,26 @@ def _load_hits(combined_dir: Path, feu_ids: set, mode: str,
     if not all_files:
         return None
 
-    if mode == 'first':
-        all_files = [f for f in all_files if _extract_file_num(f.name) == 0]
-    elif mode == 'per_file' and file_num is not None:
-        all_files = [f for f in all_files if _extract_file_num(f.name) == file_num]
-
+    all_files = _filter_by_mode(all_files, mode, file_num)
     if not all_files:
         return None
 
-    try:
-        df = uproot.concatenate([f'{f}:hits' for f in all_files], library='pd')
-    except Exception as e:
-        print(f'[qa] Failed to load hits: {e}')
+    # Read each file individually and cap entries, rather than uproot.concatenate
+    # over everything at once — bounds peak memory for files that grow large.
+    chunks = []
+    for f in all_files:
+        try:
+            with uproot.open(f) as uf:
+                if 'hits' not in uf:
+                    continue
+                chunks.append(uf['hits'].arrays(entry_stop=MAX_ENTRIES_PER_FILE, library='pd'))
+        except Exception as e:
+            print(f'[qa] Failed to load hits from {f.name}: {e}')
+
+    if not chunks:
         return None
 
+    df = pd.concat(chunks, ignore_index=True)
     return df[df['feu'].isin(feu_ids)].copy()
 
 
@@ -504,10 +530,17 @@ def _plot_xy_hit_map(df: pd.DataFrame, x_feu_ids: set, y_feu_ids: set,
 # Waveform mean/RMS from decoded ROOT files
 # ---------------------------------------------------------------------------
 
-def _load_wf_stats_from_decoded(decoded_dir: Path, feu_ids) -> dict:
-    """Stream decoded ROOT files and compute per-(channel, sample) mean & RMS."""
+def _load_wf_stats_from_decoded(decoded_dir: Path, feu_ids, mode: str,
+                                file_num: int = None) -> dict:
+    """
+    Stream decoded ROOT files — restricted to the same file_num(s) _load_hits
+    uses for `mode` (e.g. only file_num==0 in 'first' mode, the qa_watcher
+    default) and capped at MAX_ENTRIES_PER_FILE waveform rows per file — and
+    compute per-(channel, sample) mean & RMS amplitude.
+    """
     result    = {}
     all_files = sorted(decoded_dir.iterdir(), key=lambda p: p.name)
+    all_files = _filter_by_mode(all_files, mode, file_num)
 
     for feu in sorted(feu_ids):
         feu_str   = f'_{feu:02d}.'
@@ -519,9 +552,9 @@ def _load_wf_stats_from_decoded(decoded_dir: Path, feu_ids) -> dict:
                     if 'nt' not in uf:
                         continue
                     tree         = uf['nt']
-                    samples_arr  = tree['sample'].array(library='np')
-                    channels_arr = tree['channel'].array(library='np')
-                    amps_arr     = tree['amplitude'].array(library='np')
+                    samples_arr  = tree['sample'].array(entry_stop=MAX_ENTRIES_PER_FILE, library='np')
+                    channels_arr = tree['channel'].array(entry_stop=MAX_ENTRIES_PER_FILE, library='np')
+                    amps_arr     = tree['amplitude'].array(entry_stop=MAX_ENTRIES_PER_FILE, library='np')
             except Exception as e:
                 print(f'[qa/wf] Error reading {fpath.name}: {e}')
                 continue
@@ -529,10 +562,10 @@ def _load_wf_stats_from_decoded(decoded_dir: Path, feu_ids) -> dict:
                 continue
             flat_s = np.concatenate([np.asarray(x) for x in samples_arr])
             flat_c = np.concatenate([np.asarray(x) for x in channels_arr])
-            flat_a = np.concatenate([np.asarray(x) for x in amps_arr]).astype(float)
+            flat_a = np.concatenate([np.asarray(x) for x in amps_arr])
             chunks.append(pd.DataFrame({'channel':   flat_c.astype(np.int32),
                                         'sample':    flat_s.astype(np.int32),
-                                        'amplitude': flat_a}))
+                                        'amplitude': flat_a.astype(np.float32)}))
         if not chunks:
             continue
 
@@ -589,7 +622,7 @@ def _plot_wf_mean_rms(stats: dict, feu_ids, title: str, out_dir: Path,
         ax_r.set_ylabel('Channel')
         ax_r.set_title(f'FEU {feu} — RMS')
 
-        fig.suptitle(f'{title}\nWaveform mean & RMS — all events', fontsize=10)
+        fig.suptitle(f'{title}\nWaveform mean & RMS (≤{MAX_ENTRIES_PER_FILE:,} waveforms/file)', fontsize=10)
         fig.tight_layout()
         _save(fig, out_dir, f'waveform_mean_rms_feu{feu:02d}.png')
 
@@ -635,12 +668,12 @@ def _plot_wf_mean_rms_per_strip(stats: dict, feu_ids, title: str, out_dir: Path)
 
 
 def _plot_wf_stats(subrun_dir: Path, feu_ids, ns_per_sample: float,
-                   title: str, out_dir: Path) -> None:
+                   title: str, out_dir: Path, mode: str, file_num: int = None) -> None:
     decoded_dir = subrun_dir / DECODED_ROOT_DIR
     if not decoded_dir.exists() or not feu_ids:
         return
-    print(f'[qa/wf] Computing per-strip mean/RMS across decoded files ...')
-    wf_stats = _load_wf_stats_from_decoded(decoded_dir, sorted(feu_ids))
+    print(f'[qa/wf] Computing per-strip mean/RMS from decoded files ...')
+    wf_stats = _load_wf_stats_from_decoded(decoded_dir, sorted(feu_ids), mode, file_num)
     if wf_stats:
         _plot_wf_mean_rms(wf_stats, sorted(feu_ids), title, out_dir, ns_per_sample)
         _plot_wf_mean_rms_per_strip(wf_stats, sorted(feu_ids), title, out_dir)
