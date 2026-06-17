@@ -23,7 +23,8 @@ class Config:
     def __init__(self):
         # self.run_name = 'mx17_det4_ArIso_HV_Scan_5-7-26'
         # self.run_name = 'zs_compression_test_M3_6-7-26'
-        self.run_name = 'mx17_det3_new_test_zs_m3_6-17-26'
+        # self.run_name = 'mx17_det3_new_test_zs_m3_6-17-26'
+        self.run_name = 'mx17_det1_det2_overnight_6-17-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         # self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.base_out_dir = BASE_DATA_DIR
@@ -96,20 +97,20 @@ class Config:
         self.sub_runs = []  # Append subruns in order they should be run.
 
         new_subrun = {
-            'sub_run_name': f'ZS_common_noise_subtr_M3_test',
-            'run_time': 5,  # Minutes*
-            'zero_suppress': True,
-            'common_noise_subtraction': True,
+            'sub_run_name': f'quick_run',
+            'run_time': 15,  # Minutes*
             'hvs': {
                 0: {
-                    7: 900,
+                    6: 1000,
+                    7: 1000,
                     8: 500,
                     9: 500,
                     10: 500,
                     11: 500,
                 },
                 3: {
-                    0: 500,
+                    3: 500,
+                    4: 500,
                     8: 455,
                     9: 455,
                     10: 455,
@@ -119,21 +120,22 @@ class Config:
         }
         self.sub_runs.append(new_subrun)
 
+        # Longer run for 2 hours at nominal voltages (1000V drift, 500V resist).
         new_subrun = {
-            'sub_run_name': f'ZS_common_noise_subtr_M3_test',
-            'run_time': 5,  # Minutes*
-            'zero_suppress': True,
-            'common_noise_subtraction': False,
+            'sub_run_name': f'longer_run',
+            'run_time': 2 * 60,  # Minutes
             'hvs': {
                 0: {
-                    7: 900,
+                    6: 1000,
+                    7: 1000,
                     8: 500,
                     9: 500,
                     10: 500,
                     11: 500,
                 },
                 3: {
-                    0: 500,
+                    3: 500,
+                    4: 500,
                     8: 455,
                     9: 455,
                     10: 455,
@@ -143,19 +145,49 @@ class Config:
         }
         self.sub_runs.append(new_subrun)
 
+        # HV scan: 8 steps of 30 minutes (4 hours total), resist from 520V in steps of -10V.
+        resists = [520, 510, 500, 490, 480, 470, 460, 450]
+        for resist in resists:
+            new_subrun = {
+                'sub_run_name': f'resist_{resist}V_drift_1000V',
+                'run_time': 30,  # Minutes
+                'hvs': {
+                    0: {
+                        6: 1000,
+                        7: 1000,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    3: {
+                        3: resist,
+                        4: resist,
+                        8: 455,
+                        9: 455,
+                        10: 455,
+                        11: 455,
+                    }
+                },
+            }
+            self.sub_runs.append(new_subrun)
+
+        # Final long run for 24 hours at 500V resist.
         new_subrun = {
-            'sub_run_name': f'non_ZS_M3_test',
-            'run_time': 5,  # Minutes
+            'sub_run_name': f'long_run',
+            'run_time': 24 * 60,  # Minutes
             'hvs': {
                 0: {
-                    7: 900,
+                    6: 1000,
+                    7: 1000,
                     8: 500,
                     9: 500,
                     10: 500,
                     11: 500,
                 },
                 3: {
-                    0: 500,
+                    3: 500,
+                    4: 500,
                     8: 455,
                     9: 455,
                     10: 455,
@@ -410,7 +442,7 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
-        self.included_detectors = ['mx17_1',
+        self.included_detectors = ['mx17_1', 'mx17_2',
                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
         # self.included_detectors = ['clas12_test',
         #                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
@@ -418,7 +450,7 @@ class Config:
         self.detectors = [
             {
                 'name': 'mx17_1',
-                'description': 'Det3 from May beam test',
+                'description': 'Bulked by Arnaud June 12. Giant pillars on parts of the detector.',
                 'det_type': 'mx17',
                 'resist_type': 'strip',
                 'det_center_coords': {  # Center of detector
@@ -433,7 +465,7 @@ class Config:
                 },
                 'hv_channels': {
                     'drift': (0, 7),
-                    'resist': (3, 0),
+                    'resist': (3, 3),
                 },
                 'dream_feus': {
                     'x_1': (3, 1),  # Runs along x direction, indicates y hit location
@@ -452,6 +484,62 @@ class Config:
                     'y_6': (4, 6),
                     'y_7': (4, 7),
                     'y_8': (4, 8),
+                },
+                'dream_feu_orientation': {  # If connector is normal, inverted, rotated, or rotated_inverted
+                    'x_1': 'inverted',
+                    'x_2': 'inverted',
+                    'x_3': 'inverted',
+                    'x_4': 'inverted',
+                    'x_5': 'inverted',
+                    'x_6': 'inverted',
+                    'x_7': 'inverted',
+                    'x_8': 'inverted',
+                    'y_1': 'inverted',
+                    'y_2': 'inverted',
+                    'y_3': 'inverted',
+                    'y_4': 'inverted',
+                    'y_5': 'inverted',
+                    'y_6': 'inverted',
+                    'y_7': 'inverted',
+                    'y_8': 'inverted',
+                },
+            },
+            {
+                'name': 'mx17_2',
+                'description': 'Bulked by Stephan June 15',
+                'det_type': 'mx17',
+                'resist_type': 'strip',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': self.bench_geometry['p2_z'] + self.bench_geometry['board_thickness'],  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 0,  # deg  Rotation about z axis
+                },
+                'hv_channels': {
+                    'drift': (0, 6),
+                    'resist': (3, 4),
+                },
+                'dream_feus': {
+                    'x_1': (7, 1),  # Runs along x direction, indicates y hit location
+                    'x_2': (7, 2),
+                    'x_3': (7, 3),
+                    'x_4': (7, 4),
+                    'x_5': (7, 5),
+                    'x_6': (7, 6),
+                    'x_7': (7, 7),
+                    'x_8': (7, 8),
+                    'y_1': (8, 1),  # Runs along y direction, indicates x hit location
+                    'y_2': (8, 2),
+                    'y_3': (8, 3),
+                    'y_4': (8, 4),
+                    'y_5': (8, 5),
+                    'y_6': (8, 6),
+                    'y_7': (8, 7),
+                    'y_8': (8, 8),
                 },
                 'dream_feu_orientation': {  # If connector is normal, inverted, rotated, or rotated_inverted
                     'x_1': 'inverted',
