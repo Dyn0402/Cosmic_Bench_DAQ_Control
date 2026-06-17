@@ -51,6 +51,10 @@ pip install -r requirements.txt
 
 The CAEN HV library (`caen_hv_py`) and the DREAM decode binaries (`decode`, `convert_vec_tree_to_array`, `analyze_waveforms`, `combine_feus_hits`) must be installed separately and their paths set in the run config.
 
+### ROOT environment
+
+All C++ processing steps now run under **ROOT 6** — both the DREAM decode/analyze/combine binaries **and** the M3 tracking binaries (`DataReader`, `tracking`). There is no longer a separate ROOT 5 path for M3 tracking. The processor builds the ROOT 6 environment once by sourcing the `cpp_setup_script` from the processor config (e.g. `source <root6>/bin/thisroot.sh && source scl_source enable devtoolset-9`) and applies that same environment to every processing subprocess, M3 tracking included. The M3 tracking binaries must therefore be built against the same ROOT 6 (see the tracking repo's README for build instructions).
+
 ---
 
 ## Configuration
@@ -82,7 +86,7 @@ self.gas = 'Ar/CF4 90/10'        # Gas mixture label (written to run metadata)
 
 ### Processor configuration (`processor_config.py`)
 
-Run `processor_config.py` to generate a JSON config for `processor_watcher.py`. Key fields: paths to decode/analyze/combine binaries, which pipeline steps to run (`do_decode`, `do_analyze`, `do_combine`), and M3 filtering options.
+Run `processor_config.py` to generate a JSON config for `processor_watcher.py`. Key fields: paths to decode/analyze/combine binaries, which pipeline steps to run (`do_decode`, `do_analyze`, `do_combine`), M3 tracking/filtering options (`do_m3_tracking`, `tracking_sh_path`, `tracking_run_dir`, `filter_by_m3`), and the `cpp_setup_script` used to source the ROOT 6 environment shared by all processing steps (see [ROOT environment](#root-environment)).
 
 ---
 
