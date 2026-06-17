@@ -311,16 +311,10 @@ def _process_file_num(fnum, all_fdf_paths, subrun_dir, ped_dir,
             if fdf.exists():
                 fdf.unlink()
                 print(f"[cleanup] Removed {fdf.name}")
-    if not save_decoded and decoded_dir.exists():
-        for f in decoded_dir.glob('*.root'):
-            if '_datrun_' in f.name and _extract_file_num(f.name) == fnum:
-                f.unlink()
-                print(f"[cleanup] Removed {f.name}")
-        if filter_by_m3 and filtered_dir.exists():
-            for f in filtered_dir.glob('*.root'):
-                if '_datrun_' in f.name and _extract_file_num(f.name) == fnum:
-                    f.unlink()
-                    print(f"[cleanup] Removed filtered {f.name}")
+    if not save_decoded:
+        _remove_datrun_roots(decoded_dir, fnum)
+        if filter_by_m3:
+            _remove_datrun_roots(filtered_dir, fnum, label='filtered ')
 
 
 def _decode_pedestals(ped_dir: str, decode_exe: str, cpp_env):
@@ -520,6 +514,16 @@ def _make_combined_name(a_hits_path: str) -> str:
     """Replace the 2-digit FEU field with 'feu-combined' in a hits filename."""
     name = os.path.basename(a_hits_path)
     return re.sub(r'(_\d{3}_)\d{2}(_hits\.root)$', r'\1feu-combined\2', name)
+
+
+def _remove_datrun_roots(directory: Path, fnum: int, label: str = ''):
+    """Delete decoded/filtered datrun ROOT files for fnum in directory."""
+    if not directory.exists():
+        return
+    for f in directory.glob('*.root'):
+        if '_datrun_' in f.name and _extract_file_num(f.name) == fnum:
+            f.unlink()
+            print(f"[cleanup] Removed {label}{f.name}")
 
 
 # ---------------------------------------------------------------------------
