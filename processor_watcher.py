@@ -253,7 +253,7 @@ def _process_file_num(fnum, all_fdf_paths, subrun_dir, ped_dir,
         create_dir_if_not_exist(str(m3_track_dir))
         print(f"[m3_track] Running M3 tracking for file_num={fnum:03d}")
         _run_m3_tracking(m3_fdfs[0].parent, m3_track_dir,
-                         tracking_sh_path, tracking_run_dir, m3_feu_num, fnum)
+                         tracking_sh_path, tracking_run_dir, m3_feu_num, fnum, cpp_env)
 
     # Step 2: Decode non-M3 FDFs
     if do_decode and main_fdfs:
@@ -353,8 +353,10 @@ def _m3_tracking_done(m3_track_dir: Path, fnum: int) -> bool:
 
 def _run_m3_tracking(fdf_dir: Path, m3_track_dir: Path,
                      tracking_sh_path: str, tracking_run_dir: str,
-                     m3_feu_num: int, fnum: int):
-    """Run M3 tracking in the default process environment (no ROOT sourced)."""
+                     m3_feu_num: int, fnum: int, cpp_env=None):
+    """Run M3 tracking. The tracking binaries are ROOT-linked, so they run with
+    cpp_env (the same ROOT-sourced environment used for decode/analyze/combine).
+    Failures are caught and logged so a single bad file can't crash the watcher."""
     try:
         from m3_tracking_control import m3_tracking
     except ImportError:
@@ -365,8 +367,12 @@ def _run_m3_tracking(fdf_dir: Path, m3_track_dir: Path,
         print("[m3_track] tracking_sh_path or tracking_run_dir not configured, skipping")
         return
 
-    m3_tracking(str(fdf_dir) + '/', tracking_sh_path, tracking_run_dir,
-                out_dir=str(m3_track_dir) + '/', m3_feu_num=m3_feu_num, file_num=fnum)
+    try:
+        m3_tracking(str(fdf_dir) + '/', tracking_sh_path, tracking_run_dir,
+                    out_dir=str(m3_track_dir) + '/', m3_feu_num=m3_feu_num, file_num=fnum, env=cpp_env)
+    except Exception as e:
+        print(f"[m3_track] ERROR: M3 tracking failed for file_num={fnum:03d}: {e}\n"
+              f"[m3_track] Skipping M3 tracking for this file and continuing.")
 
 
 # ---------------------------------------------------------------------------
