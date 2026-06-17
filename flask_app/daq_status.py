@@ -25,11 +25,10 @@ import re
 
 # Live Dream DAQ event count, updated by get_dream_daq_status() on every poll and
 # read by get_live_dream_daq_event_count() (e.g. from /get_run_events) without
-# triggering another tmux capture. "count" only ever increases within a single
-# data-taking phase so a single bad regex scrape can't make it jump backward;
-# "taking_data" flips to False whenever the pane leaves "_TakeData:" so the next
-# data-taking phase (new subrun) starts from a fresh baseline instead of max-ing
-# against the previous subrun's leftover count.
+# triggering another tmux capture. "count" tracks the current subrun's live
+# nb_of_events (DREAM restarts this counter each subrun, so it can go down across
+# subruns). "taking_data" is True only while the pane is showing "_TakeData:", so
+# the live count is treated as valid only during a data-taking phase.
 _live_events = {"count": 0, "taking_data": False}
 
 
@@ -65,13 +64,15 @@ def get_dream_daq_status():
         m_ir = re.search(r"IntRate=\s*([\d.]+\s*[A-Za-z]+)", output)
         if m_ir: fields.append({"label": "Int Rate", "value": m_ir.group(1)})
 
+        # Report the current subrun's live nb_of_events directly. DREAM restarts
+        # this counter at the start of every subrun, so a high-water-mark/max()
+        # across the data-taking phase would freeze the display at the first
+        # subrun's peak (the "_TakeData:" substring lingers in the 500-line
+        # scrollback between subruns, so the phase never resets). The live status
+        # line updates in place, so the current regex match is the reliable value.
         m_ev = re.search(r"nb_of_events=(\d+)", output)
         if m_ev:
-            seen = int(m_ev.group(1))
-            if not _live_events["taking_data"]:
-                _live_events["count"] = seen  # entering a new data-taking phase -> fresh baseline
-            else:
-                _live_events["count"] = max(_live_events["count"], seen)  # never decrease
+            _live_events["count"] = int(m_ev.group(1))
             _live_events["taking_data"] = True
         if _live_events["taking_data"]:
             fields.append({"label": "Events", "value": str(_live_events["count"])})
