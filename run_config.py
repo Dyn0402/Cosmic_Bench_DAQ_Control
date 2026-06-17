@@ -22,7 +22,8 @@ BASE_DATA_DIR = f'{BASE_DISK}{PROJECT}/'
 class Config:
     def __init__(self):
         # self.run_name = 'mx17_det4_ArIso_HV_Scan_5-7-26'
-        self.run_name = 'zs_compression_test_M3_6-7-26'
+        # self.run_name = 'zs_compression_test_M3_6-7-26'
+        self.run_name = 'mx17_det3_new_test_zs_m3_6-17-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         # self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.base_out_dir = BASE_DATA_DIR
@@ -57,7 +58,7 @@ class Config:
             'raw_daq_inner_dir': self.raw_daq_inner_dir,
             'copy_on_fly': True,  # True to copy raw data to out dir during run, False to copy after run
             'n_samples_per_waveform': 32,  # Number of samples per waveform to configure in DAQ
-            'zero_suppress': True,  # True to run in zero suppression mode, False to run in full readout mode
+            'zero_suppress': False,  # True to run in zero suppression mode, False to run in full readout mode
             # 'pedestals_dir': f'{self.base_out_dir}pedestals/',  # None to ignore, else top directory for pedestal runs
             'pedestals_dir': None,  # None to ignore, else top directory for pedestal runs
             'pedestals': 'latest',
@@ -68,7 +69,7 @@ class Config:
             'zs_check_sample': 1,  # Number of samples to read out beyond threshold crossing
             # 'zs_check_sample': 4,  # Number of samples to read out beyond threshold crossing
             'pedestal_subtraction': False,
-            'common_noise_subtraction': True,
+            'common_noise_subtraction': False,
             'zs_type': 'tpc',
             'do_pedestal_threshold_run': True,   # Sys Action PedThrRun (bool/int/str → 0 or 1)
             'do_trigger_threshold_run': False,   # Sys Action TrgThrRun
@@ -95,8 +96,56 @@ class Config:
         self.sub_runs = []  # Append subruns in order they should be run.
 
         new_subrun = {
-            'sub_run_name': f'ZS_M3_test',
-            'run_time': 10,  # Minutes
+            'sub_run_name': f'ZS_common_noise_subtr_M3_test',
+            'run_time': 5,  # Minutes*
+            'zero_suppress': True,
+            'common_noise_subtraction': True,
+            'hvs': {
+                0: {
+                    7: 900,
+                    8: 500,
+                    9: 500,
+                    10: 500,
+                    11: 500,
+                },
+                3: {
+                    0: 500,
+                    8: 455,
+                    9: 455,
+                    10: 455,
+                    11: 455,
+                }
+            },
+        }
+        self.sub_runs.append(new_subrun)
+
+        new_subrun = {
+            'sub_run_name': f'ZS_common_noise_subtr_M3_test',
+            'run_time': 5,  # Minutes*
+            'zero_suppress': True,
+            'common_noise_subtraction': False,
+            'hvs': {
+                0: {
+                    7: 900,
+                    8: 500,
+                    9: 500,
+                    10: 500,
+                    11: 500,
+                },
+                3: {
+                    0: 500,
+                    8: 455,
+                    9: 455,
+                    10: 455,
+                    11: 455,
+                }
+            },
+        }
+        self.sub_runs.append(new_subrun)
+
+        new_subrun = {
+            'sub_run_name': f'non_ZS_M3_test',
+            'run_time': 5,  # Minutes
             'hvs': {
                 0: {
                     7: 900,
