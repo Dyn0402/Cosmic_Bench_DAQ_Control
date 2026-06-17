@@ -28,7 +28,7 @@ M3_FEU_NUM      = 1
 MM_BUILD        = '/local/home/usernsw/mm_dream_reconstruction/build'
 DECODE_EXE      = f'{MM_BUILD}/decoder/decode'
 
-M3_TRACKING_DIR = '/local/home/usernsw/dylan/m3_tracking/'
+M3_TRACKING_DIR = '/local/home/usernsw/cosmic_bench_m3_tracking/'
 TRACKING_SH     = f'{M3_TRACKING_DIR}run_tracking_single.sh'
 
 CPP_SETUP = (

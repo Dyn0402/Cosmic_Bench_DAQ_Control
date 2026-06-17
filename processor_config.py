@@ -16,7 +16,7 @@ BASE_DATA = f'{BASE_DATA_DIR}Run/'
 # BASE_DATA = '/mnt/cosmic_data/clas12/Run/'
 MM_BUILD = '/local/home/usernsw/mm_dream_reconstruction/build'
 
-M3_TRACKING_DIR = '/local/home/usernsw/dylan/m3_tracking/'
+M3_TRACKING_DIR = '/local/home/usernsw/cosmic_bench_m3_tracking/'
 
 CONFIG = {
     # Top-level directory containing all run_N/ subdirectories
