@@ -24,7 +24,7 @@ class Config:
         # self.run_name = 'mx17_det4_ArIso_HV_Scan_5-7-26'
         # self.run_name = 'zs_compression_test_M3_6-7-26'
         # self.run_name = 'mx17_det3_new_test_zs_m3_6-17-26'
-        self.run_name = 'mx17_det1_det2_overnight_6-17-26'
+        self.run_name = 'mx17_det1_det2_short_6-18-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         # self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.base_out_dir = BASE_DATA_DIR
@@ -97,8 +97,8 @@ class Config:
         self.sub_runs = []  # Append subruns in order they should be run.
 
         new_subrun = {
-            'sub_run_name': f'quick_run',
-            'run_time': 15,  # Minutes*
+            'sub_run_name': f'short_run',
+            'run_time': 60 * 3,  # Minutes*
             'hvs': {
                 0: {
                     6: 1000,
@@ -461,7 +461,7 @@ class Config:
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
                     'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
+                    'z': 90,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
                     'drift': (0, 7),
@@ -517,7 +517,7 @@ class Config:
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
                     'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
+                    'z': 90,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
                     'drift': (0, 6),
