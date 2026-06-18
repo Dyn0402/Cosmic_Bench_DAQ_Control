@@ -381,6 +381,21 @@ Data is written per-subrun under `BASE_DATA_DIR`:
             └── *.png                  # QA plots from qa_watcher
 ```
 
+### Disk layout & performance
+
+`dream_run/` (DREAM DAQ scratch + on-the-fly copy **source**) and `Run/` (copy
+**destination** + all decode/analyze/combine output) are both derived from
+`BASE_DATA_DIR`, so by default they live on the **same physical disk**. On a single
+mechanical drive this is a major bottleneck: the copy and the processing pipeline
+do many concurrent read+write streams on one head, which seek-thrashes throughput
+down from ~100–150 MB/s to ~5–20 MB/s.
+
+**Put the DAQ write disk and the processing disk on separate physical spindles**
+(point the processing tree at a different drive), and on a single HDD keep
+`free_threads` high so only ~1–2 decode/analyze jobs run at once. See
+[docs/disk_layout_dream_vs_processing.md](docs/disk_layout_dream_vs_processing.md)
+for the full rationale, a diagnosis checklist, and the Saclay-host findings.
+
 ---
 
 ## Flask Monitoring Dashboard

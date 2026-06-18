@@ -443,7 +443,12 @@ def _get_data_file_nums(raw_dir: Path) -> set:
 def _get_processed_file_nums(subrun_dir, combined_inner, hits_inner, decoded_inner, filtered_inner,
                               m3_track_inner, do_combine, do_analyze, filter_by_m3, do_m3_tracking,
                               m3_feu_num) -> set:
-    """Return file_nums whose final pipeline output already exists."""
+    """Return file_nums whose final pipeline output already exists.
+
+    When M3 tracking is enabled, a file_num only counts as done once its
+    _rays.root also exists.  Otherwise a file_num whose M3 pass failed or was
+    skipped would still be marked complete by the main pipeline's combined
+    output and never retried, silently dropping M3 rays for that file_num."""
     if do_combine:
         check_dir, flag = subrun_dir / combined_inner, 'feu-combined'
     elif do_analyze:
@@ -454,14 +459,30 @@ def _get_processed_file_nums(subrun_dir, combined_inner, hits_inner, decoded_inn
         check_dir, flag = subrun_dir / decoded_inner, '.root'
 
     done = set()
-    if not check_dir.exists():
+    if check_dir.exists():
+        for f in check_dir.iterdir():
+            if flag not in f.name:
+                continue
+            n = _extract_file_num(f.name)
+            if n is not None:
+                done.add(n)
+
+    if do_m3_tracking and m3_feu_num is not None:
+        done &= _get_m3_done_file_nums(subrun_dir / m3_track_inner)
+
+    return done
+
+
+def _get_m3_done_file_nums(m3_track_dir: Path) -> set:
+    """Return file_nums that already have an M3 _rays.root output."""
+    done = set()
+    if not m3_track_dir.exists():
         return done
-    for f in check_dir.iterdir():
-        if flag not in f.name:
-            continue
-        n = _extract_file_num(f.name)
-        if n is not None:
-            done.add(n)
+    for f in m3_track_dir.iterdir():
+        if f.name.endswith('_rays.root'):
+            n = _extract_file_num(f.name)
+            if n is not None:
+                done.add(n)
     return done
 
 

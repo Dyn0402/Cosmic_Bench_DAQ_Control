@@ -174,7 +174,7 @@ def copy_files_on_the_fly(sub_run_dir, sub_out_dir, daq_finished_event, check_in
                     file_name.endswith('.fdf') and
                     get_file_num_from_fdf_file_name(file_name, -2) == file_num
                 ):
-                    shutil.copy(
+                    _atomic_copy(
                         os.path.join(sub_run_dir, file_name),
                         os.path.join(sub_out_dir, file_name),
                     )
@@ -192,13 +192,33 @@ def copy_files_on_the_fly(sub_run_dir, sub_out_dir, daq_finished_event, check_in
                 src = os.path.join(sub_run_dir, file_name)
                 dst = os.path.join(sub_out_dir, file_name)
                 try:
-                    shutil.copy(src, dst)
+                    _atomic_copy(src, dst)
                     already_seen.add(file_name)
                 except Exception:
                     pass
         sleep(check_interval)
 
     print("On-the-fly copy thread exiting.")
+
+
+def _atomic_copy(src, dst):
+    """Copy src to dst so the destination only ever appears once fully written.
+
+    The data is copied to a hidden '.part' temp file in the destination directory,
+    then atomically renamed onto dst with os.replace (same filesystem -> atomic).
+    This prevents the processor_watcher from seeing partially-copied FDFs: it globs
+    '*.fdf', so the '.part' temp name is ignored until the rename completes."""
+    tmp = os.path.join(os.path.dirname(dst), f'.{os.path.basename(dst)}.part')
+    try:
+        shutil.copy(src, tmp)
+        os.replace(tmp, dst)
+    except Exception:
+        if os.path.exists(tmp):
+            try:
+                os.remove(tmp)
+            except OSError:
+                pass
+        raise
 
 
 def file_num_still_running(fdf_dir, file_num, wait_time=30, silent=False):
