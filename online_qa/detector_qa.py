@@ -199,7 +199,11 @@ def _load_hits(combined_dir: Path, feu_ids: set, mode: str,
             with uproot.open(f) as uf:
                 if 'hits' not in uf:
                     continue
-                chunks.append(uf['hits'].arrays(entry_stop=MAX_ENTRIES_PER_FILE, library='pd'))
+                c = uf['hits'].arrays(entry_stop=MAX_ENTRIES_PER_FILE, library='pd')
+                # Drop unwanted FEUs per chunk so peak memory never holds rows
+                # for boards this detector doesn't use.
+                chunks.append(c[c['feu'].isin(feu_ids)])
+                del c
         except Exception as e:
             print(f'[qa] Failed to load hits from {f.name}: {e}')
 
@@ -207,7 +211,9 @@ def _load_hits(combined_dir: Path, feu_ids: set, mode: str,
         return None
 
     df = pd.concat(chunks, ignore_index=True)
-    return df[df['feu'].isin(feu_ids)].copy()
+    del chunks
+    gc.collect()
+    return df
 
 
 # ---------------------------------------------------------------------------
@@ -545,7 +551,13 @@ def _load_wf_stats_from_decoded(decoded_dir: Path, feu_ids, mode: str,
     for feu in sorted(feu_ids):
         feu_str   = f'_{feu:02d}.'
         feu_files = [f for f in all_files if f.suffix == '.root' and feu_str in f.name]
-        chunks    = []
+
+        # Stream files and accumulate per-(channel, sample) count/sum/sum-of-
+        # squares into small dense arrays. Peak memory stays bounded by a single
+        # file plus the accumulators, regardless of how many waveforms a run has
+        # — avoiding the giant concat + groupby that used to OOM on long runs.
+        n_ch = n_smp = 0
+        acc_cnt = acc_sum = acc_sq = None
         for fpath in feu_files:
             try:
                 with uproot.open(fpath) as uf:
@@ -560,20 +572,46 @@ def _load_wf_stats_from_decoded(decoded_dir: Path, feu_ids, mode: str,
                 continue
             if len(samples_arr) == 0:
                 continue
-            flat_s = np.concatenate([np.asarray(x) for x in samples_arr])
-            flat_c = np.concatenate([np.asarray(x) for x in channels_arr])
-            flat_a = np.concatenate([np.asarray(x) for x in amps_arr])
-            chunks.append(pd.DataFrame({'channel':   flat_c.astype(np.int32),
-                                        'sample':    flat_s.astype(np.int32),
-                                        'amplitude': flat_a.astype(np.float32)}))
-        if not chunks:
+            flat_s = np.concatenate([np.asarray(x) for x in samples_arr]).astype(np.int64)
+            flat_c = np.concatenate([np.asarray(x) for x in channels_arr]).astype(np.int64)
+            flat_a = np.concatenate([np.asarray(x) for x in amps_arr]).astype(np.float64)
+
+            # Grow accumulators if this file exposes larger channel/sample ids.
+            file_n_ch  = int(flat_c.max()) + 1
+            file_n_smp = int(flat_s.max()) + 1
+            if file_n_ch > n_ch or file_n_smp > n_smp:
+                new_n_ch, new_n_smp = max(n_ch, file_n_ch), max(n_smp, file_n_smp)
+                new_cnt = np.zeros((new_n_ch, new_n_smp))
+                new_sum = np.zeros((new_n_ch, new_n_smp))
+                new_sq  = np.zeros((new_n_ch, new_n_smp))
+                if acc_cnt is not None:
+                    new_cnt[:n_ch, :n_smp] = acc_cnt
+                    new_sum[:n_ch, :n_smp] = acc_sum
+                    new_sq[:n_ch, :n_smp]  = acc_sq
+                acc_cnt, acc_sum, acc_sq = new_cnt, new_sum, new_sq
+                n_ch, n_smp = new_n_ch, new_n_smp
+
+            lin  = flat_c * n_smp + flat_s
+            size = n_ch * n_smp
+            acc_cnt += np.bincount(lin, minlength=size).reshape(n_ch, n_smp)
+            acc_sum += np.bincount(lin, weights=flat_a, minlength=size).reshape(n_ch, n_smp)
+            acc_sq  += np.bincount(lin, weights=flat_a * flat_a, minlength=size).reshape(n_ch, n_smp)
+
+            del samples_arr, channels_arr, amps_arr, flat_s, flat_c, flat_a, lin
+            gc.collect()
+
+        if acc_cnt is None:
             continue
 
-        df_wf = pd.concat(chunks, ignore_index=True)
-        g     = df_wf.groupby(['channel', 'sample'])['amplitude']
-        stats = pd.DataFrame({'mean': g.mean(),
-                               'rms':  g.std(ddof=0).fillna(0.0)}).reset_index()
-        result[feu] = stats
+        ch_idx, smp_idx = np.nonzero(acc_cnt > 0)
+        cnt  = acc_cnt[ch_idx, smp_idx]
+        mean = acc_sum[ch_idx, smp_idx] / cnt
+        var  = acc_sq[ch_idx, smp_idx] / cnt - mean * mean
+        rms  = np.sqrt(np.clip(var, 0.0, None))
+        result[feu] = pd.DataFrame({'channel': ch_idx.astype(np.int32),
+                                    'sample':  smp_idx.astype(np.int32),
+                                    'mean':    mean.astype(np.float32),
+                                    'rms':     rms.astype(np.float32)})
 
     return result
 
@@ -622,7 +660,8 @@ def _plot_wf_mean_rms(stats: dict, feu_ids, title: str, out_dir: Path,
         ax_r.set_ylabel('Channel')
         ax_r.set_title(f'FEU {feu} — RMS')
 
-        fig.suptitle(f'{title}\nWaveform mean & RMS (≤{MAX_ENTRIES_PER_FILE:,} waveforms/file)', fontsize=10)
+        cap_note = 'all waveforms/file' if MAX_ENTRIES_PER_FILE is None else f'≤{MAX_ENTRIES_PER_FILE:,} waveforms/file'
+        fig.suptitle(f'{title}\nWaveform mean & RMS ({cap_note})', fontsize=10)
         fig.tight_layout()
         _save(fig, out_dir, f'waveform_mean_rms_feu{feu:02d}.png')
 

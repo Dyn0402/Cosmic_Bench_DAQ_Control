@@ -62,7 +62,7 @@ def main():
     print('donzo')
 
 
-def m3_tracking(fdf_dir, tracking_sh_ref_path, tracking_run_dir, out_dir=None, m3_feu_num=1, file_num=None):
+def m3_tracking(fdf_dir, tracking_sh_ref_path, tracking_run_dir, out_dir=None, m3_feu_num=1, file_num=None, env=None):
     """
 
     :param fdf_dir:
@@ -71,6 +71,7 @@ def m3_tracking(fdf_dir, tracking_sh_ref_path, tracking_run_dir, out_dir=None, m
     :param out_dir:
     :param m3_feu_num:
     :param file_num:
+    :param env: Environment dict for the tracking subprocess (e.g. with the correct ROOT sourced). None = inherit.
     :return:
     """
     for file in os.listdir(fdf_dir):
@@ -89,10 +90,11 @@ def m3_tracking(fdf_dir, tracking_sh_ref_path, tracking_run_dir, out_dir=None, m
         wait_for_copy_complete(f'{fdf_dir}/{file}', check_interval=0.2, stable_time=1.0)
 
         get_rays_from_fdf(run_name, tracking_sh_ref_path, [file_num_i], out_dir, tracking_run_dir, verbose=True,
-                          fdf_dir=fdf_dir)
+                          fdf_dir=fdf_dir, env=env)
 
 
-def get_rays_from_fdf(fdf_run, tracking_sh_file, file_nums, output_root_dir, run_dir, verbose=False, fdf_dir=None):
+def get_rays_from_fdf(fdf_run, tracking_sh_file, file_nums, output_root_dir, run_dir, verbose=False, fdf_dir=None,
+                      env=None):
     """
     Get rays from fdf files and write to root file.
     :param fdf_run:
@@ -102,31 +104,39 @@ def get_rays_from_fdf(fdf_run, tracking_sh_file, file_nums, output_root_dir, run
     :param run_dir:
     :param verbose:
     :param fdf_dir:
+    :param env: Environment dict for the tracking subprocess (e.g. with the correct ROOT sourced). None = inherit.
     :return:
     """
     og_dir = os.getcwd()
     os.chdir(run_dir)
-    for i in file_nums:
-        print(f'Processing file {i} of {len(file_nums)} for run {fdf_run}...')
-        ped_in_dir = fdf_dir if fdf_dir is not None else None
-        data_in_dir = fdf_dir if fdf_dir is not None else None
-        temp_sh_file = make_temp_sh_file(fdf_run, tracking_sh_file, i, 'tracking',
-                                         ped_in_dir=ped_in_dir, data_in_dir=data_in_dir)
+    try:
+        for i in file_nums:
+            print(f'Processing file {i} of {len(file_nums)} for run {fdf_run}...')
+            ped_in_dir = fdf_dir if fdf_dir is not None else None
+            data_in_dir = fdf_dir if fdf_dir is not None else None
+            temp_sh_file = make_temp_sh_file(fdf_run, tracking_sh_file, i, 'tracking',
+                                             ped_in_dir=ped_in_dir, data_in_dir=data_in_dir)
 
-        # Construct the final command based on verbosity
-        if not verbose:
-            cmd = f'{temp_sh_file} > /dev/null'
-        else:
-            cmd = f'{temp_sh_file}'
+            # Construct the final command based on verbosity
+            if not verbose:
+                cmd = f'{temp_sh_file} > /dev/null'
+            else:
+                cmd = f'{temp_sh_file}'
 
-        print(f'Running command: {cmd}')
+            print(f'Running command: {cmd}')
 
-        subprocess.run(cmd, shell=True)
+            subprocess.run(cmd, shell=True, env=env)
 
-        out_root_path = f'{output_root_dir}{fdf_run}_{i:03d}_rays.root'
-        shutil.move(f'output_{i:03d}.root', out_root_path)
-        os.chmod(out_root_path, 0o777)
-    os.chdir(og_dir)
+            local_out = f'output_{i:03d}.root'
+            if not os.path.exists(local_out):
+                raise FileNotFoundError(
+                    f'Tracking produced no output: {local_out} (run {fdf_run} file {i}). '
+                    f'Check the tracking binaries and ROOT environment.')
+            out_root_path = f'{output_root_dir}{fdf_run}_{i:03d}_rays.root'
+            shutil.move(local_out, out_root_path)
+            os.chmod(out_root_path, 0o777)
+    finally:
+        os.chdir(og_dir)
 
 
 def make_temp_sh_file(fdf_run, ref_sh_file, file_num, sh_file_type='tracking', feu='01',
