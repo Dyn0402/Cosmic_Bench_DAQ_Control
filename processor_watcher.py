@@ -125,6 +125,9 @@ def run_watcher(config: dict):
     cpp_setup = config.get('cpp_setup_script', '')
     cpp_env   = _build_cpp_env(cpp_setup) if cpp_setup else None
 
+    _check_binaries(do_decode, decode_exe, do_analyze, analyze_exe,
+                    do_combine, combine_exe, do_m3_tracking, tracking_sh_path)
+
     print(f"[watcher] runs_dir      : {runs_dir}")
     if include_runs:
         print(f"[watcher] include_runs  : {sorted(include_runs)}")
@@ -561,6 +564,33 @@ def _combine_hits(feu_hits_map: dict, combined_path: str, combine_exe: str, cpp_
             tmp.write(f"{path} {feu}\n")
         tmp.flush()
         subprocess.run([combine_exe, tmp.name, combined_path], check=True, env=cpp_env)
+
+
+# ---------------------------------------------------------------------------
+# Startup binary check
+# ---------------------------------------------------------------------------
+
+def _check_binaries(do_decode, decode_exe, do_analyze, analyze_exe,
+                    do_combine, combine_exe, do_m3_tracking, tracking_sh_path):
+    checks = [
+        (do_decode,      decode_exe,       "decode",             "mm_dream_reconstruction/build/decoder/decode"),
+        (do_analyze,     analyze_exe,      "analyze_waveforms",  "mm_dream_reconstruction/build/waveform_analysis/analyze_waveforms"),
+        (do_combine,     combine_exe,      "combine_feus_hits",  "mm_dream_reconstruction/build/feu_hit_combiner/combine_feus_hits"),
+        (do_m3_tracking, tracking_sh_path, "run_tracking_single.sh", "cosmic_bench_m3_tracking/run_tracking_single.sh"),
+    ]
+    warned = False
+    for enabled, path, name, hint in checks:
+        if not enabled:
+            continue
+        if not path:
+            print(f"[watcher] WARNING: {name} is enabled but no path configured")
+            warned = True
+        elif not os.path.isfile(path):
+            print(f"[watcher] WARNING: {name} binary not found: {path}")
+            print(f"[watcher]          Expected at: {hint}  — has it been built?")
+            warned = True
+    if warned:
+        print("[watcher] WARNING: Missing binaries listed above — affected pipeline steps will fail when reached.")
 
 
 # ---------------------------------------------------------------------------
