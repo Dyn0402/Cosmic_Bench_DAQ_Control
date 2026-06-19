@@ -24,7 +24,7 @@ class Config:
         # self.run_name = 'mx17_det4_ArIso_HV_Scan_5-7-26'
         # self.run_name = 'zs_compression_test_M3_6-7-26'
         # self.run_name = 'mx17_det3_new_test_zs_m3_6-17-26'
-        self.run_name = 'mx17_det1_det2_short_6-18-26'
+        self.run_name = 'mx17_det2_det3_weekend_6-19-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         # self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.base_out_dir = BASE_DATA_DIR
@@ -98,7 +98,7 @@ class Config:
 
         new_subrun = {
             'sub_run_name': f'short_run',
-            'run_time': 60 * 3,  # Minutes*
+            'run_time': 2 * 60,  # Minutes*
             'hvs': {
                 0: {
                     6: 1000,
@@ -123,7 +123,7 @@ class Config:
         # Longer run for 2 hours at nominal voltages (1000V drift, 500V resist).
         new_subrun = {
             'sub_run_name': f'longer_run',
-            'run_time': 2 * 60,  # Minutes
+            'run_time': 6 * 60,  # Minutes
             'hvs': {
                 0: {
                     6: 1000,
@@ -145,8 +145,8 @@ class Config:
         }
         self.sub_runs.append(new_subrun)
 
-        # HV scan: 8 steps of 30 minutes (4 hours total), resist from 520V in steps of -10V.
-        resists = [520, 510, 500, 490, 480, 470, 460, 450]
+        # HV scan: 16 steps of 30 minutes (4 hours total), resist from 520V in steps of -10V.
+        resists = [525, 520, 515, 510, 505, 500, 495, 490, 485, 480, 475, 470, 465, 460, 455, 450]
         for resist in resists:
             new_subrun = {
                 'sub_run_name': f'resist_{resist}V_drift_1000V',
@@ -172,10 +172,10 @@ class Config:
             }
             self.sub_runs.append(new_subrun)
 
-        # Final long run for 24 hours at 500V resist.
+        # Final long run for 48 hours at 500V resist.
         new_subrun = {
             'sub_run_name': f'long_run',
-            'run_time': 24 * 60,  # Minutes
+            'run_time': 2 * 24 * 60,  # Minutes
             'hvs': {
                 0: {
                     6: 1000,
@@ -442,14 +442,14 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
-        self.included_detectors = ['mx17_1', 'mx17_2',
+        self.included_detectors = ['mx17_2', 'mx17_3',
                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
         # self.included_detectors = ['clas12_test',
         #                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
 
         self.detectors = [
             {
-                'name': 'mx17_1',
+                'name': 'mx17_2',
                 'description': 'Bulked by Arnaud June 12. Giant pillars on parts of the detector.',
                 'det_type': 'mx17',
                 'resist_type': 'strip',
@@ -464,8 +464,8 @@ class Config:
                     'z': 90,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
-                    'drift': (0, 7),
-                    'resist': (3, 3),
+                    'drift': (0, 6),
+                    'resist': (3, 4),
                 },
                 'dream_feus': {
                     'x_1': (3, 1),  # Runs along x direction, indicates y hit location
@@ -505,7 +505,7 @@ class Config:
                 },
             },
             {
-                'name': 'mx17_2',
+                'name': 'mx17_3',
                 'description': 'Bulked by Stephan June 15',
                 'det_type': 'mx17',
                 'resist_type': 'strip',
@@ -520,8 +520,8 @@ class Config:
                     'z': 90,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
-                    'drift': (0, 6),
-                    'resist': (3, 4),
+                    'drift': (0, 7),
+                    'resist': (3, 3),
                 },
                 'dream_feus': {
                     'x_1': (7, 1),  # Runs along x direction, indicates y hit location
