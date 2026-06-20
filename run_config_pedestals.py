@@ -54,42 +54,25 @@ class Config:
         self.hv_info = copy.deepcopy(run.hv_info)
         self.hv_info['run_out_dir'] = self.run_out_dir
 
-        # Single pedestal subrun — set all channels to 0 V.
-        # Adjust hvs here if low-voltage bias is needed during pedestal acquisition.
+        # Pedestal bias applied only to HV channels that belong to a detector
+        # included in run_config.py (self.detectors is already filtered to the
+        # included detectors). Channels not used by an included detector are left
+        # untouched, so we no longer ramp the whole crate for pedestals.
+        ped_voltage = 200  # V; adjust if a different pedestal bias is needed
+        ped_hvs = {}
+        for det in self.detectors:
+            hv_channels = det.get('hv_channels')
+            if not isinstance(hv_channels, dict):
+                continue  # e.g. banco ('banco' string) or detectors with no HV
+            for slot, channel in hv_channels.values():
+                ped_hvs.setdefault(slot, {})[channel] = ped_voltage
+
+        # Single pedestal subrun — only the HV channels defined in run_config.py.
         self.sub_runs = [
             {
                 'sub_run_name': 'pedestals',
                 'run_time': 10 / 60,  # Minutes
-                'hvs': {
-                    0: {
-                        0: 200,
-                        1: 200,
-                        2: 200,
-                        3: 200,
-                        4: 200,
-                        5: 200,
-                        6: 200,
-                        7: 200,
-                        8: 200,
-                        9: 200,
-                        10: 200,
-                        11: 200,
-                    },
-                    3: {
-                        0: 200,
-                        1: 200,
-                        2: 200,
-                        3: 200,
-                        4: 200,
-                        5: 200,
-                        6: 200,
-                        7: 200,
-                        8: 200,
-                        9: 200,
-                        10: 200,
-                        11: 200,
-                    },
-                },
+                'hvs': ped_hvs,
             }
         ]
 
