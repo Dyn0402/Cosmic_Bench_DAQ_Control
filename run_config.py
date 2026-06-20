@@ -24,7 +24,7 @@ class Config:
         # self.run_name = 'mx17_det4_ArIso_HV_Scan_5-7-26'
         # self.run_name = 'zs_compression_test_M3_6-7-26'
         # self.run_name = 'mx17_det3_new_test_zs_m3_6-17-26'
-        self.run_name = 'mx17_det2_det3_weekend_6-19-26'
+        self.run_name = 'mx17_det2_det3_weekend_6-20-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         # self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.base_out_dir = BASE_DATA_DIR
@@ -121,29 +121,29 @@ class Config:
         self.sub_runs.append(new_subrun)
 
         # Longer run for 2 hours at nominal voltages (1000V drift, 500V resist).
-        new_subrun = {
-            'sub_run_name': f'longer_run',
-            'run_time': 6 * 60,  # Minutes
-            'hvs': {
-                0: {
-                    6: 1000,
-                    7: 1000,
-                    8: 500,
-                    9: 500,
-                    10: 500,
-                    11: 500,
-                },
-                3: {
-                    3: 500,
-                    4: 500,
-                    8: 455,
-                    9: 455,
-                    10: 455,
-                    11: 455,
-                }
-            },
-        }
-        self.sub_runs.append(new_subrun)
+        # new_subrun = {
+        #     'sub_run_name': f'longer_run',
+        #     'run_time': 6 * 60,  # Minutes
+        #     'hvs': {
+        #         0: {
+        #             6: 1000,
+        #             7: 1000,
+        #             8: 500,
+        #             9: 500,
+        #             10: 500,
+        #             11: 500,
+        #         },
+        #         3: {
+        #             3: 500,
+        #             4: 500,
+        #             8: 455,
+        #             9: 455,
+        #             10: 455,
+        #             11: 455,
+        #         }
+        #     },
+        # }
+        # self.sub_runs.append(new_subrun)
 
         # HV scan: 16 steps of 30 minutes (4 hours total), resist from 520V in steps of -10V.
         resists = [525, 520, 515, 510, 505, 500, 495, 490, 485, 480, 475, 470, 465, 460, 455, 450]
@@ -442,15 +442,15 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
-        self.included_detectors = ['mx17_2', 'mx17_3',
+        self.included_detectors = ['mx17_3',
                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
         # self.included_detectors = ['clas12_test',
         #                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
 
         self.detectors = [
             {
-                'name': 'mx17_2',
-                'description': 'Bulked by Arnaud June 12. Giant pillars on parts of the detector.',
+                'name': 'mx17_3',
+                'description': 'Bulked by Stephan June 15',
                 'det_type': 'mx17',
                 'resist_type': 'strip',
                 'det_center_coords': {  # Center of detector
@@ -505,8 +505,8 @@ class Config:
                 },
             },
             {
-                'name': 'mx17_3',
-                'description': 'Bulked by Stephan June 15',
+                'name': 'mx17_2',
+                'description': 'Bulked by Arnaud June 12. Giant pillars on parts of the detector.',
                 'det_type': 'mx17',
                 'resist_type': 'strip',
                 'det_center_coords': {  # Center of detector
