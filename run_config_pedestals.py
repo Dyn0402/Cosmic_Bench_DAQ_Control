@@ -49,13 +49,8 @@ class Config:
             'do_data_run': True,                 # Sys Action DataRun
         })
 
-        # Update processor and HV info paths to point at the pedestal output dir
-        self.dedip196_processor_info = copy.deepcopy(run.dedip196_processor_info)
-        self.dedip196_processor_info['run_dir'] = self.run_out_dir
-
-        self.sedip28_processor_info = copy.deepcopy(run.sedip28_processor_info)
-        self.sedip28_processor_info['run_dir'] = self.run_out_dir
-
+        # Point HV info at the pedestal output dir. (Everything else, including
+        # any processor info, is already inherited via __dict__.update above.)
         self.hv_info = copy.deepcopy(run.hv_info)
         self.hv_info['run_out_dir'] = self.run_out_dir
 
