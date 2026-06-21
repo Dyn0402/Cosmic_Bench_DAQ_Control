@@ -1,7 +1,12 @@
 #!/bin/bash
-SESSION="daq_control"
+# Stop the WHOLE run cleanly.
+#
+# Drop a .stop_run flag, then stop the DAQ. RunCtrl exits and the current
+# sub-run ends; daq_control sees the flag, skips the rest of the sub-runs, and
+# powers off HV via its normal shutdown — no orphaned RunCtrl and no Ctrl-C
+# races. The cut-short sub-run is left unmarked so resume re-runs it.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-# Send Ctrl-C to the session
-tmux send-keys -t "$SESSION" C-c
-sleep 1
-tmux send-keys -t "$SESSION" C-c
+touch "$REPO_DIR/.stop_run"
+"$SCRIPT_DIR/stop_dream.sh"

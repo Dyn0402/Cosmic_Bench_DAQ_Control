@@ -8,6 +8,7 @@ Created as Cosmic_Bench_DAQ_Control/daq_control.py
 @author: Dylan Neff, Dylan
 """
 
+import os
 import sys
 from time import sleep
 
@@ -19,6 +20,20 @@ from common_functions import *
 from weiner_ps_monitor import get_pl512_status
 
 RUNCONFIG_REL_PATH = "config/json_run_configs/"
+
+# Stop-request flags dropped by bash_scripts/stop_run.sh and stop_sub_run.sh.
+# Using flag files (instead of racing Ctrl-C into the tmux pane) makes stopping
+# deterministic: daq_control checks them between/after sub-runs and stops the DAQ
+# via stop_dream.sh. Paths must match those scripts (repo root = this file's dir).
+STOP_RUN_FLAG = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.stop_run')
+STOP_SUBRUN_FLAG = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.stop_subrun')
+
+
+def _remove_flag(path):
+    try:
+        os.remove(path)
+    except FileNotFoundError:
+        pass
 
 
 def main():
@@ -57,8 +72,13 @@ def main():
         dream_daq.send_json(config.dream_daq_info)
 
         sleep(2)  # Give servers time to set up directories
+        _remove_flag(STOP_RUN_FLAG)  # clear any stale stop requests from a previous run
+        _remove_flag(STOP_SUBRUN_FLAG)
         try:
             for sub_run in config.sub_runs:
+                if os.path.exists(STOP_RUN_FLAG):
+                    print('[stop] Stop-run requested — ending run before next sub-run.')
+                    break
                 sub_run_name = sub_run['sub_run_name']
                 sub_top_out_dir = f'{config.run_out_dir}{sub_run_name}/'
                 complete_marker = f'{sub_top_out_dir}.subrun_complete'
@@ -96,9 +116,17 @@ def main():
                         hv.receive()
                         hv.receive()
 
-                    # Mark this sub-run complete so a future resume run skips it (see config.resume).
-                    with open(complete_marker, 'w') as f:
-                        f.write(datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '\n')
+                    # A manual stop (stop_run/stop_sub_run) cuts the sub-run short, so don't mark it
+                    # complete — resume should re-run it. Otherwise mark it so a resume run skips it.
+                    stop_run_req = os.path.exists(STOP_RUN_FLAG)
+                    stop_subrun_req = os.path.exists(STOP_SUBRUN_FLAG)
+                    if stop_subrun_req:
+                        _remove_flag(STOP_SUBRUN_FLAG)
+                    if stop_run_req or stop_subrun_req:
+                        print(f'[stop] Sub run {sub_run_name} stopped manually — not marking complete.')
+                    else:
+                        with open(complete_marker, 'w') as f:
+                            f.write(datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '\n')
 
                     print(f'Finished with sub run {sub_run_name}, waiting 10 seconds before next run')
                     sleep(10)
@@ -109,7 +137,8 @@ def main():
                 hv.receive()
                 hv.receive()
         finally:
-            pass
+            _remove_flag(STOP_RUN_FLAG)
+            _remove_flag(STOP_SUBRUN_FLAG)
 
         print('Run complete, closing down subsystems')
         if config.power_off_hv_at_end:
@@ -125,6 +154,9 @@ def run_daq_controller(sub_run, sub_out_dir, dream_daq_client):
     daq_controller = DAQController(subrun=sub_run, out_dir=sub_out_dir, dream_daq_client=dream_daq_client)
     daq_success = False
     while not daq_success:
+        if os.path.exists(STOP_RUN_FLAG) or os.path.exists(STOP_SUBRUN_FLAG):
+            print('[stop] Stop requested — not (re)starting DAQ controller.')
+            break
         print('Starting DAQ Controller')
         daq_success = daq_controller.run()
 
