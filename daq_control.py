@@ -61,6 +61,10 @@ def main():
             for sub_run in config.sub_runs:
                 sub_run_name = sub_run['sub_run_name']
                 sub_top_out_dir = f'{config.run_out_dir}{sub_run_name}/'
+                complete_marker = f'{sub_top_out_dir}.subrun_complete'
+                if getattr(config, 'resume', False) and os.path.exists(complete_marker):
+                    print(f'[resume] Skipping already-completed sub run {sub_run_name}')
+                    continue
                 create_dir_if_not_exist(sub_top_out_dir)
                 sub_out_dir = f'{sub_top_out_dir}{config.raw_daq_inner_dir}/'
                 create_dir_if_not_exist(sub_out_dir)
@@ -91,6 +95,10 @@ def main():
                         hv.send('End Monitoring')
                         hv.receive()
                         hv.receive()
+
+                    # Mark this sub-run complete so a future resume run skips it (see config.resume).
+                    with open(complete_marker, 'w') as f:
+                        f.write(datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '\n')
 
                     print(f'Finished with sub run {sub_run_name}, waiting 10 seconds before next run')
                     sleep(10)

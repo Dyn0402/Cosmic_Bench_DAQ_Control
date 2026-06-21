@@ -38,6 +38,9 @@ class Config:
         self.m3_feu_num = 1
         self.power_off_hv_at_end = True  # True to power off HV at end of run
         self.save_fdfs = True  # True to save FDF files after processing
+        self.resume = False  # True to skip sub-runs already completed in run_out_dir (resume after a crash).
+        # Completion is tracked by a '.subrun_complete' marker written into each sub-run's out dir on success,
+        # so the full sub_runs list (and thus run_config.json) stays intact while only unfinished sub-runs run.
         self.start_time = None  # '2024-06-03 15:30:00'  # 'YYYY-MM-DD HH:MM:SS' or None to start immediately
         self.write_all_dectors_to_json = False  # Only when making run config json template.
         self.gas = 'Ar/Iso 95/5'  # Gas type for run
