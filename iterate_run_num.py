@@ -31,6 +31,23 @@ def main():
 
     print(f"Run output directory already exists: {run_out_dir}")
 
+    # Resume-aware: when resume is enabled and the existing run still has unfinished
+    # sub-runs, do NOT iterate — keep run_name so daq_control resumes into the same
+    # directory and reruns just the missing sub-runs. Only iterate when resume is off
+    # (or absent), or when the existing run is already complete. Completion is tracked
+    # by the same '.subrun_complete' markers daq_control writes and checks.
+    if getattr(config, 'resume', False):
+        incomplete = [s['sub_run_name'] for s in config.sub_runs
+                      if not os.path.exists(
+                          os.path.join(run_out_dir, s['sub_run_name'], '.subrun_complete'))]
+        if incomplete:
+            print(f"resume=True and {len(incomplete)} sub-run(s) not yet complete — "
+                  f"keeping run_name {run_name!r} to resume "
+                  f"(missing: {', '.join(incomplete)})")
+            print('donzo')
+            return
+        print("resume=True but all sub-runs already complete — iterating to a fresh run.")
+
     # Strip a trailing _<number> suffix if present, then start from the next integer.
     # Uses _(\d+)$ so date-like suffixes (e.g. _06-07-26) are never stripped.
     m = re.match(r'^(.*?)_(\d+)$', run_name)
