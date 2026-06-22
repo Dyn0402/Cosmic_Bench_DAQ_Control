@@ -63,8 +63,7 @@ class Config:
             'copy_on_fly': True,  # True to copy raw data to out dir during run, False to copy after run
             'n_samples_per_waveform': 32,  # Number of samples per waveform to configure in DAQ
             'zero_suppress': False,  # True to run in zero suppression mode, False to run in full readout mode
-            # 'pedestals_dir': f'{self.base_out_dir}pedestals/',  # None to ignore, else top directory for pedestal runs
-            'pedestals_dir': None,  # None to ignore, else top directory for pedestal runs
+            'pedestals_dir': f'{self.base_out_dir}pedestals/',  # None to ignore, else top directory for pedestal runs
             'pedestals': 'latest',
             # 'latest' for most recent, otherwise specify directory name, eg "pedestals_10-22-25_13-43-34"
             # 'latency': 33,  # Latency setting for DAQ in clock cycles

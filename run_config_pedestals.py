@@ -37,7 +37,11 @@ class Config:
         # dream_daq_info: inherit from run config, then force pedestal-mode flags
         self.dream_daq_info = copy.deepcopy(run.dream_daq_info)
         self.dream_daq_info.update({
-            'run_directory':          f'{self.base_out_dir}dream_run/{self.run_name}/',
+            # Run RunCtrl inside the pedestal output tree (not the scratch
+            # dream_run/ tree) so the generated _ped.prg/_thr.prg files land in
+            # {run_out_dir}/pedestals/ where get_pedestals() reads them back.
+            # Mirrors nTof_x17_DAQ, where pedestals='latest' works.
+            'run_directory':          self.run_out_dir,
             'data_out_dir':           self.run_out_dir,
             'zero_suppress':          False,   # always full readout for pedestals
             'pedestal_subtraction':   False,
