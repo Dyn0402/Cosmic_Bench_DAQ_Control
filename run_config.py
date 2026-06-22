@@ -38,7 +38,7 @@ class Config:
         self.m3_feu_num = 1
         self.power_off_hv_at_end = True  # True to power off HV at end of run
         self.save_fdfs = True  # True to save FDF files after processing
-        self.resume = False  # True to skip sub-runs already completed in run_out_dir (resume after a crash).
+        self.resume = True  # True to skip sub-runs already completed in run_out_dir (resume after a crash).
         # Completion is tracked by a '.subrun_complete' marker written into each sub-run's out dir on success,
         # so the full sub_runs list (and thus run_config.json) stays intact while only unfinished sub-runs run.
         self.start_time = None  # '2024-06-03 15:30:00'  # 'YYYY-MM-DD HH:MM:SS' or None to start immediately
@@ -123,6 +123,34 @@ class Config:
         }
         self.sub_runs.append(new_subrun)
 
+        # short_run_2: the salvaged short_run from the interrupted '..._1' relaunch on 2026-06-21.
+        # Its data was relocated into this run as sub-run 'short_run_2' and marked complete, so resume
+        # skips it. Kept in the config so run_config.json records it as part of the run. Same settings
+        # as short_run (2 h at nominal 1000V drift / 500V resist).
+        new_subrun = {
+            'sub_run_name': f'short_run_2',
+            'run_time': 2 * 60,  # Minutes
+            'hvs': {
+                0: {
+                    6: 1000,
+                    7: 1000,
+                    8: 500,
+                    9: 500,
+                    10: 500,
+                    11: 500,
+                },
+                3: {
+                    3: 500,
+                    4: 500,
+                    8: 455,
+                    9: 455,
+                    10: 455,
+                    11: 455,
+                }
+            },
+        }
+        self.sub_runs.append(new_subrun)
+
         # Longer run for 2 hours at nominal voltages (1000V drift, 500V resist).
         # new_subrun = {
         #     'sub_run_name': f'longer_run',
@@ -179,6 +207,34 @@ class Config:
         new_subrun = {
             'sub_run_name': f'long_run',
             'run_time': 2 * 24 * 60,  # Minutes
+            'hvs': {
+                0: {
+                    6: 1000,
+                    7: 1000,
+                    8: 500,
+                    9: 500,
+                    10: 500,
+                    11: 500,
+                },
+                3: {
+                    3: 500,
+                    4: 500,
+                    8: 455,
+                    9: 455,
+                    10: 455,
+                    11: 455,
+                }
+            },
+        }
+        self.sub_runs.append(new_subrun)
+
+        # long_run_partial_1: salvaged ~43 min of data from the first long_run attempt on 2026-06-22
+        # (01:02-01:45) before the Dream DAQ trigger stalled. Data was relocated into this run as
+        # 'long_run_partial_1' and marked complete (resume skips it). Recorded here so run_config.json
+        # reflects it. Same HV as long_run; run_time is nominal (actual salvaged data ~43 min).
+        new_subrun = {
+            'sub_run_name': f'long_run_partial_1',
+            'run_time': 2 * 24 * 60,  # Minutes (nominal; actual salvaged data ~43 min)
             'hvs': {
                 0: {
                     6: 1000,
