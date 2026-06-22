@@ -24,7 +24,8 @@ class Config:
         # self.run_name = 'mx17_det4_ArIso_HV_Scan_5-7-26'
         # self.run_name = 'zs_compression_test_M3_6-7-26'
         # self.run_name = 'mx17_det3_new_test_zs_m3_6-17-26'
-        self.run_name = 'mx17_det2_det3_weekend_6-20-26'
+        # self.run_name = 'mx17_det2_det3_weekend_6-20-26'
+        self.run_name = 'mx17_det2_det3_overnight_6-22-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         # self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.base_out_dir = BASE_DATA_DIR
@@ -101,6 +102,30 @@ class Config:
 
         new_subrun = {
             'sub_run_name': f'short_run',
+            'run_time': 60,  # Minutes*
+            'hvs': {
+                0: {
+                    6: 1000,
+                    7: 1000,
+                    8: 500,
+                    9: 500,
+                    10: 500,
+                    11: 500,
+                },
+                3: {
+                    3: 495,
+                    4: 495,
+                    8: 455,
+                    9: 455,
+                    10: 455,
+                    11: 455,
+                }
+            },
+        }
+        self.sub_runs.append(new_subrun)
+
+        new_subrun = {
+            'sub_run_name': f'longer_run',
             'run_time': 2 * 60,  # Minutes*
             'hvs': {
                 0: {
@@ -112,36 +137,8 @@ class Config:
                     11: 500,
                 },
                 3: {
-                    3: 500,
-                    4: 500,
-                    8: 455,
-                    9: 455,
-                    10: 455,
-                    11: 455,
-                }
-            },
-        }
-        self.sub_runs.append(new_subrun)
-
-        # short_run_2: the salvaged short_run from the interrupted '..._1' relaunch on 2026-06-21.
-        # Its data was relocated into this run as sub-run 'short_run_2' and marked complete, so resume
-        # skips it. Kept in the config so run_config.json records it as part of the run. Same settings
-        # as short_run (2 h at nominal 1000V drift / 500V resist).
-        new_subrun = {
-            'sub_run_name': f'short_run_2',
-            'run_time': 2 * 60,  # Minutes
-            'hvs': {
-                0: {
-                    6: 1000,
-                    7: 1000,
-                    8: 500,
-                    9: 500,
-                    10: 500,
-                    11: 500,
-                },
-                3: {
-                    3: 500,
-                    4: 500,
+                    3: 495,
+                    4: 495,
                     8: 455,
                     9: 455,
                     10: 455,
@@ -217,8 +214,8 @@ class Config:
                     11: 500,
                 },
                 3: {
-                    3: 500,
-                    4: 500,
+                    3: 495,
+                    4: 495,
                     8: 455,
                     9: 455,
                     10: 455,
@@ -228,33 +225,6 @@ class Config:
         }
         self.sub_runs.append(new_subrun)
 
-        # long_run_partial_1: salvaged ~43 min of data from the first long_run attempt on 2026-06-22
-        # (01:02-01:45) before the Dream DAQ trigger stalled. Data was relocated into this run as
-        # 'long_run_partial_1' and marked complete (resume skips it). Recorded here so run_config.json
-        # reflects it. Same HV as long_run; run_time is nominal (actual salvaged data ~43 min).
-        new_subrun = {
-            'sub_run_name': f'long_run_partial_1',
-            'run_time': 2 * 24 * 60,  # Minutes (nominal; actual salvaged data ~43 min)
-            'hvs': {
-                0: {
-                    6: 1000,
-                    7: 1000,
-                    8: 500,
-                    9: 500,
-                    10: 500,
-                    11: 500,
-                },
-                3: {
-                    3: 500,
-                    4: 500,
-                    8: 455,
-                    9: 455,
-                    10: 455,
-                    11: 455,
-                }
-            },
-        }
-        self.sub_runs.append(new_subrun)
 
         # new_subrun = {
         #     'sub_run_name': f'initial_run',
@@ -501,7 +471,7 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
-        self.included_detectors = ['mx17_3',
+        self.included_detectors = ['mx17_2', 'mx17_3',
                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
         # self.included_detectors = ['clas12_test',
         #                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
@@ -523,8 +493,8 @@ class Config:
                     'z': 90,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
-                    'drift': (0, 6),
-                    'resist': (3, 4),
+                    'drift': (0, 7),
+                    'resist': (3, 3),
                 },
                 'dream_feus': {
                     'x_1': (3, 1),  # Runs along x direction, indicates y hit location
@@ -579,18 +549,18 @@ class Config:
                     'z': 90,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
-                    'drift': (0, 7),
-                    'resist': (3, 3),
+                    'drift': (0, 6),
+                    'resist': (3, 4),
                 },
                 'dream_feus': {
-                    'x_1': (7, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (7, 2),
-                    'x_3': (7, 3),
-                    'x_4': (7, 4),
-                    'x_5': (7, 5),
-                    'x_6': (7, 6),
-                    'x_7': (7, 7),
-                    'x_8': (7, 8),
+                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
+                    'x_2': (6, 2),
+                    'x_3': (6, 3),
+                    'x_4': (6, 4),
+                    'x_5': (6, 5),
+                    'x_6': (6, 6),
+                    'x_7': (6, 7),
+                    'x_8': (6, 8),
                     'y_1': (8, 1),  # Runs along y direction, indicates x hit location
                     'y_2': (8, 2),
                     'y_3': (8, 3),
