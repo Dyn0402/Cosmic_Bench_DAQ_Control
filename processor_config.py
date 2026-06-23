@@ -40,6 +40,11 @@ CONFIG = {
     'do_analyze': True,
     'do_combine': True,
 
+    # Common-noise subtraction (median across each 64-channel block, per sample) during
+    # waveform analysis. NB: the pedestal RMS is ALWAYS computed after CNS in the processor;
+    # this flag only toggles CNS on the DATA waveforms.
+    'common_noise_subtraction': True,
+
     # M3 tracker configuration
     # Set m3_feu_num to the FEU number of the M3 detector, or null to disable M3 handling
     'm3_feu_num':       1,

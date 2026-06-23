@@ -98,6 +98,7 @@ def run_watcher(config: dict):
     do_decode  = config.get('do_decode',  True) and bool(decode_exe)
     do_analyze = config.get('do_analyze', True) and bool(analyze_exe)
     do_combine = config.get('do_combine', True) and bool(combine_exe)
+    common_noise_subtraction = config.get('common_noise_subtraction', True)
 
     m3_feu_num       = config.get('m3_feu_num', None)
     do_m3_tracking   = config.get('do_m3_tracking', False) and m3_feu_num is not None
@@ -212,7 +213,8 @@ def run_watcher(config: dict):
                                 do_m3_tracking, filter_by_m3,
                                 m3_feu_num, tracking_sh_path, tracking_run_dir,
                                 run_detectors, run_included, detector_info_dir,
-                                save_fdfs, save_decoded, n_threads, cpp_env
+                                save_fdfs, save_decoded, n_threads, cpp_env,
+                                common_noise_subtraction
                             )
                             del prev_sizes[key]
                             found_new = True
@@ -240,7 +242,8 @@ def _process_file_num(fnum, all_fdf_paths, subrun_dir, ped_dir,
                        do_m3_tracking, filter_by_m3,
                        m3_feu_num, tracking_sh_path, tracking_run_dir,
                        detectors, included_detectors, detector_info_dir,
-                       save_fdfs, save_decoded, n_threads, cpp_env):
+                       save_fdfs, save_decoded, n_threads, cpp_env,
+                       common_noise_subtraction=True):
 
     decoded_dir  = subrun_dir / decoded_inner
     hits_dir     = subrun_dir / hits_inner
@@ -294,7 +297,7 @@ def _process_file_num(fnum, all_fdf_paths, subrun_dir, ped_dir,
                 hits_path = hits_dir / root_path.name.replace('.root', '_hits.root')
                 if hits_path.exists():
                     continue
-                tasks.append(pool.submit(_analyze_file, str(root_path), ped_dir, str(hits_path), analyze_exe, cpp_env))
+                tasks.append(pool.submit(_analyze_file, str(root_path), ped_dir, str(hits_path), analyze_exe, cpp_env, common_noise_subtraction))
             for t in as_completed(tasks):
                 t.result()
 
@@ -559,7 +562,8 @@ def _decode_file(fdf_path: str, root_path: str, decode_exe: str, cpp_env):
     subprocess.run([decode_exe, fdf_path, root_path], env=cpp_env)
 
 
-def _analyze_file(root_path: str, ped_dir: str, hits_out_path: str, analyze_exe: str, cpp_env):
+def _analyze_file(root_path: str, ped_dir: str, hits_out_path: str, analyze_exe: str, cpp_env,
+                  common_noise_subtraction: bool = True):
     feu_match = re.search(r'_(\d{3})_(\d{2})', os.path.basename(root_path))
     if not feu_match:
         print(f"[analyze] Cannot extract FEU number from {root_path}, skipping")
@@ -575,7 +579,8 @@ def _analyze_file(root_path: str, ped_dir: str, hits_out_path: str, analyze_exe:
                 break
 
     print(f"[analyze] {os.path.basename(root_path)}")
-    subprocess.run([analyze_exe, root_path, hits_out_path, ped_path], env=cpp_env)
+    cmd = [analyze_exe, root_path, hits_out_path, ped_path, '--cns', '1' if common_noise_subtraction else '0']
+    subprocess.run(cmd, env=cpp_env)
 
 
 def _combine_hits(feu_hits_map: dict, combined_path: str, combine_exe: str, cpp_env):
