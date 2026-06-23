@@ -177,11 +177,11 @@ class Config:
         # self.sub_runs.append(new_subrun)
 
         # HV scan: 16 steps of 30 minutes (4 hours total), resist from 520V in steps of -10V.
-        resists = [525, 520, 515, 510, 505, 500, 495, 490, 485, 480, 475, 470, 465, 460, 455, 450]
+        resists = [525, 520, 515, 510, 505, 500, 495, 490, 485, 480, 475, 470, 465]
         for resist in resists:
             new_subrun = {
                 'sub_run_name': f'resist_{resist}V_drift_1000V',
-                'run_time': 30,  # Minutes
+                'run_time': 20,  # Minutes
                 'hvs': {
                     0: {
                         6: 1000,
