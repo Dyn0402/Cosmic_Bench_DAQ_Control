@@ -25,7 +25,8 @@ class Config:
         # self.run_name = 'zs_compression_test_M3_6-7-26'
         # self.run_name = 'mx17_det3_new_test_zs_m3_6-17-26'
         # self.run_name = 'mx17_det2_det3_weekend_6-20-26'
-        self.run_name = 'mx17_det2_det3_overnight_6-22-26'
+        # self.run_name = 'mx17_det2_det3_overnight_6-22-26'
+        self.run_name = 'mx17_det3_det4_overnight_6-23-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         # self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.base_out_dir = BASE_DATA_DIR
@@ -75,7 +76,10 @@ class Config:
             'pedestal_subtraction': False,
             'common_noise_subtraction': False,
             'zs_type': 'tpc',
-            'do_pedestal_threshold_run': True,   # Sys Action PedThrRun (bool/int/str → 0 or 1)
+            # Off: use the dedicated 'latest' pedestals copied in by get_pedestals instead of
+            # taking a per-subrun pedestal run. (Both at once = two _pedthr_ sets per FEU in
+            # raw_daq_data -> processor refuses with "Multiple pedestals for FEU".)
+            'do_pedestal_threshold_run': False,  # Sys Action PedThrRun (bool/int/str → 0 or 1)
             'do_trigger_threshold_run': False,   # Sys Action TrgThrRun
             'do_data_run': True,                 # Sys Action DataRun
         }
@@ -470,12 +474,68 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
-        self.included_detectors = ['mx17_2', 'mx17_3',
+        self.included_detectors = ['mx17_3', 'mx17_4',
                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
         # self.included_detectors = ['clas12_test',
         #                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
 
         self.detectors = [
+            {
+                'name': 'mx17_2',
+                'description': 'Bulked by Arnaud June 12. Giant pillars on parts of the detector.',
+                'det_type': 'mx17',
+                'resist_type': 'strip',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': self.bench_geometry['p2_z'] + self.bench_geometry['board_thickness'],  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 90,  # deg  Rotation about z axis
+                },
+                'hv_channels': {
+                    'drift': (0, 6),
+                    'resist': (3, 4),
+                },
+                'dream_feus': {
+                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
+                    'x_2': (6, 2),
+                    'x_3': (6, 3),
+                    'x_4': (6, 4),
+                    'x_5': (6, 5),
+                    'x_6': (6, 6),
+                    'x_7': (6, 7),
+                    'x_8': (6, 8),
+                    'y_1': (8, 1),  # Runs along y direction, indicates x hit location
+                    'y_2': (8, 2),
+                    'y_3': (8, 3),
+                    'y_4': (8, 4),
+                    'y_5': (8, 5),
+                    'y_6': (8, 6),
+                    'y_7': (8, 7),
+                    'y_8': (8, 8),
+                },
+                'dream_feu_orientation': {  # If connector is normal, inverted, rotated, or rotated_inverted
+                    'x_1': 'inverted',
+                    'x_2': 'inverted',
+                    'x_3': 'inverted',
+                    'x_4': 'inverted',
+                    'x_5': 'inverted',
+                    'x_6': 'inverted',
+                    'x_7': 'inverted',
+                    'x_8': 'inverted',
+                    'y_1': 'inverted',
+                    'y_2': 'inverted',
+                    'y_3': 'inverted',
+                    'y_4': 'inverted',
+                    'y_5': 'inverted',
+                    'y_6': 'inverted',
+                    'y_7': 'inverted',
+                    'y_8': 'inverted',
+                },
+            },
             {
                 'name': 'mx17_3',
                 'description': 'Bulked by Stephan June 15',
@@ -533,8 +593,9 @@ class Config:
                 },
             },
             {
-                'name': 'mx17_2',
-                'description': 'Bulked by Arnaud June 12. Giant pillars on parts of the detector.',
+                'name': 'mx17_4',
+                'description': 'Bulked by Stephan in batch of 3 on June 22. Was board C. Had a few bubbles, but '
+                               'appears that the pillars underneath were still there, so just no caps',
                 'det_type': 'mx17',
                 'resist_type': 'strip',
                 'det_center_coords': {  # Center of detector

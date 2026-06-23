@@ -357,17 +357,24 @@ def update_config_value(filepath, updates, output_path=None):
 
 def get_pedestals(pedestals_dir, pedestals, run_dir, out_dir=None):
     """
-    Get pedestal files from specified directory and copy to run directory with proper naming.
+    Copy pedestal files from the selected pedestal run into the run directory.
+
+    The raw pedestal FDFs are read from the nested ``<ped_run>/pedestals/raw_daq_data/``
+    (falling back to the flat ``<ped_run>/pedestals/`` for older layouts), and ONLY the
+    ``*_pedthr_*`` FDFs are copied -- never the ``*_datrun_*`` files, which would otherwise
+    be picked up by the processor as data. Any ``*_ped.prg``/``*_thr.prg`` threshold files
+    (used by the DAQ for zero suppression) are copied too, and a ``pedestal_run.txt`` pointer
+    is written for processors using ``pedestal_loc='find'``.
     """
     sub_run_name = 'pedestals'  # Standard name for cosmic bench pedestal runs
     if not os.path.isdir(pedestals_dir):
         print(f'Pedestals directory `{pedestals_dir}` does not exist.')
         return None
 
+    # --- select which pedestal run to use ---
     if pedestals == 'latest':
         valid_dirs = []
         for item in os.listdir(pedestals_dir):
-            print(f'Checking pedestal item: {item}')
             full_path = os.path.join(pedestals_dir, item)
             if not os.path.isdir(full_path) or not item.startswith('pedestals_'):
                 continue
@@ -391,46 +398,60 @@ def get_pedestals(pedestals_dir, pedestals, run_dir, out_dir=None):
             return None
 
         valid_dirs.sort(key=lambda x: x[0])
-        latest_pedestal_dir = valid_dirs[-1][1]
-        pedestals_prg_dir = os.path.join(pedestals_dir, latest_pedestal_dir, sub_run_name) + os.sep
+        ped_run = valid_dirs[-1][1]
     else:
-        pedestals_prg_dir = os.path.join(pedestals_dir, pedestals, sub_run_name) + os.sep
+        ped_run = pedestals
 
-    for file in os.listdir(pedestals_prg_dir):
-        print(f'Checking pedestal file: {file}')
-        if file.endswith('.prg'):
+    ped_base_dir = os.path.join(pedestals_dir, ped_run, sub_run_name)
+    if not os.path.isdir(ped_base_dir):
+        print(f'Pedestal run dir `{ped_base_dir}` does not exist.')
+        return None
+
+    # Raw FDFs live in the nested raw_daq_data/ (current layout); fall back to the flat dir.
+    fdf_src = os.path.join(ped_base_dir, 'raw_daq_data')
+    if not os.path.isdir(fdf_src):
+        fdf_src = ped_base_dir
+    print(f'Using pedestal run {ped_run} (fdf source: {fdf_src})')
+
+    # --- copy ONLY the pedthr FDFs (never datrun) ---
+    for file in os.listdir(fdf_src):
+        if file.endswith('.fdf') and '_pedthr_' in file and re.search(r'_(\d{3})_(\d{2})\.', file):
+            print(f'Copying pedestal fdf file {file}...')
+            shutil.copy(os.path.join(fdf_src, file), f'{run_dir}{file}')
+            if out_dir:
+                shutil.copy(os.path.join(fdf_src, file), f'{out_dir}{file}')
+
+    # --- copy threshold .prg files (for zero suppression) from whichever source has them ---
+    for prg_src in (ped_base_dir, fdf_src):
+        prg_files = [f for f in os.listdir(prg_src) if f.endswith('.prg')]
+        if not prg_files:
+            continue
+        for file in prg_files:
             feu_num_search = re.search(r'_(\d{2})_', file)
-            if feu_num_search:
-                feu_num = feu_num_search.group(1)
-                if '_ped.prg' in file:
-                    dest_file_name = f'dream_pedestals_{feu_num}_ped.prg'
-                elif '_thr.prg' in file:
-                    dest_file_name = f'dream_thresholds_{feu_num}_thr.prg'
-                else:
-                    print(f'Unknown pedestal file type for {file}, skipping.')
-                    continue
-                print(f'Copying pedestal file {file} for FEU {feu_num}...')
-                shutil.copy(f'{pedestals_prg_dir}{file}', f'{run_dir}{dest_file_name}')
-                if out_dir:
-                    shutil.copy(f'{pedestals_prg_dir}{file}', f'{out_dir}{file}')
-                ped_run = pedestals_prg_dir.strip('/').split('/')[-2]
-                with open(f'{run_dir}pedestal_run.txt', 'w') as f:
-                    f.write(ped_run)
-                if out_dir:
-                    with open(f'{out_dir}pedestal_run.txt', 'w') as f:
-                        f.write(ped_run)
-                print(f'Copied pedestal file {file} to {dest_file_name}')
-            else:
+            if not feu_num_search:
                 print(f'Could not find FEU number in pedestal file name {file}, skipping.')
-        elif file.endswith('.fdf'):
-            feu_num_search = re.search(r'_(\d{3})_(\d{2})\.', file)
-            if feu_num_search:
-                print(f'Copying pedestal fdf file {file}...')
-                shutil.copy(f'{pedestals_prg_dir}{file}', f'{run_dir}{file}')
-                if out_dir:
-                    shutil.copy(f'{pedestals_prg_dir}{file}', f'{out_dir}{file}')
+                continue
+            feu_num = feu_num_search.group(1)
+            if '_ped.prg' in file:
+                dest_file_name = f'dream_pedestals_{feu_num}_ped.prg'
+            elif '_thr.prg' in file:
+                dest_file_name = f'dream_thresholds_{feu_num}_thr.prg'
             else:
-                print(f'Could not find FEU number in pedestal fdf file name {file}, skipping.')
+                print(f'Unknown pedestal file type for {file}, skipping.')
+                continue
+            print(f'Copying pedestal file {file} for FEU {feu_num}...')
+            shutil.copy(os.path.join(prg_src, file), f'{run_dir}{dest_file_name}')
+            if out_dir:
+                shutil.copy(os.path.join(prg_src, file), f'{out_dir}{file}')
+        break  # used the first source that had .prg files
+
+    # --- always drop a pedestal_run.txt pointer (for processor pedestal_loc='find') ---
+    with open(f'{run_dir}pedestal_run.txt', 'w') as f:
+        f.write(ped_run)
+    if out_dir:
+        with open(f'{out_dir}pedestal_run.txt', 'w') as f:
+            f.write(ped_run)
+    print(f'Pedestal files for {ped_run} copied into {run_dir}')
 
 
 if __name__ == '__main__':
