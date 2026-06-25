@@ -15,7 +15,7 @@ import copy
 # Site configuration — edit here or use the Flask GUI to switch projects
 # ---------------------------------------------------------------------------
 BASE_DISK     = '/mnt/cosmic_data/'
-PROJECT       = 'P2'  # 'MX17', 'P2', 'clas12', 'EIC'
+PROJECT       = 'MX17'  # 'MX17', 'P2', 'clas12', 'EIC'
 BASE_DATA_DIR = f'{BASE_DISK}{PROJECT}/'
 
 
@@ -27,7 +27,8 @@ class Config:
         # self.run_name = 'mx17_det2_det3_weekend_6-20-26'
         # self.run_name = 'mx17_det2_det3_overnight_6-22-26'
         # self.run_name = 'mx17_det3_day_6-25-26'
-        self.run_name = 'P2_det1-6-25-26_test'
+        # self.run_name = 'P2_det1-6-25-26_test'
+        self.run_name = 'mx17_det6_det7_overnight_6-26-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         # self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.base_out_dir = BASE_DATA_DIR
@@ -58,8 +59,7 @@ class Config:
             # 'daq_config_template_path': '/mnt/cosmic_data/clas12/dream_config/CosmicTb_clas12.cfg',
             # 'daq_config_template_path': '/mnt/cosmic_data/MX17/dream_config/CosmicTb_MX17_ZS_scan.cfg',
             # 'daq_config_template_path': '/mnt/cosmic_data/MX17/dream_config/CosmicTb_MX17.cfg',
-            'daq_config_template_path': '/mnt/cosmic_data/P2/dream_config/CosmicTb_P2.cfg',
-            # 'run_directory': f'/data/cosmic_data/Run_MX_temp/{self.run_name}/',
+            # 'daq_config_template_path': '/mnt/cosmic_data/P2/dream_config/CosmicTb_P2.cfg',
             'run_directory': f'{self.base_out_dir}dream_run/{self.run_name}/',
             # 'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
             'data_out_dir': self.run_out_dir,
@@ -84,7 +84,16 @@ class Config:
             'do_pedestal_threshold_run': True,  # Sys Action PedThrRun (bool/int/str → 0 or 1)
             'do_trigger_threshold_run': False,   # Sys Action TrgThrRun
             'do_data_run': True,                 # Sys Action DataRun
+            # True to auto-select the active FEUs in the .cfg from the included detectors' dream_feus maps.
+            # Only the Sys Topo / Feu_RunCtrl_Id / NetChan_Ip lines for FEUs actually used by the included
+            # detectors are left active; the rest are commented out. The template stays the source of truth
+            # for each FEU's role (Trg/Dat) and hardware Id/IP.
+            'set_feus_from_detectors': True,
         }
+        if PROJECT == 'MX17':
+            self.dream_daq_info['daq_config_template_path'] = '/mnt/cosmic_data/MX17/dream_config/CosmicTb_MX17.cfg'
+        elif PROJECT == 'P2':
+            self.dream_daq_info['daq_config_template_path'] = '/mnt/cosmic_data/P2/dream_config/CosmicTb_P2.cfg'
 
         self.hv_control_info = {
             'ip': '192.168.10.1',
@@ -106,32 +115,32 @@ class Config:
         self.sub_runs = []  # Append subruns in order they should be run.
 
         # det_3 (mx17_3): drift (0, 7), resist (3, 3). Channels 8-11 on cards 0/3 are the m3 drift/mesh.
-        new_subrun = {
-            'sub_run_name': f'pedestal-connectors-test',
-            'run_time': 24 * 60,  # Minutes (24 hours, kill manually)
-            'hvs': {
-                0: {
-                    # 7: 500,
-                    8: 500, #M3
-                    9: 500, #M3
-                    10: 500, #M3
-                    11: 500, #M3
-                },
-                1: {
-                    0: 200,  # M3
-                    1: 200,  # M3
-
-                },
-                3: {
-                    # 3: 495,
-                    8: 455, #M3
-                    9: 455, #M3
-                    10: 455, #M3
-                    11: 455, #M3
-                }
-            },
-        }
-        self.sub_runs.append(new_subrun)
+        # new_subrun = {
+        #     'sub_run_name': f'pedestal-connectors-test',
+        #     'run_time': 24 * 60,  # Minutes (24 hours, kill manually)
+        #     'hvs': {
+        #         0: {
+        #             # 7: 500,
+        #             8: 500, #M3
+        #             9: 500, #M3
+        #             10: 500, #M3
+        #             11: 500, #M3
+        #         },
+        #         1: {
+        #             0: 200,  # M3
+        #             1: 200,  # M3
+        #
+        #         },
+        #         3: {
+        #             # 3: 495,
+        #             8: 455, #M3
+        #             9: 455, #M3
+        #             10: 455, #M3
+        #             11: 455, #M3
+        #         }
+        #     },
+        # }
+        # self.sub_runs.append(new_subrun)
 
 
         # new_subrun = {
@@ -379,7 +388,7 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
-        self.included_detectors = ['p2',
+        self.included_detectors = ['mx17_6', 'mx17_7',
                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
         # self.included_detectors = ['clas12_test',
         #                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
@@ -581,6 +590,121 @@ class Config:
                 },
                 'hv_channels': {
                     'drift': (0, 6),
+                    'resist': (3, 4),
+                },
+                'dream_feus': {
+                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
+                    'x_2': (6, 2),
+                    'x_3': (6, 3),
+                    'x_4': (6, 4),
+                    'x_5': (6, 5),
+                    'x_6': (6, 6),
+                    'x_7': (6, 7),
+                    'x_8': (6, 8),
+                    'y_1': (8, 1),  # Runs along y direction, indicates x hit location
+                    'y_2': (8, 2),
+                    'y_3': (8, 3),
+                    'y_4': (8, 4),
+                    'y_5': (8, 5),
+                    'y_6': (8, 6),
+                    'y_7': (8, 7),
+                    'y_8': (8, 8),
+                },
+                'dream_feu_orientation': {  # If connector is normal, inverted, rotated, or rotated_inverted
+                    'x_1': 'inverted',
+                    'x_2': 'inverted',
+                    'x_3': 'inverted',
+                    'x_4': 'inverted',
+                    'x_5': 'inverted',
+                    'x_6': 'inverted',
+                    'x_7': 'inverted',
+                    'x_8': 'inverted',
+                    'y_1': 'inverted',
+                    'y_2': 'inverted',
+                    'y_3': 'inverted',
+                    'y_4': 'inverted',
+                    'y_5': 'inverted',
+                    'y_6': 'inverted',
+                    'y_7': 'inverted',
+                    'y_8': 'inverted',
+                },
+            },
+            {
+                'name': 'mx17_6',
+                'description': 'Bulked by Stephan June 24 (?). Was board D. Stephan redid the lamination after first '
+                               'layer had wrinkles a few times until good. In the end, a column of waves in the mesh '
+                               'and maybe a spot with no pillar caps.',
+                'det_type': 'mx17',
+                'resist_type': 'strip',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['board_thickness'],  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 90,  # deg  Rotation about z axis
+                },
+                'hv_channels': {
+                    'drift': (0, 6),
+                    'resist': (3, 3),
+                },
+                'dream_feus': {
+                    'x_1': (3, 1),  # Runs along x direction, indicates y hit location
+                    'x_2': (3, 2),
+                    'x_3': (3, 3),
+                    'x_4': (3, 4),
+                    'x_5': (3, 5),
+                    'x_6': (3, 6),
+                    'x_7': (3, 7),
+                    'x_8': (3, 8),
+                    'y_1': (4, 1),  # Runs along y direction, indicates x hit location
+                    'y_2': (4, 2),
+                    'y_3': (4, 3),
+                    'y_4': (4, 4),
+                    'y_5': (4, 5),
+                    'y_6': (4, 6),
+                    'y_7': (4, 7),
+                    'y_8': (4, 8),
+                },
+                'dream_feu_orientation': {  # If connector is normal, inverted, rotated, or rotated_inverted
+                    'x_1': 'inverted',
+                    'x_2': 'inverted',
+                    'x_3': 'inverted',
+                    'x_4': 'inverted',
+                    'x_5': 'inverted',
+                    'x_6': 'inverted',
+                    'x_7': 'inverted',
+                    'x_8': 'inverted',
+                    'y_1': 'inverted',
+                    'y_2': 'inverted',
+                    'y_3': 'inverted',
+                    'y_4': 'inverted',
+                    'y_5': 'inverted',
+                    'y_6': 'inverted',
+                    'y_7': 'inverted',
+                    'y_8': 'inverted',
+                },
+            },
+            {
+                'name': 'mx17_7',
+                'description': 'Bulked by Stephan in batch of 3 on June 22. Was board B. Had one or two bubbles, but '
+                               'appears that the pillars underneath were still there, so just no caps',
+                'det_type': 'mx17',
+                'resist_type': 'strip',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': self.bench_geometry['p2_z'] + self.bench_geometry['board_thickness'],  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 90,  # deg  Rotation about z axis
+                },
+                'hv_channels': {
+                    'drift': (0, 7),
                     'resist': (3, 4),
                 },
                 'dream_feus': {
@@ -951,6 +1075,37 @@ class Config:
 
         if not self.write_all_dectors_to_json:
             self.detectors = [det for det in self.detectors if det['name'] in self.included_detectors]
+
+        # Derive the active FEUs (and their used connectors) from the included detectors so
+        # dream_daq_control can enable only those FEUs in the .cfg and set per-Dream roles.
+        # Skip when writing the full detector list to a json template.
+        if not self.write_all_dectors_to_json and self.dream_daq_info.get('set_feus_from_detectors', False):
+            feu_connectors = self.get_active_feu_connectors()
+            self.dream_daq_info['included_feus'] = sorted(feu_connectors)
+            self.dream_daq_info['feu_connectors'] = feu_connectors
+            self.dream_daq_info['trigger_feu'] = self.m3_feu_num
+
+    def get_active_feu_connectors(self):
+        """Map each FEU used by the included detectors to the sorted list of its used connectors.
+
+        Each dream_feus value is a (feu_number, connector) tuple. Connectors are 1-based (1..8) and
+        correspond to FEU Dream indices 0..7 (Dream index = connector - 1). String-valued maps
+        (e.g. 'banco') carry no explicit FEU/connector numbers and are skipped.
+        """
+        feu_connectors = {}
+        for det in self.detectors:
+            dream_feus = det.get('dream_feus')
+            if not isinstance(dream_feus, dict):
+                continue
+            for mapping in dream_feus.values():
+                if isinstance(mapping, (tuple, list)) and len(mapping) >= 2:
+                    feu, connector = int(mapping[0]), int(mapping[1])
+                    feu_connectors.setdefault(feu, set()).add(connector)
+        return {feu: sorted(conns) for feu, conns in feu_connectors.items()}
+
+    def get_active_feus(self):
+        """Sorted FEU numbers used by the included detectors (keys of get_active_feu_connectors)."""
+        return sorted(self.get_active_feu_connectors())
 
     def write_to_file(self, file_path):
         with open(file_path, 'w') as file:
