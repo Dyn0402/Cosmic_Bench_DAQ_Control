@@ -114,6 +114,116 @@ class Config:
 
         self.sub_runs = []  # Append subruns in order they should be run.
 
+        # det6 (mx17_6): drift (0, 6), resist (3, 3).  det7 (mx17_7): drift (0, 7), resist (3, 4).
+        # M3 telescope: drift 0:8-11 @ 500V, mesh 3:8-11 @ 455V.
+        # Both detectors run 700V on drift. Nominal resist 495V for both.
+        # det6 draws little current -> push to 530V on the HV scan.
+        # det7 trips above ~505V -> cap the HV scan at 505V.
+
+        # Short 1 hr run at nominal HV.
+        new_subrun = {
+            'sub_run_name': f'short_run',
+            'run_time': 60,  # Minutes
+            'hvs': {
+                0: {
+                    6: 700,
+                    7: 700,
+                    8: 500,
+                    9: 500,
+                    10: 500,
+                    11: 500,
+                },
+                3: {
+                    3: 495,
+                    4: 495,
+                    8: 455,
+                    9: 455,
+                    10: 455,
+                    11: 455,
+                }
+            },
+        }
+        self.sub_runs.append(new_subrun)
+
+        # Longer 2 hr run at nominal HV.
+        new_subrun = {
+            'sub_run_name': f'longer_run',
+            'run_time': 2 * 60,  # Minutes
+            'hvs': {
+                0: {
+                    6: 700,
+                    7: 700,
+                    8: 500,
+                    9: 500,
+                    10: 500,
+                    11: 500,
+                },
+                3: {
+                    3: 495,
+                    4: 495,
+                    8: 455,
+                    9: 455,
+                    10: 455,
+                    11: 455,
+                }
+            },
+        }
+        self.sub_runs.append(new_subrun)
+
+        # HV scan: 6 steps of 20 minutes (2 hours total), resist dropping from each detector's
+        # max in -5V steps. det6 from 530V, det7 from 505V (they track 25V apart). Drift held at 700V.
+        det6_resists = [530, 525, 520, 515, 510, 505]
+        det7_resists = [505, 500, 495, 490, 485, 480]
+        for r6, r7 in zip(det6_resists, det7_resists):
+            new_subrun = {
+                'sub_run_name': f'resist_det6_{r6}V_det7_{r7}V_drift_700V',
+                'run_time': 20,  # Minutes
+                'hvs': {
+                    0: {
+                        6: 700,
+                        7: 700,
+                        8: 500,
+                        9: 500,
+                        10: 500,
+                        11: 500,
+                    },
+                    3: {
+                        3: r6,
+                        4: r7,
+                        8: 455,
+                        9: 455,
+                        10: 455,
+                        11: 455,
+                    }
+                },
+            }
+            self.sub_runs.append(new_subrun)
+
+        # Final long run at nominal HV (start ~6AM). Killed manually.
+        new_subrun = {
+            'sub_run_name': f'long_run',
+            'run_time': 24 * 60,  # Minutes
+            'hvs': {
+                0: {
+                    6: 700,
+                    7: 700,
+                    8: 500,
+                    9: 500,
+                    10: 500,
+                    11: 500,
+                },
+                3: {
+                    3: 495,
+                    4: 495,
+                    8: 455,
+                    9: 455,
+                    10: 455,
+                    11: 455,
+                }
+            },
+        }
+        self.sub_runs.append(new_subrun)
+
         # det_3 (mx17_3): drift (0, 7), resist (3, 3). Channels 8-11 on cards 0/3 are the m3 drift/mesh.
         # new_subrun = {
         #     'sub_run_name': f'pedestal-connectors-test',
