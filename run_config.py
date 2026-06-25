@@ -81,7 +81,7 @@ class Config:
             # Off: use the dedicated 'latest' pedestals copied in by get_pedestals instead of
             # taking a per-subrun pedestal run. (Both at once = two _pedthr_ sets per FEU in
             # raw_daq_data -> processor refuses with "Multiple pedestals for FEU".)
-            'do_pedestal_threshold_run': True,  # Sys Action PedThrRun (bool/int/str → 0 or 1)
+            'do_pedestal_threshold_run': False,  # Sys Action PedThrRun (bool/int/str → 0 or 1)
             'do_trigger_threshold_run': False,   # Sys Action TrgThrRun
             'do_data_run': True,                 # Sys Action DataRun
             # True to auto-select the active FEUs in the .cfg from the included detectors' dream_feus maps.
