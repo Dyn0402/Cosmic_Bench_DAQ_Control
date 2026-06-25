@@ -15,7 +15,7 @@ import copy
 # Site configuration — edit here or use the Flask GUI to switch projects
 # ---------------------------------------------------------------------------
 BASE_DISK     = '/mnt/cosmic_data/'
-PROJECT       = 'MX17'  # 'P2', 'clas12', 'EIC'
+PROJECT       = 'P2'  # 'MX17', 'P2', 'clas12', 'EIC'
 BASE_DATA_DIR = f'{BASE_DISK}{PROJECT}/'
 
 
@@ -26,7 +26,8 @@ class Config:
         # self.run_name = 'mx17_det3_new_test_zs_m3_6-17-26'
         # self.run_name = 'mx17_det2_det3_weekend_6-20-26'
         # self.run_name = 'mx17_det2_det3_overnight_6-22-26'
-        self.run_name = 'mx17_det3_long_run_6-25-26'
+        # self.run_name = 'mx17_det3_day_6-25-26'
+        self.run_name = 'P2_det1-6-25-26_test'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         # self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.base_out_dir = BASE_DATA_DIR
@@ -56,7 +57,8 @@ class Config:
             'port': 1101,
             # 'daq_config_template_path': '/mnt/cosmic_data/clas12/dream_config/CosmicTb_clas12.cfg',
             # 'daq_config_template_path': '/mnt/cosmic_data/MX17/dream_config/CosmicTb_MX17_ZS_scan.cfg',
-            'daq_config_template_path': '/mnt/cosmic_data/MX17/dream_config/CosmicTb_MX17.cfg',
+            # 'daq_config_template_path': '/mnt/cosmic_data/MX17/dream_config/CosmicTb_MX17.cfg',
+            'daq_config_template_path': '/mnt/cosmic_data/P2/dream_config/CosmicTb_P2.cfg',
             # 'run_directory': f'/data/cosmic_data/Run_MX_temp/{self.run_name}/',
             'run_directory': f'{self.base_out_dir}dream_run/{self.run_name}/',
             # 'data_out_dir': f'/mnt/cosmic_data/Run/{self.run_name}',
@@ -79,7 +81,7 @@ class Config:
             # Off: use the dedicated 'latest' pedestals copied in by get_pedestals instead of
             # taking a per-subrun pedestal run. (Both at once = two _pedthr_ sets per FEU in
             # raw_daq_data -> processor refuses with "Multiple pedestals for FEU".)
-            'do_pedestal_threshold_run': False,  # Sys Action PedThrRun (bool/int/str → 0 or 1)
+            'do_pedestal_threshold_run': True,  # Sys Action PedThrRun (bool/int/str → 0 or 1)
             'do_trigger_threshold_run': False,   # Sys Action TrgThrRun
             'do_data_run': True,                 # Sys Action DataRun
         }
@@ -103,26 +105,29 @@ class Config:
 
         self.sub_runs = []  # Append subruns in order they should be run.
 
-        # Single long run, detector 3 only (mx17_3): 495V resist, 800V drift.
-        # Channel 0:7 = det3 drift, 3:3 = det3 resist. The 0:8-11 / 3:8-11 channels
-        # are the m3 tracking detector drifts/meshes.
+        # det_3 (mx17_3): drift (0, 7), resist (3, 3). Channels 8-11 on cards 0/3 are the m3 drift/mesh.
         new_subrun = {
-            'sub_run_name': f'long_run',
-            'run_time': 2 * 24 * 60,  # Minutes
+            'sub_run_name': f'pedestal-connectors-test',
+            'run_time': 24 * 60,  # Minutes (24 hours, kill manually)
             'hvs': {
                 0: {
-                    7: 500,
-                    8: 500,
-                    9: 500,
-                    10: 500,
-                    11: 500,
+                    # 7: 500,
+                    8: 500, #M3
+                    9: 500, #M3
+                    10: 500, #M3
+                    11: 500, #M3
+                },
+                1: {
+                    0: 200,  # M3
+                    1: 200,  # M3
+
                 },
                 3: {
-                    3: 495,
-                    8: 455,
-                    9: 455,
-                    10: 455,
-                    11: 455,
+                    # 3: 495,
+                    8: 455, #M3
+                    9: 455, #M3
+                    10: 455, #M3
+                    11: 455, #M3
                 }
             },
         }
@@ -374,12 +379,78 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
-        self.included_detectors = ['mx17_3',
+        self.included_detectors = ['p2',
                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
         # self.included_detectors = ['clas12_test',
         #                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
 
         self.detectors = [
+            {
+                'name': 'P2_1',
+                'description': 'Bulked at 11-6-26  with footprint on the mesh from the frame gluing',
+                'det_type': 'P2',
+                'resist_type': 'none',
+                'bulked_from': 'Alex+Arnaud',
+                'det_center_coords': {  # Center of detector
+                    'x': 0,  # mm
+                    'y': 0,  # mm
+                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['board_thickness'],  # mm
+                },
+                'det_orientation': {
+                    'x': 0,  # deg  Rotation about x axis
+                    'y': 0,  # deg  Rotation about y axis
+                    'z': 90,  # deg  Rotation about z axis
+                },
+                'hv_channels': {
+                    'drift': (1, 1),
+                    'mesh': (1, 0),
+                },
+                'dream_feus': {
+                    'c_1_bot': (3, 1),  # Runs along x direction, indicates y hit location
+                    'c_1_top': (3, 2),
+                    'c_2_bot': (3, 3),
+                    'c_2_top': (3, 4),
+                    'c_3_bot': (3, 5),
+                    'c_3_top': (3, 6),
+                    'c_4_bot': (3, 7),
+                    'c_4_top': (4, 8),
+                    'c_5_bot': (4, 1),  # Runs along y direction, indicates x hit location
+                    'c_5_tob': (4, 2),
+                    'c_6_bot': (4, 3),
+                    'c_6_top': (4, 4),
+                    'c_7_bot': (4, 5),
+                    'c_7_top': (4, 6),
+                    'c_8_bot': (4, 7),
+                    'c_8_top': (4, 8),
+                    'c_9_bot': (7, 1),  # Runs along y direction, indicates x hit location
+                    'c_9_top': (7, 2),
+                    'c_10_bot': (7, 3),
+                    'c_10_top': (7, 4),
+
+                },
+                'dream_feu_orientation': {  # If connector is normal, inverted, rotated, or rotated_inverted
+                    'c_1_bot': 'rotated_inverted',
+                    'c_1_top': 'rotated_inverted',
+                    'c_2_bot': 'rotated_inverted',
+                    'c_2_top': 'rotated_inverted',
+                    'c_3_bot': 'rotated_inverted',
+                    'c_3_top': 'rotated_inverted',
+                    'c_4_bot': 'rotated_inverted',
+                    'c_4_top': 'rotated_inverted',
+                    'c_5_bot': 'rotated_inverted',
+                    'c_5_tob': 'rotated_inverted',
+                    'c_6_bot': 'rotated_inverted',
+                    'c_6_top': 'rotated_inverted',
+                    'c_7_bot': 'rotated_inverted',
+                    'c_7_top': 'rotated_inverted',
+                    'c_8_bot': 'rotated_inverted',
+                    'c_8_top': 'rotated_inverted',
+                    'c_9_bot': 'rotated_inverted',
+                    'c_9_top': 'rotated_inverted',
+                    'c_10_bot': 'rotated_inverted',
+                    'c_10_top': 'rotated_inverted',
+                },
+            },
             {
                 'name': 'mx17_2',
                 'description': 'Bulked by Arnaud June 12. Giant pillars on parts of the detector.',
@@ -496,63 +567,6 @@ class Config:
                 'name': 'mx17_4',
                 'description': 'Bulked by Stephan in batch of 3 on June 22. Was board C. Had a few bubbles, but '
                                'appears that the pillars underneath were still there, so just no caps',
-                'det_type': 'mx17',
-                'resist_type': 'strip',
-                'det_center_coords': {  # Center of detector
-                    'x': 0,  # mm
-                    'y': 0,  # mm
-                    'z': self.bench_geometry['p2_z'] + self.bench_geometry['board_thickness'],  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 90,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (0, 6),
-                    'resist': (3, 4),
-                },
-                'dream_feus': {
-                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (6, 2),
-                    'x_3': (6, 3),
-                    'x_4': (6, 4),
-                    'x_5': (6, 5),
-                    'x_6': (6, 6),
-                    'x_7': (6, 7),
-                    'x_8': (6, 8),
-                    'y_1': (8, 1),  # Runs along y direction, indicates x hit location
-                    'y_2': (8, 2),
-                    'y_3': (8, 3),
-                    'y_4': (8, 4),
-                    'y_5': (8, 5),
-                    'y_6': (8, 6),
-                    'y_7': (8, 7),
-                    'y_8': (8, 8),
-                },
-                'dream_feu_orientation': {  # If connector is normal, inverted, rotated, or rotated_inverted
-                    'x_1': 'inverted',
-                    'x_2': 'inverted',
-                    'x_3': 'inverted',
-                    'x_4': 'inverted',
-                    'x_5': 'inverted',
-                    'x_6': 'inverted',
-                    'x_7': 'inverted',
-                    'x_8': 'inverted',
-                    'y_1': 'inverted',
-                    'y_2': 'inverted',
-                    'y_3': 'inverted',
-                    'y_4': 'inverted',
-                    'y_5': 'inverted',
-                    'y_6': 'inverted',
-                    'y_7': 'inverted',
-                    'y_8': 'inverted',
-                },
-            },
-            {
-                'name': 'mx17_5',
-                'description': 'Bulked by Stephan in batch of 3 on June 22. Was board A. Looked good but saw quite a'
-                               'lot of current in the clean room',
                 'det_type': 'mx17',
                 'resist_type': 'strip',
                 'det_center_coords': {  # Center of detector
@@ -803,48 +817,6 @@ class Config:
                 'dream_feus': {
                     'x_1': (6, 1),
                     'x_2': (6, 2),
-                },
-            },
-            {
-                'name': 'p2_1',
-                'det_type': 'p2',
-                'det_center_coords': {  # Center of detector
-                    'x': 9.2,  # mm
-                    'y': 38.4,  # mm
-                    # 'z': self.bench_geometry['p1_z'] + self.bench_geometry['bottom_level_z'] +
-                    #      5 * self.bench_geometry['level_z_spacing'] + self.bench_geometry['board_thickness'],  # mm
-                    'z': 100.0,  # mm
-                },
-                'det_orientation': {
-                    'x': 0,  # deg  Rotation about x axis
-                    'y': 0,  # deg  Rotation about y axis
-                    'z': 0,  # deg  Rotation about z axis
-                },
-                'hv_channels': {
-                    'drift': (1, 0),
-                    'mesh': (1, 1),
-                },
-                'dream_feus': {
-                    '0': (7, 0),
-                    '1': (7, 1),
-                    '2': (3, 0),
-                    '3': (3, 1),
-                    '4': (3, 2),
-                    '5': (3, 3),
-                    '6': (3, 4),
-                    '7': (3, 5),
-                    '8': (3, 6),
-                    '9': (3, 7),
-                    '10': (4, 0),
-                    '11': (4, 1),
-                    '12': (4, 2),
-                    '13': (4, 3),
-                    '14': (4, 4),
-                    '15': (4, 5),
-                    '16': (4, 6),
-                    '17': (4, 7),
-                    '18': (7, 2),
-                    '19': (7, 3),
                 },
             },
             {
