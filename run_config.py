@@ -30,7 +30,7 @@ class Config:
         # self.run_name = 'P2_det1-6-25-26_test'
         # self.run_name = 'mx17_det6_det7_overnight_6-26-26'
         # self.run_name = 'mx17_det6_det7_hv_scan_6-26-26'
-        self.run_name = 'mx17_det3_p2_quick_6-26-26'
+        self.run_name = 'mx17_det3_quick_6-26-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         # self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.base_out_dir = BASE_DATA_DIR
@@ -121,7 +121,7 @@ class Config:
         # Single quick run.
         new_subrun = {
             'sub_run_name': f'resist_530V_drift_1200V',
-            'run_time': 10,  # Minutes
+            'run_time': 24 * 60,  # Minutes
             'hvs': {
                 0: {
                     7: 1200,
