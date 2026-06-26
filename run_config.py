@@ -30,7 +30,7 @@ class Config:
         # self.run_name = 'P2_det1-6-25-26_test'
         # self.run_name = 'mx17_det6_det7_overnight_6-26-26'
         # self.run_name = 'mx17_det6_det7_hv_scan_6-26-26'
-        self.run_name = 'mx17_det3_quick_6-26-26'
+        self.run_name = 'mx17_det3_weekend_scan_6-26-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         # self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.base_out_dir = BASE_DATA_DIR
@@ -116,30 +116,76 @@ class Config:
 
         self.sub_runs = []  # Append subruns in order they should be run.
 
-        # det3 (mx17_3) on P2 (z): drift (0, 7) @ 1200V, resist (3, 4) @ 530V.
+        # det3 (mx17_3) on P2 (upper): drift (0, 7), resist (3, 4).
         # M3 telescope: drift 0:8-11 @ 500V, mesh 3:8-11 @ 455V (FEU 1 = trigger).
-        # Single quick run.
-        new_subrun = {
-            'sub_run_name': f'resist_530V_drift_1200V',
-            'run_time': 24 * 60,  # Minutes
-            'hvs': {
+        default_drift, default_resist = 1000, 490  # V
+
+        def make_hvs(drift, resist):
+            """Build the hvs dict for det3 + M3 telescope at the given drift/resist (V)."""
+            return {
                 0: {
-                    7: 1200,
-                    8: 500,
-                    9: 500,
-                    10: 500,
-                    11: 500,
+                    7: drift,  # mx17_3 drift
+                    8: 500, 9: 500, 10: 500, 11: 500,  # M3 drift
+                },
+                1: {
+                    0: None,  # Monitor P2 mesh
+                    1: None,  # Monitor P2 Drift
                 },
                 3: {
-                    4: 530,
-                    8: 455,
-                    9: 455,
-                    10: 455,
-                    11: 455,
-                }
-            },
-        }
-        self.sub_runs.append(new_subrun)
+                    4: resist,  # mx17_3 resist
+                    8: 455, 9: 455, 10: 455, 11: 455,  # M3 mesh
+                },
+            }
+
+        # 1) Short initial run: 2 hours at default drift/resist.
+        self.sub_runs.append({
+            'sub_run_name': f'short_initial_resist_{default_resist}V_drift_{default_drift}V',
+            'run_time': 2 * 60,  # Minutes
+            'hvs': make_hvs(default_drift, default_resist),
+        })
+
+        # 2) Quick drift/resist grid (moved up to run right after the short run).
+        #    15-min runs. 7 resist (10 V steps) x 7 drift (150 V steps) = 49 runs = 12.25 hours.
+        grid_resists = list(range(460, 521, 10))   # V, 460 -> 520 in 10 V steps (7 pts)
+        grid_drifts = list(range(1200, 299, -150))  # V, 1200 -> 300 in 150 V steps (7 pts)
+        for resist in grid_resists:
+            for drift in grid_drifts:
+                self.sub_runs.append({
+                    'sub_run_name': f'grid_resist_{resist}V_drift_{drift}V',
+                    'run_time': 10,  # Minutes
+                    'hvs': make_hvs(drift, resist),
+                })
+
+        # 3) HV (resist) scan at default drift: 525 -> 405 V in -10 V steps, 30 min each.
+        for resist in range(525, 399, -10):
+            self.sub_runs.append({
+                'sub_run_name': f'hv_scan_resist_{resist}V_drift_{default_drift}V',
+                'run_time': 30,  # Minutes
+                'hvs': make_hvs(default_drift, resist),
+            })
+
+        # 4) Second HV (resist) scan, offset by 5 V: 520 -> 450 V in -10 V steps, 30 min each.
+        for resist in range(520, 449, -10):
+            self.sub_runs.append({
+                'sub_run_name': f'hv_scan2_resist_{resist}V_drift_{default_drift}V',
+                'run_time': 30,  # Minutes
+                'hvs': make_hvs(default_drift, resist),
+            })
+
+        # 5) Drift scan at resist 490 V: 1100 -> 0 V in -100 V steps, 30 min each.
+        for drift in range(1100, -1, -100):
+            self.sub_runs.append({
+                'sub_run_name': f'drift_scan_resist_{default_resist}V_drift_{drift}V',
+                'run_time': 30,  # Minutes
+                'hvs': make_hvs(drift, default_resist),
+            })
+
+        # 6) Final long run: 48 hours at default drift/resist.
+        self.sub_runs.append({
+            'sub_run_name': f'long_run_resist_{default_resist}V_drift_{default_drift}V',
+            'run_time': 48 * 60,  # Minutes
+            'hvs': make_hvs(default_drift, default_resist),
+        })
 
         # det_3 (mx17_3): drift (0, 7), resist (3, 3). Channels 8-11 on cards 0/3 are the m3 drift/mesh.
         # new_subrun = {
