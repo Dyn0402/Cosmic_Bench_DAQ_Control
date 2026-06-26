@@ -28,7 +28,9 @@ class Config:
         # self.run_name = 'mx17_det2_det3_overnight_6-22-26'
         # self.run_name = 'mx17_det3_day_6-25-26'
         # self.run_name = 'P2_det1-6-25-26_test'
-        self.run_name = 'mx17_det6_det7_overnight_6-26-26'
+        # self.run_name = 'mx17_det6_det7_overnight_6-26-26'
+        # self.run_name = 'mx17_det6_det7_hv_scan_6-26-26'
+        self.run_name = 'mx17_det3_p2_quick_6-26-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         # self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.base_out_dir = BASE_DATA_DIR
@@ -114,107 +116,22 @@ class Config:
 
         self.sub_runs = []  # Append subruns in order they should be run.
 
-        # det6 (mx17_6): drift (0, 6), resist (3, 3).  det7 (mx17_7): drift (0, 7), resist (3, 4).
-        # M3 telescope: drift 0:8-11 @ 500V, mesh 3:8-11 @ 455V.
-        # Both detectors run 700V on drift. Nominal resist 495V for both.
-        # det6 draws little current -> push to 530V on the HV scan.
-        # det7 trips above ~505V -> cap the HV scan at 505V.
-
-        # Short 1 hr run at nominal HV.
+        # det3 (mx17_3) on P2 (z): drift (0, 7) @ 1200V, resist (3, 4) @ 530V.
+        # M3 telescope: drift 0:8-11 @ 500V, mesh 3:8-11 @ 455V (FEU 1 = trigger).
+        # Single quick run.
         new_subrun = {
-            'sub_run_name': f'short_run',
-            'run_time': 60,  # Minutes
+            'sub_run_name': f'resist_530V_drift_1200V',
+            'run_time': 10,  # Minutes
             'hvs': {
                 0: {
-                    6: 700,
-                    7: 700,
+                    7: 1200,
                     8: 500,
                     9: 500,
                     10: 500,
                     11: 500,
                 },
                 3: {
-                    3: 495,
-                    4: 495,
-                    8: 455,
-                    9: 455,
-                    10: 455,
-                    11: 455,
-                }
-            },
-        }
-        self.sub_runs.append(new_subrun)
-
-        # Longer 2 hr run at nominal HV.
-        new_subrun = {
-            'sub_run_name': f'longer_run',
-            'run_time': 2 * 60,  # Minutes
-            'hvs': {
-                0: {
-                    6: 700,
-                    7: 700,
-                    8: 500,
-                    9: 500,
-                    10: 500,
-                    11: 500,
-                },
-                3: {
-                    3: 495,
-                    4: 495,
-                    8: 455,
-                    9: 455,
-                    10: 455,
-                    11: 455,
-                }
-            },
-        }
-        self.sub_runs.append(new_subrun)
-
-        # HV scan: 6 steps of 20 minutes (2 hours total), resist dropping from each detector's
-        # max in -5V steps. det6 from 530V, det7 from 505V (they track 25V apart). Drift held at 700V.
-        det6_resists = [530, 525, 520, 515, 510, 505]
-        det7_resists = [505, 500, 495, 490, 485, 480]
-        for r6, r7 in zip(det6_resists, det7_resists):
-            new_subrun = {
-                'sub_run_name': f'resist_det6_{r6}V_det7_{r7}V_drift_700V',
-                'run_time': 20,  # Minutes
-                'hvs': {
-                    0: {
-                        6: 700,
-                        7: 700,
-                        8: 500,
-                        9: 500,
-                        10: 500,
-                        11: 500,
-                    },
-                    3: {
-                        3: r6,
-                        4: r7,
-                        8: 455,
-                        9: 455,
-                        10: 455,
-                        11: 455,
-                    }
-                },
-            }
-            self.sub_runs.append(new_subrun)
-
-        # Final long run at nominal HV (start ~6AM). Killed manually.
-        new_subrun = {
-            'sub_run_name': f'long_run',
-            'run_time': 24 * 60,  # Minutes
-            'hvs': {
-                0: {
-                    6: 700,
-                    7: 700,
-                    8: 500,
-                    9: 500,
-                    10: 500,
-                    11: 500,
-                },
-                3: {
-                    3: 495,
-                    4: 495,
+                    4: 530,
                     8: 455,
                     9: 455,
                     10: 455,
@@ -498,7 +415,7 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
-        self.included_detectors = ['mx17_6', 'mx17_7',
+        self.included_detectors = ['mx17_3',
                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
         # self.included_detectors = ['clas12_test',
         #                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
@@ -634,7 +551,7 @@ class Config:
                 'det_center_coords': {  # Center of detector
                     'x': 0,  # mm
                     'y': 0,  # mm
-                    'z': self.bench_geometry['p1_z'] + self.bench_geometry['board_thickness'],  # mm
+                    'z': self.bench_geometry['p2_z'] + self.bench_geometry['board_thickness'],  # mm  on P2 (upper)
                 },
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
@@ -643,7 +560,7 @@ class Config:
                 },
                 'hv_channels': {
                     'drift': (0, 7),
-                    'resist': (3, 3),
+                    'resist': (3, 4),
                 },
                 'dream_feus': {
                     'x_1': (3, 1),  # Runs along x direction, indicates y hit location
