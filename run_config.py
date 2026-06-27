@@ -593,14 +593,14 @@ class Config:
                     'resist': (3, 4),
                 },
                 'dream_feus': {
-                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (6, 2),
-                    'x_3': (6, 3),
-                    'x_4': (6, 4),
-                    'x_5': (6, 5),
-                    'x_6': (6, 6),
-                    'x_7': (6, 7),
-                    'x_8': (6, 8),
+                    'x_1': (7, 1),  # Runs along x direction, indicates y hit location
+                    'x_2': (7, 2),
+                    'x_3': (7, 3),
+                    'x_4': (7, 4),
+                    'x_5': (7, 5),
+                    'x_6': (7, 6),
+                    'x_7': (7, 7),
+                    'x_8': (7, 8),
                     'y_1': (8, 1),  # Runs along y direction, indicates x hit location
                     'y_2': (8, 2),
                     'y_3': (8, 3),
