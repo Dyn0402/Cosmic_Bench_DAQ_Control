@@ -30,7 +30,7 @@ class Config:
         # self.run_name = 'P2_det1-6-25-26_test'
         # self.run_name = 'mx17_det6_det7_overnight_6-26-26'
         # self.run_name = 'mx17_det6_det7_hv_scan_6-26-26'
-        self.run_name = 'mx17_det3_weekend_scan_6-26-26'
+        self.run_name = 'mx17_det3_saturday_scan_6-27-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         # self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.base_out_dir = BASE_DATA_DIR
@@ -137,53 +137,37 @@ class Config:
                 },
             }
 
-        # 1) Short initial run: 2 hours at default drift/resist.
-        self.sub_runs.append({
-            'sub_run_name': f'short_initial_resist_{default_resist}V_drift_{default_drift}V',
-            'run_time': 2 * 60,  # Minutes
-            'hvs': make_hvs(default_drift, default_resist),
-        })
+        # Overnight Sat 5PM -> Sun 9AM (16 h). 2D grid + short warmup dropped to fit.
+        # Scans at 15 min/step = 6.0 h (24 sub-runs), leaving ~9 h for the long run.
 
-        # 2) Quick drift/resist grid (moved up to run right after the short run).
-        #    15-min runs. 7 resist (10 V steps) x 7 drift (150 V steps) = 49 runs = 12.25 hours.
-        grid_resists = list(range(460, 521, 10))   # V, 460 -> 520 in 10 V steps (7 pts)
-        grid_drifts = list(range(1200, 299, -150))  # V, 1200 -> 300 in 150 V steps (7 pts)
-        for resist in grid_resists:
-            for drift in grid_drifts:
-                self.sub_runs.append({
-                    'sub_run_name': f'grid_resist_{resist}V_drift_{drift}V',
-                    'run_time': 10,  # Minutes
-                    'hvs': make_hvs(drift, resist),
-                })
-
-        # 3) HV (resist) scan at default drift: 525 -> 405 V in -10 V steps, 30 min each.
-        for resist in range(525, 399, -10):
+        # 1) HV (resist) scan at default drift: 525 -> 425 V in -10 V steps, 15 min each.
+        for resist in range(525, 424, -10):
             self.sub_runs.append({
                 'sub_run_name': f'hv_scan_resist_{resist}V_drift_{default_drift}V',
-                'run_time': 30,  # Minutes
+                'run_time': 15,  # Minutes
                 'hvs': make_hvs(default_drift, resist),
             })
 
-        # 4) Second HV (resist) scan, offset by 5 V: 520 -> 450 V in -10 V steps, 30 min each.
-        for resist in range(520, 449, -10):
+        # 2) Second HV (resist) scan, offset by 5 V: 520 -> 460 V in -10 V steps, 15 min each.
+        for resist in range(520, 459, -10):
             self.sub_runs.append({
                 'sub_run_name': f'hv_scan2_resist_{resist}V_drift_{default_drift}V',
-                'run_time': 30,  # Minutes
+                'run_time': 15,  # Minutes
                 'hvs': make_hvs(default_drift, resist),
             })
 
-        # 5) Drift scan at resist 490 V: 1100 -> 0 V in -100 V steps, 30 min each.
-        for drift in range(1100, -1, -100):
+        # 3) Drift scan at resist 490 V: 1100 -> 100 V in -200 V steps (skip 0 V), 15 min each.
+        for drift in range(1100, 0, -200):
             self.sub_runs.append({
                 'sub_run_name': f'drift_scan_resist_{default_resist}V_drift_{drift}V',
-                'run_time': 30,  # Minutes
+                'run_time': 15,  # Minutes
                 'hvs': make_hvs(drift, default_resist),
             })
 
-        # 6) Final long run: 48 hours at default drift/resist.
+        # 4) Final long run: ~12 hours at default drift/resist (fills the rest of the window).
         self.sub_runs.append({
             'sub_run_name': f'long_run_resist_{default_resist}V_drift_{default_drift}V',
-            'run_time': 48 * 60,  # Minutes
+            'run_time': 12 * 60,  # Minutes
             'hvs': make_hvs(default_drift, default_resist),
         })
 
@@ -609,22 +593,22 @@ class Config:
                     'resist': (3, 4),
                 },
                 'dream_feus': {
-                    'x_1': (3, 1),  # Runs along x direction, indicates y hit location
-                    'x_2': (3, 2),
-                    'x_3': (3, 3),
-                    'x_4': (3, 4),
-                    'x_5': (3, 5),
-                    'x_6': (3, 6),
-                    'x_7': (3, 7),
-                    'x_8': (3, 8),
-                    'y_1': (4, 1),  # Runs along y direction, indicates x hit location
-                    'y_2': (4, 2),
-                    'y_3': (4, 3),
-                    'y_4': (4, 4),
-                    'y_5': (4, 5),
-                    'y_6': (4, 6),
-                    'y_7': (4, 7),
-                    'y_8': (4, 8),
+                    'x_1': (6, 1),  # Runs along x direction, indicates y hit location
+                    'x_2': (6, 2),
+                    'x_3': (6, 3),
+                    'x_4': (6, 4),
+                    'x_5': (6, 5),
+                    'x_6': (6, 6),
+                    'x_7': (6, 7),
+                    'x_8': (6, 8),
+                    'y_1': (8, 1),  # Runs along y direction, indicates x hit location
+                    'y_2': (8, 2),
+                    'y_3': (8, 3),
+                    'y_4': (8, 4),
+                    'y_5': (8, 5),
+                    'y_6': (8, 6),
+                    'y_7': (8, 7),
+                    'y_8': (8, 8),
                 },
                 'dream_feu_orientation': {  # If connector is normal, inverted, rotated, or rotated_inverted
                     'x_1': 'inverted',
