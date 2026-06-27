@@ -160,8 +160,11 @@ def get_hv_control_status():
 
 def get_daq_control_status():
     try:
+        # -J joins wrapped lines so the long single-line [status] entry (which can
+        # exceed the 80-col pane width once run+subrun names are long) is matched
+        # by the run/subrun/run_time regex below instead of being split across rows.
         output = subprocess.check_output(
-            ["tmux", "capture-pane", "-pS", "-50", "-t", "daq_control:0.0"],
+            ["tmux", "capture-pane", "-pJS", "-50", "-t", "daq_control:0.0"],
             text=True
         )
     except subprocess.CalledProcessError:
