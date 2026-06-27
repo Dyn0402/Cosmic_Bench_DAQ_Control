@@ -438,10 +438,10 @@ class Config:
                     'c_7_top': (4, 6),
                     'c_8_bot': (4, 7),
                     'c_8_top': (4, 8),
-                    'c_9_bot': (7, 1),  # Runs along y direction, indicates x hit location
-                    'c_9_top': (7, 2),
-                    'c_10_bot': (7, 3),
-                    'c_10_top': (7, 4),
+                    'c_9_bot': (6, 1),  # Runs along y direction, indicates x hit location
+                    'c_9_top': (6, 2),
+                    'c_10_bot': (6, 3),
+                    'c_10_top': (6, 4),
 
                 },
                 'dream_feu_orientation': {  # If connector is normal, inverted, rotated, or rotated_inverted
