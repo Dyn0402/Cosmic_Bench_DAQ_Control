@@ -30,7 +30,8 @@ class Config:
         # self.run_name = 'P2_det1-6-25-26_test'
         # self.run_name = 'mx17_det6_det7_overnight_6-26-26'
         # self.run_name = 'mx17_det6_det7_hv_scan_6-26-26'
-        self.run_name = 'mx17_det3_saturday_scan_6-27-26'
+        # self.run_name = 'mx17_det3_saturday_scan_6-27-26'
+        self.run_name = 'mx17_det3_p2_det1_overnight_6-27-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         # self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.base_out_dir = BASE_DATA_DIR
@@ -120,84 +121,33 @@ class Config:
         # M3 telescope: drift 0:8-11 @ 500V, mesh 3:8-11 @ 455V (FEU 1 = trigger).
         default_drift, default_resist = 1000, 490  # V
 
-        def make_hvs(drift, resist):
-            """Build the hvs dict for det3 + M3 telescope at the given drift/resist (V)."""
-            return {
+        # det_3 (mx17_3): drift (0, 7), resist (3, 3). Channels 8-11 on cards 0/3 are the m3 drift/mesh.
+        new_subrun = {
+            'sub_run_name': f'long_run_p2_det1_sanity_check',
+            'run_time': 24 * 60,  # Minutes (24 hours, kill manually)
+            'hvs': {
                 0: {
-                    7: drift,  # mx17_3 drift
-                    8: 500, 9: 500, 10: 500, 11: 500,  # M3 drift
+                    7: 1000,
+                    8: 500, #M3
+                    9: 500, #M3
+                    10: 500, #M3
+                    11: 500, #M3
                 },
                 1: {
-                    0: None,  # Monitor P2 mesh
-                    1: None,  # Monitor P2 Drift
+                    0: 420,  #P2 mesh
+                    1: 600,  #P2 drift
+
                 },
                 3: {
-                    4: resist,  # mx17_3 resist
-                    8: 455, 9: 455, 10: 455, 11: 455,  # M3 mesh
-                },
-            }
-
-        # Overnight Sat 5PM -> Sun 9AM (16 h). 2D grid + short warmup dropped to fit.
-        # Scans at 15 min/step = 6.0 h (24 sub-runs), leaving ~9 h for the long run.
-
-        # 1) HV (resist) scan at default drift: 525 -> 425 V in -10 V steps, 15 min each.
-        for resist in range(525, 424, -10):
-            self.sub_runs.append({
-                'sub_run_name': f'hv_scan_resist_{resist}V_drift_{default_drift}V',
-                'run_time': 15,  # Minutes
-                'hvs': make_hvs(default_drift, resist),
-            })
-
-        # 2) Second HV (resist) scan, offset by 5 V: 520 -> 460 V in -10 V steps, 15 min each.
-        for resist in range(520, 459, -10):
-            self.sub_runs.append({
-                'sub_run_name': f'hv_scan2_resist_{resist}V_drift_{default_drift}V',
-                'run_time': 15,  # Minutes
-                'hvs': make_hvs(default_drift, resist),
-            })
-
-        # 3) Drift scan at resist 490 V: 1100 -> 100 V in -200 V steps (skip 0 V), 15 min each.
-        for drift in range(1100, 0, -200):
-            self.sub_runs.append({
-                'sub_run_name': f'drift_scan_resist_{default_resist}V_drift_{drift}V',
-                'run_time': 15,  # Minutes
-                'hvs': make_hvs(drift, default_resist),
-            })
-
-        # 4) Final long run: ~12 hours at default drift/resist (fills the rest of the window).
-        self.sub_runs.append({
-            'sub_run_name': f'long_run_resist_{default_resist}V_drift_{default_drift}V',
-            'run_time': 12 * 60,  # Minutes
-            'hvs': make_hvs(default_drift, default_resist),
-        })
-
-        # det_3 (mx17_3): drift (0, 7), resist (3, 3). Channels 8-11 on cards 0/3 are the m3 drift/mesh.
-        # new_subrun = {
-        #     'sub_run_name': f'pedestal-connectors-test',
-        #     'run_time': 24 * 60,  # Minutes (24 hours, kill manually)
-        #     'hvs': {
-        #         0: {
-        #             # 7: 500,
-        #             8: 500, #M3
-        #             9: 500, #M3
-        #             10: 500, #M3
-        #             11: 500, #M3
-        #         },
-        #         1: {
-        #             0: 200,  # M3
-        #             1: 200,  # M3
-        #
-        #         },
-        #         3: {
-        #             # 3: 495,
-        #             8: 455, #M3
-        #             9: 455, #M3
-        #             10: 455, #M3
-        #             11: 455, #M3
-        #         }
-        #     },
-        # }
-        # self.sub_runs.append(new_subrun)
+                    3: 490,
+                    8: 455, #M3
+                    9: 455, #M3
+                    10: 455, #M3
+                    11: 455, #M3
+                }
+            },
+        }
+        self.sub_runs.append(new_subrun)
 
 
         # new_subrun = {
@@ -445,7 +395,7 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
-        self.included_detectors = ['mx17_3',
+        self.included_detectors = ['mx17_3', 'P2_1',
                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
         # self.included_detectors = ['clas12_test',
         #                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
@@ -465,7 +415,7 @@ class Config:
                 'det_orientation': {
                     'x': 0,  # deg  Rotation about x axis
                     'y': 0,  # deg  Rotation about y axis
-                    'z': 90,  # deg  Rotation about z axis
+                    'z': 0,  # deg  Rotation about z axis
                 },
                 'hv_channels': {
                     'drift': (1, 1),
