@@ -429,7 +429,7 @@ class Config:
                     'c_3_bot': (3, 5),
                     'c_3_top': (3, 6),
                     'c_4_bot': (3, 7),
-                    'c_4_top': (4, 8),
+                    'c_4_top': (3, 8),
                     'c_5_bot': (4, 1),  # Runs along y direction, indicates x hit location
                     'c_5_tob': (4, 2),
                     'c_6_bot': (4, 3),
