@@ -27,7 +27,7 @@ CONFIG = {
     'qa_file_mode': 'first',
 
     # Run filtering
-    'include_runs': None,  # e.g. ['run_name_1', 'run_name_2'] — only process these; None = all
+    'include_runs': ['mx17_det3_p2_det1_overnight_6-27-26'],  # e.g. ['run_name_1', 'run_name_2'] — only process these; None = all
     'exclude_runs': None,  # e.g. ['pedestals_06-07-26_10-00-00'] — skip these
 
     # Watcher behavior
