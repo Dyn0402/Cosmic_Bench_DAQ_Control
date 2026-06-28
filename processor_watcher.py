@@ -412,6 +412,11 @@ def _run_is_stale(run_dir: Path, raw_inner: str, stale_days: float) -> bool:
             mtime = raw_dir.stat().st_mtime
             if mtime > newest_mtime:
                 newest_mtime = mtime
+    # A brand-new run whose raw_daq_data dir doesn't exist yet leaves newest_mtime
+    # at 0.0; don't mark it stale (0.0 < cutoff is always True) or it gets added to
+    # checked_stale_runs permanently and its data is never processed once it arrives.
+    if newest_mtime == 0.0:
+        return False
     return newest_mtime < cutoff
 
 
