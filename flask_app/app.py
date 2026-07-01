@@ -361,8 +361,30 @@ def set_project():
         tmp_path = tmp.name
     os.replace(tmp_path, run_config_path)
 
+    # Keep the watcher configs in sync with the new project. processor_config.py
+    # and qa_config.py derive runs_dir from run_config's BASE_DATA_DIR, so just
+    # re-running them regenerates the JSONs for the new project. A watcher that is
+    # already running keeps its old config until restarted, so flag that rather
+    # than killing it (a running processor could be mid-decode).
+    regen_warnings = []
+    for cfg_py in ("processor_config.py", "qa_config.py"):
+        r = subprocess.run(["python", f"{BASE_DIR}/{cfg_py}"],
+                           capture_output=True, text=True)
+        if r.returncode != 0:
+            regen_warnings.append(f"{cfg_py} regen failed: {r.stderr.strip()}")
+
+    running = [s for s in (PROCESSOR_SESSION, QA_TMUX)
+               if subprocess.run(["tmux", "has-session", "-t", s],
+                                 stderr=subprocess.DEVNULL).returncode == 0]
+
     log_event("SET_PROJECT", "flask", base_disk=new_disk, project=new_project)
-    return jsonify(success=True, message=f"Project set to {new_disk}{new_project}")
+
+    msg = f"Project set to {new_disk}{new_project}"
+    if running:
+        msg += f" - restart to apply new project: {', '.join(running)}"
+    if regen_warnings:
+        msg += " - WARNING: " + "; ".join(regen_warnings)
+    return jsonify(success=True, message=msg)
 
 
 @app.route("/git_reset", methods=["POST"])

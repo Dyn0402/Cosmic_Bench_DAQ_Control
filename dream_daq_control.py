@@ -160,49 +160,62 @@ def main():
     print('donzo')
 
 
-def copy_files_on_the_fly(sub_run_dir, sub_out_dir, daq_finished_event, check_interval=5, extra_minutes_after_finish=3):
+def copy_files_on_the_fly(sub_run_dir, sub_out_dir, daq_finished_event, check_interval=5, settle_time=15):
     """
-    Copies new .fdf files during the run, and continues for extra_minutes_after_finish
-    after DAQ finishes, then exits cleanly without blocking the main thread.
+    Copy raw .fdf files from sub_run_dir into sub_out_dir as they complete.
+
+    A file is copied once it is 'stable' (its size stopped growing between two
+    polls), which naturally skips the file RunCtrl is still writing. Files are
+    tracked by name so each is copied exactly once, regardless of file number.
+    After the DAQ finishes every remaining file is complete, so a final sweep
+    copies whatever is left, then the thread exits.
+
+    This replaces the previous version, whose monotonic file-number counter
+    raced ahead of the data (file_num_still_running() returns False for numbers
+    that don't exist yet), so it incremented past the real files and copied
+    nothing but the very first (pedestal) set.
     """
     create_dir_if_not_exist(sub_out_dir)
-    sleep(60)  # Give DAQ time to start writing before first scan
 
-    file_num = 0
+    copied = set()
+    last_sizes = {}
 
-    # Phase 1: DAQ running
-    while not daq_finished_event.is_set():
-        if not file_num_still_running(sub_run_dir, file_num, silent=True):
-            for file_name in os.listdir(sub_run_dir):
-                if (
-                    file_name.endswith('.fdf') and
-                    get_file_num_from_fdf_file_name(file_name, -2) == file_num
-                ):
-                    _atomic_copy(
-                        os.path.join(sub_run_dir, file_name),
-                        os.path.join(sub_out_dir, file_name),
-                    )
-            file_num += 1
-        sleep(check_interval)
-
-    # Phase 2: DAQ has ended — keep copying stragglers
-    print("DAQ finished — continuing file copy for cleanup window.")
-    end_time = time.time() + extra_minutes_after_finish * 60
-    already_seen = set()
-
-    while time.time() < end_time:
+    def sweep(require_stable):
         for file_name in os.listdir(sub_run_dir):
-            if file_name.endswith('.fdf') and file_name not in already_seen:
-                src = os.path.join(sub_run_dir, file_name)
-                dst = os.path.join(sub_out_dir, file_name)
-                try:
-                    _atomic_copy(src, dst)
-                    already_seen.add(file_name)
-                except Exception:
-                    pass
+            if not file_name.endswith('.fdf') or file_name in copied:
+                continue
+            src = os.path.join(sub_run_dir, file_name)
+            try:
+                size = os.path.getsize(src)
+            except OSError:
+                continue
+            if size == 0:
+                continue
+            if require_stable and last_sizes.get(file_name) != size:
+                # First sighting or still growing -> record size, wait for it to settle.
+                last_sizes[file_name] = size
+                continue
+            try:
+                _atomic_copy(src, os.path.join(sub_out_dir, file_name))
+                copied.add(file_name)
+            except Exception as e:
+                print(f'On-the-fly copy failed for {file_name}: {e}')
+
+    # Phase 1: DAQ running -- copy only files whose size has settled.
+    while not daq_finished_event.is_set():
+        sweep(require_stable=True)
         sleep(check_interval)
 
-    print("On-the-fly copy thread exiting.")
+    # Phase 2: DAQ finished -- everything is complete. Sweep for a short settle
+    # window to catch files flushed at the very end, then a final unconditional
+    # sweep guarantees nothing is left behind.
+    print('DAQ finished -- final copy sweep for remaining files.')
+    deadline = time.time() + settle_time
+    while time.time() < deadline:
+        sweep(require_stable=False)
+        sleep(check_interval)
+    sweep(require_stable=False)
+    print(f'On-the-fly copy thread exiting ({len(copied)} files copied).')
 
 
 def _atomic_copy(src, dst):

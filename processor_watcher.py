@@ -159,6 +159,14 @@ def run_watcher(config: dict):
                 if run_dir.name in checked_stale_runs:
                     continue
 
+                # Skip run dirs we cannot read (e.g. owned by another user or not
+                # made by the current DAQ) so a PermissionError from iterdir()
+                # below does not crash the whole watcher.
+                if not os.access(run_dir, os.R_OK | os.X_OK):
+                    print(f"[watcher] Skipping unreadable run dir: {run_dir.name}")
+                    checked_stale_runs.add(run_dir.name)
+                    continue
+
                 is_stale = _run_is_stale(run_dir, raw_inner, stale_run_days)
 
                 # Load detector info from run_config.json if not set in processor config
