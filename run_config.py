@@ -15,7 +15,7 @@ import copy
 # Site configuration — edit here or use the Flask GUI to switch projects
 # ---------------------------------------------------------------------------
 BASE_DISK     = '/mnt/cosmic_data/'
-PROJECT       = 'MX17'  # 'MX17', 'P2', 'clas12', 'EIC'
+PROJECT       = 'P2'  # 'MX17', 'P2', 'clas12', 'EIC'
 BASE_DATA_DIR = f'{BASE_DISK}{PROJECT}/'
 
 
@@ -31,7 +31,7 @@ class Config:
         # self.run_name = 'mx17_det6_det7_overnight_6-26-26'
         # self.run_name = 'mx17_det6_det7_hv_scan_6-26-26'
         # self.run_name = 'mx17_det3_saturday_scan_6-27-26'
-        self.run_name = 'mx17_det3_p2_det1_overnight_6-27-26'
+        self.run_name = 'p2_det1_long_run_6-30-26'
         # self.data_out_dir = '/mnt/cosmic_data/Run/'
         # self.data_out_dir = '/data/cosmic_data/Run_MX/'
         self.base_out_dir = BASE_DATA_DIR
@@ -84,7 +84,7 @@ class Config:
             # Off: use the dedicated 'latest' pedestals copied in by get_pedestals instead of
             # taking a per-subrun pedestal run. (Both at once = two _pedthr_ sets per FEU in
             # raw_daq_data -> processor refuses with "Multiple pedestals for FEU".)
-            'do_pedestal_threshold_run': False,  # Sys Action PedThrRun (bool/int/str → 0 or 1)
+            'do_pedestal_threshold_run': True,  # Sys Action PedThrRun (bool/int/str → 0 or 1)
             'do_trigger_threshold_run': False,   # Sys Action TrgThrRun
             'do_data_run': True,                 # Sys Action DataRun
             # True to auto-select the active FEUs in the .cfg from the included detectors' dream_feus maps.
@@ -111,7 +111,7 @@ class Config:
             'n_channels_per_card': 12,
             'run_out_dir': self.run_out_dir,
             'hv_monitoring': True,  # True to monitor HV during run, False to not monitor
-            'monitor_interval': 2,  # Seconds between HV monitoring
+            'monitor_interval': 0.5,  # Seconds between HV monitoring reads (sub-second OK; ~0.1s query overhead/cycle)
         }
 
 
@@ -123,11 +123,10 @@ class Config:
 
         # det_3 (mx17_3): drift (0, 7), resist (3, 3). Channels 8-11 on cards 0/3 are the m3 drift/mesh.
         new_subrun = {
-            'sub_run_name': f'long_run_p2_det1_sanity_check',
+            'sub_run_name': f'efficiency_long_run_p2_det1',
             'run_time': 24 * 60,  # Minutes (24 hours, kill manually)
             'hvs': {
                 0: {
-                    7: 1000,
                     8: 500, #M3
                     9: 500, #M3
                     10: 500, #M3
@@ -139,7 +138,7 @@ class Config:
 
                 },
                 3: {
-                    4: 490,
+                   
                     8: 455, #M3
                     9: 455, #M3
                     10: 455, #M3
@@ -395,7 +394,9 @@ class Config:
         #                            'urw_strip', 'urw_inter', 'asacusa_strip_1', 'asacusa_strip_2', 'strip_plein_1',
         #                            'strip_strip_1',
         #                            'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top', 'scintillator_top']
-        self.included_detectors = ['mx17_3', 'P2_1',
+        # self.included_detectors = ['mx17_3', 'P2_1',
+                                #    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
+        self.included_detectors = ['P2_1',
                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
         # self.included_detectors = ['clas12_test',
         #                                    'm3_bot_bot', 'm3_bot_top', 'm3_top_bot', 'm3_top_top']
