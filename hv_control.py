@@ -12,6 +12,7 @@ import os
 import threading
 import time
 import csv
+from datetime import datetime
 
 from Server import Server
 from caen_hv_py.CAENHVController import CAENHVController
@@ -161,11 +162,16 @@ def monitor_hvs(hv_info, hvs, sub_run_name, stop_event, print_event):
         writer.writerow(headers)  # write headers once
 
         with CAENHVController(ip_address, username, password) as caen_hv:
+            next_time = time.monotonic()  # drift-corrected scheduler
             while not stop_event.is_set():
-                row = [time.strftime("%Y-%m-%d %H:%M:%S")]
+                next_time += monitor_interval
+                now = datetime.now()
+                # Millisecond-resolution timestamp so sub-second monitor_interval
+                # values produce distinct, sortable timestamps.
+                row = [now.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]]
 
                 if print_event.is_set():
-                    print(f"Monitoring HV \n{time.strftime('%H:%M:%S', time.strptime(row[0], '%Y-%m-%d %H:%M:%S'))}")
+                    print(f"Monitoring HV \n{now.strftime('%H:%M:%S.%f')[:-3]}")
                 for slot, channel_v0s in hvs.items():
                     for channel, v0 in channel_v0s.items():
                         power = caen_hv.get_ch_power(int(slot), int(channel))
@@ -184,7 +190,16 @@ def monitor_hvs(hv_info, hvs, sub_run_name, stop_event, print_event):
 
                 writer.writerow(row)
                 csvfile.flush()  # ensure data is written to disk
-                time.sleep(monitor_interval)
+
+                # Sleep until the next scheduled tick so the true cadence stays
+                # close to monitor_interval regardless of how long the crate
+                # queries took. If we have fallen behind, reset rather than
+                # bursting a backlog of reads.
+                sleep_s = next_time - time.monotonic()
+                if sleep_s > 0:
+                    time.sleep(sleep_s)
+                else:
+                    next_time = time.monotonic()
 
 
 if __name__ == '__main__':
