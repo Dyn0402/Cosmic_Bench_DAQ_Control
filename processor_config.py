@@ -9,11 +9,14 @@ The flask UI's Start Processor button reads that JSON to launch processor_watche
 import json
 import os
 
+from run_config import BASE_DATA_DIR
+
 # --- Paths ---
-BASE_DATA = '/data/cosmic_data/Run_MX/'
+BASE_DATA = f'{BASE_DATA_DIR}Run/'
+# BASE_DATA = '/mnt/cosmic_data/clas12/Run/'
 MM_BUILD = '/local/home/usernsw/mm_dream_reconstruction/build'
 
-M3_TRACKING_DIR = '/local/home/usernsw/dylan/m3_tracking/'
+M3_TRACKING_DIR = '/local/home/usernsw/cosmic_bench_m3_tracking/'
 
 CONFIG = {
     # Top-level directory containing all run_N/ subdirectories
@@ -36,6 +39,11 @@ CONFIG = {
     'do_decode':  True,
     'do_analyze': True,
     'do_combine': True,
+
+    # Common-noise subtraction (median across each 64-channel block, per sample) during
+    # waveform analysis. NB: the pedestal RMS is ALWAYS computed after CNS in the processor;
+    # this flag only toggles CNS on the DATA waveforms.
+    'common_noise_subtraction': True,
 
     # M3 tracker configuration
     # Set m3_feu_num to the FEU number of the M3 detector, or null to disable M3 handling
@@ -63,6 +71,21 @@ CONFIG = {
     #   'find'  - read pedestal_run.txt from raw_daq_data/ and look up pedestal_dir/<name>/pedestals_noise/
     'pedestal_loc': 'same',
     'pedestal_dir': None,
+
+    # Shell commands to set up the C++ environment (ROOT + devtoolset) for decode/analyze/combine.
+    # Run in a login bash shell at watcher startup; the captured env dict is passed to all
+    # C++ subprocess calls.  M3 tracking always runs in the default process env (no ROOT sourced).
+    'cpp_setup_script': (
+        'source ~/root_6_30_02/root-build/bin/thisroot.sh && '
+        'source scl_source enable devtoolset-9'
+    ),
+
+    # Run filtering: process only specific runs or exclude certain runs by directory name.
+    # If include_runs is a non-empty list, only those run directories are processed.
+    # If exclude_runs is a non-empty list, those run directories are skipped.
+    # Both null/empty means process all runs as normal.
+    'include_runs': None,  # e.g. ['run_42', 'run_43'] — only process these runs
+    'exclude_runs': None,  # e.g. ['run_1', 'run_2']  — skip these runs
 
     # Watcher behavior
     'poll_interval':  30,  # seconds between full directory scans

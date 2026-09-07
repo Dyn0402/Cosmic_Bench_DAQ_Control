@@ -13,18 +13,19 @@ import runpy
 
 def main():
     # load run_config_beam.py AS A SCRIPT, not a module
-    config_namespace = runpy.run_path("run_config_beam.py")
+    # config_namespace = runpy.run_path("run_config_beam.py")
+    config_namespace = runpy.run_path("run_config.py")
 
     # the file now acts like a dict namespace
     Config = config_namespace["Config"]
 
     config = Config()
     run_name = config.run_name
-    banco_position = config.bench_geometry['banco_moveable_y_position']
+    # banco_position = config.bench_geometry['banco_moveable_y_position']
 
     print(json.dumps({
         "run_name": run_name,
-        "banco_position": banco_position
+        # "banco_position": banco_position
     }))
 
 if __name__ == "__main__":

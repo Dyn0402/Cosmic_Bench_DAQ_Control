@@ -16,14 +16,16 @@ import select
 import threading
 import time
 import json
+from datetime import datetime
 import pandas as pd
+from urllib.parse import quote
 from flask import Flask, render_template, jsonify, request, send_from_directory, abort
 from flask_socketio import SocketIO, emit
 
 from daq_status import *
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # Add parent dir to path
-from run_config_beam import Config
+from run_config import BASE_DISK, PROJECT, BASE_DATA_DIR
 from get_run_events import get_total_events_for_run
 
 # BASE_DIR = "/home/dylan/PycharmProjects/nTof_x17_DAQ"
@@ -31,19 +33,39 @@ from get_run_events import get_total_events_for_run
 BASE_DIR = "/local/home/usernsw/Cosmic_Bench_DAQ_Control"
 CONFIG_TEMPLATE_DIR = f"{BASE_DIR}/config/json_templates"
 CONFIG_RUN_DIR = f"{BASE_DIR}/config/json_run_configs"
-CONFIG_PY_PATH = f"{BASE_DIR}/run_config_beam.py"
+# CONFIG_PY_PATH = f"{BASE_DIR}/run_config_beam.py"
+CONFIG_PY_PATH = f"{BASE_DIR}/run_config.py"
 BASH_DIR = f"{BASE_DIR}/bash_scripts"
 PROCESSOR_CONFIG_PATH = f"{BASE_DIR}/config/processor_config.json"
 PROCESSOR_SESSION = "processor"
-ANALYSIS_DIR = "/data/cosmic_data/Analysis"
-RUN_DIR = "/data/cosmic_data/Run"
+QA_CONFIG_PATH = f"{BASE_DIR}/config/qa_config.json"
+QA_RESET_PATH  = f"{BASE_DIR}/config/qa_reset.json"
+QA_TMUX = "qa_watcher"
+ANALYSIS_DIR = f'{BASE_DATA_DIR}analysis'
+GENERAL_ANALYSIS_DIR = f'{BASE_DATA_DIR}analysis'
+RUN_DIR = f'{BASE_DATA_DIR}Run'
 HV_TAIL = 1000  # number of most recent rows to show
+
+LOG_DIR = f"{BASE_DIR}/logs"
+LOG_FILE = f"{LOG_DIR}/daq_events.log"
+
+
+def log_event(event, source, **details):
+    try:
+        os.makedirs(LOG_DIR, exist_ok=True)
+        ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        detail_str = ' | '.join(f'{k}={v}' for k, v in details.items())
+        line = f"{ts} | {event:<14} | {source:<12} | {detail_str}\n"
+        with open(LOG_FILE, 'a') as f:
+            f.write(line)
+    except Exception as e:
+        print(f"Warning: could not write to event log: {e}")
 
 
 app = Flask(__name__)
 socketio = SocketIO(app)
 
-TMUX_SESSIONS = ["daq_control", "dream_daq", "hv_control", "processor"]
+TMUX_SESSIONS = ["daq_control", "dream_daq", "hv_control", "processor", "qa_watcher"]
 sessions = {}
 
 @app.route("/")
@@ -67,6 +89,8 @@ def status_all():
             info = get_daq_control_status()
         elif s == "processor":
             info = get_processor_status()
+        elif s == "qa_watcher":
+            info = get_qa_watcher_status()
         else:
             info = {"status": "READY", "color": "secondary", "fields": []}
 
@@ -146,9 +170,11 @@ def update_run_config_py():
 @app.route("/run_config_py", methods=['POST'])
 def run_config_py():
     try:
-        subprocess.Popen(["python", f"{BASE_DIR}/run_config_beam.py"])
+        # subprocess.Popen(["python", f"{BASE_DIR}/run_config_beam.py"])
+        subprocess.Popen(["python", f"{BASE_DIR}/run_config.py"])
         time.sleep(1)
-        config_path = os.path.join(CONFIG_RUN_DIR, 'run_config_beam.json')
+        # config_path = os.path.join(CONFIG_RUN_DIR, 'run_config_beam.json')
+        config_path = os.path.join(CONFIG_RUN_DIR, 'run_config.json')
         if not os.path.exists(config_path):
             return jsonify({"message": f"Config not found: {config_path}"}), 404
 
@@ -168,7 +194,8 @@ def run_config_py():
             run_name = "Error loading run name"
 
         if result.returncode == 0:
-            return jsonify({"success": True, "message": f"Run started with loaded run_config_beam.py", "run_name": run_name})
+            # return jsonify({"success": True, "message": f"Run started with loaded run_config_beam.py", "run_name": run_name})
+            return jsonify({"success": True, "message": f"Run started with loaded run_config.py", "run_name": run_name})
         else:
             return jsonify({"message": f"Error: {result.stderr}"}), 500
     except Exception as e:
@@ -212,6 +239,152 @@ def stop_processor():
         return jsonify({"success": True, "message": "Processor watcher stopped"})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
+
+
+@app.route("/start_qa", methods=["POST"])
+def start_qa():
+    try:
+        result = subprocess.run(
+            ["python", f"{BASE_DIR}/qa_config.py"],
+            capture_output=True, text=True
+        )
+        if result.returncode != 0:
+            return jsonify({"success": False, "message": f"Config generation failed: {result.stderr}"}), 500
+        subprocess.Popen(['tmux', 'kill-session', '-t', QA_TMUX],
+                         stderr=subprocess.PIPE).wait()
+        # Delegate to start_tmux.sh (like start_processor does) instead of calling
+        # "tmux new-session"/"send-keys" directly: the script does "unset TMUX" first,
+        # which matters because the Flask server itself runs inside a tmux session, so
+        # $TMUX is set in its env and tmux 1.8 on this machine can't create a fresh
+        # session while it's inherited by the subprocess.
+        command = f'python {BASE_DIR}/qa_watcher.py "{QA_CONFIG_PATH}"'
+        subprocess.Popen([f'{BASH_DIR}/start_tmux.sh', QA_TMUX, command])
+        return jsonify({"success": True, "message": "QA watcher started"})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@app.route("/stop_qa", methods=["POST"])
+def stop_qa():
+    try:
+        subprocess.run(["tmux", "kill-session", "-t", QA_TMUX], capture_output=True)
+        return jsonify({"success": True, "message": "QA watcher stopped"})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@app.route("/rerun_qa", methods=["POST"])
+def rerun_qa():
+    try:
+        data = request.get_json(silent=True) or {}
+        runs = data.get('runs') or None
+        with open(QA_RESET_PATH, 'w') as f:
+            json.dump({"runs": runs}, f)
+        msg = f"QA rerun queued for: {', '.join(runs)}" if runs else "QA rerun queued for all runs"
+        return jsonify({"success": True, "message": msg})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+def _load_run_config():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("_run_config_live", f"{BASE_DIR}/run_config.py")
+    mod  = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+@app.route("/get_project")
+def get_project():
+    mod = _load_run_config()
+    return jsonify(success=True, base_disk=mod.BASE_DISK, project=mod.PROJECT)
+
+
+@app.route("/get_projects")
+def get_projects():
+    mod  = _load_run_config()
+    disk = request.args.get("base_disk", mod.BASE_DISK)
+    if not os.path.isdir(disk):
+        return jsonify(success=False, message=f"Base disk not found: {disk}",
+                       base_disk=mod.BASE_DISK, project=mod.PROJECT, projects=[])
+    projects = sorted(
+        d for d in os.listdir(disk)
+        if os.path.isdir(os.path.join(disk, d)) and not d.startswith('.')
+    )
+    return jsonify(success=True, base_disk=mod.BASE_DISK, project=mod.PROJECT, projects=projects)
+
+
+@app.route("/set_project", methods=["POST"])
+def set_project():
+    import re, tempfile
+    data = request.get_json(silent=True) or {}
+    new_disk    = data.get("base_disk", "").strip()
+    new_project = data.get("project", "").strip()
+
+    # --- Validate base_disk ---
+    if not re.fullmatch(r'/[a-zA-Z0-9_./ -]{1,98}/', new_disk):
+        return jsonify(success=False, message="Invalid BASE_DISK: must be an absolute path ending in '/', max 100 chars, no special chars"), 400
+    if not os.path.isdir(new_disk):
+        return jsonify(success=False, message=f"BASE_DISK does not exist: {new_disk}"), 400
+
+    # --- Validate project ---
+    if not re.fullmatch(r'[a-zA-Z0-9_.][a-zA-Z0-9_.-]{0,49}', new_project):
+        return jsonify(success=False, message="Invalid PROJECT: alphanumeric/underscore/hyphen/dot only, max 50 chars"), 400
+    if not os.path.isdir(os.path.join(new_disk, new_project)):
+        return jsonify(success=False, message=f"Project directory not found: {os.path.join(new_disk, new_project)}"), 400
+
+    run_config_path = f"{BASE_DIR}/run_config.py"
+    with open(run_config_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    # Replace only the specific module-level constant lines — abort if not exactly 1 match each
+    updated, n_disk = re.subn(
+        r"^BASE_DISK\s*=\s*'[^']*'",
+        f"BASE_DISK     = '{new_disk}'",
+        content, flags=re.MULTILINE
+    )
+    if n_disk != 1:
+        return jsonify(success=False, message=f"Expected 1 BASE_DISK line, found {n_disk}"), 500
+
+    updated, n_proj = re.subn(
+        r"^PROJECT\s*=\s*'[^']*'",
+        f"PROJECT       = '{new_project}'",
+        updated, flags=re.MULTILINE
+    )
+    if n_proj != 1:
+        return jsonify(success=False, message=f"Expected 1 PROJECT line, found {n_proj}"), 500
+
+    # Atomic write
+    dir_ = os.path.dirname(run_config_path)
+    with tempfile.NamedTemporaryFile("w", dir=dir_, delete=False, suffix=".tmp", encoding="utf-8") as tmp:
+        tmp.write(updated)
+        tmp_path = tmp.name
+    os.replace(tmp_path, run_config_path)
+
+    # Keep the watcher configs in sync with the new project. processor_config.py
+    # and qa_config.py derive runs_dir from run_config's BASE_DATA_DIR, so just
+    # re-running them regenerates the JSONs for the new project. A watcher that is
+    # already running keeps its old config until restarted, so flag that rather
+    # than killing it (a running processor could be mid-decode).
+    regen_warnings = []
+    for cfg_py in ("processor_config.py", "qa_config.py"):
+        r = subprocess.run(["python", f"{BASE_DIR}/{cfg_py}"],
+                           capture_output=True, text=True)
+        if r.returncode != 0:
+            regen_warnings.append(f"{cfg_py} regen failed: {r.stderr.strip()}")
+
+    running = [s for s in (PROCESSOR_SESSION, QA_TMUX)
+               if subprocess.run(["tmux", "has-session", "-t", s],
+                                 stderr=subprocess.DEVNULL).returncode == 0]
+
+    log_event("SET_PROJECT", "flask", base_disk=new_disk, project=new_project)
+
+    msg = f"Project set to {new_disk}{new_project}"
+    if running:
+        msg += f" - restart to apply new project: {', '.join(running)}"
+    if regen_warnings:
+        msg += " - WARNING: " + "; ".join(regen_warnings)
+    return jsonify(success=True, message=msg)
 
 
 @app.route("/git_reset", methods=["POST"])
@@ -351,7 +524,7 @@ def list_pngs():
     if not os.path.isdir(directory):
         return jsonify(success=False, message=f"Invalid directory: {directory}")
 
-    pngs = [f for f in os.listdir(directory) if f.lower().endswith(".png")]
+    pngs = sorted(f for f in os.listdir(directory) if f.lower().endswith(".png"))
     if not pngs:
         return jsonify(success=True, images=[])
 
@@ -369,6 +542,49 @@ def serve_png():
     if not os.path.isfile(os.path.join(directory, filename)):
         abort(404, "File not found")
     return send_from_directory(directory, filename)
+
+
+@app.route("/browse_analysis")
+def browse_analysis():
+    rel_path = request.args.get("path", "").strip("/")
+    target = os.path.normpath(os.path.join(GENERAL_ANALYSIS_DIR, rel_path)) if rel_path \
+             else os.path.normpath(GENERAL_ANALYSIS_DIR)
+
+    if not target.startswith(os.path.abspath(GENERAL_ANALYSIS_DIR)):
+        return jsonify(success=False, message="Invalid path"), 403
+    if not os.path.isdir(target):
+        return jsonify(success=False, message=f"Directory not found: {target}")
+
+    subdirs = sorted(d for d in os.listdir(target)
+                     if os.path.isdir(os.path.join(target, d)))
+    images  = [f"/serve_png?dir={quote(target, safe='')}&file={quote(f, safe='')}"
+               for f in sorted(os.listdir(target))
+               if f.lower().endswith(".png")]
+
+    return jsonify(success=True, subdirs=subdirs, images=images, path=rel_path)
+
+
+@app.route("/system_stats")
+def system_stats():
+    try:
+        import psutil
+        cpu_pcts = psutil.cpu_percent(percpu=True)
+        mem = psutil.virtual_memory()
+        swap = psutil.swap_memory()
+        disk = psutil.disk_usage('/')
+        load = os.getloadavg()
+        return jsonify({
+            "success": True,
+            "cpu_cores": cpu_pcts,
+            "memory": {"total": mem.total, "used": mem.used, "percent": mem.percent},
+            "swap":   {"total": swap.total, "used": swap.used, "percent": swap.percent},
+            "disk":   {"total": disk.total, "used": disk.used, "percent": disk.percent},
+            "load_avg": list(load),
+        })
+    except ImportError:
+        return jsonify({"success": False, "message": "psutil not installed"})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)})
 
 
 @app.route("/get_config_py", methods=['GET'])
@@ -407,11 +623,23 @@ def get_run_events():
         output = result.stdout.strip()
         config_data = json.loads(output)
         run_name = config_data.get("run_name", "Unknown")
-        run_number = int(run_name.replace("run_", ""))
         total_events, subrun_details = get_total_events_for_run(
             run_dir=RUN_DIR,
-            run_number=run_number
+            run_name=run_name
         )
+
+        # Add the in-progress subrun's live event count (from the cache that
+        # get_dream_daq_status() keeps updated via /status polling) on top of
+        # the completed-subrun total. The live subrun's logs aren't copied into
+        # raw_daq_data until it finishes, so get_total_events_for_run never
+        # includes it -- no double counting.
+        live_count = get_live_dream_daq_event_count()
+        if live_count is not None:
+            ctrl_fields = {f["label"]: f["value"] for f in get_daq_control_status().get("fields", [])}
+            if ctrl_fields.get("Run") == run_name:
+                subrun_details[ctrl_fields.get("Subrun", "current")] = live_count
+                total_events += live_count
+
         return jsonify({
             "success": True,
             "total_events": total_events,
