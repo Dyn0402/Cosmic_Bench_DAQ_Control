@@ -72,6 +72,8 @@ CONFIG = {
     'pedestal_loc': 'same',
     'pedestal_dir': None,
 
+    # WARNING: ROOT 6.30.02 is deliberate here. Do NOT bump to 6.40.x with the rest of the setup;
+    # the DAQ machines need the old ROOT (see docs/ROOT_VERSION.md).
     # Shell commands to set up the C++ environment (ROOT + devtoolset) for decode/analyze/combine.
     # Run in a login bash shell at watcher startup; the captured env dict is passed to all
     # C++ subprocess calls.  M3 tracking always runs in the default process env (no ROOT sourced).

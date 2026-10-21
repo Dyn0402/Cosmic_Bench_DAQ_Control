@@ -4,6 +4,10 @@ Control software for the high-voltage (HV) crate and DREAM DAQ system at the cos
 
 The system orchestrates multi-detector data acquisition runs: it ramps HV channels on a CAEN crate, starts and stops the DREAM front-end DAQ, optionally runs M3 reference tracking, drives on-the-fly data processing (FDF decode → ROOT conversion → hit analysis), and produces online QA plots as data arrives.
 
+> **ROOT 6.30.02 is deliberate.** The DAQ/processing machines must stay on the old ROOT
+> (`~/root_6_30_02`, devtoolset-9) even though the rest of the setup moved to ROOT 6.40.04.
+> Do not update it to match. See [docs/ROOT_VERSION.md](docs/ROOT_VERSION.md).
+
 ---
 
 ## Architecture

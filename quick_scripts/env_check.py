@@ -31,6 +31,7 @@ DECODE_EXE      = f'{MM_BUILD}/decoder/decode'
 M3_TRACKING_DIR = '/local/home/usernsw/cosmic_bench_m3_tracking/'
 TRACKING_SH     = f'{M3_TRACKING_DIR}run_tracking_single.sh'
 
+# NOTE: ROOT 6.30.02 is deliberate, do not bump to 6.40 (docs/ROOT_VERSION.md).
 CPP_SETUP = (
     'source ~/root_6_30_02/root-build/bin/thisroot.sh && '
     'source scl_source enable devtoolset-9'
